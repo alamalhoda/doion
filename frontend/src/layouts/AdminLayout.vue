@@ -10,12 +10,13 @@
       </div>
     </header>
     <main class="admin-main">
-      <slot />
+      <RouterView />
     </main>
   </div>
 </template>
 
 <script setup lang="ts">
+import { RouterView } from 'vue-router'
 import { useRouter } from 'vue-router'
 import { useAuthStore } from '@/features/auth/stores/authStore'
 import { ROUTES } from '@/constants/routes'
