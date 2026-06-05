@@ -22,7 +22,6 @@ npm-debug.log*
 *.swp
 *.swo
 *~
-.DS_Store
 
 # Environment
 .env
@@ -37,3 +36,14 @@ npm-debug.log*
 # Testing
 coverage/
 .nyc_output/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# TypeScript
+*.tsbuildinfo
+
+# PWA
+public/sw.js
+public/workbox-*.js

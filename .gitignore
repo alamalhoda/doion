@@ -22,7 +22,6 @@ npm-debug.log*
 *.swp
 *.swo
 *~
-.DS_Store
 
 # Environment
 .env
@@ -38,8 +37,10 @@ npm-debug.log*
 coverage/
 .nyc_output/
 
-#
-*/.DS_Store
-.kilo/.DS_Store
+# OS
 .DS_Store
+Thumbs.db
 
+# Project specific
+.kilo/
+*.local
