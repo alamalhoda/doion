@@ -1,0 +1,39 @@
+# Dependencies
+node_modules/
+package-lock.json
+yarn.lock
+pnpm-lock.yaml
+
+# Build outputs
+dist/
+build/
+
+# Dev server
+.vite/
+
+# Logs
+*.log
+logs/
+npm-debug.log*
+
+# Editor settings
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+
+# Environment
+.env
+.env.local
+.env.*.local
+
+# Caches
+.cache/
+.eslintcache
+.stylelintcache
+
+# Testing
+coverage/
+.nyc_output/
