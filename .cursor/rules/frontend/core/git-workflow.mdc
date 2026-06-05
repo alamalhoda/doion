@@ -1,0 +1,70 @@
+---
+description: Frontend git workflow notes aligned with share/gitflow-unified
+globs:
+  - "frontend/**/*"
+alwaysApply: false
+---
+
+# Git Workflow Rules
+
+## Source of Truth
+
+- مرجع اصلی و الزامی Git Flow در پروژه:
+  - `.cursor/rules/share/gitflow-branch-policy.mdc`
+- اگر اختلافی وجود داشت، همیشه `gitflow-branch-policy.mdc` اولویت دارد.
+
+## استراتژی شاخه‌بندی برای توسعه UI
+
+- ایجاد شاخه ویژگی جدید: `feature/ui-component-name`
+- ایجاد شاخه برای رفع باگ: `bugfix/ui-bug-description`
+- برای بهبود عملکرد و refactor نیز از `feature/*` استفاده کن
+- ایجاد شاخه برای نسخه جدید: `release/v1.0.0`
+- ایجاد شاخه برای رفع فوری: `hotfix/ui-critical-fix`
+
+## قراردادهای commit message برای تغییرات UI
+
+### افزودن ویژگی جدید
+```
+feat(ui): add user profile component
+```
+
+### رفع باگ
+```
+fix(ui): resolve modal focus trap issue
+```
+
+### بازبینی کد
+```
+refactor(ui): simplify button component structure
+```
+
+### بهبود عملکرد
+```
+perf(ui): optimize image lazy loading
+```
+
+### تغییرات استایل
+```
+style(ui): update button hover states
+```
+
+### مستندات
+```
+docs(ui): add component usage examples
+```
+
+### تست
+```
+test(ui): add unit tests for form validation
+```
+
+### ساختار پروژه
+```
+chore(ui): reorganize component directory structure
+```
+
+## مدیریت تغییرات breaking در کامپوننت‌ها
+
+- تغییرات breaking باید در CHANGELOG.md مستند شوند
+- از semantic versioning استفاده کن
+- تغییرات breaking باید در commit message با `BREAKING CHANGE:` مشخص شوند

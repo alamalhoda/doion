@@ -1,0 +1,34 @@
+{
+  "app_name": "Doion",
+  "layout": {
+    "header": "Home",
+    "nav": {
+      "admin": "Admin",
+      "user": "User"
+    }
+  },
+  "auth": {
+    "login": "Login",
+    "username": "Username",
+    "password": "Password",
+    "submit": "Sign In",
+    "logout": "Logout",
+    "loading": "Loading..."
+  },
+  "dashboard": {
+    "admin_title": "Admin Dashboard",
+    "user_title": "User Dashboard",
+    "welcome": "Welcome"
+  },
+  "error": {
+    "unknown": "An unknown error occurred",
+    "validation_error": "Invalid input data",
+    "unauthenticated": "You need to sign in",
+    "forbidden": "Access denied",
+    "network_error": "Network error occurred"
+  },
+  "language": {
+    "fa": "فارسی",
+    "en": "English"
+  }
+}

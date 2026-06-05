@@ -1,0 +1,34 @@
+{
+  "app_name": "دیون",
+  "layout": {
+    "header": "صفحه اول",
+    "nav": {
+      "admin": "مدیریت",
+      "user": "کاربر"
+    }
+  },
+  "auth": {
+    "login": "ورود",
+    "username": "نام کاربری",
+    "password": "رمز عبور",
+    "submit": "ورود",
+    "logout": "خروج",
+    "loading": "در حال پردازش..."
+  },
+  "dashboard": {
+    "admin_title": "داشبورد مدیریت",
+    "user_title": "داشبورد کاربر",
+    "welcome": "خوش آمدید"
+  },
+  "error": {
+    "unknown": "خطای نامشخص رخ داده است",
+    "validation_error": "داده‌های ورودی نامعتبر است",
+    "unauthenticated": "شما نیاز به ورود دارید",
+    "forbidden": "شما دسترسی ندارید",
+    "network_error": "خطای شبکه رخ داده است"
+  },
+  "language": {
+    "fa": "فارسی",
+    "en": "English"
+  }
+}

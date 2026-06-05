@@ -1,0 +1,44 @@
+---
+description: "[ARCHIVED] Svelte best practices — پروژه frontend قدیمی؛ مرجع فقط"
+globs:
+  - "frontend/src/**/*.svelte"
+alwaysApply: false
+---
+
+# Svelte Best Practices (آرشیو — مرجع)
+
+> این قانون برای پروژه قدیمی frontend (Svelte) است. پروژه واسط کاربری فعلی frontend (Vue 3) است. برای قوانین Vue از `tools/vue.mdc` و `state/pinia.mdc` استفاده کن.
+
+## Reactivity System
+
+### Reactive Declarations (`$:`)
+
+✅ **Good:**
+```svelte
+$: doubled = count * 2;
+$: fullName = `${firstName} ${lastName}`;
+```
+
+**قوانین:**
+- از `$:` برای derived state استفاده کن
+- از reactive statements به صورت بهینه استفاده کن
+
+### Store Subscriptions
+
+✅ **Good:** Auto-subscription با `$`
+```svelte
+<p>{$user.name}</p>
+```
+
+## Component Structure
+
+**ترتیب استاندارد:** Imports → Props (export let) → State → Reactive ($:) → Lifecycle → Handlers → Helpers
+
+## Props & Events
+
+- از `export let` برای props استفاده کن
+- از `createEventDispatcher` برای custom events استفاده کن
+
+## Stores
+
+- از Svelte stores (writable, derived) برای global state استفاده کن

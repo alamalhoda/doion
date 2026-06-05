@@ -1,0 +1,55 @@
+{
+  "name": "doion-frontend",
+  "version": "0.1.0",
+  "type": "module",
+  "description": "Doion Frontend - Vue 3 + Vite + TypeScript",
+  "author": "Doion Team",
+  "license": "MIT",
+  "scripts": {
+    "dev": "vite",
+    "build": "vue-tsc -p tsconfig.app.json --noEmit && vite build",
+    "type-check": "vue-tsc -p tsconfig.app.json --noEmit",
+    "preview": "vite preview",
+    "test": "vitest",
+    "test:ui": "vitest --ui",
+    "test:coverage": "vitest --coverage",
+    "lint": "eslint . --fix --ignore-path .gitignore",
+    "format": "prettier --write ."
+  },
+  "dependencies": {
+    "axios": "^1.6.2",
+    "dayjs": "^1.11.11",
+    "naive-ui": "^2.40.1",
+    "pinia": "^2.1.7",
+    "vue": "^3.3.8",
+    "vue-i18n": "^9.13.1",
+    "vue-router": "^4.2.5",
+    "vee-validate": "^4.12.0",
+    "@vee-validate/zod": "^4.12.0",
+    "zod": "^3.22.4",
+    "@vueuse/core": "^10.7.2"
+  },
+  "devDependencies": {
+    "@types/node": "^20.10.5",
+    "@vitejs/plugin-vue": "^5.0.4",
+    "@vue/test-utils": "^2.4.3",
+    "@vueuse/core": "^10.7.2",
+    "eslint": "^8.56.0",
+    "eslint-plugin-vue": "^9.20.0",
+    "@typescript-eslint/eslint-plugin": "^6.15.0",
+    "@typescript-eslint/parser": "^6.15.0",
+    "prettier": "^3.1.1",
+    "typescript": "^5.3.3",
+    "vite": "^5.0.7",
+    "vite-plugin-pwa": "^0.17.4",
+    "vue-tsc": "^1.8.22",
+    "vitest": "^1.1.0",
+    "@vitest/ui": "^1.1.0",
+    "@vitest/coverage-v8": "^1.1.0",
+    "jsdom": "^23.0.1"
+  },
+  "engines": {
+    "node": ">=18.0.0",
+    "npm": ">=9.0.0"
+  }
+}
