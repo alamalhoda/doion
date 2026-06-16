@@ -6,5 +6,6 @@
         "${workspaceFolder}/backend"
     ],
     "python.envFile": "${workspaceFolder}/backend/.env",
-    "django.settingsModule": "config.settings.local"
+    "django.settingsModule": "config.settings.local",
+    "specstory.cloudSync.enabled": "never"
 }
