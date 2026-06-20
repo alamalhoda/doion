@@ -1,80 +1,64 @@
 <template>
   <div class="user-layout">
-    <header class="user-header">
-      <div class="header-content">
-        <h1>{{ $t('layout.header') }}</h1>
-        <div class="header-actions">
-          <LanguageSwitcher />
-          <button @click="logout">{{ $t('auth.logout') }}</button>
+    <!-- Top Navigation (User) -->
+    <nav class="navbar navbar--user">
+      <div class="navbar-inner">
+        <RouterLink to="/app" class="navbar-brand">
+          <span class="navbar-brand-text">چک‌بازار</span>
+        </RouterLink>
+
+        <div class="navbar-links">
+          <RouterLink to="/app" class="navbar-link" active-class="active">داشبورد</RouterLink>
+          <RouterLink to="/app/listings" class="navbar-link" active-class="active">آگهی‌های من</RouterLink>
+        </div>
+
+        <div class="navbar-actions">
+          <button class="btn-ghost" @click="handleLogout">
+            خروج
+          </button>
         </div>
       </div>
-    </header>
+    </nav>
+
+    <!-- Main Content -->
     <main class="user-main">
-      <RouterView />
+      <slot />
     </main>
   </div>
 </template>
 
 <script setup lang="ts">
-import { RouterView } from 'vue-router'
 import { useRouter } from 'vue-router'
 import { useAuthStore } from '@/features/auth/stores/authStore'
-import { ROUTES } from '@/constants/routes'
-import LanguageSwitcher from '@/components/common/LanguageSwitcher.vue'
 
-const router = useRouter()
 const authStore = useAuthStore()
+const router = useRouter()
 
-function logout() {
-  authStore.logout()
-  router.push(ROUTES.LOGIN)
+const handleLogout = async () => {
+  await authStore.logout()
+  router.push('/login')
 }
 </script>
 
-<style scoped>
+<style>
 .user-layout {
-  width: 100%;
-  height: 100vh;
+  min-height: 100vh;
   display: flex;
   flex-direction: column;
-}
-
-.user-header {
-  background: var(--color-bg-secondary);
-  border-bottom: 1px solid var(--color-border);
-  padding: var(--spacing-lg);
-}
-
-.header-content {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
-
-.header-content h1 {
-  font-size: var(--font-size-lg);
-  color: var(--color-text-primary);
-}
-
-.header-actions {
-  display: flex;
-  gap: var(--spacing-md);
-  align-items: center;
+  background: var(--bg);
 }
 
 .user-main {
   flex: 1;
-  overflow-y: auto;
-  padding: var(--spacing-lg);
+  padding: 2rem 1rem;
+  max-width: 1100px;
+  width: 100%;
+  margin: 0 auto;
 }
 
 @media (max-width: 768px) {
-  .user-header {
-    padding: var(--spacing-md);
-  }
-
   .user-main {
-    padding: var(--spacing-md);
+    padding: 1rem 0.75rem;
   }
 }
 </style>

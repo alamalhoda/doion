@@ -1,16 +1,35 @@
 <template>
-  <div id="app">
-    <RouterView />
+  <div class="framework-root">
+    <AppNavbar />
+    <main class="main-content">
+      <RouterView />
+    </main>
   </div>
 </template>
 
 <script setup lang="ts">
-import { RouterView } from 'vue-router'
+import AppNavbar from '@/components/AppNavbar.vue'
 </script>
 
 <style>
-#app {
+.framework-root {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  background: var(--bg, #f8f9fa);
+}
+
+.main-content {
+  flex: 1;
+  max-width: 1200px;
   width: 100%;
-  height: 100%;
+  margin: 0 auto;
+  padding: 2rem 1.5rem;
+}
+
+@media (max-width: 768px) {
+  .main-content {
+    padding: 1rem;
+  }
 }
 </style>

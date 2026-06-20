@@ -4,15 +4,17 @@
       {{ label }}
       <span v-if="required" class="required">*</span>
     </label>
-    <input
+    <component
+      :is="inputComponent"
       :id="id"
       :type="type"
       :value="modelValue"
       :placeholder="placeholder"
       :disabled="disabled"
+      :rows="rows"
       class="form-input"
       :class="{ 'has-error': error }"
-      @input="$emit('update:modelValue', ($event.target as HTMLInputElement).value)"
+      @input="handleInput"
     />
     <p v-if="error" class="error-message">{{ error }}</p>
   </div>
@@ -30,19 +32,28 @@ interface Props {
   error?: string
   disabled?: boolean
   required?: boolean
+  rows?: number
 }
 
 const props = withDefaults(defineProps<Props>(), {
   type: 'text',
   disabled: false,
   required: false,
+  rows: 3,
 })
 
 const id = computed(() => props.id || `input-${Math.random().toString(36).substr(2, 9)}`)
 
+const inputComponent = computed(() => props.type === 'textarea' ? 'textarea' : 'input')
+
 defineEmits<{
   'update:modelValue': [value: string]
 }>()
+
+function handleInput(event: Event): void {
+  const target = event.target as HTMLInputElement | HTMLTextAreaElement
+  emit('update:modelValue', target.value)
+}
 </script>
 
 <style scoped>
@@ -73,6 +84,7 @@ defineEmits<{
   color: var(--color-text-primary);
   font-size: var(--font-size-sm);
   transition: border-color 0.2s;
+  font-family: inherit;
 }
 
 .form-input:focus {

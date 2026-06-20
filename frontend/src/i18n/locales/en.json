@@ -4,7 +4,13 @@
     "header": "Home",
     "nav": {
       "admin": "Admin",
-      "user": "User"
+      "user": "User",
+      "dashboard": "Dashboard",
+      "workflow_prototype": "Workflow Prototype",
+      "my_listings": "My Listings",
+      "marketplace": "Marketplace",
+      "my_matches": "My Matches",
+      "notifications": "Notifications"
     }
   },
   "auth": {

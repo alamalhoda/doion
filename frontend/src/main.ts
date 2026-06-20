@@ -8,7 +8,10 @@ import { setupDayjs } from './utils/date'
 import { setupInterceptors } from './api/interceptors'
 import { useAuthStore } from './features/auth/stores/authStore'
 
-// Styles
+// Styles — import order: tokens → theme → rtl → global
+import './styles/tokens.css'
+import './styles/themes/light.css'
+import './styles/rtl.css'
 import './styles/global.css'
 
 const app = createApp(App)
@@ -29,6 +32,6 @@ const authStore = useAuthStore()
 setupInterceptors(authStore)
 
 // Restore auth state before mount
-await authStore.restoreAuth()
-
-app.mount('#app')
+void authStore.restoreAuth().then(() => {
+  app.mount('#app')
+})

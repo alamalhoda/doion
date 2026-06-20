@@ -1,8 +1,4 @@
-/* Light Theme */
+/* light.css is now the default in tokens.css — kept for explicit [data-theme='light'] */
 [data-theme='light'] {
-  --color-bg-primary: var(--color-white);
-  --color-bg-secondary: var(--color-gray-50);
-  --color-text-primary: var(--color-gray-900);
-  --color-text-secondary: var(--color-gray-600);
-  --color-border: var(--color-gray-200);
+  /* All light theme tokens are defined in tokens.css :root */
 }

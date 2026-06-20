@@ -1,75 +1,58 @@
 <template>
   <div class="admin-layout">
-    <header class="admin-header">
-      <div class="header-content">
-        <h1>{{ $t('layout.header') }}</h1>
-        <div class="header-actions">
-          <LanguageSwitcher />
-          <button @click="logout">{{ $t('auth.logout') }}</button>
+    <!-- Top Navigation (Admin) -->
+    <nav class="navbar navbar--admin">
+      <div class="navbar-inner">
+        <RouterLink to="/admin" class="navbar-brand">
+          <span class="navbar-brand-text">چک‌بازار</span>
+        </RouterLink>
+
+        <div class="navbar-links">
+          <RouterLink to="/admin" class="navbar-link" active-class="active">داشبورد</RouterLink>
+          <RouterLink to="/admin/management" class="navbar-link" active-class="active">مدیریت</RouterLink>
+        </div>
+
+        <div class="navbar-actions">
+          <button class="btn-ghost" @click="handleLogout">
+            خروج
+          </button>
         </div>
       </div>
-    </header>
+    </nav>
+
+    <!-- Main Content -->
     <main class="admin-main">
-      <RouterView />
+      <slot />
     </main>
   </div>
 </template>
 
 <script setup lang="ts">
-import { RouterView } from 'vue-router'
 import { useRouter } from 'vue-router'
 import { useAuthStore } from '@/features/auth/stores/authStore'
-import { ROUTES } from '@/constants/routes'
-import LanguageSwitcher from '@/components/common/LanguageSwitcher.vue'
 
-const router = useRouter()
 const authStore = useAuthStore()
+const router = useRouter()
 
-function logout() {
-  authStore.logout()
-  router.push(ROUTES.LOGIN)
+const handleLogout = async () => {
+  await authStore.logout()
+  router.push('/login')
 }
 </script>
 
-<style scoped>
+<style>
 .admin-layout {
-  width: 100%;
-  height: 100vh;
+  min-height: 100vh;
   display: flex;
   flex-direction: column;
-}
-
-.admin-header {
-  background: var(--color-bg-secondary);
-  border-bottom: 1px solid var(--color-border);
-  padding: var(--spacing-lg);
-}
-
-.header-content {
-  max-width: 1200px;
-  margin: 0 auto;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
-
-.header-content h1 {
-  font-size: var(--font-size-xl);
-  color: var(--color-text-primary);
-}
-
-.header-actions {
-  display: flex;
-  gap: var(--spacing-md);
-  align-items: center;
+  background: var(--bg);
 }
 
 .admin-main {
   flex: 1;
-  overflow-y: auto;
-  padding: var(--spacing-xl);
-  max-width: 1200px;
-  margin: 0 auto;
+  padding: 2rem;
+  max-width: 1100px;
   width: 100%;
+  margin: 0 auto;
 }
 </style>

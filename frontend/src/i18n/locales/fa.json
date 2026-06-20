@@ -4,7 +4,13 @@
     "header": "صفحه اول",
     "nav": {
       "admin": "مدیریت",
-      "user": "کاربر"
+      "user": "کاربر",
+      "dashboard": "داشبورد",
+      "workflow_prototype": "نمونه جریان",
+      "my_listings": "آگهی‌های من",
+      "marketplace": "بازارچه",
+      "my_matches": "تطبیق‌ها",
+      "notifications": "اعلان‌ها"
     }
   },
   "auth": {

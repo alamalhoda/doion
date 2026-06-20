@@ -1,0 +1,105 @@
+// Match Pinia store
+import { defineStore } from 'pinia'
+import { ref, computed } from 'vue'
+import { MatchService } from '../services/matchService'
+import type { Match, CreateMatchRequest, UpdateMatchStatusRequest } from '../types/match'
+
+export const useMatchStore = defineStore('match', () => {
+  const matches = ref<Match[]>([])
+  const currentMatch = ref<Match | null>(null)
+  const isLoading = ref(false)
+  const error = ref<string | null>(null)
+
+  const pendingMatches = computed(() => 
+    matches.value.filter(m => m.status === 'pending')
+  )
+
+  const acceptedMatches = computed(() => 
+    matches.value.filter(m => m.status === 'accepted')
+  )
+
+  const rejectedMatches = computed(() => 
+    matches.value.filter(m => m.status === 'rejected' || m.status === 'settled_off_platform')
+  )
+
+  async function createMatch(data: CreateMatchRequest): Promise<Match> {
+    isLoading.value = true
+    error.value = null
+
+    try {
+      const match = await MatchService.createMatch(data)
+      matches.value.unshift(match)
+      return match
+    } catch (err: any) {
+      error.value = err.message || 'error.unknown'
+      throw err
+    } finally {
+      isLoading.value = false
+    }
+  }
+
+  async function fetchMyMatches(): Promise<void> {
+    isLoading.value = true
+    error.value = null
+
+    try {
+      const data = await MatchService.getMyMatches()
+      matches.value = data
+    } catch (err: any) {
+      error.value = err.message || 'error.unknown'
+    } finally {
+      isLoading.value = false
+    }
+  }
+
+  async function updateMatchStatus(id: string, data: UpdateMatchStatusRequest): Promise<void> {
+    isLoading.value = true
+    error.value = null
+
+    try {
+      const updated = await MatchService.updateMatchStatus(id, data)
+      const index = matches.value.findIndex(m => m.id === id)
+      if (index !== -1) {
+        matches.value[index] = updated
+      }
+      if (currentMatch.value?.id === id) {
+        currentMatch.value = updated
+      }
+    } catch (err: any) {
+      error.value = err.message || 'error.unknown'
+      throw err
+    } finally {
+      isLoading.value = false
+    }
+  }
+
+  async function fetchMatch(id: string): Promise<Match> {
+    isLoading.value = true
+    error.value = null
+
+    try {
+      const match = await MatchService.getMatch(id)
+      currentMatch.value = match
+      return match
+    } catch (err: any) {
+      error.value = err.message || 'error.unknown'
+      throw err
+    } finally {
+      isLoading.value = false
+    }
+  }
+
+  return {
+    matches,
+    currentMatch,
+    isLoading,
+    error,
+    pendingMatches,
+    acceptedMatches,
+    rejectedMatches,
+    createMatch,
+    fetchMyMatches,
+    updateMatchStatus,
+    fetchMatch,
+  }
+})
