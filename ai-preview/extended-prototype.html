@@ -1,0 +1,877 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>چک‌بازار — پنل مدیریت و اعلان‌ها</title>
+<link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --navy:#0C2340;--navy-mid:#1A3D6B;--navy-light:#2A5FA8;
+  --gold:#C9960A;--gold-light:#EAC84A;--gold-pale:#FDF5DC;
+  --teal:#0D7A72;--teal-light:#E6F4F3;
+  --red:#C0392B;--red-light:#FDECEA;
+  --orange:#D4730A;--orange-light:#FEF3E6;
+  --bg:#F5F4F0;--surface:#FFFFFF;--surface2:#F8F7F3;
+  --border:#E0DDD5;--border2:#C8C4BA;
+  --text1:#1A1613;--text2:#4A4540;--text3:#7A7570;
+  --radius-sm:6px;--radius:10px;--radius-lg:14px;
+  --shadow:0 1px 3px rgba(12,35,64,.08),0 4px 12px rgba(12,35,64,.05);
+  --shadow-lg:0 4px 16px rgba(12,35,64,.12),0 12px 40px rgba(12,35,64,.08);
+}
+body{font-family:'Vazirmatn',sans-serif;background:var(--bg);color:var(--text1);font-size:15px;line-height:1.7;min-height:100vh}
+a{color:inherit;text-decoration:none}
+button{font-family:inherit;cursor:pointer;border:none;outline:none}
+input,select,textarea{font-family:inherit;font-size:inherit}
+
+/* NAV */
+.nav{background:var(--navy);padding:0 2rem;display:flex;align-items:center;justify-content:space-between;height:60px;position:sticky;top:0;z-index:100}
+.nav-logo{display:flex;align-items:center;gap:.5rem;color:#fff;font-size:1.1rem;font-weight:700}
+.nav-logo-badge{font-size:.65rem;background:var(--gold);color:#1A1200;padding:.1rem .5rem;border-radius:var(--radius-sm);font-weight:700;margin-right:.4rem}
+.nav-links{display:flex;gap:1.25rem;align-items:center}
+.nav-links a{color:rgba(255,255,255,.7);font-size:.85rem;transition:color .2s;padding:.3rem .5rem;border-radius:var(--radius-sm)}
+.nav-links a:hover,.nav-links a.active{color:#fff;background:rgba(255,255,255,.08)}
+.nav-right{display:flex;gap:.75rem;align-items:center}
+.nav-notif-btn{position:relative;background:rgba(255,255,255,.1);border:none;color:#fff;width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;cursor:pointer;transition:background .2s}
+.nav-notif-btn:hover{background:rgba(255,255,255,.18)}
+.nav-notif-badge{position:absolute;top:4px;right:4px;width:8px;height:8px;background:var(--gold);border-radius:50%;border:1.5px solid var(--navy)}
+.nav-admin-indicator{font-size:.7rem;color:var(--gold-light);border:1px solid rgba(201,150,10,.4);padding:.2rem .6rem;border-radius:var(--radius-sm)}
+
+/* PAGE */
+.page{display:none}
+.page.active{display:block}
+.page-header{background:var(--navy);padding:1.5rem 2rem}
+.page-header-inner{max-width:1100px;margin:0 auto}
+.page-header h2{color:#fff;font-size:1.25rem;font-weight:700;margin-bottom:.25rem}
+.page-header p{color:rgba(255,255,255,.6);font-size:.875rem}
+
+/* WRAP */
+.wrap{max-width:1100px;margin:0 auto;padding:2rem}
+
+/* TABS */
+.tabs{display:flex;gap:.25rem;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:.3rem;margin-bottom:1.5rem;width:fit-content}
+.tab{padding:.4rem 1rem;border-radius:var(--radius-sm);font-size:.85rem;font-weight:500;color:var(--text3);background:transparent;border:none;cursor:pointer;transition:all .2s;white-space:nowrap}
+.tab.active{background:var(--navy);color:#fff}
+.tab-count{display:inline-flex;align-items:center;justify-content:center;width:18px;height:18px;background:var(--gold);color:#1A1200;border-radius:50%;font-size:.65rem;font-weight:700;margin-right:.35rem}
+
+/* STATS ROW */
+.stats-row{display:grid;grid-template-columns:repeat(4,1fr);gap:1rem;margin-bottom:1.75rem}
+.stat-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:1rem 1.25rem;display:flex;align-items:center;gap:.85rem}
+.stat-icon{width:40px;height:40px;border-radius:var(--radius-sm);display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.stat-icon svg{width:20px;height:20px}
+.stat-val{font-size:1.5rem;font-weight:700;color:var(--navy);line-height:1.1}
+.stat-lbl{font-size:.72rem;color:var(--text3);margin-top:.1rem}
+
+/* TABLE */
+.data-table{width:100%;border-collapse:collapse;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-lg);overflow:hidden}
+.data-table th{background:var(--surface2);padding:.65rem 1rem;font-size:.75rem;font-weight:600;color:var(--text3);text-align:right;border-bottom:1px solid var(--border);letter-spacing:.03em}
+.data-table td{padding:.75rem 1rem;font-size:.85rem;border-bottom:1px solid var(--border);color:var(--text2);vertical-align:middle}
+.data-table tr:last-child td{border-bottom:none}
+.data-table tr:hover td{background:var(--surface2)}
+.data-table .amount{font-weight:600;color:var(--navy);font-size:.9rem}
+.data-table .mono{font-size:.78rem;font-family:monospace;letter-spacing:.03em;color:var(--text3)}
+
+/* BADGES */
+.badge{display:inline-flex;align-items:center;gap:.3rem;font-size:.7rem;font-weight:600;padding:.2rem .65rem;border-radius:var(--radius-sm)}
+.badge-low{background:#0D4F2A;color:#7FFAB0}
+.badge-mid{background:#5C3700;color:#FFBE68}
+.badge-high{background:#4D1500;color:#FFB0A0}
+.pill{display:inline-block;font-size:.72rem;font-weight:600;padding:.2rem .65rem;border-radius:100px}
+.pill-pending{background:#FEF3E6;color:#7A4000}
+.pill-published{background:#E6F4F3;color:#0A4E49}
+.pill-matched{background:#EEF0FE;color:#3D34A0}
+.pill-rejected{background:#FDECEA;color:#7A1A1A}
+.pill-approved{background:#E6F4F3;color:#0A4E49}
+.pill-kyc-pending{background:#EEF0FE;color:#3D34A0}
+
+/* ACTION BUTTONS */
+.btn-approve{background:var(--teal);color:#fff;padding:.35rem .9rem;border-radius:var(--radius-sm);font-size:.8rem;font-weight:600;transition:all .2s;border:none;cursor:pointer}
+.btn-approve:hover{background:#0A6560}
+.btn-reject{background:transparent;border:1px solid var(--red);color:var(--red);padding:.35rem .9rem;border-radius:var(--radius-sm);font-size:.8rem;font-weight:600;transition:all .2s;cursor:pointer}
+.btn-reject:hover{background:var(--red-light)}
+.btn-view{background:transparent;border:1px solid var(--border);color:var(--text2);padding:.3rem .75rem;border-radius:var(--radius-sm);font-size:.78rem;transition:all .2s;cursor:pointer}
+.btn-view:hover{border-color:var(--border2);background:var(--surface2)}
+.btn-primary{background:var(--navy);color:#fff;padding:.55rem 1.5rem;border-radius:var(--radius-sm);font-size:.875rem;font-weight:600;transition:background .2s;border:none;cursor:pointer}
+.btn-primary:hover{background:var(--navy-mid)}
+.btn-ghost{background:transparent;border:1px solid var(--border);color:var(--text2);padding:.55rem 1.25rem;border-radius:var(--radius-sm);font-size:.875rem;transition:all .2s;cursor:pointer}
+.btn-ghost:hover{border-color:var(--border2)}
+
+/* SEARCH BAR */
+.search-bar{display:flex;gap:.75rem;align-items:center;margin-bottom:1.25rem;flex-wrap:wrap}
+.search-input{border:1px solid var(--border);border-radius:var(--radius-sm);padding:.5rem 1rem;font-size:.875rem;width:260px;transition:border-color .2s}
+.search-input:focus{outline:none;border-color:var(--navy-light)}
+.filter-select{border:1px solid var(--border);border-radius:var(--radius-sm);padding:.5rem .85rem;font-size:.85rem;color:var(--text2);background:var(--surface);cursor:pointer}
+
+/* MODAL OVERLAY */
+.modal-overlay{display:none;position:fixed;inset:0;background:rgba(12,35,64,.5);z-index:200;justify-content:center;align-items:center;padding:1rem}
+.modal-overlay.open{display:flex}
+.modal{background:var(--surface);border-radius:var(--radius-lg);width:100%;max-width:580px;max-height:90vh;overflow-y:auto;box-shadow:var(--shadow-lg)}
+.modal-header{background:var(--navy);padding:1rem 1.5rem;display:flex;align-items:center;justify-content:space-between;border-radius:var(--radius-lg) var(--radius-lg) 0 0}
+.modal-header h3{color:#fff;font-size:1rem;font-weight:600}
+.modal-close-btn{background:rgba(255,255,255,.15);border:none;color:#fff;width:28px;height:28px;border-radius:50%;cursor:pointer;font-size:1rem;display:flex;align-items:center;justify-content:center}
+.modal-body{padding:1.5rem}
+.modal-section-label{font-size:.75rem;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:.07em;margin-bottom:.65rem;padding-bottom:.4rem;border-bottom:1px solid var(--border)}
+.modal-field-grid{display:grid;grid-template-columns:1fr 1fr;gap:.75rem;margin-bottom:1.25rem}
+.modal-field label{font-size:.75rem;color:var(--text3);display:block;margin-bottom:.2rem}
+.modal-field span{font-size:.9rem;font-weight:500;color:var(--text1)}
+.doc-preview{display:flex;gap:.5rem;flex-wrap:wrap;margin-bottom:1.25rem}
+.doc-chip{background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius-sm);padding:.4rem .8rem;font-size:.78rem;color:var(--text2);display:inline-flex;align-items:center;gap:.4rem}
+.reject-form{background:var(--red-light);border:1px solid rgba(192,57,43,.2);border-radius:var(--radius);padding:1rem;margin-top:1rem}
+.reject-form label{font-size:.8rem;font-weight:500;color:var(--red);margin-bottom:.5rem;display:block}
+.reject-form select,.reject-form textarea{width:100%;border:1px solid rgba(192,57,43,.3);border-radius:var(--radius-sm);padding:.5rem .75rem;font-size:.85rem;margin-bottom:.75rem;background:var(--surface)}
+.reject-form textarea{resize:vertical;min-height:70px}
+.modal-actions{display:flex;gap:.75rem;justify-content:flex-end;padding-top:1rem;border-top:1px solid var(--border);margin-top:1rem}
+
+/* NOTIFICATION CENTER */
+.notif-layout{display:grid;grid-template-columns:220px 1fr;gap:1.5rem;align-items:start}
+.notif-sidebar{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-lg);padding:1rem;position:sticky;top:78px}
+.notif-sidebar-title{font-size:.75rem;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:.07em;margin-bottom:.85rem}
+.notif-filter-btn{width:100%;text-align:right;background:transparent;border:none;padding:.5rem .75rem;border-radius:var(--radius-sm);font-size:.85rem;color:var(--text2);cursor:pointer;display:flex;align-items:center;justify-content:space-between;transition:background .2s;margin-bottom:.15rem}
+.notif-filter-btn:hover,.notif-filter-btn.active{background:var(--surface2);color:var(--navy);font-weight:500}
+.notif-filter-count{font-size:.72rem;background:var(--navy);color:#fff;padding:.1rem .45rem;border-radius:100px;font-weight:600}
+.notif-filter-count.gold{background:var(--gold);color:#1A1200}
+.notif-main{}
+.notif-toolbar{display:flex;align-items:center;justify-content:space-between;margin-bottom:1rem}
+.notif-toolbar h3{font-size:1rem;font-weight:600;color:var(--navy)}
+.notif-group-label{font-size:.75rem;font-weight:600;color:var(--text3);padding:.5rem 0;margin:.5rem 0 .4rem;border-bottom:1px solid var(--border)}
+.notif-item{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:.9rem 1rem;margin-bottom:.5rem;display:flex;gap:.85rem;align-items:flex-start;cursor:pointer;transition:all .2s;position:relative}
+.notif-item:hover{border-color:var(--border2);box-shadow:var(--shadow)}
+.notif-item.unread{border-right:3px solid var(--navy)}
+.notif-item.unread::before{content:'';position:absolute;top:.85rem;left:1rem;width:7px;height:7px;background:var(--gold);border-radius:50%}
+.notif-type-icon{width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:.9rem}
+.notif-type-match{background:#EEF0FE}
+.notif-type-kyc{background:var(--teal-light)}
+.notif-type-listing{background:var(--gold-pale)}
+.notif-type-system{background:var(--surface2)}
+.notif-content{}
+.notif-title{font-size:.875rem;font-weight:500;color:var(--text1);margin-bottom:.15rem}
+.notif-body{font-size:.8rem;color:var(--text2);line-height:1.5;margin-bottom:.3rem}
+.notif-time{font-size:.72rem;color:var(--text3)}
+.notif-settings{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-lg);padding:1.25rem;margin-top:1rem}
+.notif-setting-row{display:flex;align-items:center;justify-content:space-between;padding:.65rem 0;border-bottom:1px solid var(--border)}
+.notif-setting-row:last-child{border-bottom:none}
+.notif-setting-label{font-size:.875rem;color:var(--text1)}
+.notif-setting-desc{font-size:.75rem;color:var(--text3)}
+.toggle{width:40px;height:22px;background:var(--border2);border-radius:100px;position:relative;cursor:pointer;transition:background .2s;flex-shrink:0}
+.toggle.on{background:var(--teal)}
+.toggle::after{content:'';position:absolute;width:16px;height:16px;background:#fff;border-radius:50%;top:3px;right:3px;transition:transform .2s}
+.toggle.on::after{transform:translateX(-18px)}
+
+/* EMPTY STATE */
+.empty-state{text-align:center;padding:3.5rem 1rem}
+.empty-icon{font-size:2.5rem;margin-bottom:1rem;opacity:.5}
+.empty-title{font-size:1rem;font-weight:600;color:var(--navy);margin-bottom:.4rem}
+.empty-desc{font-size:.875rem;color:var(--text3);max-width:280px;margin:0 auto 1.25rem}
+
+/* KYC CARD */
+.kyc-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-lg);padding:1.1rem 1.25rem;margin-bottom:.75rem;display:flex;gap:1rem;align-items:flex-start}
+.kyc-avatar{width:42px;height:42px;border-radius:50%;background:var(--navy);color:var(--gold-light);font-weight:700;font-size:.9rem;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.kyc-info{flex:1}
+.kyc-info h4{font-size:.9rem;font-weight:600;color:var(--navy)}
+.kyc-info p{font-size:.78rem;color:var(--text3);margin-top:.1rem}
+.kyc-docs-row{display:flex;gap:.5rem;margin-top:.6rem;flex-wrap:wrap}
+.kyc-actions{display:flex;gap:.5rem;align-items:center;flex-shrink:0}
+
+/* TOAST */
+.toast{position:fixed;bottom:2rem;left:50%;transform:translateX(-50%) translateY(80px);background:var(--navy);color:#fff;padding:.7rem 1.4rem;border-radius:var(--radius);font-size:.875rem;opacity:0;transition:all .3s;z-index:500;pointer-events:none;white-space:nowrap}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+
+/* RESPONSIVE */
+@media(max-width:768px){
+  .stats-row{grid-template-columns:repeat(2,1fr)}
+  .notif-layout{grid-template-columns:1fr}
+  .modal-field-grid{grid-template-columns:1fr}
+}
+</style>
+</head>
+<body>
+
+<nav class="nav">
+  <div style="display:flex;align-items:center;gap:1rem">
+    <div class="nav-logo">
+      <svg width="26" height="26" viewBox="0 0 28 28" fill="none">
+        <rect width="28" height="28" rx="7" fill="#C9960A"/>
+        <rect x="5" y="10" width="18" height="12" rx="2" fill="#0C2340"/>
+        <rect x="5" y="10" width="18" height="4" fill="#1A3D6B"/>
+        <rect x="7" y="17" width="6" height="1.5" rx=".75" fill="#C9960A"/>
+      </svg>
+      <span>چک<em style="color:#C9960A">بازار</em></span>
+    </div>
+    <span class="nav-admin-indicator">پنل مدیریت</span>
+  </div>
+  <div class="nav-links">
+    <a href="#" class="active" onclick="showPage('admin',this)">صف Moderation</a>
+    <a href="#" onclick="showPage('kyc',this)">صف KYC</a>
+    <a href="#" onclick="showPage('notif',this)">مرکز اعلان‌ها</a>
+    <a href="#" onclick="showPage('states',this)">State Machines</a>
+  </div>
+  <div class="nav-right">
+    <button class="nav-notif-btn" onclick="showPage('notif',null)">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="white"><path d="M12 22c1.1 0 2-.9 2-2h-4c0 1.1.9 2 2 2zm6-6v-5c0-3.07-1.64-5.64-4.5-6.32V4c0-.83-.67-1.5-1.5-1.5s-1.5.67-1.5 1.5v.68C7.63 5.36 6 7.92 6 11v5l-2 2v1h16v-1l-2-2z"/></svg>
+      <div class="nav-notif-badge"></div>
+    </button>
+    <div style="display:flex;align-items:center;gap:.5rem;color:rgba(255,255,255,.8);font-size:.85rem">
+      <div style="width:30px;height:30px;background:var(--gold);border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:.75rem;color:#1A1200">ام</div>
+      امید مدیری
+    </div>
+  </div>
+</nav>
+
+<!-- ═══════════════════════════════════════════════════════ -->
+<!-- PAGE: MODERATION QUEUE                                   -->
+<!-- ═══════════════════════════════════════════════════════ -->
+<div id="page-admin" class="page active">
+  <div class="page-header">
+    <div class="page-header-inner">
+      <h2>صف Moderation — آگهی‌های در انتظار بررسی</h2>
+      <p>آگهی‌های ثبت‌شده را بررسی و تأیید یا رد کنید</p>
+    </div>
+  </div>
+  <div class="wrap">
+    <div class="stats-row">
+      <div class="stat-card">
+        <div class="stat-icon" style="background:#FEF3E6">
+          <svg viewBox="0 0 24 24" fill="#D4730A"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z"/></svg>
+        </div>
+        <div><div class="stat-val">۷</div><div class="stat-lbl">در انتظار بررسی</div></div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon" style="background:var(--teal-light)">
+          <svg viewBox="0 0 24 24" fill="#0D7A72"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg>
+        </div>
+        <div><div class="stat-val">۳۴</div><div class="stat-lbl">تأیید شده (امروز)</div></div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon" style="background:var(--red-light)">
+          <svg viewBox="0 0 24 24" fill="#C0392B"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </div>
+        <div><div class="stat-val">۵</div><div class="stat-lbl">رد شده (امروز)</div></div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon" style="background:var(--gold-pale)">
+          <svg viewBox="0 0 24 24" fill="#C9960A"><path d="M11.99 2C6.47 2 2 6.48 2 12s4.47 10 9.99 10C17.52 22 22 17.52 22 12S17.52 2 11.99 2zm4.24 16L12 15.45 7.77 18l1.12-4.81-3.73-3.23 4.92-.42L12 5l1.92 4.53 4.92.42-3.73 3.23L16.23 18z"/></svg>
+        </div>
+        <div><div class="stat-val">۳۹</div><div class="stat-lbl">میانگین ساعت بررسی: ۶.۲</div></div>
+      </div>
+    </div>
+
+    <div class="search-bar">
+      <input class="search-input" type="text" placeholder="جست‌وجو بر اساس نام صادرکننده...">
+      <select class="filter-select">
+        <option>همه آگهی‌ها</option>
+        <option>ارسال مجدد</option>
+        <option>اولین ارسال</option>
+      </select>
+      <select class="filter-select">
+        <option>همه مبالغ</option>
+        <option>زیر ۲۰۰ میلیون</option>
+        <option>۲۰۰ تا ۵۰۰ میلیون</option>
+        <option>بالای ۵۰۰ میلیون</option>
+      </select>
+      <select class="filter-select">
+        <option>قدیمی‌ترین ابتدا</option>
+        <option>جدیدترین ابتدا</option>
+        <option>بالاترین مبلغ</option>
+      </select>
+    </div>
+
+    <table class="data-table">
+      <thead>
+        <tr>
+          <th>صادرکننده</th>
+          <th>بانک</th>
+          <th>مبلغ (ریال)</th>
+          <th>سررسید</th>
+          <th>نوع</th>
+          <th>ارسال</th>
+          <th>تلاش</th>
+          <th>عملیات</th>
+        </tr>
+      </thead>
+      <tbody id="modQueueBody"></tbody>
+    </table>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════ -->
+<!-- PAGE: KYC QUEUE                                          -->
+<!-- ═══════════════════════════════════════════════════════ -->
+<div id="page-kyc" class="page">
+  <div class="page-header">
+    <div class="page-header-inner">
+      <h2>صف KYC — احراز هویت در انتظار بررسی</h2>
+      <p>درخواست‌های احراز هویت را بررسی و تأیید یا رد کنید</p>
+    </div>
+  </div>
+  <div class="wrap">
+    <div class="stats-row" style="grid-template-columns:repeat(3,1fr)">
+      <div class="stat-card">
+        <div class="stat-icon" style="background:#EEF0FE">
+          <svg viewBox="0 0 24 24" fill="#3D34A0"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>
+        </div>
+        <div><div class="stat-val">۱۲</div><div class="stat-lbl">در انتظار بررسی</div></div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon" style="background:var(--teal-light)">
+          <svg viewBox="0 0 24 24" fill="#0D7A72"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg>
+        </div>
+        <div><div class="stat-val">۵۱</div><div class="stat-lbl">تأیید شده (این هفته)</div></div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon" style="background:var(--red-light)">
+          <svg viewBox="0 0 24 24" fill="#C0392B"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </div>
+        <div><div class="stat-val">۸</div><div class="stat-lbl">رد شده (این هفته)</div></div>
+      </div>
+    </div>
+
+    <div id="kycQueueList"></div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════ -->
+<!-- PAGE: NOTIFICATION CENTER                               -->
+<!-- ═══════════════════════════════════════════════════════ -->
+<div id="page-notif" class="page">
+  <div class="page-header">
+    <div class="page-header-inner">
+      <h2>مرکز اعلان‌ها</h2>
+      <p>اعلان‌های پلتفرم و تنظیمات کانال‌های اطلاع‌رسانی</p>
+    </div>
+  </div>
+  <div class="wrap">
+    <div class="tabs">
+      <button class="tab active" onclick="switchNotifTab('all',this)">همه <span class="tab-count gold">۵</span></button>
+      <button class="tab" onclick="switchNotifTab('match',this)">تطابق</button>
+      <button class="tab" onclick="switchNotifTab('kyc',this)">KYC</button>
+      <button class="tab" onclick="switchNotifTab('listing',this)">آگهی</button>
+      <button class="tab" onclick="switchNotifTab('settings',this)">تنظیمات</button>
+    </div>
+
+    <div id="notif-tab-all">
+      <div class="notif-toolbar">
+        <h3>همه اعلان‌ها <span style="font-size:.8rem;color:var(--text3);font-weight:400">(۵ خوانده نشده)</span></h3>
+        <button class="btn-ghost" style="font-size:.8rem;padding:.35rem .9rem" onclick="markAllRead()">علامت‌گذاری همه به‌عنوان خوانده</button>
+      </div>
+
+      <div class="notif-group-label">امروز</div>
+
+      <div class="notif-item unread" onclick="markRead(this)">
+        <div class="notif-type-icon notif-type-match">🤝</div>
+        <div class="notif-content">
+          <div class="notif-title">ابراز تمایل جدید دریافت شد</div>
+          <div class="notif-body">یک سرمایه‌گذار به آگهی چک ۵۰۰ میلیونی شما (بانک ملت — شرکت آسان‌پرداخت) ابراز تمایل کرده است.</div>
+          <div class="notif-time">۲ ساعت پیش · <span style="color:var(--navy-light);cursor:pointer" onclick="event.stopPropagation()">مشاهده آگهی</span></div>
+        </div>
+      </div>
+
+      <div class="notif-item unread" onclick="markRead(this)">
+        <div class="notif-type-icon notif-type-kyc">✅</div>
+        <div class="notif-content">
+          <div class="notif-title">احراز هویت تأیید شد</div>
+          <div class="notif-body">احراز هویت (KYC) شما با موفقیت تأیید شد. اکنون می‌توانید آگهی ثبت کنید.</div>
+          <div class="notif-time">۵ ساعت پیش</div>
+        </div>
+      </div>
+
+      <div class="notif-item unread" onclick="markRead(this)">
+        <div class="notif-type-icon notif-type-listing">📋</div>
+        <div class="notif-content">
+          <div class="notif-title">آگهی شما منتشر شد</div>
+          <div class="notif-body">آگهی چک بانک پارسیان (۶۰۰ میلیون ریال) پس از تأیید تیم مدیریت در بازارچه منتشر شد.</div>
+          <div class="notif-time">۷ ساعت پیش</div>
+        </div>
+      </div>
+
+      <div class="notif-group-label">دیروز</div>
+
+      <div class="notif-item unread" onclick="markRead(this)">
+        <div class="notif-type-icon notif-type-match">🎯</div>
+        <div class="notif-content">
+          <div class="notif-title">تطابق قطعی یافت شد</div>
+          <div class="notif-body">آگهی چک بانک صادرات شما تطابق قطعی یافت. می‌توانید با سرمایه‌گذار مستقیماً تماس بگیرید.</div>
+          <div class="notif-time">دیروز — ۱۳:۴۵ · <span style="color:var(--navy-light);cursor:pointer" onclick="event.stopPropagation()">مشاهده تطابق</span></div>
+        </div>
+      </div>
+
+      <div class="notif-item unread" onclick="markRead(this)">
+        <div class="notif-type-icon notif-type-listing">⚠️</div>
+        <div class="notif-content">
+          <div class="notif-title">آگهی رد شد — اصلاح نیاز است</div>
+          <div class="notif-body">آگهی چک بانک ملی رد شد. دلیل: تصویر چک ناخوانا است. برای ارسال مجدد اقدام کنید.</div>
+          <div class="notif-time">دیروز — ۰۹:۲۰ · <span style="color:var(--red);cursor:pointer" onclick="event.stopPropagation()">اصلاح آگهی</span></div>
+        </div>
+      </div>
+
+      <div class="notif-group-label">هفته گذشته</div>
+
+      <div class="notif-item" onclick="markRead(this)">
+        <div class="notif-type-icon notif-type-system">🔔</div>
+        <div class="notif-content">
+          <div class="notif-title">به چک‌بازار خوش آمدید</div>
+          <div class="notif-body">حساب شما با موفقیت ایجاد شد. برای شروع، مرحله احراز هویت را تکمیل کنید.</div>
+          <div class="notif-time">۵ روز پیش</div>
+        </div>
+      </div>
+    </div>
+
+    <div id="notif-tab-match" style="display:none">
+      <div class="empty-state">
+        <div class="empty-icon">🤝</div>
+        <div class="empty-title">اعلان‌های تطابق</div>
+        <div class="empty-desc">اعلان‌های مربوط به ابراز تمایل و تطابق‌ها اینجا نمایش داده می‌شوند.</div>
+      </div>
+    </div>
+
+    <div id="notif-tab-kyc" style="display:none">
+      <div class="empty-state">
+        <div class="empty-icon">✅</div>
+        <div class="empty-title">اعلان‌های KYC</div>
+        <div class="empty-desc">نتیجه احراز هویت شما اینجا اعلام می‌شود.</div>
+      </div>
+    </div>
+
+    <div id="notif-tab-listing" style="display:none">
+      <div class="empty-state">
+        <div class="empty-icon">📋</div>
+        <div class="empty-title">اعلان‌های آگهی</div>
+        <div class="empty-desc">وضعیت آگهی‌های شما اینجا نمایش داده می‌شود.</div>
+      </div>
+    </div>
+
+    <div id="notif-tab-settings" style="display:none">
+      <div style="max-width:520px">
+        <div style="font-size:.875rem;color:var(--text2);margin-bottom:1.25rem">تنظیم کانال دریافت اعلان برای هر نوع رویداد:</div>
+        <div class="notif-settings">
+          <div style="font-size:.75rem;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:.07em;margin-bottom:.75rem">تطابق و سرمایه‌گذاری</div>
+          <div class="notif-setting-row">
+            <div><div class="notif-setting-label">ابراز تمایل جدید</div><div class="notif-setting-desc">وقتی سرمایه‌گذار به آگهی شما علاقه نشان می‌دهد</div></div>
+            <div style="display:flex;gap:.75rem;align-items:center">
+              <div style="font-size:.72rem;color:var(--text3)">SMS</div>
+              <div class="toggle on" onclick="toggleSwitch(this)"></div>
+              <div style="font-size:.72rem;color:var(--text3)">اپ</div>
+              <div class="toggle on" onclick="toggleSwitch(this)"></div>
+            </div>
+          </div>
+          <div class="notif-setting-row">
+            <div><div class="notif-setting-label">تطابق قطعی</div><div class="notif-setting-desc">وقتی توافق نهایی می‌شود</div></div>
+            <div style="display:flex;gap:.75rem;align-items:center">
+              <div style="font-size:.72rem;color:var(--text3)">SMS</div>
+              <div class="toggle on" onclick="toggleSwitch(this)"></div>
+              <div style="font-size:.72rem;color:var(--text3)">اپ</div>
+              <div class="toggle on" onclick="toggleSwitch(this)"></div>
+            </div>
+          </div>
+        </div>
+        <div class="notif-settings" style="margin-top:.75rem">
+          <div style="font-size:.75rem;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:.07em;margin-bottom:.75rem">آگهی‌ها و KYC</div>
+          <div class="notif-setting-row">
+            <div><div class="notif-setting-label">انتشار / رد آگهی</div><div class="notif-setting-desc">نتیجه بررسی آگهی‌های ثبت‌شده</div></div>
+            <div style="display:flex;gap:.75rem;align-items:center">
+              <div style="font-size:.72rem;color:var(--text3)">SMS</div>
+              <div class="toggle on" onclick="toggleSwitch(this)"></div>
+              <div style="font-size:.72rem;color:var(--text3)">اپ</div>
+              <div class="toggle on" onclick="toggleSwitch(this)"></div>
+            </div>
+          </div>
+          <div class="notif-setting-row">
+            <div><div class="notif-setting-label">نتیجه KYC</div><div class="notif-setting-desc">تأیید یا رد احراز هویت</div></div>
+            <div style="display:flex;gap:.75rem;align-items:center">
+              <div style="font-size:.72rem;color:var(--text3)">SMS</div>
+              <div class="toggle on" onclick="toggleSwitch(this)"></div>
+              <div style="font-size:.72rem;color:var(--text3)">اپ</div>
+              <div class="toggle on" onclick="toggleSwitch(this)"></div>
+            </div>
+          </div>
+          <div class="notif-setting-row">
+            <div><div class="notif-setting-label">اعلان‌های سیستمی</div><div class="notif-setting-desc">به‌روزرسانی‌ها و اطلاعیه‌های پلتفرم</div></div>
+            <div style="display:flex;gap:.75rem;align-items:center">
+              <div style="font-size:.72rem;color:var(--text3)">SMS</div>
+              <div class="toggle" onclick="toggleSwitch(this)"></div>
+              <div style="font-size:.72rem;color:var(--text3)">اپ</div>
+              <div class="toggle on" onclick="toggleSwitch(this)"></div>
+            </div>
+          </div>
+        </div>
+        <div style="margin-top:1rem;display:flex;justify-content:flex-end">
+          <button class="btn-primary" onclick="showToast('تنظیمات ذخیره شد')">ذخیره تنظیمات</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════ -->
+<!-- PAGE: STATE MACHINES VISUAL                             -->
+<!-- ═══════════════════════════════════════════════════════ -->
+<div id="page-states" class="page">
+  <div class="page-header">
+    <div class="page-header-inner">
+      <h2>State Machines — نمودار ماشین حالت</h2>
+      <p>وضعیت‌های ممکن و انتقال‌های هر موجودیت اصلی</p>
+    </div>
+  </div>
+  <div class="wrap">
+    <div class="tabs">
+      <button class="tab active" onclick="switchStateTab('listing',this)">آگهی چک</button>
+      <button class="tab" onclick="switchStateTab('user',this)">کاربر / KYC</button>
+      <button class="tab" onclick="switchStateTab('match',this)">تطابق (Match)</button>
+    </div>
+    <div id="state-tab-listing">
+      <div style="overflow-x:auto;padding-bottom:1rem">
+        <svg viewBox="0 0 860 400" width="860" style="min-width:760px;display:block;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-lg);padding:1rem" xmlns="http://www.w3.org/2000/svg" font-family="Vazirmatn,sans-serif">
+          <defs>
+            <marker id="arr" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto"><path d="M0,0 L0,6 L8,3 z" fill="#4A4540"/></marker>
+            <marker id="arr-red" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto"><path d="M0,0 L0,6 L8,3 z" fill="#C0392B"/></marker>
+            <marker id="arr-teal" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto"><path d="M0,0 L0,6 L8,3 z" fill="#0D7A72"/></marker>
+          </defs>
+          <!-- STATES -->
+          <rect x="20" y="170" width="90" height="40" rx="6" fill="#F5F4F0" stroke="#C8C4BA"/>
+          <text x="65" y="195" text-anchor="middle" font-size="11" fill="#1A1613" font-weight="500">DRAFT</text>
+          <rect x="160" y="170" width="130" height="40" rx="6" fill="#FEF3E6" stroke="#D4730A"/>
+          <text x="225" y="195" text-anchor="middle" font-size="10" fill="#7A4000" font-weight="600">PENDING_MODERATION</text>
+          <rect x="360" y="100" width="120" height="40" rx="6" fill="#FDECEA" stroke="#C0392B"/>
+          <text x="420" y="125" text-anchor="middle" font-size="11" fill="#7A1A1A" font-weight="600">REJECTED</text>
+          <rect x="360" y="240" width="120" height="40" rx="6" fill="#E6F4F3" stroke="#0D7A72"/>
+          <text x="420" y="265" text-anchor="middle" font-size="11" fill="#0A4E49" font-weight="600">PUBLISHED</text>
+          <rect x="560" y="170" width="100" height="40" rx="6" fill="#EEF0FE" stroke="#534AB7"/>
+          <text x="610" y="195" text-anchor="middle" font-size="11" fill="#3D34A0" font-weight="600">MATCHED</text>
+          <rect x="730" y="100" width="110" height="40" rx="6" fill="#E6F4F3" stroke="#0D7A72"/>
+          <text x="785" y="115" text-anchor="middle" font-size="9" fill="#0A4E49" font-weight="600">SETTLED</text>
+          <text x="785" y="130" text-anchor="middle" font-size="9" fill="#0A4E49">OFF_PLATFORM</text>
+          <rect x="730" y="240" width="100" height="40" rx="6" fill="#F5F4F0" stroke="#C8C4BA"/>
+          <text x="780" y="260" text-anchor="middle" font-size="11" fill="#4A4540">EXPIRED</text>
+          <text x="780" y="274" text-anchor="middle" font-size="9" fill="#7A7570">auto</text>
+          <rect x="730" y="310" width="100" height="40" rx="6" fill="#F5F4F0" stroke="#C8C4BA"/>
+          <text x="780" y="335" text-anchor="middle" font-size="11" fill="#4A4540">WITHDRAWN</text>
+          <!-- ARROWS -->
+          <line x1="110" y1="190" x2="158" y2="190" stroke="#4A4540" stroke-width="1.5" marker-end="url(#arr)"/>
+          <text x="134" y="183" text-anchor="middle" font-size="9" fill="#7A7570">submit</text>
+          <line x1="290" y1="178" x2="358" y2="128" stroke="#C0392B" stroke-width="1.5" marker-end="url(#arr-red)"/>
+          <text x="315" y="148" text-anchor="middle" font-size="9" fill="#C0392B">reject</text>
+          <line x1="290" y1="202" x2="358" y2="252" stroke="#0D7A72" stroke-width="1.5" marker-end="url(#arr-teal)"/>
+          <text x="315" y="242" text-anchor="middle" font-size="9" fill="#0D7A72">approve</text>
+          <path d="M360,120 Q290,140 290,175 Q290,200 360,215" stroke="#4A4540" stroke-width="1.5" fill="none" stroke-dasharray="5,3" marker-end="url(#arr)"/>
+          <text x="275" y="168" text-anchor="middle" font-size="9" fill="#7A7570">resubmit</text>
+          <line x1="480" y1="260" x2="558" y2="198" stroke="#4A4540" stroke-width="1.5" marker-end="url(#arr)"/>
+          <text x="525" y="222" text-anchor="middle" font-size="9" fill="#7A7570">match_accepted</text>
+          <line x1="660" y1="182" x2="728" y2="125" stroke="#0D7A72" stroke-width="1.5" marker-end="url(#arr-teal)"/>
+          <text x="700" y="148" text-anchor="middle" font-size="9" fill="#0D7A72">settle</text>
+          <line x1="660" y1="198" x2="728" y2="252" stroke="#4A4540" stroke-width="1.5" marker-end="url(#arr)"/>
+          <text x="700" y="235" text-anchor="middle" font-size="9" fill="#7A7570">expire</text>
+          <line x1="480" y1="275" x2="728" y2="325" stroke="#4A4540" stroke-width="1.5" marker-end="url(#arr)"/>
+          <text x="595" y="315" text-anchor="middle" font-size="9" fill="#7A7570">withdraw</text>
+        </svg>
+      </div>
+      <div style="margin-top:1.5rem;display:grid;grid-template-columns:repeat(3,1fr);gap:1rem">
+        <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:1rem">
+          <div style="font-size:.75rem;font-weight:600;color:var(--text3);margin-bottom:.65rem;text-transform:uppercase">وضعیت‌های پایانی</div>
+          <div style="display:flex;flex-direction:column;gap:.4rem;font-size:.82rem">
+            <span><span class="pill pill-published">SETTLED_OFF_PLATFORM</span> — معامله نهایی شد</span>
+            <span><span style="background:#F5F4F0;color:#4A4540" class="pill">EXPIRED</span> — سررسید گذشت</span>
+            <span><span style="background:#F5F4F0;color:#4A4540" class="pill">WITHDRAWN</span> — دارنده پس گرفت</span>
+          </div>
+        </div>
+        <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:1rem">
+          <div style="font-size:.75rem;font-weight:600;color:var(--text3);margin-bottom:.65rem;text-transform:uppercase">قوانین کلیدی</div>
+          <div style="font-size:.82rem;color:var(--text2);line-height:1.7">
+            • حداکثر ۳ بار ارسال مجدد<br>
+            • EXPIRED: ویرایش ممنوع<br>
+            • WITHDRAW: فقط بدون Match فعال<br>
+            • هر transition → AuditEvent
+          </div>
+        </div>
+        <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:1rem">
+          <div style="font-size:.75rem;font-weight:600;color:var(--text3);margin-bottom:.65rem;text-transform:uppercase">رویدادهای emit</div>
+          <div style="font-size:.8rem;color:var(--navy);font-family:monospace;line-height:1.9">
+            ListingSubmittedForModeration<br>
+            ChequeListingPublished<br>
+            ListingRejected<br>
+            ListingMatched<br>
+            ListingExpired
+          </div>
+        </div>
+      </div>
+    </div>
+    <div id="state-tab-user" style="display:none">
+      <div style="overflow-x:auto;padding-bottom:1rem">
+        <svg viewBox="0 0 700 280" width="700" style="min-width:600px;display:block;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-lg);padding:1rem" xmlns="http://www.w3.org/2000/svg" font-family="Vazirmatn,sans-serif">
+          <defs>
+            <marker id="arr2" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto"><path d="M0,0 L0,6 L8,3 z" fill="#4A4540"/></marker>
+            <marker id="arr2t" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto"><path d="M0,0 L0,6 L8,3 z" fill="#0D7A72"/></marker>
+            <marker id="arr2r" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto"><path d="M0,0 L0,6 L8,3 z" fill="#C0392B"/></marker>
+          </defs>
+          <rect x="20" y="110" width="100" height="40" rx="6" fill="#F5F4F0" stroke="#C8C4BA"/>
+          <text x="70" y="135" text-anchor="middle" font-size="11" fill="#1A1613" font-weight="500">REGISTERED</text>
+          <rect x="190" y="110" width="110" height="40" rx="6" fill="#EEF0FE" stroke="#534AB7"/>
+          <text x="245" y="135" text-anchor="middle" font-size="11" fill="#3D34A0" font-weight="600">KYC_PENDING</text>
+          <rect x="380" y="60" width="120" height="40" rx="6" fill="#E6F4F3" stroke="#0D7A72"/>
+          <text x="440" y="85" text-anchor="middle" font-size="11" fill="#0A4E49" font-weight="600">KYC_APPROVED</text>
+          <rect x="380" y="160" width="120" height="40" rx="6" fill="#FDECEA" stroke="#C0392B"/>
+          <text x="440" y="185" text-anchor="middle" font-size="11" fill="#7A1A1A" font-weight="600">KYC_REJECTED</text>
+          <rect x="580" y="60" width="100" height="40" rx="6" fill="#F5F4F0" stroke="#C8C4BA"/>
+          <text x="630" y="85" text-anchor="middle" font-size="11" fill="#4A4540" font-weight="500">SUSPENDED</text>
+          <line x1="120" y1="130" x2="188" y2="130" stroke="#4A4540" stroke-width="1.5" marker-end="url(#arr2)"/>
+          <text x="154" y="122" text-anchor="middle" font-size="9" fill="#7A7570">submit_kyc</text>
+          <line x1="300" y1="118" x2="378" y2="82" stroke="#0D7A72" stroke-width="1.5" marker-end="url(#arr2t)"/>
+          <text x="332" y="96" text-anchor="middle" font-size="9" fill="#0D7A72">approve</text>
+          <line x1="300" y1="142" x2="378" y2="170" stroke="#C0392B" stroke-width="1.5" marker-end="url(#arr2r)"/>
+          <text x="332" y="165" text-anchor="middle" font-size="9" fill="#C0392B">reject</text>
+          <path d="M380,180 Q310,200 300,150 Q295,130 300,125" stroke="#4A4540" stroke-width="1.5" fill="none" stroke-dasharray="4,3" marker-end="url(#arr2)"/>
+          <text x="310" y="200" text-anchor="middle" font-size="9" fill="#7A7570">resubmit</text>
+          <line x1="500" y1="80" x2="578" y2="80" stroke="#4A4540" stroke-width="1.5" marker-end="url(#arr2)"/>
+          <text x="538" y="72" text-anchor="middle" font-size="9" fill="#7A7570">admin_suspend</text>
+          <path d="M630,100 Q630,130 510,130 Q490,130 500,90" stroke="#4A4540" stroke-width="1" fill="none" stroke-dasharray="4,3" marker-end="url(#arr2)"/>
+          <text x="580" y="135" text-anchor="middle" font-size="9" fill="#7A7570">reinstate</text>
+        </svg>
+      </div>
+    </div>
+    <div id="state-tab-match" style="display:none">
+      <div style="overflow-x:auto;padding-bottom:1rem">
+        <svg viewBox="0 0 780 300" width="780" style="min-width:680px;display:block;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-lg);padding:1rem" xmlns="http://www.w3.org/2000/svg" font-family="Vazirmatn,sans-serif">
+          <defs>
+            <marker id="arr3" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto"><path d="M0,0 L0,6 L8,3 z" fill="#4A4540"/></marker>
+            <marker id="arr3t" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto"><path d="M0,0 L0,6 L8,3 z" fill="#0D7A72"/></marker>
+            <marker id="arr3r" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto"><path d="M0,0 L0,6 L8,3 z" fill="#C0392B"/></marker>
+          </defs>
+          <rect x="20" y="120" width="90" height="40" rx="6" fill="#EEF0FE" stroke="#534AB7"/>
+          <text x="65" y="145" text-anchor="middle" font-size="11" fill="#3D34A0" font-weight="600">PENDING</text>
+          <rect x="200" y="60" width="100" height="40" rx="6" fill="#E6F4F3" stroke="#0D7A72"/>
+          <text x="250" y="85" text-anchor="middle" font-size="11" fill="#0A4E49" font-weight="600">ACCEPTED</text>
+          <rect x="200" y="180" width="100" height="40" rx="6" fill="#FDECEA" stroke="#C0392B"/>
+          <text x="250" y="205" text-anchor="middle" font-size="11" fill="#7A1A1A" font-weight="600">DECLINED</text>
+          <rect x="400" y="60" width="150" height="40" rx="6" fill="#E6F4F3" stroke="#0D7A72"/>
+          <text x="475" y="75" text-anchor="middle" font-size="9" fill="#0A4E49" font-weight="600">OFF_PLATFORM</text>
+          <text x="475" y="90" text-anchor="middle" font-size="9" fill="#0A4E49" font-weight="600">_CONFIRMED</text>
+          <rect x="640" y="60" width="90" height="40" rx="6" fill="#E6F4F3" stroke="#0D7A72"/>
+          <text x="685" y="85" text-anchor="middle" font-size="11" fill="#0A4E49" font-weight="600">SETTLED</text>
+          <rect x="400" y="180" width="100" height="40" rx="6" fill="#F5F4F0" stroke="#C8C4BA"/>
+          <text x="450" y="205" text-anchor="middle" font-size="11" fill="#4A4540">CANCELLED</text>
+          <line x1="110" y1="130" x2="198" y2="84" stroke="#0D7A72" stroke-width="1.5" marker-end="url(#arr3t)"/>
+          <text x="148" y="102" text-anchor="middle" font-size="9" fill="#0D7A72">holder_accept</text>
+          <line x1="110" y1="150" x2="198" y2="196" stroke="#C0392B" stroke-width="1.5" marker-end="url(#arr3r)"/>
+          <text x="148" y="182" text-anchor="middle" font-size="9" fill="#C0392B">holder_decline</text>
+          <line x1="300" y1="80" x2="398" y2="80" stroke="#0D7A72" stroke-width="1.5" marker-end="url(#arr3t)"/>
+          <text x="349" y="72" text-anchor="middle" font-size="9" fill="#0D7A72">both_confirm</text>
+          <line x1="550" y1="80" x2="638" y2="80" stroke="#0D7A72" stroke-width="1.5" marker-end="url(#arr3t)"/>
+          <text x="594" y="72" text-anchor="middle" font-size="9" fill="#0D7A72">close</text>
+          <line x1="250" y1="100" x2="420" y2="178" stroke="#4A4540" stroke-width="1.5" marker-end="url(#arr3)"/>
+          <text x="325" y="148" text-anchor="middle" font-size="9" fill="#7A7570">cancel</text>
+          <line x1="110" y1="140" x2="398" y2="200" stroke="#4A4540" stroke-width="1" fill="none" stroke-dasharray="4,3" marker-end="url(#arr3)"/>
+          <text x="250" y="230" text-anchor="middle" font-size="9" fill="#7A7570">listing_expired (auto)</text>
+        </svg>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- MODERATION DETAIL MODAL -->
+<div class="modal-overlay" id="modModal" onclick="closeModModal(event)">
+  <div class="modal" id="modModalContent">
+    <div class="modal-header">
+      <h3>بررسی آگهی</h3>
+      <button class="modal-close-btn" onclick="document.getElementById('modModal').classList.remove('open')">✕</button>
+    </div>
+    <div class="modal-body" id="modModalBody"></div>
+  </div>
+</div>
+
+<!-- KYC DETAIL MODAL -->
+<div class="modal-overlay" id="kycModal" onclick="closeKycModal(event)">
+  <div class="modal" id="kycModalContent">
+    <div class="modal-header">
+      <h3>بررسی احراز هویت</h3>
+      <button class="modal-close-btn" onclick="document.getElementById('kycModal').classList.remove('open')">✕</button>
+    </div>
+    <div class="modal-body" id="kycModalBody"></div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+const modQueue=[
+  {id:'m1',issuer:'شرکت فناوری نوآور',issuerType:'حقوقی',bank:'بانک ملت',amount:'۸۵۰٬۰۰۰٬۰۰۰',duedate:'۱۴۰۴/۰۵/۲۰',risk:'low',submitted:'۳ ساعت پیش',attempt:1,sayad:'۱۴۰۳۸۷۶۵۴۳۲۱۰۹'},
+  {id:'m2',issuer:'کامران احمدپور',issuerType:'حقیقی',bank:'بانک ملی',amount:'۹۵٬۰۰۰٬۰۰۰',duedate:'۱۴۰۴/۰۸/۱۵',risk:'high',submitted:'۵ ساعت پیش',attempt:1,sayad:'۱۴۰۲۵۴۳۲۱۰۹۸۷۶'},
+  {id:'m3',issuer:'شرکت بازرگانی پیشرو',issuerType:'حقوقی',bank:'بانک صادرات',amount:'۲۲۰٬۰۰۰٬۰۰۰',duedate:'۱۴۰۴/۰۳/۳۰',risk:'mid',submitted:'۸ ساعت پیش',attempt:2,sayad:'۱۴۰۴۰۱۲۳۴۵۶۷۸۹'},
+  {id:'m4',issuer:'ستاره معتمد',issuerType:'حقیقی',bank:'بانک پارسیان',amount:'۱۴۰٬۰۰۰٬۰۰۰',duedate:'۱۴۰۴/۰۴/۱۰',risk:'low',submitted:'دیروز ۱۶:۳۰',attempt:1,sayad:'۱۴۰۳۱۲۳۴۵۶۷۸۹۰'},
+  {id:'m5',issuer:'شرکت سیمان شرق',issuerType:'حقوقی',bank:'بانک تجارت',amount:'۱٬۵۰۰٬۰۰۰٬۰۰۰',duedate:'۱۴۰۴/۰۶/۰۵',risk:'low',submitted:'دیروز ۱۰:۱۵',attempt:1,sayad:'۱۴۰۳۸۷۶۵۴۳۲۱۰۸'},
+  {id:'m6',issuer:'محمد رجبی',issuerType:'حقیقی',bank:'بانک ملی',amount:'۵۵٬۰۰۰٬۰۰۰',duedate:'۱۴۰۴/۰۹/۰۱',risk:'high',submitted:'۲ روز پیش',attempt:3,sayad:'۱۴۰۲۱۰۳۵۶۸۷۱۲۴'},
+  {id:'m7',issuer:'شرکت توسعه کشاورزی',issuerType:'حقوقی',bank:'بانک کشاورزی',amount:'۳۸۰٬۰۰۰٬۰۰۰',duedate:'۱۴۰۴/۰۴/۲۵',risk:'mid',submitted:'۲ روز پیش',attempt:1,sayad:'۱۴۰۳۲۱۰۴۷۸۹۶۵۵'},
+];
+const kycQueue=[
+  {id:'k1',name:'امیر حسینی',type:'حقیقی',phone:'091۲۸۷۶۵۴۳۲',national:'۰۰۹۸۷۶۵۴۳۲',submitted:'۱ ساعت پیش',docs:['کارت ملی (جلو)','کارت ملی (پشت)']},
+  {id:'k2',name:'شرکت صنایع معدنی کیان',type:'حقوقی',phone:'021۸۸۷۶۵۴۳۲',national:'شناسه: ۱۰۸۶۲۳۴۵۶۷',submitted:'۴ ساعت پیش',docs:['روزنامه رسمی','کارت ملی مدیرعامل','اساسنامه']},
+  {id:'k3',name:'فاطمه موسوی',type:'حقیقی',phone:'093۱۲۳۴۵۶۷۸',national:'۰۰۱۲۳۴۵۶۷۸',submitted:'۶ ساعت پیش',docs:['کارت ملی (جلو)']},
+  {id:'k4',name:'رضا قاسمی',type:'حقیقی',phone:'09۱۵۶۷۸۹۰۱۲',national:'۰۰۵۶۷۸۹۰۱۲',submitted:'دیروز',docs:['کارت ملی (جلو)','کارت ملی (پشت)','سلفی']},
+];
+
+function riskBadge(r){const m={low:'badge-low کم‌ریسک',mid:'badge-mid ریسک متوسط',high:'badge-high پرریسک'};const[cls,lbl]=m[r].split(' ');return`<span class="badge ${cls}">${lbl}</span>`}
+
+function buildModQueue(){
+  const tbody=document.getElementById('modQueueBody');
+  tbody.innerHTML=modQueue.map(i=>`
+    <tr>
+      <td><div style="font-weight:500;color:var(--navy)">${i.issuer}</div><div style="font-size:.75rem;color:var(--text3)">${i.issuerType}</div></td>
+      <td>${i.bank}</td>
+      <td class="amount">${i.amount}</td>
+      <td>${i.duedate}</td>
+      <td>${riskBadge(i.risk)}</td>
+      <td style="color:var(--text3);font-size:.8rem">${i.submitted}</td>
+      <td><span style="font-size:.8rem;${i.attempt>1?'color:var(--orange);font-weight:600':'color:var(--text3)'}">${i.attempt === 1 ? 'اول' : i.attempt+'م'}</span></td>
+      <td>
+        <div style="display:flex;gap:.4rem">
+          <button class="btn-view" onclick="openModModal('${i.id}')">بررسی</button>
+          <button class="btn-approve" onclick="approveItem('${i.id}','mod')">تأیید</button>
+          <button class="btn-reject" onclick="openRejectInline('${i.id}')">رد</button>
+        </div>
+      </td>
+    </tr>
+  `).join('');
+}
+
+function buildKycQueue(){
+  const el=document.getElementById('kycQueueList');
+  el.innerHTML=kycQueue.map(k=>`
+    <div class="kyc-card">
+      <div class="kyc-avatar">${k.name[0]}</div>
+      <div class="kyc-info">
+        <h4>${k.name}</h4>
+        <p>${k.type} · ${k.phone} · ${k.national}</p>
+        <p style="font-size:.72rem;color:var(--text3);margin-top:.1rem">ارسال شده: ${k.submitted}</p>
+        <div class="kyc-docs-row">${k.docs.map(d=>`<span class="doc-chip">📄 ${d}</span>`).join('')}</div>
+      </div>
+      <div class="kyc-actions">
+        <button class="btn-view" onclick="openKycModal('${k.id}')">مشاهده</button>
+        <button class="btn-approve" onclick="approveItem('${k.id}','kyc')">تأیید</button>
+        <button class="btn-reject" onclick="showToast('فرم رد KYC در Modal باز می‌شود')">رد</button>
+      </div>
+    </div>
+  `).join('');
+}
+
+function openModModal(id){
+  const i=modQueue.find(x=>x.id===id);
+  document.getElementById('modModalBody').innerHTML=`
+    <div class="modal-section-label">اطلاعات چک</div>
+    <div class="modal-field-grid">
+      <div class="modal-field"><label>صادرکننده</label><span>${i.issuer} (${i.issuerType})</span></div>
+      <div class="modal-field"><label>بانک</label><span>${i.bank}</span></div>
+      <div class="modal-field"><label>مبلغ</label><span style="color:var(--navy);font-weight:700">${i.amount} ریال</span></div>
+      <div class="modal-field"><label>سررسید</label><span>${i.duedate}</span></div>
+      <div class="modal-field"><label>کد صیاد</label><span class="mono">${i.sayad}</span></div>
+      <div class="modal-field"><label>سطح ریسک</label><span>${i.risk==='low'?'کم‌ریسک':i.risk==='mid'?'متوسط':'پرریسک'}</span></div>
+    </div>
+    <div class="modal-section-label">مدارک پیوست</div>
+    <div class="doc-preview">
+      <span class="doc-chip">📄 تصویر چک (جلو)</span>
+      <span class="doc-chip">📄 تصویر چک (پشت)</span>
+      <span class="doc-chip">🪪 مدرک صادرکننده</span>
+    </div>
+    <div class="reject-form" id="rejectBlock-${i.id}" style="display:none">
+      <label>دلیل رد آگهی</label>
+      <select>
+        <option>MOD_302 — تصویر چک ناخوانا</option>
+        <option>MOD_303 — عدم تطابق اطلاعات</option>
+        <option>MOD_301 — اطلاعات ناقص</option>
+        <option>MOD_305 — مدارک صادرکننده ناقص</option>
+        <option>MOD_304 — محتوای غیرمجاز</option>
+      </select>
+      <textarea placeholder="توضیح تکمیلی برای کاربر (اختیاری)..."></textarea>
+    </div>
+    <div class="modal-actions">
+      <button class="btn-ghost" onclick="document.getElementById('rejectBlock-${i.id}').style.display=document.getElementById('rejectBlock-${i.id}').style.display==='none'?'block':'none'">رد آگهی</button>
+      <button class="btn-approve" onclick="approveItem('${i.id}','mod');document.getElementById('modModal').classList.remove('open')">تأیید و انتشار</button>
+    </div>
+  `;
+  document.getElementById('modModal').classList.add('open');
+}
+
+function openKycModal(id){
+  const k=kycQueue.find(x=>x.id===id);
+  document.getElementById('kycModalBody').innerHTML=`
+    <div class="modal-section-label">اطلاعات کاربر</div>
+    <div class="modal-field-grid">
+      <div class="modal-field"><label>نام</label><span>${k.name}</span></div>
+      <div class="modal-field"><label>نوع</label><span>${k.type}</span></div>
+      <div class="modal-field"><label>شماره موبایل</label><span>${k.phone}</span></div>
+      <div class="modal-field"><label>شناسه</label><span>${k.national}</span></div>
+    </div>
+    <div class="modal-section-label">مدارک آپلودشده</div>
+    <div class="doc-preview">${k.docs.map(d=>`<span class="doc-chip">📄 ${d}</span>`).join('')}</div>
+    <div class="reject-form">
+      <label>دلیل رد (در صورت رد)</label>
+      <select>
+        <option>KYC_101 — تصویر مدرک ناخوانا</option>
+        <option>KYC_102 — اطلاعات مغایرت دارد</option>
+        <option>KYC_103 — مدارک ناقص</option>
+        <option>KYC_104 — هویت قبلاً ثبت شده</option>
+      </select>
+      <textarea placeholder="توضیح تکمیلی برای کاربر..."></textarea>
+    </div>
+    <div class="modal-actions">
+      <button class="btn-reject" onclick="rejectKyc('${k.id}')">رد احراز هویت</button>
+      <button class="btn-approve" onclick="approveItem('${k.id}','kyc');document.getElementById('kycModal').classList.remove('open')">تأیید احراز هویت</button>
+    </div>
+  `;
+  document.getElementById('kycModal').classList.add('open');
+}
+
+function approveItem(id,type){
+  showToast(type==='mod'?'✓ آگهی تأیید و منتشر شد':'✓ احراز هویت تأیید شد — SMS ارسال شد');
+  if(type==='mod')document.getElementById('modModal').classList.remove('open');
+  if(type==='kyc')document.getElementById('kycModal').classList.remove('open');
+}
+
+function rejectKyc(id){
+  showToast('✓ درخواست رد شد — دلیل به کاربر اطلاع داده شد');
+  document.getElementById('kycModal').classList.remove('open');
+}
+
+function openRejectInline(id){showToast('فرم رد از طریق Modal بررسی در دسترس است');}
+function closeModModal(e){if(e.target===document.getElementById('modModal'))document.getElementById('modModal').classList.remove('open')}
+function closeKycModal(e){if(e.target===document.getElementById('kycModal'))document.getElementById('kycModal').classList.remove('open')}
+
+function showPage(name,link){
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.getElementById('page-'+name).classList.add('active');
+  document.querySelectorAll('.nav-links a').forEach(a=>a.classList.remove('active'));
+  if(link)link.classList.add('active');
+  window.scrollTo(0,0);
+}
+
+function switchNotifTab(tab,btn){
+  document.querySelectorAll('.tabs .tab').forEach(t=>t.classList.remove('active'));
+  btn.classList.add('active');
+  ['all','match','kyc','listing','settings'].forEach(t=>{
+    const el=document.getElementById('notif-tab-'+t);
+    if(el)el.style.display=t===tab?'block':'none';
+  });
+}
+
+function switchStateTab(tab,btn){
+  btn.closest('.tabs').querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+  btn.classList.add('active');
+  ['listing','user','match'].forEach(t=>{
+    const el=document.getElementById('state-tab-'+t);
+    if(el)el.style.display=t===tab?'block':'none';
+  });
+}
+
+function markRead(el){el.classList.remove('unread');showToast('اعلان به‌عنوان خوانده علامت‌گذاری شد')}
+function markAllRead(){document.querySelectorAll('.notif-item.unread').forEach(el=>el.classList.remove('unread'));showToast('همه اعلان‌ها خوانده شدند')}
+function toggleSwitch(el){el.classList.toggle('on')}
+
+function showToast(msg){
+  const t=document.getElementById('toast');
+  t.textContent=msg;
+  t.classList.add('show');
+  setTimeout(()=>t.classList.remove('show'),3000);
+}
+
+buildModQueue();
+buildKycQueue();
+</script>
+</body>
+</html>

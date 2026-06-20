@@ -1,0 +1,628 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>چقیار — بازارچه هوشمند نقدشوندگی چک</title>
+<link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: 'Vazirmatn', Tahoma, sans-serif; direction: rtl; background: #070d1a; color: #e2e8f0; min-height: 100vh; }
+:root {
+  --sapphire: #1e40af; --sapphire-light: #3b82f6; --sapphire-glow: #60a5fa;
+  --gold: #d97706; --gold-light: #f59e0b; --gold-bright: #fbbf24;
+  --bg-0: #070d1a; --bg-1: #0f1a2e; --bg-2: #162035; --bg-3: #1e2d45;
+  --border: rgba(59,130,246,0.15); --border-gold: rgba(217,119,6,0.3);
+  --text-1: #e2e8f0; --text-2: #94a3b8; --text-3: #64748b;
+  --success: #10b981; --danger: #ef4444; --warn: #f59e0b;
+}
+.header { background: var(--bg-1); border-bottom: 1px solid var(--border); padding: 0 24px; display: flex; align-items: center; justify-content: space-between; height: 60px; position: sticky; top: 0; z-index: 100; }
+.logo { display: flex; align-items: center; gap: 10px; }
+.logo-icon { width: 36px; height: 36px; background: linear-gradient(135deg, var(--sapphire-light), var(--gold)); border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 16px; font-weight: 700; color: white; }
+.logo-text { font-size: 18px; font-weight: 700; color: var(--text-1); }
+.logo-sub { font-size: 11px; color: var(--text-3); }
+.badge-compliance { background: rgba(16,185,129,0.1); border: 1px solid rgba(16,185,129,0.3); color: #10b981; font-size: 10px; padding: 4px 12px; border-radius: 20px; }
+.tabs-nav { display: flex; background: var(--bg-1); border-bottom: 1px solid var(--border); padding: 0 24px; gap: 4px; overflow-x: auto; }
+.tab-btn { padding: 14px 20px; font-family: 'Vazirmatn', Tahoma, sans-serif; font-size: 13px; font-weight: 500; color: var(--text-3); background: none; border: none; cursor: pointer; border-bottom: 2px solid transparent; transition: all 0.2s; display: flex; align-items: center; gap: 8px; white-space: nowrap; }
+.tab-btn:hover { color: var(--text-2); }
+.tab-btn.active-blue { color: var(--sapphire-glow); border-bottom-color: var(--sapphire-glow); }
+.tab-btn.active-gold { color: var(--gold-bright); border-bottom-color: var(--gold-bright); }
+.tab-btn.active-purple { color: #a78bfa; border-bottom-color: #a78bfa; }
+.dot { width: 6px; height: 6px; border-radius: 50%; display: inline-block; }
+.dot-blue { background: var(--sapphire-glow); }
+.dot-gold { background: var(--gold-bright); }
+.dot-purple { background: #a78bfa; }
+.content { padding: 24px; max-width: 1100px; margin: 0 auto; }
+.section-title { font-size: 20px; font-weight: 600; color: var(--text-1); margin-bottom: 4px; }
+.section-sub { font-size: 13px; color: var(--text-3); margin-bottom: 24px; }
+.stats-row { display: flex; gap: 12px; margin-bottom: 24px; flex-wrap: wrap; }
+.stat-card { background: var(--bg-1); border: 1px solid var(--border); border-radius: 10px; padding: 16px 20px; flex: 1; min-width: 140px; }
+.stat-val { font-size: 22px; font-weight: 700; color: var(--text-1); }
+.stat-label { font-size: 11px; color: var(--text-3); margin-top: 4px; }
+.stat-change { font-size: 11px; color: var(--success); margin-top: 2px; }
+.filters-bar { background: var(--bg-1); border: 1px solid var(--border); border-radius: 12px; padding: 16px 20px; margin-bottom: 20px; display: flex; gap: 12px; flex-wrap: wrap; align-items: flex-end; }
+.filter-group { display: flex; flex-direction: column; flex: 1; min-width: 120px; gap: 5px; }
+.filter-label { font-size: 12px; color: var(--text-3); }
+.filter-input, .filter-select { background: var(--bg-0); border: 1px solid var(--border); border-radius: 8px; padding: 9px 12px; font-family: 'Vazirmatn', Tahoma, sans-serif; font-size: 12px; color: var(--text-1); outline: none; direction: rtl; transition: border-color 0.2s; }
+.filter-input:focus, .filter-select:focus { border-color: var(--sapphire-light); }
+.filter-select option { background: #0f1a2e; }
+.search-wrap { position: relative; }
+.search-wrap .s-icon { position: absolute; right: 12px; top: 50%; transform: translateY(-50%); font-size: 15px; pointer-events: none; }
+.search-wrap input { padding-right: 36px; width: 100%; }
+.cards-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 16px; }
+.card { background: var(--bg-1); border: 1px solid var(--border); border-radius: 14px; padding: 20px; transition: border-color 0.2s, transform 0.15s; }
+.card:hover { border-color: rgba(59,130,246,0.35); transform: translateY(-1px); }
+.card-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 16px; }
+.card-id { font-size: 11px; color: var(--text-3); }
+.card-issuer { font-size: 13px; font-weight: 600; color: var(--text-1); margin-top: 2px; }
+.badge { display: inline-flex; align-items: center; padding: 3px 10px; border-radius: 20px; font-size: 11px; font-weight: 500; }
+.badge-pending { background: rgba(245,158,11,0.12); color: var(--warn); border: 1px solid rgba(245,158,11,0.25); }
+.badge-published { background: rgba(16,185,129,0.1); color: var(--success); border: 1px solid rgba(16,185,129,0.25); }
+.badge-matched { background: rgba(59,130,246,0.12); color: var(--sapphire-glow); border: 1px solid rgba(59,130,246,0.25); }
+.badge-rejected { background: rgba(239,68,68,0.1); color: var(--danger); border: 1px solid rgba(239,68,68,0.2); }
+.card-amount { font-size: 24px; font-weight: 700; color: var(--text-1); margin-bottom: 2px; direction: ltr; text-align: right; }
+.card-label { font-size: 11px; color: var(--text-3); margin-bottom: 12px; }
+.divider { border: none; border-top: 1px solid var(--border); margin: 14px 0; }
+.meta { display: flex; flex-direction: column; gap: 8px; }
+.meta-row { display: flex; justify-content: space-between; align-items: center; }
+.meta-key { font-size: 12px; color: var(--text-3); }
+.meta-val { font-size: 12px; color: var(--text-2); font-weight: 500; }
+.val-gold { color: var(--gold-bright); font-size: 13px; }
+.val-green { color: var(--success); }
+.val-blue { color: var(--sapphire-glow); }
+.val-danger { color: var(--danger); }
+.val-warn { color: var(--warn); }
+.credit-bar { display: flex; align-items: center; gap: 6px; }
+.cdots { display: flex; gap: 3px; }
+.cdot { width: 8px; height: 8px; border-radius: 50%; }
+.cdot-on { background: var(--success); }
+.cdot-off { background: #1e2d45; }
+.cta-btn { width: 100%; margin-top: 16px; background: linear-gradient(135deg, #1e3a8a, #1e40af); border: 1px solid rgba(59,130,246,0.4); color: var(--sapphire-glow); font-family: 'Vazirmatn', Tahoma, sans-serif; padding: 11px 16px; border-radius: 8px; cursor: pointer; font-size: 13px; font-weight: 600; transition: all 0.2s; display: flex; align-items: center; justify-content: center; gap: 8px; }
+.cta-btn:hover { background: linear-gradient(135deg, #1e40af, #2563eb); border-color: var(--sapphire-glow); color: white; }
+.btn { font-family: 'Vazirmatn', Tahoma, sans-serif; padding: 9px 18px; border-radius: 8px; border: none; cursor: pointer; font-size: 13px; font-weight: 500; transition: all 0.2s; display: inline-flex; align-items: center; gap: 6px; }
+.btn-gold { background: var(--gold); color: white; }
+.btn-gold:hover { background: var(--gold-light); }
+.btn-outline { background: transparent; border: 1px solid var(--border); color: var(--text-2); }
+.btn-outline:hover { border-color: var(--sapphire-light); color: var(--text-1); }
+.btn-success { background: rgba(16,185,129,0.15); border: 1px solid rgba(16,185,129,0.4); color: var(--success); }
+.btn-success:hover { background: rgba(16,185,129,0.25); }
+.btn-danger { background: rgba(239,68,68,0.12); border: 1px solid rgba(239,68,68,0.3); color: var(--danger); }
+.btn-danger:hover { background: rgba(239,68,68,0.22); }
+.btn-sm { padding: 6px 12px; font-size: 12px; }
+.compliance-note { background: rgba(16,185,129,0.06); border: 1px solid rgba(16,185,129,0.2); border-radius: 8px; padding: 12px 16px; margin-bottom: 20px; font-size: 12px; color: #6ee7b7; display: flex; align-items: flex-start; gap: 8px; line-height: 1.6; }
+.form-section { background: var(--bg-1); border: 1px solid var(--border); border-radius: 14px; padding: 24px; margin-bottom: 24px; }
+.form-title { font-size: 15px; font-weight: 600; color: var(--text-1); margin-bottom: 4px; }
+.form-sub { font-size: 12px; color: var(--text-3); margin-bottom: 20px; }
+.form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+.form-field { display: flex; flex-direction: column; gap: 6px; }
+.form-field.full { grid-column: 1 / -1; }
+.form-label { font-size: 12px; color: var(--text-2); font-weight: 500; }
+.form-input { background: var(--bg-0); border: 1px solid var(--border); border-radius: 8px; padding: 10px 14px; font-family: 'Vazirmatn', Tahoma, sans-serif; font-size: 13px; color: var(--text-1); outline: none; direction: rtl; transition: border-color 0.2s; width: 100%; }
+.form-input:focus { border-color: var(--sapphire-light); }
+.form-input::placeholder { color: var(--text-3); }
+.upload-zone { background: var(--bg-0); border: 2px dashed var(--border); border-radius: 8px; padding: 28px 20px; text-align: center; cursor: pointer; }
+.upload-zone:hover { border-color: var(--sapphire-light); }
+.upload-icon { font-size: 28px; margin-bottom: 8px; }
+.upload-text { font-size: 12px; color: var(--text-3); }
+.upload-text span { color: var(--sapphire-glow); }
+.panel { background: var(--bg-1); border: 1px solid var(--border); border-radius: 14px; overflow: hidden; margin-bottom: 24px; }
+.panel-header { padding: 16px 20px; border-bottom: 1px solid var(--border); font-size: 14px; font-weight: 600; color: var(--text-1); display: flex; align-items: center; justify-content: space-between; background: var(--bg-2); }
+.table-wrap { overflow-x: auto; }
+table { width: 100%; border-collapse: collapse; }
+th { padding: 11px 16px; text-align: right; font-size: 11px; color: var(--text-3); font-weight: 500; border-bottom: 1px solid var(--border); background: var(--bg-2); white-space: nowrap; }
+td { padding: 13px 16px; font-size: 12px; color: var(--text-2); border-bottom: 1px solid rgba(59,130,246,0.06); vertical-align: middle; }
+tr:last-child td { border-bottom: none; }
+tr:hover td { background: rgba(30,64,175,0.04); }
+.req-item { padding: 16px 20px; border-bottom: 1px solid var(--border); display: flex; align-items: center; gap: 12px; }
+.req-item:last-child { border-bottom: none; }
+.avatar { width: 36px; height: 36px; border-radius: 50%; background: linear-gradient(135deg, var(--sapphire), var(--sapphire-light)); display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 700; color: white; flex-shrink: 0; }
+.req-info { flex: 1; }
+.req-name { font-size: 13px; font-weight: 600; color: var(--text-1); }
+.req-detail { font-size: 11px; color: var(--text-3); margin-top: 3px; }
+.req-phone { font-size: 11px; color: var(--sapphire-glow); margin-top: 2px; }
+.req-amount { font-size: 13px; font-weight: 700; color: var(--gold-bright); white-space: nowrap; text-align: left; direction: ltr; }
+.req-amount-label { font-size: 10px; color: var(--text-3); text-align: right; margin-top: 2px; }
+.queue-card { background: var(--bg-1); border: 1px solid var(--border); border-radius: 14px; margin-bottom: 14px; overflow: hidden; }
+.queue-head { padding: 14px 20px; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; background: var(--bg-2); }
+.queue-body { padding: 18px 20px; }
+.queue-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 16px; margin-bottom: 14px; }
+.q-field { display: flex; flex-direction: column; gap: 4px; }
+.q-label { font-size: 11px; color: var(--text-3); }
+.q-val { font-size: 13px; color: var(--text-1); font-weight: 500; }
+.queue-actions { display: flex; gap: 10px; justify-content: flex-end; padding-top: 14px; border-top: 1px solid var(--border); }
+.tag { display: inline-flex; padding: 2px 8px; border-radius: 4px; font-size: 10px; font-weight: 600; background: rgba(59,130,246,0.15); color: var(--sapphire-glow); }
+.docs-link { font-size: 12px; color: var(--text-3); margin-bottom: 14px; }
+.docs-link span { color: var(--gold-bright); cursor: pointer; }
+.modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.78); z-index: 1000; align-items: center; justify-content: center; padding: 20px; }
+.modal-overlay.open { display: flex; }
+.modal { background: var(--bg-1); border: 1px solid var(--border); border-radius: 16px; padding: 28px; max-width: 440px; width: 100%; }
+.modal-title { font-size: 16px; font-weight: 700; color: var(--text-1); margin-bottom: 12px; }
+.modal-body { font-size: 13px; color: var(--text-2); line-height: 1.8; margin-bottom: 20px; }
+.modal-actions { display: flex; gap: 10px; justify-content: flex-end; }
+.toast { display: none; position: fixed; bottom: 24px; left: 24px; background: var(--bg-2); border: 1px solid var(--success); border-radius: 10px; padding: 14px 18px; font-size: 13px; color: var(--success); z-index: 2000; align-items: center; gap: 8px; box-shadow: 0 8px 32px rgba(0,0,0,0.4); }
+.toast.show { display: flex; }
+.toast.error { border-color: var(--danger); color: var(--danger); }
+.empty-state { text-align: center; padding: 48px 20px; color: var(--text-3); font-size: 14px; }
+.empty-icon { font-size: 40px; margin-bottom: 12px; }
+.panel.gold-border { border-color: var(--border-gold); }
+@media (max-width: 600px) {
+  .form-grid { grid-template-columns: 1fr; }
+  .queue-grid { grid-template-columns: 1fr 1fr; }
+  .stats-row .stat-card { min-width: 120px; }
+}
+</style>
+</head>
+<body>
+
+<!-- Header -->
+<div class="header">
+  <div class="logo">
+    <div class="logo-icon">چ</div>
+    <div>
+      <div class="logo-text">چقیار</div>
+      <div class="logo-sub">بازارچه هوشمند نقدشوندگی چک</div>
+    </div>
+  </div>
+  <div class="badge-compliance">Compliance by Design · فاز MVP</div>
+</div>
+
+<!-- Tabs -->
+<div class="tabs-nav">
+  <button class="tab-btn active-blue" id="tab-investor" onclick="switchTab('investor')">
+    <span class="dot dot-blue"></span> 📊 پنل سرمایه‌گذار
+  </button>
+  <button class="tab-btn" id="tab-holder" onclick="switchTab('holder')">
+    <span class="dot dot-gold"></span> 📋 پنل دارنده چک
+  </button>
+  <button class="tab-btn" id="tab-admin" onclick="switchTab('admin')">
+    <span class="dot dot-purple"></span> 🛡 پنل ناظر / ادمین
+  </button>
+</div>
+
+<!-- Content -->
+<div class="content">
+  <div id="page-title" class="section-title">بازار آگهی‌های چک</div>
+  <div id="page-sub" class="section-sub">جستجو، فیلتر و درخواست ارتباط با دارندگان چک</div>
+
+  <!-- INVESTOR VIEW -->
+  <div id="view-investor">
+    <div class="stats-row">
+      <div class="stat-card">
+        <div class="stat-val" id="stat-count">۶</div>
+        <div class="stat-label">آگهی فعال</div>
+        <div class="stat-change">↑ ۱۲ آگهی جدید این هفته</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-val" id="stat-total">۷۶۸ میلیون</div>
+        <div class="stat-label">ارزش کل بازار (تومان)</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-val" id="stat-rate">۱۹٪</div>
+        <div class="stat-label">میانگین نرخ تنزیل</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-val" id="stat-days">۹۰</div>
+        <div class="stat-label">میانگین روزهای باقی‌مانده</div>
+      </div>
+    </div>
+
+    <div class="filters-bar">
+      <div class="filter-group" style="flex:2">
+        <div class="filter-label">جستجو</div>
+        <div class="search-wrap">
+          <span class="s-icon">🔍</span>
+          <input class="filter-input" type="text" id="f-search" placeholder="نام صادرکننده، شهر یا کد آگهی..." oninput="applyFilters()">
+        </div>
+      </div>
+      <div class="filter-group">
+        <div class="filter-label">حداقل مبلغ (میلیون)</div>
+        <input class="filter-input" type="number" id="f-min" placeholder="۰" oninput="applyFilters()">
+      </div>
+      <div class="filter-group">
+        <div class="filter-label">حداکثر روز تا سررسید</div>
+        <input class="filter-input" type="number" id="f-days" placeholder="هر تعداد" oninput="applyFilters()">
+      </div>
+      <div class="filter-group">
+        <div class="filter-label">حداقل اعتبار صادرکننده</div>
+        <select class="filter-select" id="f-credit" onchange="applyFilters()">
+          <option value="0">همه</option>
+          <option value="3">متوسط به بالا</option>
+          <option value="4">خوب به بالا</option>
+          <option value="5">عالی</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="cards-grid" id="listings-grid"></div>
+    <div class="empty-state" id="empty-inv" style="display:none">
+      <div class="empty-icon">🔍</div>
+      آگهی‌ای با این فیلترها یافت نشد
+    </div>
+  </div>
+
+  <!-- HOLDER VIEW -->
+  <div id="view-holder" style="display:none">
+    <div class="compliance-note">
+      ⚖️ <span>یادآوری مهم: پلتفرم چقیار صرفاً واسطه اطلاعاتی است. پول یا چک را نگه نمی‌دارد. تمام مذاکرات مالی خارج از پلتفرم انجام می‌شود.</span>
+    </div>
+
+    <div class="form-section">
+      <div class="form-title">📋 ثبت آگهی چک جدید</div>
+      <div class="form-sub">اطلاعات چک را وارد کنید — پس از بررسی ناظر منتشر می‌شود</div>
+      <div class="form-grid">
+        <div class="form-field">
+          <label class="form-label">مبلغ اسمی چک (میلیون تومان) *</label>
+          <input class="form-input" id="f-amount" type="number" placeholder="مثلاً ۵۰">
+        </div>
+        <div class="form-field">
+          <label class="form-label">تاریخ سررسید *</label>
+          <input class="form-input" id="f-maturity" type="text" placeholder="۱۴۰۴/۰۳/۱۵">
+        </div>
+        <div class="form-field">
+          <label class="form-label">کدملی / شناسه ملی صادرکننده *</label>
+          <input class="form-input" id="f-natid" type="text" placeholder="۱۰۱۰۳۴۵۶۷۸۹">
+        </div>
+        <div class="form-field">
+          <label class="form-label">بانک صادرکننده</label>
+          <select class="form-input" id="f-bank">
+            <option>بانک ملت</option><option>بانک ملی</option><option>بانک صادرات</option>
+            <option>بانک تجارت</option><option>بانک پاسارگاد</option><option>سایر</option>
+          </select>
+        </div>
+        <div class="form-field full">
+          <label class="form-label">توضیحات تکمیلی</label>
+          <input class="form-input" id="f-note" type="text" placeholder="مثلاً: چک تضمینی، بدون برگشت، مربوط به پروژه...">
+        </div>
+        <div class="form-field full">
+          <label class="form-label">تصویر چک (اختیاری)</label>
+          <div class="upload-zone">
+            <div class="upload-icon">📎</div>
+            <div class="upload-text"><span>انتخاب فایل</span> یا کشیدن و رها کردن — JPG, PNG, PDF حداکثر ۵ مگابایت</div>
+          </div>
+        </div>
+      </div>
+      <div style="display:flex;justify-content:flex-end;margin-top:20px">
+        <button class="btn btn-gold" onclick="submitListing()">ثبت آگهی ←</button>
+      </div>
+    </div>
+
+    <div class="panel">
+      <div class="panel-header">
+        <span>آگهی‌های من</span>
+        <span id="holder-count" class="badge badge-published"></span>
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead><tr>
+            <th>شناسه</th><th>مبلغ (تومان)</th><th>سررسید</th><th>روز باقی‌مانده</th><th>وضعیت</th><th>درخواست‌ها</th>
+          </tr></thead>
+          <tbody id="holder-table"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="panel gold-border">
+      <div class="panel-header">
+        <span>📬 درخواست‌های ارتباطی دریافتی</span>
+        <span class="badge badge-pending">نیاز به پاسخ</span>
+      </div>
+      <div id="req-list"></div>
+    </div>
+  </div>
+
+  <!-- ADMIN VIEW -->
+  <div id="view-admin" style="display:none">
+    <div class="stats-row">
+      <div class="stat-card">
+        <div class="stat-val" id="queue-count">۳</div>
+        <div class="stat-label">آگهی در صف بررسی</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-val">۲۴ ساعت</div>
+        <div class="stat-label">میانگین زمان بررسی</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-val">۸۷٪</div>
+        <div class="stat-label">نرخ تایید این ماه</div>
+      </div>
+    </div>
+    <div class="compliance-note">
+      🛡 <span>هدف بررسی: تأیید صحت اطلاعات چک، احراز هویت دارنده، و بررسی مدارک بارگذاری‌شده — نه ارزیابی مالی معامله</span>
+    </div>
+    <div id="queue-list"></div>
+    <div class="empty-state" id="empty-queue" style="display:none">
+      <div class="empty-icon">✅</div>
+      همه آگهی‌ها بررسی شدند — صف خالی است
+    </div>
+  </div>
+</div>
+
+<!-- Modal -->
+<div class="modal-overlay" id="contact-modal" onclick="if(event.target===this)closeModal()">
+  <div class="modal">
+    <div class="modal-title">📩 درخواست ارتباط با دارنده</div>
+    <div class="modal-body" id="modal-body"></div>
+    <div class="modal-actions">
+      <button class="btn btn-outline" onclick="closeModal()">انصراف</button>
+      <button class="btn btn-gold" onclick="confirmContact()">ارسال درخواست ←</button>
+    </div>
+  </div>
+</div>
+
+<!-- Toast -->
+<div class="toast" id="toast"></div>
+
+<script>
+const listings = [
+  { id:'CHQ-1401', issuer:'شرکت ساختمانی آریا', amount:85000000, maturity:'۱۴۰۴/۰۳/۱۵', daysLeft:47, discountRate:18, creditScore:4, city:'تهران', note:'چک تضمینی بانک ملت' },
+  { id:'CHQ-1402', issuer:'تجارت پارسیان', amount:220000000, maturity:'۱۴۰۴/۰۴/۲۰', daysLeft:83, discountRate:22, creditScore:3, city:'اصفهان', note:'چک عادی' },
+  { id:'CHQ-1403', issuer:'گروه صنعتی البرز', amount:50000000, maturity:'۱۴۰۴/۰۲/۲۸', daysLeft:19, discountRate:15, creditScore:5, city:'کرج', note:'چک تضمین‌دار بانک صادرات' },
+  { id:'CHQ-1404', issuer:'بازرگانی نور', amount:175000000, maturity:'۱۴۰۴/۰۵/۱۰', daysLeft:101, discountRate:20, creditScore:2, city:'مشهد', note:'چک عادی' },
+  { id:'CHQ-1405', issuer:'فناوری رایمند', amount:38000000, maturity:'۱۴۰۴/۰۶/۰۱', daysLeft:124, discountRate:17, creditScore:4, city:'تهران', note:'چک تضمینی' },
+  { id:'CHQ-1406', issuer:'پیمانکاری مهراب', amount:310000000, maturity:'۱۴۰۴/۰۷/۱۵', daysLeft:168, discountRate:24, creditScore:3, city:'شیراز', note:'چک شرکتی' },
+];
+
+let holderListings = [
+  { id:'CHQ-1407', amount:95000000, maturity:'۱۴۰۴/۰۴/۱۰', daysLeft:72, status:'pending', requests:0 },
+  { id:'CHQ-1401', amount:85000000, maturity:'۱۴۰۴/۰۳/۱۵', daysLeft:47, status:'published', requests:3 },
+  { id:'CHQ-1408', amount:42000000, maturity:'۱۴۰۴/۰۲/۰۱', daysLeft:4, status:'matched', requests:1 },
+  { id:'CHQ-1409', amount:130000000, maturity:'۱۴۰۴/۰۳/۲۸', daysLeft:60, status:'rejected', requests:0 },
+];
+
+const requests = [
+  { id:'R001', investor:'محمد حسینی', initials:'م.ح', amount:85000000, discountOffer:16, date:'۱۴۰۴/۰۱/۱۲', checkId:'CHQ-1401', phone:'۰۹۱۲-۱۲۳-۴۵۶۷' },
+  { id:'R002', investor:'سرمایه‌گذاری آفتاب', initials:'آ', amount:85000000, discountOffer:18, date:'۱۴۰۴/۰۱/۱۰', checkId:'CHQ-1401', phone:'۰۲۱-۸۸۲۳۴۵۶' },
+  { id:'R003', investor:'رضا کریمی', initials:'ر.ک', amount:42000000, discountOffer:15, date:'۱۴۰۴/۰۱/۱۴', checkId:'CHQ-1408', phone:'۰۹۳۳-۴۴۵-۵۶۶۷' },
+];
+
+let modQueue = [
+  { id:'CHQ-1407', issuer:'محمد رضایی', nationalId:'0023456789', amount:95000000, maturity:'۱۴۰۴/۰۴/۱۰', bank:'بانک ملی', submittedAt:'۱۴۰۴/۰۱/۱۴ · ۱۱:۳۰', city:'تهران', docCount:2 },
+  { id:'CHQ-1410', issuer:'شرکت کوشش پلاستیک', nationalId:'10104563212', amount:67000000, maturity:'۱۴۰۴/۰۳/۲۲', bank:'بانک تجارت', submittedAt:'۱۴۰۴/۰۱/۱۳ · ۱۶:۴۵', city:'اراک', docCount:3 },
+  { id:'CHQ-1411', issuer:'اکبر محمدی', nationalId:'0072347891', amount:28000000, maturity:'۱۴۰۴/۰۲/۱۵', bank:'بانک صادرات', submittedAt:'۱۴۰۴/۰۱/۱۳ · ۰۹:۱۰', city:'تبریز', docCount:1 },
+];
+
+let currentTab = 'investor';
+let contactTarget = null;
+
+function fmt(n) {
+  return n.toLocaleString('fa-IR');
+}
+function fmtM(n) {
+  return (n/1000000).toFixed(1) + ' میلیون';
+}
+function creditDots(score) {
+  let h = '<div class="cdots">';
+  for(let i=1;i<=5;i++) h += `<span class="cdot ${i<=score?'cdot-on':'cdot-off'}"></span>`;
+  return h + '</div>';
+}
+function creditLabel(s) {
+  const labels = ['','بسیار ضعیف','ضعیف','متوسط','خوب','عالی'];
+  const cls = ['','val-danger','val-warn','meta-val','val-green','val-green'];
+  return `<span class="${cls[s]}">${labels[s]}</span>`;
+}
+function badgeStatus(s) {
+  const map = { pending:'badge-pending', published:'badge-published', matched:'badge-matched', rejected:'badge-rejected' };
+  const labels = { pending:'در انتظار تایید ناظر', published:'منتشرشده', matched:'متصل‌شده', rejected:'رد شده' };
+  return `<span class="badge ${map[s]}">${labels[s]}</span>`;
+}
+
+function switchTab(tab) {
+  currentTab = tab;
+  ['investor','holder','admin'].forEach(t => {
+    document.getElementById('view-'+t).style.display = t===tab ? '' : 'none';
+    const btn = document.getElementById('tab-'+t);
+    btn.className = 'tab-btn';
+    if(t===tab) {
+      if(tab==='investor') btn.className += ' active-blue';
+      else if(tab==='holder') btn.className += ' active-gold';
+      else btn.className += ' active-purple';
+    }
+  });
+  const titles = { investor:['بازار آگهی‌های چک','جستجو، فیلتر و درخواست ارتباط با دارندگان چک'], holder:['پنل دارنده چک','ثبت آگهی، پیگیری وضعیت و مدیریت درخواست‌های ارتباطی'], admin:['پنل ناظر و مدیریت','بررسی و تایید آگهی‌های جدید پیش از انتشار'] };
+  document.getElementById('page-title').textContent = titles[tab][0];
+  document.getElementById('page-sub').textContent = titles[tab][1];
+  if(tab==='holder') renderHolder();
+  if(tab==='admin') renderAdmin();
+}
+
+function applyFilters() {
+  const search = (document.getElementById('f-search').value||'').trim();
+  const minAmt = parseInt(document.getElementById('f-min').value||0)*1000000||0;
+  const maxDays = parseInt(document.getElementById('f-days').value||99999)||99999;
+  const credit = parseInt(document.getElementById('f-credit').value||0)||0;
+  const filtered = listings.filter(l => {
+    if(search && !l.issuer.includes(search) && !l.id.includes(search) && !l.city.includes(search)) return false;
+    if(l.amount < minAmt) return false;
+    if(l.daysLeft > maxDays) return false;
+    if(credit && l.creditScore < credit) return false;
+    return true;
+  });
+  renderCards(filtered);
+  updateStats(filtered);
+}
+
+function updateStats(fl) {
+  document.getElementById('stat-count').textContent = fl.length.toLocaleString('fa-IR');
+  const total = fl.reduce((a,l)=>a+l.amount,0);
+  document.getElementById('stat-total').textContent = fmtM(total);
+  const avgRate = fl.length ? Math.round(fl.reduce((a,l)=>a+l.discountRate,0)/fl.length) : 0;
+  document.getElementById('stat-rate').textContent = avgRate+'٪';
+  const avgDays = fl.length ? Math.round(fl.reduce((a,l)=>a+l.daysLeft,0)/fl.length) : 0;
+  document.getElementById('stat-days').textContent = avgDays;
+}
+
+function renderCards(data) {
+  const grid = document.getElementById('listings-grid');
+  const empty = document.getElementById('empty-inv');
+  if(data.length===0) { grid.innerHTML=''; empty.style.display=''; return; }
+  empty.style.display='none';
+  grid.innerHTML = data.map(l => `
+    <div class="card">
+      <div class="card-header">
+        <div>
+          <div class="card-id">${l.id} · ${l.city}</div>
+          <div class="card-issuer">${l.issuer}</div>
+        </div>
+        <span class="badge badge-published">منتشرشده</span>
+      </div>
+      <div class="card-amount">${fmt(l.amount)}</div>
+      <div class="card-label">مبلغ اسمی (تومان)</div>
+      <hr class="divider">
+      <div class="meta">
+        <div class="meta-row">
+          <span class="meta-key">نرخ تنزیل پیشنهادی</span>
+          <span class="meta-val val-gold">${l.discountRate}٪</span>
+        </div>
+        <div class="meta-row">
+          <span class="meta-key">مبلغ تخمینی خرید</span>
+          <span class="meta-val val-green">${fmt(Math.round(l.amount*(1-l.discountRate/100)))}</span>
+        </div>
+        <div class="meta-row">
+          <span class="meta-key">تاریخ سررسید</span>
+          <span class="meta-val">${l.maturity}</span>
+        </div>
+        <div class="meta-row">
+          <span class="meta-key">روز تا سررسید</span>
+          <span class="meta-val val-blue">${l.daysLeft} روز</span>
+        </div>
+        <div class="meta-row">
+          <span class="meta-key">اعتبار صادرکننده</span>
+          <div class="credit-bar">${creditDots(l.creditScore)} ${creditLabel(l.creditScore)}</div>
+        </div>
+        <div class="meta-row">
+          <span class="meta-key">توضیح</span>
+          <span class="meta-val" style="font-size:11px">${l.note}</span>
+        </div>
+      </div>
+      <button class="cta-btn" onclick='openModal(${JSON.stringify(l).replace(/'/g,"&#39;")})'>
+        📩 درخواست ارتباط با دارنده
+      </button>
+    </div>
+  `).join('');
+}
+
+function renderHolder() {
+  document.getElementById('holder-count').textContent = holderListings.length + ' آگهی';
+  const tbody = document.getElementById('holder-table');
+  tbody.innerHTML = holderListings.map(l => `<tr>
+    <td style="color:var(--sapphire-glow);font-weight:600">${l.id}</td>
+    <td>${fmt(l.amount)}</td>
+    <td>${l.maturity}</td>
+    <td><span style="color:${l.daysLeft<30?'var(--danger)':l.daysLeft<60?'var(--warn)':'var(--success)'}">${l.daysLeft} روز</span></td>
+    <td>${badgeStatus(l.status)}</td>
+    <td><span style="color:${l.requests>0?'var(--gold-bright)':'var(--text-3)'}">${l.requests>0?l.requests+' درخواست':'—'}</span></td>
+  </tr>`).join('');
+
+  const reqList = document.getElementById('req-list');
+  reqList.innerHTML = requests.map(r => `
+    <div class="req-item">
+      <div class="avatar">${r.initials}</div>
+      <div class="req-info">
+        <div class="req-name">${r.investor}</div>
+        <div class="req-detail">آگهی ${r.checkId} · پیشنهاد تنزیل: ${r.discountOffer}٪ · ${r.date}</div>
+        <div class="req-phone">📞 ${r.phone}</div>
+      </div>
+      <div>
+        <div class="req-amount">${fmtM(r.amount)}</div>
+        <div class="req-amount-label">پیشنهاد خرید</div>
+      </div>
+    </div>
+  `).join('');
+}
+
+function renderAdmin() {
+  document.getElementById('queue-count').textContent = modQueue.length;
+  const qList = document.getElementById('queue-list');
+  const empty = document.getElementById('empty-queue');
+  if(modQueue.length===0) { qList.innerHTML=''; empty.style.display=''; return; }
+  empty.style.display='none';
+  qList.innerHTML = modQueue.map(q => `
+    <div class="queue-card" id="qcard-${q.id}">
+      <div class="queue-head">
+        <div style="display:flex;align-items:center;gap:10px">
+          <span style="color:var(--sapphire-glow);font-weight:700;font-size:14px">${q.id}</span>
+          <span class="tag">جدید</span>
+        </div>
+        <div style="font-size:11px;color:var(--text-3)">ثبت: ${q.submittedAt}</div>
+      </div>
+      <div class="queue-body">
+        <div class="queue-grid">
+          <div class="q-field"><div class="q-label">صادرکننده</div><div class="q-val">${q.issuer}</div></div>
+          <div class="q-field"><div class="q-label">کد ملی / شناسه</div><div class="q-val">${q.nationalId}</div></div>
+          <div class="q-field"><div class="q-label">شهر</div><div class="q-val">${q.city}</div></div>
+          <div class="q-field"><div class="q-label">مبلغ اسمی</div><div class="q-val val-gold">${fmt(q.amount)} تومان</div></div>
+          <div class="q-field"><div class="q-label">تاریخ سررسید</div><div class="q-val">${q.maturity}</div></div>
+          <div class="q-field"><div class="q-label">بانک</div><div class="q-val">${q.bank}</div></div>
+        </div>
+        <div class="docs-link">مدارک بارگذاری‌شده: <span style="color:var(--sapphire-glow)">${q.docCount} فایل</span> — <span>مشاهده مدارک ↗</span></div>
+        <div class="queue-actions">
+          <button class="btn btn-danger btn-sm" onclick="rejectItem('${q.id}')">✕ رد آگهی</button>
+          <button class="btn btn-success btn-sm" onclick="approveItem('${q.id}')">✓ تایید و انتشار</button>
+        </div>
+      </div>
+    </div>
+  `).join('');
+}
+
+function approveItem(id) {
+  modQueue = modQueue.filter(q=>q.id!==id);
+  const hl = holderListings.find(l=>l.id===id);
+  if(hl) hl.status='published';
+  renderAdmin();
+  showToast('✓ آگهی با موفقیت تایید و منتشر شد', false);
+}
+function rejectItem(id) {
+  modQueue = modQueue.filter(q=>q.id!==id);
+  const hl = holderListings.find(l=>l.id===id);
+  if(hl) hl.status='rejected';
+  renderAdmin();
+  showToast('آگهی رد شد و به دارنده اطلاع داده می‌شود', false);
+}
+
+function openModal(l) {
+  contactTarget = l;
+  document.getElementById('modal-body').innerHTML = `
+    شما در حال ارسال درخواست ارتباط برای آگهی <strong style="color:var(--sapphire-glow)">${l.id}</strong>
+    به مبلغ اسمی <strong style="color:var(--gold-bright)">${fmtM(l.amount)} تومان</strong>
+    از <strong>${l.issuer}</strong> هستید.<br><br>
+    پس از تایید، اطلاعات تماس دارنده چک در اختیار شما قرار می‌گیرد تا مذاکرات بیرون از پلتفرم انجام شود.<br><br>
+    <span style="font-size:11px;color:var(--text-3)">⚖️ پلتفرم در مذاکرات مالی یا تسویه دخالتی ندارد.</span>`;
+  document.getElementById('contact-modal').classList.add('open');
+}
+function closeModal() {
+  document.getElementById('contact-modal').classList.remove('open');
+}
+function confirmContact() {
+  closeModal();
+  showToast('✓ درخواست ارتباط ارسال شد — دارنده با شما تماس می‌گیرد', false);
+}
+
+function submitListing() {
+  const amount = document.getElementById('f-amount').value;
+  const maturity = document.getElementById('f-maturity').value;
+  const natid = document.getElementById('f-natid').value;
+  if(!amount||!maturity||!natid) { showToast('⚠ لطفاً فیلدهای ستاره‌دار را پر کنید', true); return; }
+  const newId = 'CHQ-14'+(10+holderListings.length);
+  holderListings.unshift({ id:newId, amount:parseInt(amount)*1000000, maturity, daysLeft:Math.floor(Math.random()*90+20), status:'pending', requests:0 });
+  modQueue.unshift({ id:newId, issuer:'کاربر جاری', nationalId:natid, amount:parseInt(amount)*1000000, maturity, bank:document.getElementById('f-bank').value, submittedAt:'همین لحظه', city:'—', docCount:0 });
+  document.getElementById('f-amount').value='';
+  document.getElementById('f-maturity').value='';
+  document.getElementById('f-natid').value='';
+  document.getElementById('f-note').value='';
+  showToast('✓ آگهی ثبت شد و در صف بررسی ناظر قرار گرفت', false);
+  renderHolder();
+}
+
+function showToast(msg, isError) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.className = 'toast show' + (isError?' error':'');
+  setTimeout(()=>{ t.className='toast'; }, 3500);
+}
+
+// Init
+renderCards(listings);
+updateStats(listings);
+</script>
+</body>
+</html>

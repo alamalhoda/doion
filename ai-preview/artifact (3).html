@@ -1,0 +1,3948 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>چک‌بازار — Marketplace تنزیل چک</title>
+    <style>
+        /* ===== Design System — Colors & Variables ===== */
+        :root {
+            --primary: #1e40af;
+            --primary-dark: #1e3a8a;
+            --primary-light: #3b82f6;
+            --secondary: #059669;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            --info: #3b82f6;
+            
+            --bg-page: #f9fafb;
+            --bg-card: #ffffff;
+            --bg-dark: #1f2937;
+            --bg-light: #f3f4f6;
+            
+            --text-primary: #111827;
+            --text-secondary: #6b7280;
+            --text-muted: #9ca3af;
+            --text-inverse: #ffffff;
+            
+            --border: #e5e7eb;
+            --border-dark: #d1d5db;
+            
+            --shadow-sm: 0 1px 2px 0 rgba(0,0,0,0.05);
+            --shadow-md: 0 4px 6px -1px rgba(0,0,0,0.1);
+            --shadow-lg: 0 10px 15px -3px rgba(0,0,0,0.1);
+            --shadow-xl: 0 20px 25px -5px rgba(0,0,0,0.1);
+            
+            --radius-sm: 4px;
+            --radius-md: 8px;
+            --radius-lg: 12px;
+            
+            --spacing-xs: 4px;
+            --spacing-sm: 8px;
+            --spacing-md: 16px;
+            --spacing-lg: 24px;
+            --spacing-xl: 32px;
+        }
+        
+        /* ===== Global Reset ===== */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, sans-serif;
+            background: var(--bg-page);
+            color: var(--text-primary);
+            line-height: 1.6;
+        }
+        
+        button {
+            cursor: pointer;
+            border: none;
+            font-family: inherit;
+        }
+        
+        input, select, textarea {
+            font-family: inherit;
+            font-size: 14px;
+        }
+        
+        /* ===== Layout ===== */
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 var(--spacing-lg);
+        }
+        
+        section {
+            display: none;
+        }
+        
+        section.active {
+            display: block;
+        }
+        /* ===== Navigation ===== */
+        nav {
+            background: var(--bg-card);
+            border-bottom: 1px solid var(--border);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            box-shadow: var(--shadow-sm);
+        }
+        
+        .nav-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: var(--spacing-md) var(--spacing-lg);
+        }
+        
+        .brand {
+            font-size: 24px;
+            font-weight: 700;
+            color: var(--primary);
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-sm);
+        }
+        
+        .nav-links {
+            display: flex;
+            gap: var(--spacing-lg);
+            align-items: center;
+        }
+        
+        .nav-links a {
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-weight: 500;
+            transition: color 0.2s;
+            padding: var(--spacing-sm) var(--spacing-md);
+            border-radius: var(--radius-sm);
+        }
+        
+        .nav-links a:hover,
+        .nav-links a.active {
+            color: var(--primary);
+            background: var(--bg-light);
+        }
+        
+        .nav-actions {
+            display: flex;
+            gap: var(--spacing-md);
+            align-items: center;
+        }
+        
+        /* ===== Button System ===== */
+        .btn {
+            padding: 10px 20px;
+            border-radius: var(--radius-md);
+            font-weight: 600;
+            font-size: 14px;
+            transition: all 0.2s;
+            display: inline-flex;
+            align-items: center;
+            gap: var(--spacing-sm);
+            text-decoration: none;
+        }
+        
+        .btn-primary {
+            background: var(--primary);
+            color: var(--text-inverse);
+        }
+        
+        .btn-primary:hover {
+            background: var(--primary-dark);
+            box-shadow: var(--shadow-md);
+        }
+        
+        .btn-secondary {
+            background: transparent;
+            color: var(--primary);
+            border: 2px solid var(--primary);
+        }
+        
+        .btn-secondary:hover {
+            background: var(--primary);
+            color: var(--text-inverse);
+        }
+        
+        .btn-ghost {
+            background: transparent;
+            color: var(--text-secondary);
+        }
+        
+        .btn-ghost:hover {
+            background: var(--bg-light);
+            color: var(--text-primary);
+        }
+        
+        .btn-success {
+            background: var(--success);
+            color: var(--text-inverse);
+        }
+        
+        .btn-success:hover {
+            background: #059669;
+        }
+        
+        .btn-sm {
+            padding: 6px 12px;
+            font-size: 13px;
+        }
+        
+        .btn-lg {
+            padding: 14px 28px;
+            font-size: 16px;
+        }
+        
+        .btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+        
+        /* ===== Badge System ===== */
+        .badge {
+            display: inline-block;
+            padding: 4px 10px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.3px;
+        }
+        
+        .badge-status-active { background: #d1fae5; color: #065f46; }
+        .badge-status-pending { background: #fef3c7; color: #92400e; }
+        .badge-status-sold { background: #dbeafe; color: #1e40af; }
+        .badge-status-expired { background: #fee2e2; color: #991b1b; }
+        
+        .badge-verification-full { background: #d1fae5; color: #065f46; }
+        .badge-verification-partial { background: #fef3c7; color: #92400e; }
+        .badge-verification-none { background: #f3f4f6; color: #6b7280; }
+        
+        .badge-risk-low { background: #d1fae5; color: #065f46; }
+        .badge-risk-medium { background: #fef3c7; color: #92400e; }
+        .badge-risk-high { background: #fee2e2; color: #991b1b; }
+                /* ===== Card System ===== */
+        .card {
+            background: var(--bg-card);
+            border-radius: var(--radius-lg);
+            padding: var(--spacing-lg);
+            box-shadow: var(--shadow-sm);
+            border: 1px solid var(--border);
+            transition: all 0.2s;
+        }
+        
+        .card:hover {
+            box-shadow: var(--shadow-md);
+            border-color: var(--border-dark);
+        }
+        
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: var(--spacing-md);
+            padding-bottom: var(--spacing-md);
+            border-bottom: 1px solid var(--border);
+        }
+        
+        .card-title {
+            font-size: 18px;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: var(--spacing-xs);
+        }
+        
+        .card-subtitle {
+            font-size: 14px;
+            color: var(--text-secondary);
+        }
+        
+        .card-body {
+            margin-bottom: var(--spacing-md);
+        }
+        
+        .card-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding-top: var(--spacing-md);
+            border-top: 1px solid var(--border);
+        }
+        
+        /* ===== Hero Section ===== */
+        .hero {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+            color: var(--text-inverse);
+            padding: 60px 0;
+            margin-bottom: var(--spacing-xl);
+        }
+        
+        .hero-content {
+            max-width: 800px;
+            margin: 0 auto;
+            text-align: center;
+        }
+        
+        .hero h1 {
+            font-size: 42px;
+            font-weight: 800;
+            margin-bottom: var(--spacing-md);
+            line-height: 1.2;
+        }
+        
+        .hero p {
+            font-size: 18px;
+            opacity: 0.95;
+            margin-bottom: var(--spacing-xl);
+            line-height: 1.7;
+        }
+        
+        .hero-actions {
+            display: flex;
+            gap: var(--spacing-md);
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+        
+        /* ===== Stats Grid ===== */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: var(--spacing-lg);
+            margin-bottom: var(--spacing-xl);
+        }
+        
+        .stat-card {
+            background: var(--bg-card);
+            padding: var(--spacing-lg);
+            border-radius: var(--radius-lg);
+            border: 1px solid var(--border);
+            text-align: center;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        
+        .stat-card:hover {
+            transform: translateY(-4px);
+            box-shadow: var(--shadow-lg);
+        }
+        
+        .stat-value {
+            font-size: 36px;
+            font-weight: 800;
+            color: var(--primary);
+            margin-bottom: var(--spacing-xs);
+        }
+        
+        .stat-label {
+            font-size: 14px;
+            color: var(--text-secondary);
+            font-weight: 600;
+        }
+        
+        .stat-change {
+            font-size: 12px;
+            margin-top: var(--spacing-xs);
+            font-weight: 600;
+        }
+        
+        .stat-change.positive {
+            color: var(--success);
+        }
+        
+        .stat-change.negative {
+            color: var(--danger);
+        }
+        /* ===== Grid System ===== */
+        .grid {
+            display: grid;
+            gap: var(--spacing-lg);
+        }
+        
+        .grid-2 {
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+        }
+        
+        .grid-3 {
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+        }
+        
+        .grid-4 {
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        }
+        
+        /* ===== Filter Bar ===== */
+        .filter-bar {
+            background: var(--bg-card);
+            padding: var(--spacing-lg);
+            border-radius: var(--radius-lg);
+            border: 1px solid var(--border);
+            margin-bottom: var(--spacing-xl);
+        }
+        
+        .filter-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: var(--spacing-md);
+        }
+        
+        .filter-header h3 {
+            font-size: 16px;
+            font-weight: 700;
+            color: var(--text-primary);
+        }
+        
+        .filter-reset {
+            font-size: 14px;
+            color: var(--primary);
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-weight: 600;
+            padding: 0;
+        }
+        
+        .filter-reset:hover {
+            text-decoration: underline;
+        }
+        
+        .filter-group {
+            margin-bottom: var(--spacing-lg);
+        }
+        
+        .filter-group:last-child {
+            margin-bottom: 0;
+        }
+        
+        .filter-label {
+            display: block;
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--text-secondary);
+            margin-bottom: var(--spacing-sm);
+        }
+        
+        .filter-select,
+        .filter-input {
+            width: 100%;
+            padding: 10px 14px;
+            border: 1px solid var(--border);
+            border-radius: var(--radius-md);
+            font-size: 14px;
+            background: var(--bg-page);
+            color: var(--text-primary);
+            transition: border-color 0.2s;
+        }
+        
+        .filter-select:focus,
+        .filter-input:focus {
+            outline: none;
+            border-color: var(--primary);
+        }
+        
+        .filter-range {
+            display: flex;
+            gap: var(--spacing-sm);
+            align-items: center;
+        }
+        
+        .filter-range input {
+            flex: 1;
+        }
+        
+        .filter-range-separator {
+            color: var(--text-muted);
+            font-weight: 600;
+        }
+        
+        .filter-checkboxes {
+            display: flex;
+            flex-direction: column;
+            gap: var(--spacing-sm);
+        }
+        
+        .filter-checkbox {
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-sm);
+            cursor: pointer;
+        }
+        
+        .filter-checkbox input[type="checkbox"] {
+            width: 18px;
+            height: 18px;
+            cursor: pointer;
+            accent-color: var(--primary);
+        }
+        
+        .filter-checkbox label {
+            font-size: 14px;
+            color: var(--text-primary);
+            cursor: pointer;
+        }
+        
+        /* ===== Search Box ===== */
+        .search-box {
+            position: relative;
+            margin-bottom: var(--spacing-xl);
+        }
+        
+        .search-input {
+            width: 100%;
+            padding: 14px 48px 14px 16px;
+            border: 2px solid var(--border);
+            border-radius: var(--radius-lg);
+            font-size: 16px;
+            background: var(--bg-card);
+            color: var(--text-primary);
+            transition: all 0.2s;
+        }
+        
+        .search-input:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+        }
+        
+        .search-input::placeholder {
+            color: var(--text-muted);
+        }
+        
+        .search-icon {
+            position: absolute;
+            left: 16px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--text-muted);
+            pointer-events: none;
+        }
+        
+        /* ===== Sort Bar ===== */
+        .sort-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: var(--spacing-lg);
+            padding: var(--spacing-md);
+            background: var(--bg-card);
+            border-radius: var(--radius-md);
+            border: 1px solid var(--border);
+        }
+        
+        .sort-label {
+            font-size: 14px;
+            color: var(--text-secondary);
+            font-weight: 600;
+        }
+        
+        .sort-select {
+            padding: 8px 12px;
+            border: 1px solid var(--border);
+            border-radius: var(--radius-md);
+            font-size: 14px;
+            background: var(--bg-page);
+            color: var(--text-primary);
+            cursor: pointer;
+            min-width: 200px;
+        }
+        
+        .sort-select:focus {
+            outline: none;
+            border-color: var(--primary);
+        }
+        
+        .result-count {
+            font-size: 14px;
+            color: var(--text-secondary);
+        }
+        
+        .result-count strong {
+            color: var(--text-primary);
+            font-weight: 700;
+        }
+        /* ===== Listing Cards ===== */
+        .listing-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-lg);
+            padding: var(--spacing-lg);
+            transition: all 0.2s;
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .listing-card:hover {
+            box-shadow: var(--shadow-lg);
+            border-color: var(--primary);
+            transform: translateY(-2px);
+        }
+        
+        .listing-card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: var(--spacing-md);
+        }
+        
+        .listing-issuer {
+            flex: 1;
+        }
+        
+        .listing-issuer-name {
+            font-size: 16px;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: var(--spacing-xs);
+        }
+        
+        .listing-issuer-type {
+            font-size: 13px;
+            color: var(--text-secondary);
+        }
+        
+        .listing-badges {
+            display: flex;
+            flex-direction: column;
+            gap: var(--spacing-xs);
+            align-items: flex-end;
+        }
+        
+        .listing-amount {
+            font-size: 24px;
+            font-weight: 800;
+            color: var(--primary);
+            margin-bottom: var(--spacing-sm);
+        }
+        
+        .listing-info-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: var(--spacing-md);
+            margin-bottom: var(--spacing-md);
+            padding: var(--spacing-md);
+            background: var(--bg-light);
+            border-radius: var(--radius-md);
+        }
+        
+        .listing-info-item {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+        
+        .listing-info-label {
+            font-size: 12px;
+            color: var(--text-muted);
+            font-weight: 600;
+        }
+        
+        .listing-info-value {
+            font-size: 14px;
+            color: var(--text-primary);
+            font-weight: 600;
+        }
+        
+        .listing-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding-top: var(--spacing-md);
+            border-top: 1px solid var(--border);
+        }
+        
+        .listing-meta {
+            font-size: 12px;
+            color: var(--text-muted);
+        }
+        
+        .listing-cta {
+            font-size: 14px;
+            color: var(--primary);
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+        
+        /* ===== Detail View ===== */
+        .detail-view {
+            background: var(--bg-card);
+            border-radius: var(--radius-lg);
+            border: 1px solid var(--border);
+            overflow: hidden;
+        }
+        
+        .detail-header {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+            color: var(--text-inverse);
+            padding: var(--spacing-xl);
+        }
+        
+        .detail-header-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: var(--spacing-lg);
+        }
+        
+        .detail-issuer h1 {
+            font-size: 28px;
+            font-weight: 800;
+            margin-bottom: var(--spacing-xs);
+        }
+        
+        .detail-issuer p {
+            font-size: 16px;
+            opacity: 0.9;
+        }
+        
+        .detail-amount {
+            font-size: 36px;
+            font-weight: 800;
+            text-align: left;
+        }
+        
+        .detail-stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: var(--spacing-lg);
+            padding: var(--spacing-md);
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: var(--radius-md);
+        }
+        
+        .detail-stat {
+            text-align: center;
+        }
+        
+        .detail-stat-label {
+            font-size: 13px;
+            opacity: 0.85;
+            margin-bottom: var(--spacing-xs);
+        }
+        
+        .detail-stat-value {
+            font-size: 20px;
+            font-weight: 700;
+        }
+        
+        .detail-body {
+            padding: var(--spacing-xl);
+        }
+        
+        .detail-section {
+            margin-bottom: var(--spacing-xl);
+        }
+        
+        .detail-section:last-child {
+            margin-bottom: 0;
+        }
+        
+        .detail-section-title {
+            font-size: 18px;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: var(--spacing-md);
+            padding-bottom: var(--spacing-sm);
+            border-bottom: 2px solid var(--border);
+        }
+        
+        .detail-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: var(--spacing-lg);
+        }
+        
+        .detail-field {
+            display: flex;
+            flex-direction: column;
+            gap: var(--spacing-xs);
+        }
+        
+        .detail-field-label {
+            font-size: 13px;
+            color: var(--text-secondary);
+            font-weight: 600;
+        }
+        
+        .detail-field-value {
+            font-size: 15px;
+            color: var(--text-primary);
+            font-weight: 600;
+        }
+        
+        .detail-cta-box {
+            background: var(--bg-light);
+            padding: var(--spacing-lg);
+            border-radius: var(--radius-lg);
+            text-align: center;
+            margin-top: var(--spacing-xl);
+        }
+        
+        .detail-cta-box h3 {
+            font-size: 18px;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: var(--spacing-sm);
+        }
+        
+        .detail-cta-box p {
+            font-size: 14px;
+            color: var(--text-secondary);
+            margin-bottom: var(--spacing-lg);
+            line-height: 1.6;
+        }
+        
+        /* ===== Modal System ===== */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.6);
+            z-index: 1000;
+            backdrop-filter: blur(4px);
+            align-items: center;
+            justify-content: center;
+            padding: var(--spacing-lg);
+        }
+        
+        .modal-overlay.open {
+            display: flex;
+        }
+        
+        .modal {
+            background: var(--bg-card);
+            border-radius: var(--radius-lg);
+            max-width: 900px;
+            width: 100%;
+            max-height: 90vh;
+            overflow-y: auto;
+            box-shadow: var(--shadow-xl);
+            animation: modalSlideIn 0.3s ease-out;
+        }
+        
+        @keyframes modalSlideIn {
+            from {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: var(--spacing-lg);
+            border-bottom: 1px solid var(--border);
+            position: sticky;
+            top: 0;
+            background: var(--bg-card);
+            z-index: 10;
+        }
+        
+        .modal-title {
+            font-size: 20px;
+            font-weight: 700;
+            color: var(--text-primary);
+        }
+        
+        .modal-close {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            border: none;
+            background: var(--bg-light);
+            color: var(--text-secondary);
+            font-size: 20px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s;
+        }
+        
+        .modal-close:hover {
+            background: var(--danger);
+            color: white;
+        }
+        
+        .modal-body {
+            padding: var(--spacing-xl);
+        }
+        
+        .modal-section {
+            margin-bottom: var(--spacing-xl);
+        }
+        
+        .modal-section:last-child {
+            margin-bottom: 0;
+        }
+        
+        .modal-section-title {
+            font-size: 16px;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: var(--spacing-md);
+        }
+        
+        .modal-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: var(--spacing-md);
+        }
+        
+        .modal-field {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+        
+        .modal-field-key {
+            font-size: 13px;
+            color: var(--text-secondary);
+            font-weight: 600;
+        }
+        
+        .modal-field-val {
+            font-size: 15px;
+            color: var(--text-primary);
+            font-weight: 600;
+        }
+        
+        .modal-footer {
+            padding: var(--spacing-lg);
+            border-top: 1px solid var(--border);
+            display: flex;
+            justify-content: flex-end;
+            gap: var(--spacing-md);
+            position: sticky;
+            bottom: 0;
+            background: var(--bg-card);
+        }
+        /* ===== Form System ===== */
+        .form-group {
+            margin-bottom: var(--spacing-lg);
+        }
+        
+        .form-label {
+            display: block;
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: var(--spacing-sm);
+        }
+        
+        .form-label.required::after {
+            content: '*';
+            color: var(--danger);
+            margin-right: 4px;
+        }
+        
+        .form-input,
+        .form-select,
+        .form-textarea {
+            width: 100%;
+            padding: 12px 16px;
+            border: 1px solid var(--border);
+            border-radius: var(--radius-md);
+            font-size: 14px;
+            font-family: inherit;
+            color: var(--text-primary);
+            background: var(--bg-card);
+            transition: all 0.2s;
+        }
+        
+        .form-input:focus,
+        .form-select:focus,
+        .form-textarea:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(0, 112, 243, 0.1);
+        }
+        
+        .form-input::placeholder,
+        .form-textarea::placeholder {
+            color: var(--text-muted);
+        }
+        
+        .form-textarea {
+            min-height: 120px;
+            resize: vertical;
+        }
+        
+        .form-hint {
+            font-size: 12px;
+            color: var(--text-muted);
+            margin-top: var(--spacing-xs);
+            line-height: 1.4;
+        }
+        
+        .form-error {
+            font-size: 12px;
+            color: var(--danger);
+            margin-top: var(--spacing-xs);
+            display: none;
+        }
+        
+        .form-group.error .form-input,
+        .form-group.error .form-select,
+        .form-group.error .form-textarea {
+            border-color: var(--danger);
+        }
+        
+        .form-group.error .form-error {
+            display: block;
+        }
+        
+        .form-row {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: var(--spacing-lg);
+        }
+        
+        .form-upload {
+            border: 2px dashed var(--border);
+            border-radius: var(--radius-md);
+            padding: var(--spacing-xl);
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.2s;
+            background: var(--bg-light);
+        }
+        
+        .form-upload:hover {
+            border-color: var(--primary);
+            background: rgba(0, 112, 243, 0.05);
+        }
+        
+        .form-upload-icon {
+            font-size: 48px;
+            color: var(--text-muted);
+            margin-bottom: var(--spacing-sm);
+        }
+        
+        .form-upload-text {
+            font-size: 14px;
+            color: var(--text-secondary);
+            font-weight: 600;
+        }
+        
+        .form-upload-hint {
+            font-size: 12px;
+            color: var(--text-muted);
+            margin-top: var(--spacing-xs);
+        }
+        
+        .form-checkbox-group {
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-sm);
+        }
+        
+        .form-checkbox {
+            width: 20px;
+            height: 20px;
+            cursor: pointer;
+        }
+        
+        .form-checkbox-label {
+            font-size: 14px;
+            color: var(--text-primary);
+            cursor: pointer;
+            line-height: 1.5;
+        }
+        
+        /* ===== Create Listing Wizard ===== */
+        .wizard-container {
+            max-width: 900px;
+            margin: 0 auto;
+        }
+        
+        .wizard-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-lg);
+            overflow: hidden;
+        }
+        
+        .wizard-header {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+            color: var(--text-inverse);
+            padding: var(--spacing-xl);
+            text-align: center;
+        }
+        
+        .wizard-header h1 {
+            font-size: 24px;
+            font-weight: 800;
+            margin-bottom: var(--spacing-xs);
+        }
+        
+        .wizard-header p {
+            font-size: 14px;
+            opacity: 0.9;
+        }
+        
+        /* ===== Stepper ===== */
+        .stepper {
+            display: flex;
+            justify-content: space-between;
+            padding: var(--spacing-xl);
+            background: var(--bg-light);
+            position: relative;
+        }
+        
+        .stepper::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 10%;
+            right: 10%;
+            height: 2px;
+            background: var(--border);
+            transform: translateY(-50%);
+            z-index: 0;
+        }
+        
+        .step {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: var(--spacing-sm);
+            position: relative;
+            z-index: 1;
+            flex: 1;
+        }
+        
+        .step-circle {
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            background: var(--bg-card);
+            border: 3px solid var(--border);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 18px;
+            color: var(--text-muted);
+            transition: all 0.3s;
+        }
+        
+        .step.active .step-circle {
+            background: var(--primary);
+            border-color: var(--primary);
+            color: white;
+            box-shadow: 0 0 0 4px rgba(0, 112, 243, 0.2);
+        }
+        
+        .step.completed .step-circle {
+            background: var(--success);
+            border-color: var(--success);
+            color: white;
+        }
+        
+        .step-circle::after {
+            content: attr(data-step);
+        }
+        
+        .step.completed .step-circle::after {
+            content: '✓';
+        }
+        
+        .step-label {
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--text-muted);
+            text-align: center;
+            transition: all 0.3s;
+        }
+        
+        .step.active .step-label {
+            color: var(--primary);
+        }
+        
+        .step.completed .step-label {
+            color: var(--success);
+        }
+        
+        /* ===== Wizard Steps Content ===== */
+        .wizard-body {
+            padding: var(--spacing-xl);
+        }
+        
+        .wizard-step-content {
+            display: none;
+        }
+        
+        .wizard-step-content.active {
+            display: block;
+            animation: fadeIn 0.3s ease-in;
+        }
+        
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .wizard-step-title {
+            font-size: 20px;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: var(--spacing-md);
+        }
+        
+        .wizard-step-description {
+            font-size: 14px;
+            color: var(--text-secondary);
+            margin-bottom: var(--spacing-xl);
+            line-height: 1.6;
+        }
+        
+        .wizard-footer {
+            padding: var(--spacing-lg) var(--spacing-xl);
+            border-top: 1px solid var(--border);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: var(--bg-light);
+        }
+        
+        .wizard-nav-buttons {
+            display: flex;
+            gap: var(--spacing-md);
+        }
+        
+        /* ===== Summary View ===== */
+        .summary-grid {
+            display: grid;
+            gap: var(--spacing-lg);
+        }
+        
+        .summary-section {
+            background: var(--bg-light);
+            padding: var(--spacing-lg);
+            border-radius: var(--radius-md);
+            border: 1px solid var(--border);
+        }
+        
+        .summary-section-title {
+            font-size: 16px;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: var(--spacing-md);
+            padding-bottom: var(--spacing-sm);
+            border-bottom: 2px solid var(--border);
+        }
+        
+        .summary-row {
+            display: flex;
+            justify-content: space-between;
+            padding: var(--spacing-sm) 0;
+            border-bottom: 1px solid var(--border);
+        }
+        
+        .summary-row:last-child {
+            border-bottom: none;
+        }
+        
+        .summary-key {
+            font-size: 14px;
+            color: var(--text-secondary);
+            font-weight: 600;
+        }
+        
+        .summary-value {
+            font-size: 14px;
+            color: var(--text-primary);
+            font-weight: 700;
+        }
+        
+        /* ===== Success State ===== */
+        .success-state {
+            text-align: center;
+            padding: var(--spacing-xl) 0;
+        }
+        
+        .success-icon {
+            width: 80px;
+            height: 80px;
+            margin: 0 auto var(--spacing-lg);
+            background: var(--success);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 48px;
+            color: white;
+            animation: successPop 0.5s ease-out;
+        }
+        
+        @keyframes successPop {
+            0% {
+                transform: scale(0);
+            }
+            50% {
+                transform: scale(1.1);
+            }
+            100% {
+                transform: scale(1);
+            }
+        }
+        
+        .success-title {
+            font-size: 24px;
+            font-weight: 800;
+            color: var(--text-primary);
+            margin-bottom: var(--spacing-sm);
+        }
+        
+        .success-message {
+            font-size: 16px;
+            color: var(--text-secondary);
+            margin-bottom: var(--spacing-xl);
+            line-height: 1.6;
+        }
+        /* ===== Dashboard Layout ===== */
+        .dashboard-container {
+            display: grid;
+            grid-template-columns: 280px 1fr;
+            gap: var(--spacing-xl);
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+        
+        .dashboard-sidebar {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-lg);
+            padding: var(--spacing-lg);
+            height: fit-content;
+            position: sticky;
+            top: calc(70px + var(--spacing-lg));
+        }
+        
+        .dashboard-main {
+            min-width: 0;
+        }
+        
+        /* ===== User Profile Card ===== */
+        .user-profile {
+            text-align: center;
+            padding-bottom: var(--spacing-lg);
+            border-bottom: 1px solid var(--border);
+            margin-bottom: var(--spacing-lg);
+        }
+        
+        .user-avatar {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 32px;
+            font-weight: 800;
+            color: white;
+            margin: 0 auto var(--spacing-md);
+            border: 3px solid var(--bg-light);
+        }
+        
+        .user-name {
+            font-size: 18px;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: var(--spacing-xs);
+        }
+        
+        .user-email {
+            font-size: 13px;
+            color: var(--text-muted);
+            margin-bottom: var(--spacing-md);
+        }
+        
+        .user-badges {
+            display: flex;
+            justify-content: center;
+            gap: var(--spacing-xs);
+            flex-wrap: wrap;
+        }
+        
+        /* ===== Dashboard Navigation ===== */
+        .dashboard-nav {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+        
+        .dashboard-nav-item {
+            margin-bottom: var(--spacing-xs);
+        }
+        
+        .dashboard-nav-link {
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-sm);
+            padding: var(--spacing-md);
+            border-radius: var(--radius-md);
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--text-secondary);
+            text-decoration: none;
+            transition: all 0.2s;
+        }
+        
+        .dashboard-nav-link:hover {
+            background: var(--bg-light);
+            color: var(--primary);
+        }
+        
+        .dashboard-nav-link.active {
+            background: rgba(0, 112, 243, 0.1);
+            color: var(--primary);
+        }
+        
+        .dashboard-nav-icon {
+            font-size: 18px;
+        }
+        
+        .dashboard-nav-count {
+            margin-right: auto;
+            background: var(--bg-light);
+            color: var(--text-muted);
+            font-size: 12px;
+            font-weight: 700;
+            padding: 2px 8px;
+            border-radius: 12px;
+        }
+        
+        .dashboard-nav-link.active .dashboard-nav-count {
+            background: var(--primary);
+            color: white;
+        }
+        
+        /* ===== Dashboard Header ===== */
+        .dashboard-header {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-lg);
+            padding: var(--spacing-xl);
+            margin-bottom: var(--spacing-lg);
+        }
+        
+        .dashboard-header h1 {
+            font-size: 28px;
+            font-weight: 800;
+            color: var(--text-primary);
+            margin-bottom: var(--spacing-xs);
+        }
+        
+        .dashboard-header p {
+            font-size: 14px;
+            color: var(--text-secondary);
+        }
+        
+        /* ===== Tabs System ===== */
+        .tabs-container {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-lg);
+            overflow: hidden;
+        }
+        
+        .tabs-header {
+            display: flex;
+            background: var(--bg-light);
+            border-bottom: 1px solid var(--border);
+            overflow-x: auto;
+        }
+        
+        .tab-button {
+            padding: var(--spacing-md) var(--spacing-lg);
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--text-secondary);
+            background: none;
+            border: none;
+            border-bottom: 3px solid transparent;
+            cursor: pointer;
+            transition: all 0.2s;
+            white-space: nowrap;
+            position: relative;
+        }
+        
+        .tab-button:hover {
+            color: var(--primary);
+            background: rgba(0, 112, 243, 0.05);
+        }
+        
+        .tab-button.active {
+            color: var(--primary);
+            border-bottom-color: var(--primary);
+            background: var(--bg-card);
+        }
+        
+        .tab-badge {
+            display: inline-block;
+            background: var(--bg-light);
+            color: var(--text-muted);
+            font-size: 11px;
+            font-weight: 700;
+            padding: 2px 6px;
+            border-radius: 10px;
+            margin-right: 6px;
+        }
+        
+        .tab-button.active .tab-badge {
+            background: var(--primary);
+            color: white;
+        }
+        
+        .tabs-content {
+            padding: var(--spacing-xl);
+        }
+        
+        .tab-pane {
+            display: none;
+        }
+        
+        .tab-pane.active {
+            display: block;
+            animation: fadeIn 0.3s ease-in;
+        }
+        
+        /* ===== List Row (Generic listing item in dashboard) ===== */
+        .list-row {
+            background: var(--bg-light);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-md);
+            padding: var(--spacing-lg);
+            margin-bottom: var(--spacing-md);
+            transition: all 0.2s;
+        }
+        
+        .list-row:hover {
+            border-color: var(--primary);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+        }
+        
+        .list-row-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: var(--spacing-md);
+        }
+        
+        .list-row-title {
+            font-size: 16px;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: var(--spacing-xs);
+        }
+        
+        .list-row-meta {
+            font-size: 13px;
+            color: var(--text-muted);
+        }
+        
+        .list-row-amount {
+            font-size: 18px;
+            font-weight: 800;
+            color: var(--primary);
+            text-align: left;
+        }
+        
+        .list-row-body {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: var(--spacing-md);
+            margin-bottom: var(--spacing-md);
+        }
+        
+        .list-row-detail {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+        
+        .list-row-detail-label {
+            font-size: 12px;
+            color: var(--text-muted);
+            font-weight: 600;
+        }
+        
+        .list-row-detail-value {
+            font-size: 14px;
+            color: var(--text-primary);
+            font-weight: 700;
+        }
+        
+        .list-row-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding-top: var(--spacing-md);
+            border-top: 1px solid var(--border);
+        }
+        
+        .list-row-badges {
+            display: flex;
+            gap: var(--spacing-xs);
+            flex-wrap: wrap;
+        }
+        
+        .list-row-actions {
+            display: flex;
+            gap: var(--spacing-sm);
+        }
+        
+        /* ===== Match Row (Investor match) ===== */
+        .match-row {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-md);
+            padding: var(--spacing-lg);
+            margin-bottom: var(--spacing-md);
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-lg);
+            transition: all 0.2s;
+        }
+        
+        .match-row:hover {
+            border-color: var(--success);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+        }
+        
+        .match-avatar {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--success) 0%, #059669 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            font-weight: 800;
+            color: white;
+            flex-shrink: 0;
+        }
+        
+        .match-info {
+            flex: 1;
+        }
+        
+        .match-name {
+            font-size: 16px;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: var(--spacing-xs);
+        }
+        
+        .match-details {
+            font-size: 13px;
+            color: var(--text-secondary);
+            margin-bottom: var(--spacing-xs);
+        }
+        
+        .match-badges {
+            display: flex;
+            gap: var(--spacing-xs);
+            flex-wrap: wrap;
+        }
+        
+        .match-amount {
+            text-align: center;
+            padding: 0 var(--spacing-lg);
+            border-right: 1px solid var(--border);
+            border-left: 1px solid var(--border);
+        }
+        
+        .match-amount-label {
+            font-size: 12px;
+            color: var(--text-muted);
+            margin-bottom: var(--spacing-xs);
+        }
+        
+        .match-amount-value {
+            font-size: 20px;
+            font-weight: 800;
+            color: var(--success);
+        }
+        
+        .match-actions {
+            display: flex;
+            gap: var(--spacing-sm);
+        }
+        
+        /* ===== Activity Feed ===== */
+        .activity-feed {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+        
+        .activity-item {
+            display: flex;
+            gap: var(--spacing-md);
+            padding: var(--spacing-lg);
+            border-bottom: 1px solid var(--border);
+            transition: background 0.2s;
+        }
+        
+        .activity-item:hover {
+            background: var(--bg-light);
+        }
+        
+        .activity-item:last-child {
+            border-bottom: none;
+        }
+        
+        .activity-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            flex-shrink: 0;
+        }
+        
+        .activity-icon.success {
+            background: rgba(16, 185, 129, 0.1);
+            color: var(--success);
+        }
+        
+        .activity-icon.warning {
+            background: rgba(245, 158, 11, 0.1);
+            color: var(--warning);
+        }
+        
+        .activity-icon.info {
+            background: rgba(0, 112, 243, 0.1);
+            color: var(--primary);
+        }
+        
+        .activity-content {
+            flex: 1;
+        }
+        
+        .activity-title {
+            font-size: 14px;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: var(--spacing-xs);
+        }
+        
+        .activity-description {
+            font-size: 13px;
+            color: var(--text-secondary);
+            margin-bottom: var(--spacing-xs);
+            line-height: 1.5;
+        }
+        
+        .activity-time {
+            font-size: 12px;
+            color: var(--text-muted);
+        }
+        
+        /* ===== Empty State ===== */
+        .empty-state {
+            text-align: center;
+            padding: var(--spacing-xl) var(--spacing-lg);
+        }
+        
+        .empty-state-icon {
+            font-size: 64px;
+            color: var(--text-muted);
+            margin-bottom: var(--spacing-md);
+            opacity: 0.5;
+        }
+        
+        .empty-state-title {
+            font-size: 18px;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: var(--spacing-sm);
+        }
+        
+        .empty-state-message {
+            font-size: 14px;
+            color: var(--text-secondary);
+            margin-bottom: var(--spacing-lg);
+            line-height: 1.6;
+        }
+        /* ===== Responsive Adjustments ===== */
+        
+        /* Tablet (768px - 1024px) */
+        @media (max-width: 1024px) {
+            .container {
+                padding: 0 var(--spacing-lg);
+            }
+            
+            .dashboard-container {
+                grid-template-columns: 240px 1fr;
+                gap: var(--spacing-lg);
+            }
+            
+            .hero h1 {
+                font-size: 36px;
+            }
+            
+            .stats-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            
+            .listings-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+        
+        /* Mobile (max 768px) */
+        @media (max-width: 768px) {
+            :root {
+                --spacing-xs: 4px;
+                --spacing-sm: 8px;
+                --spacing-md: 12px;
+                --spacing-lg: 16px;
+                --spacing-xl: 24px;
+            }
+            
+            /* Navigation */
+            nav {
+                padding: var(--spacing-md) var(--spacing-lg);
+            }
+            
+            .nav-brand {
+                font-size: 18px;
+            }
+            
+            .nav-links {
+                display: none;
+            }
+            
+            .nav-actions {
+                gap: var(--spacing-sm);
+            }
+            
+            .nav-actions .btn {
+                padding: 8px 12px;
+                font-size: 13px;
+            }
+            
+            .nav-actions .btn-secondary {
+                display: none;
+            }
+            
+            /* Hero */
+            .hero {
+                padding: var(--spacing-xl) 0;
+            }
+            
+            .hero h1 {
+                font-size: 28px;
+                line-height: 1.2;
+            }
+            
+            .hero p {
+                font-size: 14px;
+            }
+            
+            .hero-actions {
+                flex-direction: column;
+                width: 100%;
+            }
+            
+            .hero-actions .btn {
+                width: 100%;
+            }
+            
+            /* Stats Grid */
+            .stats-grid {
+                grid-template-columns: 1fr;
+                gap: var(--spacing-md);
+            }
+            
+            /* Filter Bar */
+            .filter-bar {
+                flex-direction: column;
+                gap: var(--spacing-md);
+            }
+            
+            .filter-group {
+                width: 100%;
+            }
+            
+            .filter-actions {
+                width: 100%;
+                justify-content: stretch;
+            }
+            
+            .filter-actions .btn {
+                flex: 1;
+            }
+            
+            /* Sort Bar */
+            .sort-bar {
+                flex-direction: column;
+                gap: var(--spacing-sm);
+            }
+            
+            .sort-controls {
+                width: 100%;
+                justify-content: space-between;
+            }
+            
+            /* Listings Grid */
+            .listings-grid {
+                grid-template-columns: 1fr;
+                gap: var(--spacing-md);
+            }
+            
+            /* Listing Card */
+            .listing-details {
+                grid-template-columns: 1fr;
+            }
+            
+            /* Detail View */
+            .detail-header {
+                padding: var(--spacing-lg);
+            }
+            
+            .detail-header h2 {
+                font-size: 20px;
+            }
+            
+            .detail-stats {
+                grid-template-columns: repeat(2, 1fr);
+                gap: var(--spacing-md);
+            }
+            
+            .detail-section {
+                padding: var(--spacing-lg);
+            }
+            
+            .detail-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            /* Modal */
+            .modal-content {
+                width: 95%;
+                margin: var(--spacing-lg);
+                max-height: calc(100vh - var(--spacing-xl));
+            }
+            
+            .modal-header h3 {
+                font-size: 18px;
+            }
+            
+            .modal-footer {
+                flex-direction: column-reverse;
+                gap: var(--spacing-sm);
+            }
+            
+            .modal-footer .btn {
+                width: 100%;
+            }
+            
+            /* Form */
+            .form-row {
+                grid-template-columns: 1fr;
+                gap: var(--spacing-md);
+            }
+            
+            /* Wizard */
+            .wizard-container {
+                padding: 0;
+            }
+            
+            .wizard-header {
+                padding: var(--spacing-lg);
+            }
+            
+            .wizard-header h1 {
+                font-size: 20px;
+            }
+            
+            .stepper {
+                padding: var(--spacing-lg) var(--spacing-sm);
+                overflow-x: auto;
+            }
+            
+            .stepper::before {
+                display: none;
+            }
+            
+            .step {
+                min-width: 80px;
+            }
+            
+            .step-circle {
+                width: 40px;
+                height: 40px;
+                font-size: 16px;
+            }
+            
+            .step-label {
+                font-size: 11px;
+            }
+            
+            .wizard-body {
+                padding: var(--spacing-lg);
+            }
+            
+            .wizard-footer {
+                padding: var(--spacing-md) var(--spacing-lg);
+                flex-direction: column;
+                gap: var(--spacing-sm);
+            }
+            
+            .wizard-nav-buttons {
+                width: 100%;
+                flex-direction: column-reverse;
+            }
+            
+            .wizard-nav-buttons .btn {
+                width: 100%;
+            }
+            
+            /* Dashboard */
+            .dashboard-container {
+                grid-template-columns: 1fr;
+                gap: var(--spacing-md);
+            }
+            
+            .dashboard-sidebar {
+                position: static;
+                order: 2;
+            }
+            
+            .dashboard-header h1 {
+                font-size: 22px;
+            }
+            
+            .tabs-header {
+                overflow-x: auto;
+            }
+            
+            .tab-button {
+                padding: var(--spacing-sm) var(--spacing-md);
+                font-size: 13px;
+            }
+            
+            .tabs-content {
+                padding: var(--spacing-lg);
+            }
+            
+            /* List Row */
+            .list-row {
+                padding: var(--spacing-md);
+            }
+            
+            .list-row-header {
+                flex-direction: column;
+                gap: var(--spacing-sm);
+            }
+            
+            .list-row-amount {
+                text-align: right;
+            }
+            
+            .list-row-body {
+                grid-template-columns: repeat(2, 1fr);
+                gap: var(--spacing-sm);
+            }
+            
+            .list-row-footer {
+                flex-direction: column;
+                gap: var(--spacing-md);
+                align-items: stretch;
+            }
+            
+            .list-row-actions {
+                width: 100%;
+            }
+            
+            .list-row-actions .btn {
+                flex: 1;
+            }
+            
+            /* Match Row */
+            .match-row {
+                flex-direction: column;
+                gap: var(--spacing-md);
+                padding: var(--spacing-md);
+            }
+            
+            .match-amount {
+                border: none;
+                border-top: 1px solid var(--border);
+                border-bottom: 1px solid var(--border);
+                padding: var(--spacing-md) 0;
+                width: 100%;
+            }
+            
+            .match-actions {
+                width: 100%;
+            }
+            
+            .match-actions .btn {
+                flex: 1;
+            }
+            
+            /* Activity Feed */
+            .activity-item {
+                padding: var(--spacing-md);
+                gap: var(--spacing-sm);
+            }
+            
+            .activity-icon {
+                width: 36px;
+                height: 36px;
+                font-size: 16px;
+            }
+        }
+        
+        /* Small Mobile (max 480px) */
+        @media (max-width: 480px) {
+            .hero h1 {
+                font-size: 24px;
+            }
+            
+            .stat-value {
+                font-size: 24px;
+            }
+            
+            .detail-stats {
+                grid-template-columns: 1fr;
+            }
+            
+            .list-row-body {
+                grid-template-columns: 1fr;
+            }
+        }
+        
+        /* ===== Utility Classes ===== */
+        
+        /* Spacing */
+        .mt-0 { margin-top: 0; }
+        .mt-xs { margin-top: var(--spacing-xs); }
+        .mt-sm { margin-top: var(--spacing-sm); }
+        .mt-md { margin-top: var(--spacing-md); }
+        .mt-lg { margin-top: var(--spacing-lg); }
+        .mt-xl { margin-top: var(--spacing-xl); }
+        
+        .mb-0 { margin-bottom: 0; }
+        .mb-xs { margin-bottom: var(--spacing-xs); }
+        .mb-sm { margin-bottom: var(--spacing-sm); }
+        .mb-md { margin-bottom: var(--spacing-md); }
+        .mb-lg { margin-bottom: var(--spacing-lg); }
+        .mb-xl { margin-bottom: var(--spacing-xl); }
+        
+        .ml-0 { margin-left: 0; }
+        .ml-xs { margin-left: var(--spacing-xs); }
+        .ml-sm { margin-left: var(--spacing-sm); }
+        .ml-md { margin-left: var(--spacing-md); }
+        .ml-lg { margin-left: var(--spacing-lg); }
+        .ml-xl { margin-left: var(--spacing-xl); }
+        
+        .mr-0 { margin-right: 0; }
+        .mr-xs { margin-right: var(--spacing-xs); }
+        .mr-sm { margin-right: var(--spacing-sm); }
+        .mr-md { margin-right: var(--spacing-md); }
+        .mr-lg { margin-right: var(--spacing-lg); }
+        .mr-xl { margin-right: var(--spacing-xl); }
+        
+        .pt-0 { padding-top: 0; }
+        .pt-xs { padding-top: var(--spacing-xs); }
+        .pt-sm { padding-top: var(--spacing-sm); }
+        .pt-md { padding-top: var(--spacing-md); }
+        .pt-lg { padding-top: var(--spacing-lg); }
+        .pt-xl { padding-top: var(--spacing-xl); }
+        
+        .pb-0 { padding-bottom: 0; }
+        .pb-xs { padding-bottom: var(--spacing-xs); }
+        .pb-sm { padding-bottom: var(--spacing-sm); }
+        .pb-md { padding-bottom: var(--spacing-md); }
+        .pb-lg { padding-bottom: var(--spacing-lg); }
+        .pb-xl { padding-bottom: var(--spacing-xl); }
+        
+        .pl-0 { padding-left: 0; }
+        .pl-xs { padding-left: var(--spacing-xs); }
+        .pl-sm { padding-left: var(--spacing-sm); }
+        .pl-md { padding-left: var(--spacing-md); }
+        .pl-lg { padding-left: var(--spacing-lg); }
+        .pl-xl { padding-left: var(--spacing-xl); }
+        
+        .pr-0 { padding-right: 0; }
+        .pr-xs { padding-right: var(--spacing-xs); }
+        .pr-sm { padding-right: var(--spacing-sm); }
+        .pr-md { padding-right: var(--spacing-md); }
+        .pr-lg { padding-right: var(--spacing-lg); }
+        .pr-xl { padding-right: var(--spacing-xl); }
+        
+        /* Text Alignment */
+        .text-left { text-align: left; }
+        .text-center { text-align: center; }
+        .text-right { text-align: right; }
+        
+        /* Text Colors */
+        .text-primary { color: var(--text-primary); }
+        .text-secondary { color: var(--text-secondary); }
+        .text-muted { color: var(--text-muted); }
+        .text-inverse { color: var(--text-inverse); }
+        .text-success { color: var(--success); }
+        .text-warning { color: var(--warning); }
+        .text-danger { color: var(--danger); }
+        
+        /* Display */
+        .d-none { display: none; }
+        .d-block { display: block; }
+        .d-inline { display: inline; }
+        .d-inline-block { display: inline-block; }
+        .d-flex { display: flex; }
+        .d-grid { display: grid; }
+        
+        /* Flex Utilities */
+        .flex-row { flex-direction: row; }
+        .flex-column { flex-direction: column; }
+        .flex-wrap { flex-wrap: wrap; }
+        .flex-nowrap { flex-wrap: nowrap; }
+        .justify-start { justify-content: flex-start; }
+        .justify-center { justify-content: center; }
+        .justify-end { justify-content: flex-end; }
+        .justify-between { justify-content: space-between; }
+        .justify-around { justify-content: space-around; }
+        .align-start { align-items: flex-start; }
+        .align-center { align-items: center; }
+        .align-end { align-items: flex-end; }
+        .align-stretch { align-items: stretch; }
+        .flex-1 { flex: 1; }
+        .gap-xs { gap: var(--spacing-xs); }
+        .gap-sm { gap: var(--spacing-sm); }
+        .gap-md { gap: var(--spacing-md); }
+        .gap-lg { gap: var(--spacing-lg); }
+        .gap-xl { gap: var(--spacing-xl); }
+        
+        /* Width */
+        .w-full { width: 100%; }
+        .w-auto { width: auto; }
+        .w-50 { width: 50%; }
+        
+        /* Font Weight */
+        .font-normal { font-weight: 400; }
+        .font-medium { font-weight: 500; }
+        .font-semibold { font-weight: 600; }
+        .font-bold { font-weight: 700; }
+        .font-extrabold { font-weight: 800; }
+        
+        /* Border Radius */
+        .rounded-none { border-radius: 0; }
+        .rounded-sm { border-radius: var(--radius-sm); }
+        .rounded-md { border-radius: var(--radius-md); }
+        .rounded-lg { border-radius: var(--radius-lg); }
+        .rounded-full { border-radius: 9999px; }
+        
+        /* Overflow */
+        .overflow-hidden { overflow: hidden; }
+        .overflow-auto { overflow: auto; }
+        .overflow-x-auto { overflow-x: auto; }
+        .overflow-y-auto { overflow-y: auto; }
+        
+        /* Position */
+        .position-relative { position: relative; }
+        .position-absolute { position: absolute; }
+        .position-fixed { position: fixed; }
+        .position-sticky { position: sticky; }
+        
+        /* Cursor */
+        .cursor-pointer { cursor: pointer; }
+        .cursor-default { cursor: default; }
+        .cursor-not-allowed { cursor: not-allowed; }
+        
+        /* Opacity */
+        .opacity-0 { opacity: 0; }
+        .opacity-50 { opacity: 0.5; }
+        .opacity-75 { opacity: 0.75; }
+        .opacity-100 { opacity: 1; }
+        
+        /* Z-Index */
+        .z-0 { z-index: 0; }
+        .z-10 { z-index: 10; }
+        .z-20 { z-index: 20; }
+        .z-30 { z-index: 30; }
+        .z-40 { z-index: 40; }
+.z-50 { z-index: 50; }
+         
+         /* Additional missing classes */
+         .w-100 { width: 100%; }
+         
+         .mt-5 { margin-top: var(--spacing-lg); }
+         
+         .issuer-avatar {
+             width: 40px;
+             height: 40px;
+             border-radius: 50%;
+             background: var(--primary);
+             display: flex;
+             align-items: center;
+             justify-content: center;
+             font-size: 14px;
+             font-weight: 700;
+             color: white;
+         }
+         
+         .badge-verified { background: var(--success); color: white; }
+         .badge-muted { background: var(--bg-light); color: var(--text-muted); }
+         
+         .trust-message {
+             display: flex;
+             gap: var(--spacing-sm);
+             padding: var(--spacing-md);
+             background: rgba(0, 112, 243, 0.05);
+             border-radius: var(--radius-md);
+             font-size: 13px;
+             color: var(--primary);
+             align-items: center;
+         }
+         
+         .detail-row {
+             display: flex;
+             justify-content: space-between;
+             padding: var(--spacing-sm) 0;
+             border-bottom: 1px solid var(--border);
+         }
+         
+         .detail-row:last-child { border-bottom: none; }
+         
+         .user-meta {
+             font-size: 13px;
+             color: var(--text-muted);
+         }
+         
+         .tabs { display: flex; gap: var(--spacing-sm); margin-bottom: var(--spacing-lg); }
+         
+         .tab-btn {
+             padding: var(--spacing-md) var(--spacing-lg);
+             background: var(--bg-light);
+             border: none;
+             border-radius: var(--radius-md);
+             font-weight: 600;
+             cursor: pointer;
+             transition: all 0.2s;
+         }
+         
+         .tab-btn.active { background: var(--primary); color: white; }
+         
+         .tab-content { display: none; }
+         
+         .tab-content.active { display: block; }
+         
+         .list-col {
+             display: flex;
+             flex-direction: column;
+             gap: 4px;
+         }
+         
+         .list-label {
+             font-size: 12px;
+             color: var(--text-muted);
+         }
+         
+         .list-value {
+             font-size: 14px;
+             font-weight: 600;
+         }
+         
+         .list-actions {
+             display: flex;
+             gap: var(--spacing-sm);
+         }
+         
+         .match-title {
+             font-size: 16px;
+             font-weight: 700;
+             margin-bottom: var(--spacing-xs);
+         }
+         
+         .match-meta {
+             font-size: 13px;
+             color: var(--text-secondary);
+         }
+         
+         .match-status {
+             padding: 0 var(--spacing-lg);
+             border-left: 1px solid var(--border);
+             border-right: 1px solid var(--border);
+         }
+         
+         .success-description {
+             font-size: 16px;
+             color: var(--text-secondary);
+             margin-bottom: var(--spacing-xl);
+         }
+         
+         .wizard-actions {
+             display: flex;
+             justify-content: space-between;
+             padding: var(--spacing-lg) var(--spacing-xl);
+             border-top: 1px solid var(--border);
+             background: var(--bg-light);
+         }
+     </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav>
+        <div class="container">
+            <div class="nav-brand">چک‌بازار</div>
+            <div class="nav-links">
+                <a href="#" onclick="showPage('marketplace'); return false;">بازار</a>
+                <a href="#" onclick="showPage('create'); return false;">ثبت چک</a>
+                <a href="#" onclick="showPage('dashboard'); return false;">داشبورد</a>
+                <a href="#">راهنما</a>
+            </div>
+            <div class="nav-actions">
+                <button class="btn btn-secondary btn-sm">ورود</button>
+                <button class="btn btn-primary btn-sm">ثبت‌نام</button>
+            </div>
+        </div>
+    </nav>
+
+    <!-- All page sections will be inserted here in Part 10 -->
+    <!-- Marketplace Page -->
+    <!-- Detail View Page -->
+    <!-- Create Listing Page -->
+    <!-- Dashboard Page -->
+    <!-- Modal Templates -->
+
+    <script>
+        // ===== State Management =====
+        let currentPage = 'marketplace';
+        let currentListingId = null;
+        let currentStep = 1;
+        let newListing = {};
+        let activeTab = 'holder';
+
+        // ===== Page Navigation =====
+        function showPage(page) {
+            // Hide all pages
+            document.querySelectorAll('.page').forEach(p => {
+                p.style.display = 'none';
+            });
+            
+            // Show selected page
+            const targetPage = document.getElementById(`${page}-page`);
+            if (targetPage) {
+                targetPage.style.display = 'block';
+                currentPage = page;
+                
+                // Update nav active state
+                document.querySelectorAll('.nav-links a').forEach(link => {
+                    link.style.opacity = '0.7';
+                });
+                
+                // Scroll to top
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+                
+                // Special handling for dashboard
+                if (page === 'dashboard') {
+                    showTab('holder');
+                }
+                
+                // Special handling for create
+                if (page === 'create') {
+                    resetWizard();
+                }
+            }
+        }
+
+        // ===== Modal Management =====
+        function openModal(modalId) {
+            const modal = document.getElementById(modalId);
+            if (modal) {
+                modal.style.display = 'flex';
+                document.body.style.overflow = 'hidden';
+                
+                // Animate in
+                setTimeout(() => {
+                    modal.querySelector('.modal-content').style.opacity = '1';
+                    modal.querySelector('.modal-content').style.transform = 'scale(1)';
+                }, 10);
+            }
+        }
+
+        function closeModal(modalId) {
+            const modal = document.getElementById(modalId);
+            if (modal) {
+                // Animate out
+                modal.querySelector('.modal-content').style.opacity = '0';
+                modal.querySelector('.modal-content').style.transform = 'scale(0.95)';
+                
+                setTimeout(() => {
+                    modal.style.display = 'none';
+                    document.body.style.overflow = 'auto';
+                }, 200);
+            }
+        }
+
+        function closeModalOutside(event, modalId) {
+            if (event.target.classList.contains('modal-overlay')) {
+                closeModal(modalId);
+            }
+        }
+
+        // ===== Detail View =====
+        function viewDetail(id) {
+            currentListingId = id;
+            const listing = listings.find(l => l.id === id);
+            
+            if (!listing) return;
+            
+            // Populate detail view
+            document.getElementById('detail-cheque-number').textContent = listing.chequeNumber;
+            document.getElementById('detail-amount').textContent = listing.amount;
+            document.getElementById('detail-due-date').textContent = listing.dueDate;
+            document.getElementById('detail-discount-rate').textContent = listing.discountRate;
+            document.getElementById('detail-net-amount').textContent = listing.netAmount;
+            document.getElementById('detail-status').innerHTML = `<span class="badge badge-${listing.status === 'active' ? 'success' : listing.status === 'pending' ? 'warning' : 'muted'}">${listing.statusLabel}</span>`;
+            
+            // Issuer info
+            document.getElementById('detail-issuer-name').textContent = listing.issuer.name;
+            document.getElementById('detail-issuer-company').textContent = listing.issuer.company;
+            document.getElementById('detail-issuer-verification').innerHTML = listing.issuer.verified 
+                ? '<span class="badge badge-verified">✓ تأیید هویت</span>' 
+                : '<span class="badge badge-muted">تأیید نشده</span>';
+            
+            // Details
+            document.getElementById('detail-bank').textContent = listing.bank;
+            document.getElementById('detail-branch').textContent = listing.branch;
+            document.getElementById('detail-account').textContent = listing.accountNumber;
+            document.getElementById('detail-issue-date').textContent = listing.issueDate;
+            document.getElementById('detail-term').textContent = listing.term;
+            document.getElementById('detail-guarantee').textContent = listing.guarantee;
+            
+            // Risk assessment
+            const riskBadge = document.getElementById('detail-risk');
+            riskBadge.textContent = riskLabel(listing.riskScore);
+            riskBadge.className = `badge badge-risk-${riskClass(listing.riskScore)}`;
+            
+            document.getElementById('detail-credit-score').textContent = `${listing.creditScore}/100`;
+            document.getElementById('detail-track-record').textContent = listing.trackRecord;
+            document.getElementById('detail-default-history').textContent = listing.defaultHistory;
+            
+            // Interest count
+            document.getElementById('detail-interest-count').textContent = listing.interestCount || 0;
+            
+            // Show detail page
+            showPage('detail');
+        }
+
+        // ===== Interest Expression =====
+        function expressInterest(listingId) {
+            openModal('interest-modal');
+        }
+
+        function submitInterest() {
+            const amount = document.getElementById('interest-amount').value;
+            const rate = document.getElementById('interest-rate').value;
+            const message = document.getElementById('interest-message').value;
+            
+            // Validation
+            if (!amount || !rate) {
+                alert('لطفاً مبلغ پیشنهادی و نرخ تنزیل را وارد کنید.');
+                return;
+            }
+            
+            // Mock submission
+            console.log('Interest submitted:', {
+                listingId: currentListingId,
+                amount,
+                rate,
+                message
+            });
+            
+            // Update listing interest count
+            const listing = listings.find(l => l.id === currentListingId);
+            if (listing) {
+                listing.interestCount = (listing.interestCount || 0) + 1;
+            }
+            
+            // Show success
+            alert('✓ درخواست شما با موفقیت ثبت شد.\nصاحب چک در اسرع وقت با شما تماس خواهد گرفت.');
+            
+            // Close modal and reset form
+            closeModal('interest-modal');
+            document.getElementById('interest-form').reset();
+            
+            // Refresh detail view
+            viewDetail(currentListingId);
+        }
+
+        // ===== Create Listing Wizard =====
+        function goStep(step) {
+            // Validation before moving forward
+            if (step > currentStep) {
+                if (!validateStep(currentStep)) {
+                    return;
+                }
+            }
+            
+            // Update step
+            currentStep = step;
+            
+            // Hide all steps
+            document.querySelectorAll('.wizard-step').forEach(s => {
+                s.classList.remove('active');
+            });
+            
+            // Show current step
+            document.getElementById(`step-${step}`).classList.add('active');
+            
+            // Update stepper UI
+            document.querySelectorAll('.step').forEach((s, index) => {
+                const stepNum = index + 1;
+                if (stepNum < step) {
+                    s.classList.add('completed');
+                    s.classList.remove('active');
+                } else if (stepNum === step) {
+                    s.classList.add('active');
+                    s.classList.remove('completed');
+                } else {
+                    s.classList.remove('active', 'completed');
+                }
+            });
+            
+            // Update buttons
+            const prevBtn = document.querySelector('.wizard-nav-buttons .btn-secondary');
+            const nextBtn = document.querySelector('.wizard-nav-buttons .btn-primary');
+            
+            if (step === 1) {
+                prevBtn.style.display = 'none';
+            } else {
+                prevBtn.style.display = 'block';
+            }
+            
+            if (step === 4) {
+                nextBtn.textContent = 'ثبت نهایی';
+            } else {
+                nextBtn.textContent = 'مرحله بعد';
+            }
+            
+            // Show summary if step 4
+            if (step === 4) {
+                showSummary();
+            }
+        }
+
+        function validateStep(step) {
+            let isValid = true;
+            let errorMsg = '';
+            
+            if (step === 1) {
+                const chequeNumber = document.getElementById('create-cheque-number').value;
+                const amount = document.getElementById('create-amount').value;
+                const dueDate = document.getElementById('create-due-date').value;
+                const bank = document.getElementById('create-bank').value;
+                
+                if (!chequeNumber || !amount || !dueDate || !bank) {
+                    errorMsg = 'لطفاً تمام فیلدهای ضروری را پر کنید.';
+                    isValid = false;
+                }
+                
+                newListing.chequeNumber = chequeNumber;
+                newListing.amount = amount;
+                newListing.dueDate = dueDate;
+                newListing.bank = bank;
+                newListing.branch = document.getElementById('create-branch').value;
+                newListing.accountNumber = document.getElementById('create-account').value;
+            }
+            
+            if (step === 2) {
+                const name = document.getElementById('create-issuer-name').value;
+                const company = document.getElementById('create-issuer-company').value;
+                const phone = document.getElementById('create-issuer-phone').value;
+                
+                if (!name || !company || !phone) {
+                    errorMsg = 'لطفاً اطلاعات صادرکننده را کامل کنید.';
+                    isValid = false;
+                }
+                
+                newListing.issuer = { name, company, phone };
+            }
+            
+            if (step === 3) {
+                const terms = document.getElementById('create-terms').checked;
+                
+                if (!terms) {
+                    errorMsg = 'لطفاً شرایط و ضوابط را بپذیرید.';
+                    isValid = false;
+                }
+            }
+            
+            if (!isValid) {
+                alert(errorMsg);
+            }
+            
+            return isValid;
+        }
+
+        function showSummary() {
+            // Populate summary
+            document.getElementById('summary-cheque-number').textContent = newListing.chequeNumber || '-';
+            document.getElementById('summary-amount').textContent = newListing.amount 
+                ? `${parseInt(newListing.amount).toLocaleString('fa-IR')} تومان` 
+                : '-';
+            document.getElementById('summary-due-date').textContent = newListing.dueDate || '-';
+            document.getElementById('summary-bank').textContent = newListing.bank || '-';
+            document.getElementById('summary-branch').textContent = newListing.branch || '-';
+            document.getElementById('summary-issuer').textContent = newListing.issuer?.name || '-';
+            document.getElementById('summary-company').textContent = newListing.issuer?.company || '-';
+        }
+
+        function submitListing() {
+            if (currentStep !== 4) {
+                goStep(currentStep + 1);
+                return;
+            }
+            
+            // Final validation
+            if (!validateStep(3)) {
+                return;
+            }
+            
+            // Mock submission
+            console.log('Listing submitted:', newListing);
+            
+            // Show success state
+            document.querySelectorAll('.wizard-step').forEach(s => s.style.display = 'none');
+            document.getElementById('wizard-success').style.display = 'flex';
+            
+            // Hide footer buttons
+            document.querySelector('.wizard-footer').style.display = 'none';
+        }
+
+        function resetWizard() {
+            currentStep = 1;
+            newListing = {};
+            
+            // Reset form
+            document.getElementById('create-form').reset();
+            
+            // Show first step
+            goStep(1);
+            
+            // Show footer, hide success
+            document.querySelector('.wizard-footer').style.display = 'flex';
+            document.getElementById('wizard-success').style.display = 'none';
+        }
+
+        function goToDashboard() {
+            resetWizard();
+            showPage('dashboard');
+        }
+
+        // ===== Dashboard Tabs =====
+        function showTab(tab) {
+            activeTab = tab;
+            
+            // Update tab buttons
+            document.querySelectorAll('.tab-button').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            document.querySelector(`[onclick="showTab('${tab}')"]`).classList.add('active');
+            
+            // Update tab content
+            document.querySelectorAll('.tab-pane').forEach(pane => {
+                pane.classList.remove('active');
+            });
+            document.getElementById(`${tab}-tab`).classList.add('active');
+        }
+
+        // ===== Utility Functions =====
+        function riskLabel(score) {
+            if (score >= 80) return 'کم‌ریسک';
+            if (score >= 60) return 'متوسط';
+            if (score >= 40) return 'نیازمند بررسی';
+            return 'پرریسک';
+        }
+
+        function riskClass(score) {
+            if (score >= 80) return 'low';
+            if (score >= 60) return 'medium';
+            if (score >= 40) return 'high';
+            return 'critical';
+        }
+
+        function formatNumber(num) {
+            return parseInt(num).toLocaleString('fa-IR');
+        }
+
+        function formatDate(date) {
+            // Simple formatter - in production use proper Jalali converter
+            return date;
+        }
+
+        // ===== Initialize on Load =====
+        window.addEventListener('DOMContentLoaded', function() {
+            // Build marketplace grid
+            buildListingsGrid();
+            
+            // Show default page
+            showPage('marketplace');
+            
+            // Add modal click-outside handlers
+            document.querySelectorAll('.modal-overlay').forEach(modal => {
+                modal.addEventListener('click', function(e) {
+                    if (e.target === this) {
+                        closeModal(this.id);
+                    }
+                });
+            });
+        });
+    </script>
+        <!-- Mock Data -->
+    <script>
+        // ===== Mock Listings Data =====
+        const listings = [
+            {
+                id: 1,
+                chequeNumber: '7845123-45',
+                amount: '۵۰,۰۰۰,۰۰۰ تومان',
+                amountRaw: 50000000,
+                dueDate: '۱۴۰۵/۰۴/۱۵',
+                dueDateRaw: '2026-07-06',
+                daysRemaining: 17,
+                discountRate: '۱۸٪',
+                discountRateRaw: 18,
+                netAmount: '۴۱,۰۰۰,۰۰۰ تومان',
+                status: 'active',
+                statusLabel: 'فعال',
+                issuer: {
+                    name: 'علی احمدی',
+                    company: 'شرکت پارس تجارت',
+                    verified: true,
+                    avatar: 'AA'
+                },
+                bank: 'بانک ملی',
+                branch: 'شعبه ولیعصر',
+                accountNumber: '0123456789',
+                issueDate: '۱۴۰۵/۰۱/۱۰',
+                term: '۹۵ روز',
+                guarantee: 'سفته',
+                riskScore: 85,
+                creditScore: 82,
+                trackRecord: '۱۲ معامله موفق',
+                defaultHistory: 'بدون سابقه',
+                interestCount: 3,
+                featured: true
+            },
+            {
+                id: 2,
+                chequeNumber: '9012345-78',
+                amount: '۱۲۰,۰۰۰,۰۰۰ تومان',
+                amountRaw: 120000000,
+                dueDate: '۱۴۰۵/۰۵/۲۰',
+                dueDateRaw: '2026-08-11',
+                daysRemaining: 53,
+                discountRate: '۲۲٪',
+                discountRateRaw: 22,
+                netAmount: '۹۳,۶۰۰,۰۰۰ تومان',
+                status: 'active',
+                statusLabel: 'فعال',
+                issuer: {
+                    name: 'مریم رضایی',
+                    company: 'تولیدی نساجی آریا',
+                    verified: true,
+                    avatar: 'MR'
+                },
+                bank: 'بانک ملت',
+                branch: 'شعبه انقلاب',
+                accountNumber: '9876543210',
+                issueDate: '۱۴۰۵/۰۲/۰۵',
+                term: '۱۳۵ روز',
+                guarantee: 'وثیقه ملکی',
+                riskScore: 72,
+                creditScore: 75,
+                trackRecord: '۸ معامله موفق',
+                defaultHistory: 'بدون سابقه',
+                interestCount: 7,
+                featured: false
+            },
+            {
+                id: 3,
+                chequeNumber: '3456789-12',
+                amount: '۳۵,۰۰۰,۰۰۰ تومان',
+                amountRaw: 35000000,
+                dueDate: '۱۴۰۵/۰۴/۰۸',
+                dueDateRaw: '2026-06-29',
+                daysRemaining: 10,
+                discountRate: '۱۵٪',
+                discountRateRaw: 15,
+                netAmount: '۲۹,۷۵۰,۰۰۰ تومان',
+                status: 'active',
+                statusLabel: 'فعال',
+                issuer: {
+                    name: 'حسین کریمی',
+                    company: 'بازرگانی کیمیا',
+                    verified: false,
+                    avatar: 'HK'
+                },
+                bank: 'بانک صادرات',
+                branch: 'شعبه سعادت‌آباد',
+                accountNumber: '5551234567',
+                issueDate: '۱۴۰۵/۰۲/۲۸',
+                term: '۷۰ روز',
+                guarantee: 'ضمانت شخصی',
+                riskScore: 58,
+                creditScore: 61,
+                trackRecord: '۴ معامله موفق',
+                defaultHistory: 'بدون سابقه',
+                interestCount: 1,
+                featured: false
+            },
+            {
+                id: 4,
+                chequeNumber: '6789012-34',
+                amount: '۲۰۰,۰۰۰,۰۰۰ تومان',
+                amountRaw: 200000000,
+                dueDate: '۱۴۰۵/۰۶/۱۰',
+                dueDateRaw: '2026-09-01',
+                daysRemaining: 74,
+                discountRate: '۲۵٪',
+                discountRateRaw: 25,
+                netAmount: '۱۵۰,۰۰۰,۰۰۰ تومان',
+                status: 'pending',
+                statusLabel: 'در انتظار تأیید',
+                issuer: {
+                    name: 'فاطمه نوری',
+                    company: 'ساختمانی دنا',
+                    verified: true,
+                    avatar: 'FN'
+                },
+                bank: 'بانک تجارت',
+                branch: 'شعبه میدان ونک',
+                accountNumber: '7778889990',
+                issueDate: '۱۴۰۵/۰۳/۱۵',
+                term: '۱۲۰ روز',
+                guarantee: 'چک ضمانتی',
+                riskScore: 68,
+                creditScore: 70,
+                trackRecord: '۶ معامله موفق',
+                defaultHistory: 'بدون سابقه',
+                interestCount: 0,
+                featured: false
+            },
+            {
+                id: 5,
+                chequeNumber: '1122334-56',
+                amount: '۸۰,۰۰۰,۰۰۰ تومان',
+                amountRaw: 80000000,
+                dueDate: '۱۴۰۵/۰۴/۲۵',
+                dueDateRaw: '2026-07-16',
+                daysRemaining: 27,
+                discountRate: '۲۰٪',
+                discountRateRaw: 20,
+                netAmount: '۶۴,۰۰۰,۰۰۰ تومان',
+                status: 'active',
+                statusLabel: 'فعال',
+                issuer: {
+                    name: 'رضا محمدی',
+                    company: 'توزیع مواد غذایی پارس',
+                    verified: true,
+                    avatar: 'RM'
+                },
+                bank: 'بانک پاسارگاد',
+                branch: 'شعبه شریعتی',
+                accountNumber: '4445556667',
+                issueDate: '۱۴۰۵/۰۲/۱۰',
+                term: '۱۰۵ روز',
+                guarantee: 'سفته + ضامن',
+                riskScore: 91,
+                creditScore: 88,
+                trackRecord: '۱۵ معامله موفق',
+                defaultHistory: 'بدون سابقه',
+                interestCount: 5,
+                featured: true
+            },
+            {
+                id: 6,
+                chequeNumber: '5566778-90',
+                amount: '۴۵,۰۰۰,۰۰۰ تومان',
+                amountRaw: 45000000,
+                dueDate: '۱۴۰۵/۰۵/۰۵',
+                dueDateRaw: '2026-07-26',
+                daysRemaining: 37,
+                discountRate: '۱۷٪',
+                discountRateRaw: 17,
+                netAmount: '۳۷,۳۵۰,۰۰۰ تومان',
+                status: 'active',
+                statusLabel: 'فعال',
+                issuer: {
+                    name: 'سارا حسینی',
+                    company: 'خدمات فنی مهر',
+                    verified: false,
+                    avatar: 'SH'
+                },
+                bank: 'بانک کشاورزی',
+                branch: 'شعبه کرج',
+                accountNumber: '3332221110',
+                issueDate: '۱۴۰۵/۰۲/۲۰',
+                term: '۱۰۵ روز',
+                guarantee: 'بدون وثیقه',
+                riskScore: 45,
+                creditScore: 52,
+                trackRecord: '۲ معامله موفق',
+                defaultHistory: '۱ تأخیر جزئی',
+                interestCount: 2,
+                featured: false
+            }
+        ];
+
+        // ===== Build Listings Grid =====
+        function buildListingsGrid() {
+            const grid = document.getElementById('listings-grid');
+            if (!grid) return;
+            
+            grid.innerHTML = '';
+            
+            listings.forEach(listing => {
+                const card = document.createElement('div');
+                card.className = 'listing-card';
+                if (listing.featured) {
+                    card.classList.add('featured');
+                }
+                
+                card.innerHTML = `
+                    ${listing.featured ? '<div class="featured-badge">ویژه</div>' : ''}
+                    
+                    <div class="listing-header">
+                        <div class="listing-id">
+                            <span class="label">شماره چک:</span>
+                            <span class="value">${listing.chequeNumber}</span>
+                        </div>
+                        <div class="listing-status">
+                            <span class="badge badge-${listing.status === 'active' ? 'success' : listing.status === 'pending' ? 'warning' : 'muted'}">
+                                ${listing.statusLabel}
+                            </span>
+                        </div>
+                    </div>
+                    
+                    <div class="listing-issuer">
+                        <div class="issuer-avatar">${listing.issuer.avatar}</div>
+                        <div class="issuer-info">
+                            <div class="issuer-name">
+                                ${listing.issuer.name}
+                                ${listing.issuer.verified ? '<span class="badge badge-verified" style="margin-right: 4px;">✓</span>' : ''}
+                            </div>
+                            <div class="issuer-company">${listing.issuer.company}</div>
+                        </div>
+                    </div>
+                    
+                    <div class="listing-amount">
+                        <div class="amount-label">مبلغ چک</div>
+                        <div class="amount-value">${listing.amount}</div>
+                    </div>
+                    
+                    <div class="listing-details">
+                        <div class="detail-item">
+                            <span class="detail-label">سررسید:</span>
+                            <span class="detail-value">${listing.dueDate}</span>
+                            <span class="badge badge-muted" style="margin-right: 4px;">${listing.daysRemaining} روز</span>
+                        </div>
+                        <div class="detail-item">
+                            <span class="detail-label">نرخ تنزیل:</span>
+                            <span class="detail-value">${listing.discountRate}</span>
+                        </div>
+                        <div class="detail-item">
+                            <span class="detail-label">مبلغ خالص:</span>
+                            <span class="detail-value">${listing.netAmount}</span>
+                        </div>
+                        <div class="detail-item">
+                            <span class="detail-label">ریسک:</span>
+                            <span class="badge badge-risk-${riskClass(listing.riskScore)}">${riskLabel(listing.riskScore)}</span>
+                        </div>
+                        <div class="detail-item">
+                            <span class="detail-label">بانک:</span>
+                            <span class="detail-value">${listing.bank}</span>
+                        </div>
+                        <div class="detail-item">
+                            <span class="detail-label">علاقه‌مندی:</span>
+                            <span class="detail-value">${listing.interestCount} نفر</span>
+                        </div>
+                    </div>
+                    
+                    <div class="listing-cta">
+                        <button class="btn btn-primary w-100" onclick="viewDetail(${listing.id})">
+                            مشاهده جزئیات و اعلام علاقه‌مندی
+                        </button>
+                    </div>
+                `;
+                
+                grid.appendChild(card);
+            });
+            
+            // Update result count
+            const resultCount = document.getElementById('result-count');
+            if (resultCount) {
+                resultCount.textContent = `${listings.length} آگهی`;
+            }
+        }
+    </script>
+
+    <!-- ========== MARKETPLACE PAGE ========== -->
+    <div id="marketplace-page" class="page">
+        <!-- Hero Section -->
+        <section class="hero">
+            <div class="container">
+                <h1>بازار تنزیل چک</h1>
+                <p>خرید و فروش چک‌های تضمین‌شده با شفافیت کامل</p>
+                <div class="hero-actions">
+                    <button class="btn btn-primary btn-lg" onclick="showPage('create')">
+                        ثبت چک جدید
+                    </button>
+                    <button class="btn btn-secondary btn-lg">
+                        راهنمای استفاده
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <!-- Stats Grid -->
+        <section class="container mt-5">
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-value">۱,۲۴۵</div>
+                    <div class="stat-label">چک ثبت‌شده</div>
+                    <div class="stat-change positive">↑ ۱۲٪ این ماه</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value">۸۹۲</div>
+                    <div class="stat-label">معامله موفق</div>
+                    <div class="stat-change positive">↑ ۸٪ این ماه</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value">۴.۲ میلیارد</div>
+                    <div class="stat-label">حجم معاملات (تومان)</div>
+                    <div class="stat-change positive">↑ ۱۵٪ این ماه</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value">۹۸.۵٪</div>
+                    <div class="stat-label">نرخ موفقیت</div>
+                    <div class="stat-change positive">↑ ۲٪ این ماه</div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Filter Bar -->
+        <section class="container mt-5">
+            <div class="filter-bar">
+                <div class="filter-group">
+                    <label>جستجو</label>
+                    <div class="search-box">
+                        <input type="text" placeholder="شماره چک، نام صادرکننده...">
+                        <span class="search-icon">🔍</span>
+                    </div>
+                </div>
+
+                <div class="filter-group">
+                    <label>محدوده مبلغ (تومان)</label>
+                    <div style="display: flex; gap: 8px;">
+                        <input type="number" placeholder="از" style="width: 120px;">
+                        <input type="number" placeholder="تا" style="width: 120px;">
+                    </div>
+                </div>
+
+                <div class="filter-group">
+                    <label>سررسید</label>
+                    <select>
+                        <option>همه</option>
+                        <option>کمتر از ۳۰ روز</option>
+                        <option>۳۰ تا ۶۰ روز</option>
+                        <option>۶۰ تا ۹۰ روز</option>
+                        <option>بیش از ۹۰ روز</option>
+                    </select>
+                </div>
+
+                <div class="filter-group">
+                    <label>بانک</label>
+                    <select>
+                        <option>همه بانک‌ها</option>
+                        <option>بانک ملی</option>
+                        <option>بانک ملت</option>
+                        <option>بانک صادرات</option>
+                        <option>بانک تجارت</option>
+                    </select>
+                </div>
+
+                <div class="filter-group">
+                    <label>سطح ریسک</label>
+                    <div class="checkbox-group">
+                        <label class="checkbox-label">
+                            <input type="checkbox" checked>
+                            <span>کم‌ریسک</span>
+                        </label>
+                        <label class="checkbox-label">
+                            <input type="checkbox" checked>
+                            <span>متوسط</span>
+                        </label>
+                        <label class="checkbox-label">
+                            <input type="checkbox">
+                            <span>پرریسک</span>
+                        </label>
+                    </div>
+                </div>
+
+                <div class="filter-group">
+                    <label>&nbsp;</label>
+                    <div style="display: flex; gap: 8px;">
+                        <label class="checkbox-label">
+                            <input type="checkbox">
+                            <span>فقط تأیید هویت شده</span>
+                        </label>
+                        <label class="checkbox-label">
+                            <input type="checkbox">
+                            <span>فقط آگهی‌های ویژه</span>
+                        </label>
+                    </div>
+                </div>
+            </div>
+
+            <div class="sort-bar">
+                <div class="sort-label">مرتب‌سازی:</div>
+                <div class="sort-controls">
+                    <button class="btn btn-sm btn-ghost">جدیدترین</button>
+                    <button class="btn btn-sm btn-ghost">کمترین مبلغ</button>
+                    <button class="btn btn-sm btn-ghost">بیشترین مبلغ</button>
+                    <button class="btn btn-sm btn-ghost">نزدیک‌ترین سررسید</button>
+                    <button class="btn btn-sm btn-ghost">کم‌ریسک‌ترین</button>
+                </div>
+                <div class="result-count" id="result-count">۶ آگهی</div>
+            </div>
+        </section>
+
+        <!-- Listings Grid -->
+        <section class="container mt-4 mb-5">
+            <div class="listings-grid" id="listings-grid">
+                <!-- Populated by JavaScript -->
+            </div>
+        </section>
+    </div>
+
+    <!-- ========== DETAIL VIEW PAGE ========== -->
+    <div id="detail-page" class="page" style="display: none;">
+        <div class="detail-view">
+            <div class="container">
+                <!-- Back Button -->
+                <button class="btn btn-ghost mb-3" onclick="showPage('marketplace')">
+                    ← بازگشت به لیست
+                </button>
+
+                <!-- Detail Header -->
+                <div class="detail-header">
+                    <div class="detail-title">
+                        <h2>چک شماره <span id="detail-cheque-number"></span></h2>
+                        <div id="detail-status"></div>
+                    </div>
+                    <div class="detail-stats">
+                        <div class="detail-stat">
+                            <div class="stat-value" id="detail-amount"></div>
+                            <div class="stat-label">مبلغ چک</div>
+                        </div>
+                        <div class="detail-stat">
+                            <div class="stat-value" id="detail-due-date"></div>
+                            <div class="stat-label">سررسید</div>
+                        </div>
+                        <div class="detail-stat">
+                            <div class="stat-value" id="detail-discount-rate"></div>
+                            <div class="stat-label">نرخ تنزیل</div>
+                        </div>
+                        <div class="detail-stat">
+                            <div class="stat-value" id="detail-net-amount"></div>
+                            <div class="stat-label">مبلغ خالص</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="detail-grid">
+                    <!-- Issuer Info -->
+                    <div class="detail-section">
+                        <h3>اطلاعات صادرکننده</h3>
+                        <div class="card">
+                            <div style="display: flex; align-items: center; gap: 16px; margin-bottom: 16px;">
+                                <div class="issuer-avatar" style="width: 64px; height: 64px; font-size: 24px;">AA</div>
+                                <div>
+                                    <div style="font-size: 18px; font-weight: 600; margin-bottom: 4px;" id="detail-issuer-name"></div>
+                                    <div style="color: #64748b; margin-bottom: 8px;" id="detail-issuer-company"></div>
+                                    <div id="detail-issuer-verification"></div>
+                                </div>
+                            </div>
+                            <div class="trust-message">
+                                <strong>✓</strong> هویت صادرکننده توسط سیستم احراز هویت تأیید شده است.
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Cheque Details -->
+                    <div class="detail-section">
+                        <h3>جزئیات چک</h3>
+                        <div class="card">
+                            <div class="detail-row">
+                                <span class="detail-label">بانک:</span>
+                                <span class="detail-value" id="detail-bank"></span>
+                            </div>
+                            <div class="detail-row">
+                                <span class="detail-label">شعبه:</span>
+                                <span class="detail-value" id="detail-branch"></span>
+                            </div>
+                            <div class="detail-row">
+                                <span class="detail-label">شماره حساب:</span>
+                                <span class="detail-value" id="detail-account"></span>
+                            </div>
+                            <div class="detail-row">
+                                <span class="detail-label">تاریخ صدور:</span>
+                                <span class="detail-value" id="detail-issue-date"></span>
+                            </div>
+                            <div class="detail-row">
+                                <span class="detail-label">مدت:</span>
+                                <span class="detail-value" id="detail-term"></span>
+                            </div>
+                            <div class="detail-row">
+                                <span class="detail-label">وثیقه/ضمانت:</span>
+                                <span class="detail-value" id="detail-guarantee"></span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Risk Assessment -->
+                    <div class="detail-section">
+                        <h3>ارزیابی ریسک</h3>
+                        <div class="card">
+                            <div class="detail-row">
+                                <span class="detail-label">سطح ریسک:</span>
+                                <span id="detail-risk"></span>
+                            </div>
+                            <div class="detail-row">
+                                <span class="detail-label">امتیاز اعتباری:</span>
+                                <span class="detail-value" id="detail-credit-score"></span>
+                            </div>
+                            <div class="detail-row">
+                                <span class="detail-label">سابقه معاملات:</span>
+                                <span class="detail-value" id="detail-track-record"></span>
+                            </div>
+                            <div class="detail-row">
+                                <span class="detail-label">سابقه نکول:</span>
+                                <span class="detail-value" id="detail-default-history"></span>
+                            </div>
+                            <div class="trust-message mt-3">
+                                <strong>ℹ️</strong> ارزیابی ریسک بر اساس داده‌های رسمی سامانه‌های بانکی و سابقه معاملات انجام شده است.
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Interest Section -->
+                    <div class="detail-section" style="grid-column: 1 / -1;">
+                        <h3>اعلام علاقه‌مندی</h3>
+                        <div class="card" style="text-align: center;">
+                            <p style="font-size: 16px; color: #64748b; margin-bottom: 20px;">
+                                <span id="detail-interest-count">0</span> نفر به این چک علاقه‌مندی نشان داده‌اند
+                            </p>
+                            <button class="btn btn-primary btn-lg" onclick="expressInterest()">
+                                اعلام علاقه‌مندی و ارسال پیشنهاد
+                            </button>
+                            <div class="trust-message mt-3">
+                                <strong>🔒</strong> اطلاعات شما محرمانه است و تنها پس از تأیید طرفین به اشتراک گذاشته می‌شود.
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ========== CREATE LISTING PAGE ========== -->
+    <div id="create-page" class="page" style="display: none;">
+        <div class="container mt-5 mb-5">
+            <div class="wizard-card">
+                <div class="wizard-header">
+                    <h2>ثبت چک جدید</h2>
+                    <p>اطلاعات چک خود را با دقت وارد کنید</p>
+                </div>
+
+                <!-- Stepper -->
+                <div class="stepper">
+                    <div class="step active" data-step="1">
+                        <div class="step-circle"></div>
+                        <div class="step-label">اطلاعات چک</div>
+                    </div>
+                    <div class="step-line"></div>
+                    <div class="step" data-step="2">
+                        <div class="step-circle"></div>
+                        <div class="step-label">صادرکننده</div>
+                    </div>
+                    <div class="step-line"></div>
+                    <div class="step" data-step="3">
+                        <div class="step-circle"></div>
+                        <div class="step-label">مدارک</div>
+                    </div>
+                    <div class="step-line"></div>
+                    <div class="step" data-step="4">
+                        <div class="step-circle"></div>
+                        <div class="step-label">تأیید</div>
+                    </div>
+                </div>
+
+                <!-- Form -->
+                <form id="create-form" onsubmit="return false;">
+                    <!-- Step 1: Cheque Info -->
+                    <div class="wizard-step active" id="step-1">
+                        <h3 class="mb-4">مشخصات چک</h3>
+                        
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label>شماره چک <span style="color: #ef4444;">*</span></label>
+                                <input type="text" id="create-cheque-number" placeholder="مثال: 7845123-45" required>
+                                <div class="form-hint">شماره سریال چک را از روی برگه چک وارد کنید</div>
+                            </div>
+
+                            <div class="form-group">
+                                <label>مبلغ (تومان) <span style="color: #ef4444;">*</span></label>
+                                <input type="number" id="create-amount" placeholder="مثال: 50000000" required>
+                            </div>
+                        </div>
+
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label>تاریخ سررسید <span style="color: #ef4444;">*</span></label>
+                                <input type="text" id="create-due-date" placeholder="۱۴۰۵/۰۴/۱۵" required>
+                                <div class="form-hint">تاریخ به شمسی وارد شود</div>
+                            </div>
+
+                            <div class="form-group">
+                                <label>نرخ تنزیل پیشنهادی (%)</label>
+                                <input type="number" id="create-discount-rate" placeholder="مثال: 18" step="0.1">
+                                <div class="form-hint">نرخ سالانه - اختیاری</div>
+                            </div>
+                        </div>
+
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label>بانک <span style="color: #ef4444;">*</span></label>
+                                <select id="create-bank" required>
+                                    <option value="">انتخاب کنید</option>
+                                    <option>بانک ملی</option>
+                                    <option>بانک ملت</option>
+                                    <option>بانک صادرات</option>
+                                    <option>بانک تجارت</option>
+                                    <option>بانک پاسارگاد</option>
+                                    <option>بانک کشاورزی</option>
+                                </select>
+                            </div>
+
+                            <div class="form-group">
+                                <label>شعبه <span style="color: #ef4444;">*</span></label>
+                                <input type="text" id="create-branch" placeholder="مثال: شعبه ولیعصر" required>
+                            </div>
+                        </div>
+
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label>شماره حساب <span style="color: #ef4444;">*</span></label>
+                                <input type="text" id="create-account" placeholder="مثال: 0123456789" required>
+                            </div>
+
+                            <div class="form-group">
+                                <label>نوع وثیقه/ضمانت</label>
+                                <select id="create-guarantee">
+                                    <option value="">بدون وثیقه</option>
+                                    <option>سفته</option>
+                                    <option>وثیقه ملکی</option>
+                                    <option>چک ضمانتی</option>
+                                    <option>ضمانت شخصی</option>
+                                    <option>سفته + ضامن</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="trust-message mt-3">
+                            <strong>🔒</strong> تمام اطلاعات شما رمزنگاری شده و با استانداردهای امنیتی بالا محافظت می‌شود.
+                        </div>
+                    </div>
+
+                    <!-- Step 2: Issuer Info -->
+                    <div class="wizard-step" id="step-2">
+                        <h3 class="mb-4">اطلاعات صادرکننده</h3>
+                        
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label>نام و نام خانوادگی <span style="color: #ef4444;">*</span></label>
+                                <input type="text" id="create-issuer-name" placeholder="مثال: علی احمدی" required>
+                            </div>
+
+                            <div class="form-group">
+                                <label>نام شرکت/کسب‌وکار</label>
+                                <input type="text" id="create-company" placeholder="مثال: شرکت پارس تجارت">
+                                <div class="form-hint">در صورت وجود</div>
+                            </div>
+                        </div>
+
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label>کد ملی <span style="color: #ef4444;">*</span></label>
+                                <input type="text" id="create-national-id" placeholder="مثال: 0123456789" maxlength="10" required>
+                            </div>
+
+                            <div class="form-group">
+                                <label>شماره شناسنامه <span style="color: #ef4444;">*</span></label>
+                                <input type="text" id="create-birth-cert" placeholder="مثال: 1234" required>
+                            </div>
+                        </div>
+
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label>شماره تماس <span style="color: #ef4444;">*</span></label>
+                                <input type="tel" id="create-phone" placeholder="09123456789" required>
+                            </div>
+
+                            <div class="form-group">
+                                <label>ایمیل</label>
+                                <input type="email" id="create-email" placeholder="example@domain.com">
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label>آدرس کامل <span style="color: #ef4444;">*</span></label>
+                            <textarea id="create-address" rows="3" placeholder="آدرس دقیق محل سکونت یا کسب‌وکار" required></textarea>
+                        </div>
+
+                        <div class="trust-message mt-3">
+                            <strong>✓</strong> اطلاعات شخصی شما محرمانه بوده و تنها پس از تطابق و تأیید معامله به طرف مقابل نمایش داده می‌شود.
+                        </div>
+                    </div>
+
+                    <!-- Step 3: Documents -->
+                    <div class="wizard-step" id="step-3">
+                        <h3 class="mb-4">بارگذاری مدارک</h3>
+                        
+                        <div class="form-group">
+                            <label>تصویر چک <span style="color: #ef4444;">*</span></label>
+                            <input type="file" id="create-cheque-image" accept="image/*" required>
+                            <div class="form-hint">تصویر واضح از برگه چک (فرمت: JPG, PNG - حداکثر 5MB)</div>
+                        </div>
+
+                        <div class="form-group">
+                            <label>کارت ملی <span style="color: #ef4444;">*</span></label>
+                            <input type="file" id="create-id-card" accept="image/*" required>
+                            <div class="form-hint">تصویر روی و پشت کارت ملی (فرمت: JPG, PNG - حداکثر 5MB)</div>
+                        </div>
+
+                        <div class="form-group">
+                            <label>مدارک وثیقه (در صورت وجود)</label>
+                            <input type="file" id="create-collateral-docs" accept=".pdf,image/*" multiple>
+                            <div class="form-hint">سند ملک، سفته، چک ضمانتی یا سایر مدارک (فرمت: PDF, JPG, PNG)</div>
+                        </div>
+
+                        <div class="form-group">
+                            <label>مدارک تکمیلی</label>
+                            <input type="file" id="create-additional-docs" accept=".pdf,image/*" multiple>
+                            <div class="form-hint">گواهی ثبت شرکت، صورت‌های مالی، سوابق بانکی و غیره</div>
+                        </div>
+
+                        <div class="trust-message mt-3">
+                            <strong>🔍</strong> تمام مدارک توسط تیم بررسی ما به دقت ارزیابی می‌شوند. فرآیند بررسی معمولاً ۲۴ تا ۴۸ ساعت طول می‌کشد.
+                        </div>
+                    </div>
+
+                    <!-- Step 4: Review & Submit -->
+                    <div class="wizard-step" id="step-4">
+                        <h3 class="mb-4">بررسی نهایی و تأیید</h3>
+                        
+                        <div class="summary-view">
+                            <div class="summary-section">
+                                <h4>مشخصات چک</h4>
+                                <div class="summary-row">
+                                    <span>شماره چک:</span>
+                                    <strong id="summary-cheque-number">-</strong>
+                                </div>
+                                <div class="summary-row">
+                                    <span>مبلغ:</span>
+                                    <strong id="summary-amount">-</strong>
+                                </div>
+                                <div class="summary-row">
+                                    <span>سررسید:</span>
+                                    <strong id="summary-due-date">-</strong>
+                                </div>
+                                <div class="summary-row">
+                                    <span>بانک:</span>
+                                    <strong id="summary-bank">-</strong>
+                                </div>
+                            </div>
+
+                            <div class="summary-section">
+                                <h4>صادرکننده</h4>
+                                <div class="summary-row">
+                                    <span>نام:</span>
+                                    <strong id="summary-issuer-name">-</strong>
+                                </div>
+                                <div class="summary-row">
+                                    <span>شرکت:</span>
+                                    <strong id="summary-company">-</strong>
+                                </div>
+                                <div class="summary-row">
+                                    <span>تماس:</span>
+                                    <strong id="summary-phone">-</strong>
+                                </div>
+                            </div>
+
+                            <div class="summary-section">
+                                <h4>مدارک بارگذاری شده</h4>
+                                <div id="summary-documents">
+                                    <div class="summary-row">✓ تصویر چک</div>
+                                    <div class="summary-row">✓ کارت ملی</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="form-group mt-4">
+                            <label class="checkbox-label" style="font-size: 14px;">
+                                <input type="checkbox" id="accept-terms" required>
+                                <span>
+                                    <a href="#" style="color: #3b82f6; text-decoration: underline;">شرایط و قوانین استفاده</a> 
+                                    از پلتفرم را مطالعه کرده و می‌پذیرم
+                                </span>
+                            </label>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="checkbox-label" style="font-size: 14px;">
+                                <input type="checkbox" id="accept-privacy" required>
+                                <span>
+                                    <a href="#" style="color: #3b82f6; text-decoration: underline;">سیاست حفظ حریم خصوصی</a> 
+                                    را مطالعه کرده و با آن موافقم
+                                </span>
+                            </label>
+                        </div>
+
+                        <div class="trust-message mt-3">
+                            <strong>ℹ️</strong> پس از ثبت، چک شما در حالت "در انتظار بررسی" قرار می‌گیرد و پس از تأیید تیم ما در بازار نمایش داده خواهد شد.
+                        </div>
+                    </div>
+
+                    <!-- Navigation Buttons -->
+                    <div class="wizard-actions">
+                        <button type="button" class="btn btn-secondary" id="btn-prev" onclick="goStep(-1)" style="display: none;">
+                            مرحله قبل
+                        </button>
+                        <button type="button" class="btn btn-ghost" onclick="showPage('marketplace')">
+                            انصراف
+                        </button>
+                        <button type="button" class="btn btn-primary" id="btn-next" onclick="goStep(1)">
+                            مرحله بعد
+                        </button>
+                        <button type="button" class="btn btn-success" id="btn-submit" onclick="submitListing()" style="display: none;">
+                            ثبت نهایی چک
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- ========== DASHBOARD PAGE ========== -->
+    <div id="dashboard-page" class="page" style="display: none;">
+        <div class="container mt-5 mb-5">
+            <h1 class="mb-4">داشبورد کاربری</h1>
+
+            <!-- User Profile Card -->
+            <div class="card mb-4">
+                <div class="user-profile">
+                    <div class="user-avatar">رک</div>
+                    <div class="user-info">
+                        <div class="user-name">
+                            رضا کریمی
+                            <span class="badge badge-verified">تأیید هویت</span>
+                        </div>
+                        <div class="user-meta">عضو از ۱۴۰۴/۱۲/۰۱</div>
+                    </div>
+                    <button class="btn btn-secondary">ویرایش پروفایل</button>
+                </div>
+            </div>
+
+            <!-- Stats Overview -->
+            <div class="stats-grid mb-4">
+                <div class="stat-card">
+                    <div class="stat-value">۳</div>
+                    <div class="stat-label">چک فعال</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value">۸</div>
+                    <div class="stat-label">معامله موفق</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value">۱۲</div>
+                    <div class="stat-label">علاقه‌مندی دریافتی</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value">۹۸٪</div>
+                    <div class="stat-label">رضایت طرف مقابل</div>
+                </div>
+            </div>
+
+            <!-- Tabs -->
+            <div class="tabs">
+                <button class="tab-btn active" onclick="showTab('holder')">چک‌های من (دارنده)</button>
+                <button class="tab-btn" onclick="showTab('investor')">سرمایه‌گذاری‌ها (خریدار)</button>
+                <button class="tab-btn" onclick="showTab('activity')">تاریخچه فعالیت</button>
+            </div>
+
+            <!-- Tab Content: Holder -->
+            <div class="tab-content active" id="tab-holder">
+                <div class="card mb-3">
+                    <div class="list-row">
+                        <div class="list-col">
+                            <div class="list-label">شماره چک</div>
+                            <div class="list-value">7845123-45</div>
+                        </div>
+                        <div class="list-col">
+                            <div class="list-label">مبلغ</div>
+                            <div class="list-value">۵۰,۰۰۰,۰۰۰ تومان</div>
+                        </div>
+                        <div class="list-col">
+                            <div class="list-label">سررسید</div>
+                            <div class="list-value">۱۴۰۵/۰۴/۱۵</div>
+                        </div>
+                        <div class="list-col">
+                            <div class="list-label">وضعیت</div>
+                            <div class="list-value">
+                                <span class="badge badge-success">فعال</span>
+                            </div>
+                        </div>
+                        <div class="list-col">
+                            <div class="list-label">علاقه‌مندی</div>
+                            <div class="list-value">۳ نفر</div>
+                        </div>
+                        <div class="list-actions">
+                            <button class="btn btn-sm btn-primary">مشاهده</button>
+                            <button class="btn btn-sm btn-ghost">ویرایش</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card mb-3">
+                    <div class="list-row">
+                        <div class="list-col">
+                            <div class="list-label">شماره چک</div>
+                            <div class="list-value">1122334-56</div>
+                        </div>
+                        <div class="list-col">
+                            <div class="list-label">مبلغ</div>
+                            <div class="list-value">۸۰,۰۰۰,۰۰۰ تومان</div>
+                        </div>
+                        <div class="list-col">
+                            <div class="list-label">سررسید</div>
+                            <div class="list-value">۱۴۰۵/۰۴/۲۵</div>
+                        </div>
+                        <div class="list-col">
+                            <div class="list-label">وضعیت</div>
+                            <div class="list-value">
+                                <span class="badge badge-warning">در حال مذاکره</span>
+                            </div>
+                        </div>
+                        <div class="list-col">
+                            <div class="list-label">علاقه‌مندی</div>
+                            <div class="list-value">۵ نفر</div>
+                        </div>
+                        <div class="list-actions">
+                            <button class="btn btn-sm btn-primary">مشاهده</button>
+                            <button class="btn btn-sm btn-ghost">ویرایش</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="empty-state">
+                    <div class="empty-icon">📄</div>
+                    <div class="empty-title">چک دیگری ندارید</div>
+                    <div class="empty-description">برای ثبت چک جدید، دکمه زیر را کلیک کنید</div>
+                    <button class="btn btn-primary mt-3" onclick="showPage('create')">
+                        ثبت چک جدید
+                    </button>
+                </div>
+            </div>
+
+            <!-- Tab Content: Investor -->
+            <div class="tab-content" id="tab-investor">
+                <div class="card mb-3">
+                    <div class="match-row">
+                        <div class="match-info">
+                            <div class="match-title">چک شماره 9012345-78</div>
+                            <div class="match-meta">
+                                صادرکننده: مریم رضایی • مبلغ: ۱۲۰,۰۰۰,۰۰۰ تومان • سررسید: ۱۴۰۵/۰۵/۲۰
+                            </div>
+                        </div>
+                        <div class="match-status">
+                            <span class="badge badge-success">تکمیل شده</span>
+                        </div>
+                        <div class="match-actions">
+                            <button class="btn btn-sm btn-primary">جزئیات</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card mb-3">
+                    <div class="match-row">
+                        <div class="match-info">
+                            <div class="match-title">چک شماره 3456789-12</div>
+                            <div class="match-meta">
+                                صادرکننده: حسین کریمی • مبلغ: ۳۵,۰۰۰,۰۰۰ تومان • سررسید: ۱۴۰۵/۰۴/۰۸
+                            </div>
+                        </div>
+                        <div class="match-status">
+                            <span class="badge badge-warning">در انتظار تأیید</span>
+                        </div>
+                        <div class="match-actions">
+                            <button class="btn btn-sm btn-primary">جزئیات</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="empty-state">
+                    <div class="empty-icon">💼</div>
+                    <div class="empty-title">سرمایه‌گذاری دیگری ندارید</div>
+                    <div class="empty-description">به بازار بروید و چک مناسب پیدا کنید</div>
+                    <button class="btn btn-primary mt-3" onclick="showPage('marketplace')">
+                        مشاهده بازار
+                    </button>
+                </div>
+            </div>
+
+            <!-- Tab Content: Activity -->
+            <div class="tab-content" id="tab-activity">
+                <div class="activity-feed">
+                    <div class="activity-item">
+                        <div class="activity-icon">✓</div>
+                        <div class="activity-content">
+                            <div class="activity-title">معامله موفق</div>
+                            <div class="activity-description">
+                                چک شماره 9012345-78 با موفقیت خریداری شد
+                            </div>
+                            <div class="activity-time">۲ روز پیش</div>
+                        </div>
+                    </div>
+
+                    <div class="activity-item">
+                        <div class="activity-icon">📨</div>
+                        <div class="activity-content">
+                            <div class="activity-title">علاقه‌مندی جدید</div>
+                            <div class="activity-description">
+                                ۲ نفر به چک ۷۸۴۵۱۲۳-۴۵ علاقه‌مندی نشان دادند
+                            </div>
+                            <div class="activity-time">۵ روز پیش</div>
+                        </div>
+                    </div>
+
+                    <div class="activity-item">
+                        <div class="activity-icon">📝</div>
+                        <div class="activity-content">
+                            <div class="activity-title">چک جدید ثبت شد</div>
+                            <div class="activity-description">
+                                چک شماره ۱۱۲۲۳۳۴-۵۶ با موفقیت ثبت و منتشر شد
+                            </div>
+                            <div class="activity-time">۱ هفته پیش</div>
+                        </div>
+                    </div>
+
+                    <div class="activity-item">
+                        <div class="activity-icon">✓</div>
+                        <div class="activity-content">
+                            <div class="activity-title">تأیید هویت</div>
+                            <div class="activity-description">
+                                هویت شما با موفقیت تأیید شد
+                            </div>
+                            <div class="activity-time">۲ هفته پیش</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+<!-- ========== MODAL: Express Interest ========== -->
+    <div id="interest-modal" class="modal-overlay">
+        <div class="modal">
+            <div class="modal-header">
+                <h3>اعلام علاقه‌مندی و ارسال پیشنهاد</h3>
+                <button class="modal-close" onclick="closeModal('interest-modal')">×</button>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label>نرخ تنزیل پیشنهادی شما (%) <span style="color: #ef4444;">*</span></label>
+                    <input type="number" id="interest-rate" placeholder="مثال: 18" step="0.1" required>
+                    <div class="form-hint">نرخ سالانه تنزیل که می‌خواهید پیشنهاد دهید</div>
+                </div>
+
+                <div class="form-group">
+                    <label>مبلغ پیشنهادی خرید (تومان) <span style="color: #ef4444;">*</span></label>
+                    <input type="number" id="interest-amount" placeholder="مبلغ بر اساس نرخ تنزیل محاسببه می‌شود" required>
+                    <div class="form-hint">مبلغی که آماده‌اید برای خرید این چک پرداخت کنید</div>
+                </div>
+
+                <div class="form-group">
+                    <label>توضیحات تکمیلی</label>
+                    <textarea id="interest-message" rows="4" placeholder="پیام خود را برای صادرکننده بنویسید (اختیاری)"></textarea>
+                </div>
+
+                <div class="trust-message">
+                    <strong>🔒</strong> پیشنهاد شما به صورت محرمانه ثبت شده و تنها برای صادرکننده چک قابل مشاهده است. اطلاعات تماس شما تنها پس از تأیید طرفین به اشتراک گذاشته می‌شود.
+                </div>
+            </div>
+<div class="modal-footer">
+                <button class="btn btn-ghost" onclick="closeModal('interest-modal')">انصراف</button>
+                <button class="btn btn-primary" onclick="submitInterest()">ارسال پیشنهاد</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ========== MODAL: Success ========== -->
+    <div id="success-modal" class="modal-overlay" onclick="closeModal('success-modal')">
+        <div class="modal">
+            <div class="modal-body" style="text-align: center; padding: 40px 20px;">
+                <div class="success-icon">✓</div>
+                <h2 class="success-title">عملیات موفق!</h2>
+                <p class="success-description" id="success-message">
+                    پیشنهاد شما با موفقیت ثبت شد و به صادرکننده ارسال گردید.
+                </p>
+                <button class="btn btn-primary mt-4" onclick="closeModal('success-modal')">
+                    بستن
+                </button>
+            </div>
+        </div>
+    </div>
+
+</body>
+</html>
+
+
