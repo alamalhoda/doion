@@ -94,11 +94,19 @@ Additional data:
 
 ```json
 {
-  "status": "loading",
-  "subagentComposerId": "877a84b4-5152-41a8-8226-154a2d9d4c28"
+  "status": "success",
+  "subagentComposerId": "877a84b4-5152-41a8-8226-154a2d9d4c28",
+  "terminationReason": "completed"
 }
 ```
-Status: **loading**
+Result:
+
+```json
+{
+  "agentId": "877a84b4-5152-41a8-8226-154a2d9d4c28"
+}
+```
+Status: **completed**
 
 
 </details>
@@ -131,11 +139,19 @@ Additional data:
 
 ```json
 {
-  "status": "loading",
-  "subagentComposerId": "648107ef-f9f3-4527-bed5-32565dfc8640"
+  "status": "success",
+  "subagentComposerId": "648107ef-f9f3-4527-bed5-32565dfc8640",
+  "terminationReason": "completed"
 }
 ```
-Status: **loading**
+Result:
+
+```json
+{
+  "agentId": "648107ef-f9f3-4527-bed5-32565dfc8640"
+}
+```
+Status: **completed**
 
 
 </details>
@@ -143,5 +159,450 @@ Status: **loading**
 
 <tool-use data-tool-type="unknown" data-tool-name="task_v2"><details>
 <summary>Tool use: **task_v2**</summary>
+
+</details></tool-use>
+
+_**Agent (composer-2.5)**_
+
+<tool-use data-tool-type="unknown" data-tool-name="ripgrep_raw_search">
+<details>
+<summary>Tool use: **ripgrep_raw_search**</summary>
+
+
+Parameters:
+
+```json
+{
+  "caseInsensitive": false,
+  "path": "/Users/alamalhoda/Projects/doion/ai-preview/cheque-marketplace-prototype.html",
+  "pattern": "id=\"page-|showPage\\(|data-page="
+}
+```
+Additional data:
+
+```json
+{
+  "isPruned": true,
+  "outputMode": "content",
+  "path": "/Users/alamalhoda/Projects/doion/ai-preview/cheque-marketplace-prototype.html",
+  "pattern": "id=\"page-|showPage\\(|data-page=",
+  "topFiles": [
+    {
+      "matchCount": 18,
+      "uri": "ai-preview/cheque-marketplace-prototype.html"
+    }
+  ],
+  "totalFiles": 1,
+  "totalMatches": 18
+}
+```
+Status: **completed**
+
+
+</details>
+</tool-use>
+
+<tool-use data-tool-type="unknown" data-tool-name="ripgrep_raw_search"><details>
+<summary>Tool use: **ripgrep_raw_search**</summary>
+
+</details></tool-use>
+
+_**Agent (composer-2.5)**_
+
+<tool-use data-tool-type="unknown" data-tool-name="ripgrep_raw_search">
+<details>
+<summary>Tool use: **ripgrep_raw_search**</summary>
+
+
+Parameters:
+
+```json
+{
+  "caseInsensitive": false,
+  "path": "/Users/alamalhoda/Projects/doion/ai-preview/extended-prototype.html",
+  "pattern": "id=\"page-|showPage\\(|data-page="
+}
+```
+Additional data:
+
+```json
+{
+  "isPruned": true,
+  "outputMode": "content",
+  "path": "/Users/alamalhoda/Projects/doion/ai-preview/extended-prototype.html",
+  "pattern": "id=\"page-|showPage\\(|data-page=",
+  "topFiles": [
+    {
+      "matchCount": 10,
+      "uri": "ai-preview/extended-prototype.html"
+    }
+  ],
+  "totalFiles": 1,
+  "totalMatches": 10
+}
+```
+Status: **completed**
+
+
+</details>
+</tool-use>
+
+<tool-use data-tool-type="unknown" data-tool-name="ripgrep_raw_search"><details>
+<summary>Tool use: **ripgrep_raw_search**</summary>
+
+</details></tool-use>
+
+_**Agent (composer-2.5)**_
+
+<tool-use data-tool-type="read" data-tool-name="read_file_v2">
+<details><summary>Tool use: **read_file_v2** • Read file: /Users/alamalhoda/Projects/doion/docs/cheque-marketplace-design-system.md</summary>
+
+</details>
+</tool-use>
+
+<tool-use data-tool-type="read" data-tool-name="read_file_v2"><details>
+<summary>Tool use: **read_file_v2**</summary>
+
+</details></tool-use>
+
+_**Agent (composer-2.5)**_
+
+<tool-use data-tool-type="search" data-tool-name="glob_file_search">
+<details>
+<summary>Tool use: **glob_file_search** • Searched codebase "" • **1** result in **1** directory</summary>
+
+Directory: **** (1 file)
+
+| File |
+|------|
+| `ai-documents/features/user-login/implementation_plan.md` |
+
+</details>
+</tool-use>
+
+<tool-use data-tool-type="search" data-tool-name="glob_file_search"><details>
+<summary>Tool use: **glob_file_search**</summary>
+
+</details></tool-use>
+
+_**Agent (composer-2.5)**_
+
+<tool-use data-tool-type="read" data-tool-name="read_file_v2">
+<details><summary>Tool use: **read_file_v2** • Read file: /Users/alamalhoda/Projects/doion/ai-preview/mvp-spec.md</summary>
+
+</details>
+</tool-use>
+
+<tool-use data-tool-type="read" data-tool-name="read_file_v2"><details>
+<summary>Tool use: **read_file_v2**</summary>
+
+</details></tool-use>
+
+_**Agent (composer-2.5)**_
+
+<tool-use data-tool-type="read" data-tool-name="read_file_v2">
+<details><summary>Tool use: **read_file_v2** • Read file: /Users/alamalhoda/Projects/doion/ai-preview/cheque-marketplace-prototype.html</summary>
+
+</details>
+</tool-use>
+
+<tool-use data-tool-type="read" data-tool-name="read_file_v2"><details>
+<summary>Tool use: **read_file_v2**</summary>
+
+</details></tool-use>
+
+_**Agent (composer-2.5)**_
+
+<tool-use data-tool-type="read" data-tool-name="read_file_v2">
+<details><summary>Tool use: **read_file_v2** • Read file: /Users/alamalhoda/Projects/doion/ai-preview/extended-prototype.html</summary>
+
+</details>
+</tool-use>
+
+<tool-use data-tool-type="read" data-tool-name="read_file_v2"><details>
+<summary>Tool use: **read_file_v2**</summary>
+
+</details></tool-use>
+
+_**Agent (composer-2.5)**_
+
+<tool-use data-tool-type="read" data-tool-name="read_file_v2">
+<details><summary>Tool use: **read_file_v2** • Read file: /Users/alamalhoda/Projects/doion/frontend/phase 0 prompt.md</summary>
+
+</details>
+</tool-use>
+
+<tool-use data-tool-type="read" data-tool-name="read_file_v2"><details>
+<summary>Tool use: **read_file_v2**</summary>
+
+</details></tool-use>
+
+_**Agent (composer-2.5)**_
+
+<think><details><summary>Thought Process</summary>
+درخواست کامل و شرایط پروژه را درک کردم.
+
+برنامه اجرایی چند فازه را بر اساس پروتوتایپ‌ها و مستندات طراحی می‌کنم.
+
+فاز اول:
+- Backend: ساختار اولیه با app users و JWT login
+- Frontend: Vue 3 SPA با UI موقی برای marketplace و listings
+
+بخش‌های پروتوتایپ اصلی:
+- صفحه landing
+- بازار
+- ثبت آگهی (سه مرحله)
+- داشبورد
+
+پروتوتایپ گسترده‌تر همچنین صف‌های مدیریت و مرکز اعلان را دارد.
+
+برنامه اجرایی را به فازهای تکمیلی تقسیم می‌کنم. هر فاز ترکیبی از backend و frontend می‌باشد که قابل تست end-to-end است.
+
+فاز صفر تقریباً تکمیل شده است. ساختار پلتفرم و احراز هویت پایه انجام شده است.
+
+سپس ترتیب اجرایی می‌شود:
+- هویت و KYC
+- ثبت چک و آگهی
+- جستجوی بازار
+- مطابقت
+- مدیریت</details></think>
+
+_**Agent (composer-2.5)**_
+
+در حال تهیه برنامه فازبندی‌شده با توجه به وضعیت فعلی کد و نقشه پروتوتایپ‌ها.
+
+
+_**Agent (composer-2.5)**_
+
+<tool-use data-tool-type="read" data-tool-name="read_file_v2">
+<details><summary>Tool use: **read_file_v2** • Read file: /Users/alamalhoda/Projects/doion/frontend/src/constants/routes.ts</summary>
+
+</details>
+</tool-use>
+
+<tool-use data-tool-type="read" data-tool-name="read_file_v2"><details>
+<summary>Tool use: **read_file_v2**</summary>
+
+</details></tool-use>
+
+_**Agent (composer-2.5)**_
+
+<tool-use data-tool-type="unknown" data-tool-name="ripgrep_raw_search">
+<details>
+<summary>Tool use: **ripgrep_raw_search**</summary>
+
+
+Parameters:
+
+```json
+{
+  "caseInsensitive": false,
+  "outputMode": "files_with_matches",
+  "path": "/Users/alamalhoda/Projects/doion/frontend/src/features",
+  "pattern": "."
+}
+```
+Additional data:
+
+```json
+{
+  "isPruned": true,
+  "outputMode": "files_with_matches",
+  "path": "/Users/alamalhoda/Projects/doion/frontend/src/features",
+  "pattern": ".",
+  "topFiles": [
+    {
+      "matchCount": 1,
+      "uri": "frontend/src/features/workflow/views/WorkflowPrototypeView.vue"
+    },
+    {
+      "matchCount": 1,
+      "uri": "frontend/src/features/admin/components/ModerationCard.vue"
+    },
+    {
+      "matchCount": 1,
+      "uri": "frontend/src/features/listings/components/ListingCard.vue"
+    },
+    {
+      "matchCount": 1,
+      "uri": "frontend/src/features/marketplace/components/MarketplaceListingCard.vue"
+    },
+    {
+      "matchCount": 1,
+      "uri": "frontend/src/features/listings/views/ListingsListView.vue"
+    },
+    {
+      "matchCount": 1,
+      "uri": "frontend/src/features/listings/views/CreateListingView.vue"
+    },
+    {
+      "matchCount": 1,
+      "uri": "frontend/src/features/listings/views/ListingDetailView.vue"
+    },
+    {
+      "matchCount": 1,
+      "uri": "frontend/src/features/marketplace/views/MarketplaceView.vue"
+    },
+    {
+      "matchCount": 1,
+      "uri": "frontend/src/features/dashboard/views/UserDashboardView.vue"
+    },
+    {
+      "matchCount": 1,
+      "uri": "frontend/src/features/dashboard/views/AdminDashboardView.vue"
+    },
+    {
+      "matchCount": 1,
+      "uri": "frontend/src/features/workflow/routes.ts"
+    },
+    {
+      "matchCount": 1,
+      "uri": "frontend/src/features/matches/views/MatchesListView.vue"
+    },
+    {
+      "matchCount": 1,
+      "uri": "frontend/src/features/notifications/routes.ts"
+    },
+    {
+      "matchCount": 1,
+      "uri": "frontend/src/features/matches/routes.ts"
+    },
+    {
+      "matchCount": 1,
+      "uri": "frontend/src/features/marketplace/routes.ts"
+    },
+    {
+      "matchCount": 1,
+      "uri": "frontend/src/features/listings/stores/listingStore.ts"
+    },
+    {
+      "matchCount": 1,
+      "uri": "frontend/src/features/listings/services/listingService.ts"
+    },
+    {
+      "matchCount": 1,
+      "uri": "frontend/src/features/notifications/components/NotificationItem.vue"
+    },
+    {
+      "matchCount": 1,
+      "uri": "frontend/src/features/notifications/types/notification.ts"
+    },
+    {
+      "matchCount": 1,
+      "uri": "frontend/src/features/notifications/stores/notificationStore.ts"
+    }
+  ],
+  "totalFiles": 38,
+  "totalMatches": 38
+}
+```
+Status: **completed**
+
+
+</details>
+</tool-use>
+
+<tool-use data-tool-type="unknown" data-tool-name="ripgrep_raw_search"><details>
+<summary>Tool use: **ripgrep_raw_search**</summary>
+
+</details></tool-use>
+
+_**Agent (composer-2.5)**_
+
+<think><details><summary>Thought Process</summary>
+context کافی جمع‌آوری شد. برنامه اجرایی چندفازه برای پیاده‌سازی پروتوتایپ تولید می‌شود.</details></think>
+
+_**Agent (composer-2.5)**_
+
+<tool-use data-tool-type="unknown" data-tool-name="create_plan">
+<details>
+<summary>Tool use: **create_plan**</summary>
+
+
+Parameters:
+
+```json
+{
+  "name": "Cheque Marketplace Phases",
+  "overview": "برنامه فازبندی‌شده برای تبدیل دو پروتوتایپ HTML به محصول واقعی چک‌بازار، با هم‌ترازی کامل با معماری Modular Monolith (LLD) و Vue 3 feature-based frontend موجود. هر فاز یک vertical slice قابل تست end-to-end است.",
+  "plan": "# برنامه اجرایی فازبندی — چک‌بازار MVP\n\n## وضعیت فعلی (Baseline)\n\n| لایه | وضعیت | مرجع |\n|------|--------|------|\n| Backend | فقط scaffold: &#96;doion.users&#96; + JWT login | [&#96;backend/doion/users/&#96;](backend/doion/users/) |\n| Frontend | Vue 3 + design tokens + UI shells با **mock data** | [&#96;frontend/src/features/&#96;](frontend/src/features/) |\n| مستندات | LLD، معماری، state machines، design system آماده | [&#96;docs/cheque-platform-low-level-design.md&#96;](docs/cheque-platform-low-level-design.md)، [&#96;ai-preview/mvp-spec.md&#96;](ai-preview/mvp-spec.md) |\n\n**نقشه پروتوتایپ → محصول:**\n\n&#96;&#96;&#96;mermaid\nflowchart LR\n  subgraph proto1 [cheque-marketplace-prototype]\n    Landing[Landing]\n    Marketplace[Marketplace]\n    CreateListing[Create Listing]\n    UserDash[User Dashboard]\n  end\n  subgraph proto2 [extended-prototype]\n    ModQueue[Moderation Queue]\n    KycQueue[KYC Queue]\n    NotifCenter[Notification Center]\n    StateViz[State Machines]\n  end\n  subgraph product [Production Vue App]\n    PublicPages[Public + Auth]\n    InvestorFlow[Investor Flow]\n    HolderFlow[Holder Flow]\n    AdminPanel[Admin Panel]\n  end\n  Landing --\u003e PublicPages\n  Marketplace --\u003e InvestorFlow\n  CreateListing --\u003e HolderFlow\n  UserDash --\u003e HolderFlow\n  ModQueue --\u003e AdminPanel\n  KycQueue --\u003e AdminPanel\n  NotifCenter --\u003e HolderFlow\n  StateViz -.-\u003e|dev reference only| product\n&#96;&#96;&#96;\n\n\u003e **تصمیم ساختاری:** LLD ساختار &#96;backend/apps/&#96; را پیشنهاد می‌دهد؛ کد فعلی Cookiecutter با &#96;backend/doion/&#96; است. در فاز ۱، appهای دامنه را زیر &#96;backend/doion/\u003capp\u003e/&#96; بسازید (هم‌راستا با &#96;users&#96;) و نام‌گذاری bounded context را از LLD حفظ کنید. مهاجرت فیزیکی به &#96;apps/&#96; اختیاری و بعد از MVP است.\n\n---\n\n## فاز ۰ — پلتفرم پایه (انجام‌شده / تکمیل جزئی)\n\n**هدف:** زیرساخت مشترک backend و frontend آماده vertical sliceها باشد.\n\n### Backend (تکمیل)\n- JWT login با phone/username/email (موجود)\n- افزودن &#96;POST /api/v1/auth/refresh/&#96; و versioning زیر &#96;/api/v1/&#96;\n- Exception handler یکنواخت خطا (فرمت LLD بخش ۹)\n- PostgreSQL در dev (جایگزینی SQLite برای migration واقعی)\n- ثبت قرارداد API در [&#96;docs/development/API_CONTRACT_REGISTRY.md&#96;](docs/development/API_CONTRACT_REGISTRY.md)\n\n### Frontend (تکمیل)\n- اتصال &#96;authStore&#96; به API واقعی (موجود جزئی)\n- ثبت routeهای تعریف‌شده ولی ناقص: &#96;REGISTER&#96;, &#96;ADMIN_MODERATION_QUEUE&#96;, &#96;USER_MATCHES/:id&#96;\n- تکمیل navigation در [&#96;UserLayout&#96;](frontend/src/layouts/) و [&#96;AdminLayout&#96;](frontend/src/layouts/)\n- رفع باگ export در [&#96;listingStore.ts&#96;](frontend/src/features/listings/stores/listingStore.ts) (&#96;fetchMarketplaceListings&#96;)\n\n### معیار پذیرش فاز ۰\n- Login/logout/refresh پایدار\n- Route guards بر اساس auth\n- Build + lint بدون خطا\n\n---\n\n## فاز ۱ — Identity، نقش‌ها و Landing عمومی\n\n**پروتوتایپ:** Hero، stats bar، «چطور کار می‌کند»، footer — [&#96;cheque-marketplace-prototype.html&#96;](ai-preview/cheque-marketplace-prototype.html) (صفحه landing)\n\n**جریان کسب‌وکار:** ثبت‌نام → انتخاب نقش (CheckHolder / Investor) → پروفایل اولیه\n\n### Backend\n| App | کار |\n|-----|-----|\n| &#96;doion.core&#96; | Base models (UUID, timestamps)، permission classes (&#96;IsCheckHolder&#96;, &#96;IsInvestor&#96;, &#96;IsModerator&#96;) |\n| &#96;doion.identity&#96; | مدل‌های &#96;Profile&#96;, گسترش &#96;User.role&#96; + Django Groups |\n\n**APIها:**\n- &#96;POST /api/v1/auth/register/&#96; — موبایل + نقش\n- &#96;GET/PATCH /api/v1/users/me/&#96; — پروفایل\n- Groups: &#96;CheckHolder&#96;, &#96;Investor&#96;, &#96;Moderator&#96;, &#96;Admin&#96;\n\n**State machine:** &#96;REGISTERED&#96; (از [&#96;mvp-spec.md&#96;](ai-preview/mvp-spec.md) §1.1)\n\n### Frontend\n| Feature | کار |\n|---------|-----|\n| &#96;auth&#96; | [&#96;RegisterView.vue&#96;](frontend/src/features/auth/views/RegisterView.vue) — انتخاب نقش + OTP stub |\n| &#96;landing&#96; (جدید) | صفحه عمومی &#96;/&#96; — Hero، steps، disclaimer حقوقی |\n| &#96;dashboard&#96; | داشبورد placeholder با badge نقش کاربر |\n\n### تست فاز ۱\n- ثبت‌نام دارنده چک و سرمایه‌گذار جدا\n- Redirect نقش‌محور پس از login\n- Landing بدون auth قابل مشاهده\n\n---\n\n## فاز ۲ — KYC و احراز هویت\n\n**پروتوتایپ:** تب KYC در داشبورد + صف KYC ادمین — [&#96;extended-prototype.html&#96;](ai-preview/extended-prototype.html) (page-kyc)\n\n**جریان:** &#96;REGISTERED&#96; → آپلود مدارک → &#96;KYC_PENDING&#96; → moderator approve/reject → &#96;KYC_APPROVED&#96;\n\n### Backend\n| App | کار |\n|-----|-----|\n| &#96;doion.identity&#96; | مدل &#96;Verification&#96; + state machine |\n| &#96;doion.documents&#96; | سرویس مشترک &#96;Document&#96; (owner, related_object, document_type) — ذخیره فایل local/S3 adapter |\n\n**APIها:**\n- &#96;POST /api/v1/verifications/&#96; — شروع KYC + آپلود\n- &#96;GET /api/v1/verifications/me/&#96; — وضعیت\n- &#96;GET /api/v1/moderation/kyc/&#96; — صف KYC (Moderator)\n- &#96;POST /api/v1/moderation/kyc/{id}/decision/&#96; — approve/reject با دلیل\n\n**Events:** &#96;VerificationSubmitted&#96;, &#96;VerificationApproved&#96; → audit stub\n\n**Policy enforcement:** طبق جدول دسترسی mvp-spec — بدون &#96;KYC_APPROVED&#96; ثبت آگهی/ابراز تمایل ممنوع\n\n### Frontend\n| Feature | کار |\n|---------|-----|\n| &#96;verification&#96; (جدید) | ویزارد KYC: کارت ملی، selfie stub، وضعیت |\n| &#96;admin&#96; | [&#96;ModerationQueueView&#96;](frontend/src/features/admin/views/ModerationQueueView.vue) الگو → &#96;KycQueueView.vue&#96; |\n| Guards | middleware KYC: redirect به verification اگر &#96;REGISTERED&#96;/&#96;KYC_REJECTED&#96; |\n\n### تست فاز ۲\n- کاربر KYC_PENDING نمی‌تواند listing بسازد\n- Moderator approve → status badge «KYC تأییدشده» در داشبورد\n- Reject با دلیل → امکان resubmit\n\n---\n\n## فاز ۳ — ثبت آگهی چک (Check Registry)\n\n**پروتوتایپ:** فرم ۳ مرحله‌ای create listing — [&#96;cheque-marketplace-prototype.html&#96;](ai-preview/cheque-marketplace-prototype.html) (page-create)\n\n**جریان:** &#96;DRAFT&#96; → submit → &#96;PENDING_MODERATION&#96;\n\n### Backend\n| App | کار |\n|-----|-----|\n| &#96;doion.checks&#96; | &#96;ChequeListing&#96;, &#96;IssuerProfile&#96;, &#96;TextChoices&#96; status |\n| &#96;doion.pricing&#96; | موتور stub: &#96;suggested_discount_rate&#96;, &#96;risk_tier&#96; از face_amount/due_date/issuer |\n| &#96;doion.documents&#96; | &#96;POST /api/v1/listings/{id}/documents/&#96; |\n\n**قواعد migration:**\n- &#96;unique_together (issuer_id, bank_name, cheque_serial_number)&#96; — LLD §3\n- Validation: &#96;due_date&#96; آینده، &#96;face_amount \u003e 0&#96;\n\n**APIها:**\n- &#96;POST /api/v1/listings/&#96; — ایجاد (status=&#96;pending_moderation&#96;)\n- &#96;PATCH /api/v1/listings/{id}/&#96; — ویرایش قبل از publish\n- &#96;GET /api/v1/listings/&#96; — آگهی‌های مالک\n\n**Events:** &#96;ListingSubmittedForModeration&#96;\n\n### Frontend\n| Feature | کار |\n|---------|-----|\n| &#96;listings&#96; | اتصال [&#96;CreateListingView.vue&#96;](frontend/src/features/listings/views/CreateListingView.vue) به API — Stepper ۳ مرحله |\n| | [&#96;ListingsListView.vue&#96;](frontend/src/features/listings/views/ListingsListView.vue) — لیست آگهی‌های من |\n| | [&#96;ListingDetailView.vue&#96;](frontend/src/features/listings/views/ListingDetailView.vue) — جزئیات + وضعیت |\n| Upload | composable &#96;useFileUpload&#96; + progress/error states |\n\n### تست فاز ۳\n- ثبت آگهی کامل با مدارک → status «در انتظار بررسی»\n- duplicate serial → خطای &#96;VALIDATION_ERROR&#96;\n- نمایش نرخ تنزیل پیشنهادی در step 3\n\n---\n\n## فاز ۴ — Moderation و انتشار آگهی\n\n**پروتوتایپ:** صف moderation + modal تأیید/رد — [&#96;extended-prototype.html&#96;](ai-preview/extended-prototype.html) (page-admin)\n\n**جریان:** &#96;PENDING_MODERATION&#96; → approve → &#96;PUBLISHED&#96; / reject → &#96;REJECTED&#96; → resubmit (max 3)\n\n### Backend\n| App | کار |\n|-----|-----|\n| &#96;doion.moderation&#96; | &#96;ModerationDecision&#96;, queue service |\n| Django Admin | fallback برای ops (LLD §1) |\n\n**APIها:**\n- &#96;GET /api/v1/moderation/queue/&#96; — فیلتر، sort، pagination\n- &#96;POST /api/v1/moderation/listings/{id}/decision/&#96; — &#96;{decision, rejection_reason?}&#96;\n\n**Events:** &#96;ChequeListingPublished&#96;, &#96;ListingRejected&#96; → notification stub\n\n### Frontend\n| Feature | کار |\n|---------|-----|\n| &#96;admin&#96; | wire [&#96;ModerationQueueView.vue&#96;](frontend/src/features/admin/views/ModerationQueueView.vue) + route &#96;ADMIN_MODERATION_QUEUE&#96; |\n| | Modal جزئیات: issuer, docs preview, reject form |\n| &#96;listings&#96; | وضعیت rejected + CTA «اصلاح و ارسال مجدد» |\n| &#96;dashboard&#96; | stat «در انتظار بررسی» / «منتشرشده» |\n\n### تست فاز ۴\n- Moderator approve → listing در DB با status &#96;published&#96;\n- Holder می‌بیند «منتشر شد» (notification در فاز ۷)\n- Reject با دلیل → resubmit تا ۳ بار\n\n---\n\n## فاز ۵ — Marketplace و مرور سرمایه‌گذار\n\n**پروتوتایپ:** فیلتر sidebar، grid کارت‌ها، modal جزئیات — [&#96;cheque-marketplace-prototype.html&#96;](ai-preview/cheque-marketplace-prototype.html) (page-marketplace)\n\n**جریان:** Investor (KYC_APPROVED) → browse → filter/sort → detail modal\n\n### Backend\n| App | کار |\n|-----|-----|\n| &#96;doion.marketplace&#96; | Read-only views روی &#96;ChequeListing&#96; با status=&#96;published&#96; |\n| Cache | Redis TTL کوتاه برای queryهای پرتکرار (LLD §10) |\n\n**API:**\n- &#96;GET /api/v1/marketplace/listings/?risk_tier=\u0026min_amount=\u0026max_days=\u0026issuer_type=\u0026sort=&#96;\n\n**فیلترها (مطابق پروتوتایپ):** risk tier، days to due، min amount، issuer type (legal/natural)\n\n### Frontend\n| Feature | کار |\n|---------|-----|\n| &#96;marketplace&#96; | wire [&#96;MarketplaceView.vue&#96;](frontend/src/features/marketplace/views/MarketplaceView.vue) + [&#96;MarketplaceListingCard.vue&#96;](frontend/src/features/marketplace/components/MarketplaceListingCard.vue) |\n| | Modal جزئیات: amount, risk bar, discount rate, disclaimer |\n| &#96;landing&#96; | بخش «آخرین آگهی‌ها» — fetch ۴ listing منتشرشده |\n\n### تست فاز ۵\n- فقط &#96;published&#96; listings نمایش داده شوند\n- فیلتر risk + sort کار کند\n- Investor بدون KYC → CTA «تکمیل احراز هویت»\n\n---\n\n## فاز ۶ — Matching و Settlement (لایه ۱)\n\n**پروتوتایپ:** دکمه «ابراز تمایل»، تب‌های investor/holder در dashboard، match rows — [&#96;cheque-marketplace-prototype.html&#96;](ai-preview/cheque-marketplace-prototype.html) (dashboard tabs)\n\n**جریان:** Investor express interest → &#96;Match(PENDING)&#96; → Holder accept/decline → &#96;ACCEPTED&#96; → both confirm off-platform → &#96;SETTLED&#96;\n\n### Backend\n| App | کار |\n|-----|-----|\n| &#96;doion.matching&#96; | &#96;Match&#96; model + state machine (mvp-spec §1.3) |\n| &#96;doion.core&#96; | &#96;SettlementPort&#96; + &#96;OffPlatformSettlement&#96; (LLD §7) |\n\n**APIها:**\n- &#96;POST /api/v1/matches/&#96; — investor creates match\n- &#96;PATCH /api/v1/matches/{id}/status/&#96; — transitions: accept, decline, confirm, cancel\n- &#96;GET /api/v1/matches/&#96; — filtered by role\n\n**Events:** &#96;MatchCreated&#96;, &#96;MatchAccepted&#96;, &#96;MatchDeclined&#96;, &#96;SettlementConfirmed&#96;\n\n**Side-effect:** listing → &#96;MATCHED&#96; when match accepted\n\n### Frontend\n| Feature | کار |\n|---------|-----|\n| &#96;marketplace&#96; | دکمه «ابراز تمایل» → API + confirmation |\n| &#96;matches&#96; | wire [&#96;MatchesListView.vue&#96;](frontend/src/features/matches/views/MatchesListView.vue) + detail route |\n| &#96;dashboard&#96; | تب‌های holder/investor با stats واقعی |\n| | Holder: accept/decline incoming matches |\n\n### تست فاز ۶\n- Investor express interest → holder notification (in-app)\n- Holder accept → listing status &#96;matched&#96;\n- Both confirm off-platform → audit record, disclaimer نمایش داده شود\n\n---\n\n## فاز ۷ — Notifications و Activity Feed\n\n**پروتوتایپ:** مرکز اعلان‌ها + تنظیمات کانال — [&#96;extended-prototype.html&#96;](ai-preview/extended-prototype.html) (page-notif)\n\n### Backend\n| App | کار |\n|-----|-----|\n| &#96;doion.matching&#96; | مدل &#96;Notification&#96; |\n| &#96;doion.integrations&#96; | SMS adapter stub (Celery async) |\n| Celery | worker + task &#96;send_notification&#96; |\n\n**APIها:**\n- &#96;GET /api/v1/notifications/&#96; — paginated, filter by type\n- &#96;PATCH /api/v1/notifications/{id}/read/&#96;\n- &#96;POST /api/v1/notifications/mark-all-read/&#96;\n- &#96;GET/PATCH /api/v1/notifications/preferences/&#96;\n\n**Event subscribers:** MatchCreated, ChequeListingPublished, VerificationApproved, ListingRejected\n\n### Frontend\n| Feature | کار |\n|---------|-----|\n| &#96;notifications&#96; | wire [&#96;NotificationsView.vue&#96;](frontend/src/features/notifications/views/NotificationsView.vue) — tabs: all/match/kyc/listing/settings |\n| Layout | bell badge + unread count در nav |\n| &#96;dashboard&#96; | تب activity — timeline از notifications |\n\n### تست فاز ۷\n- MatchCreated → in-app notification برای holder\n- Mark all read → badge صفر\n- Preferences toggle (persist در backend)\n\n---\n\n## فاز ۸ — Compliance، Jobs و Hardening\n\n**پروتوتایپ:** stats admin، state machine viz (فقط dev/internal)\n\n### Backend\n| App | کار |\n|-----|-----|\n| &#96;doion.compliance&#96; | &#96;AuditEvent&#96;, &#96;FeatureFlag&#96; |\n| Celery Beat | job انقضای listing (&#96;due_date_passed&#96; → &#96;EXPIRED&#96;) |\n| Infrastructure | rate limiting (LLD §10), structlog + correlation_id |\n\n**APIها:**\n- &#96;GET/PATCH /api/v1/feature-flags/{key}/&#96; — Admin\n- Audit خودکار روی transitions حساس\n\n### Frontend\n| Feature | کار |\n|---------|-----|\n| &#96;admin&#96; | [&#96;AdminDashboardView.vue&#96;](frontend/src/features/admin/views/AdminDashboardView.vue) — stats واقعی از API |\n| Error UX | کاتالوگ خطاهای [&#96;mvp-spec.md&#96;](ai-preview/mvp-spec.md) §2 — AUTH_*, LISTING_*, MATCH_* |\n| Polish | responsive (768px breakpoints پروتوتایپ)، loading/empty states |\n\n### تست فاز ۸\n- Listing گذشته از due_date → auto EXPIRED\n- Feature flag &#96;matching_enabled=false&#96; → دکمه express interest غیرفعال\n- E2E smoke: register → KYC → create listing → moderate → browse → match → notify\n\n---\n\n## وابستگی فازها\n\n&#96;&#96;&#96;mermaid\nflowchart TD\n  P0[Phase 0 Platform]\n  P1[Phase 1 Identity]\n  P2[Phase 2 KYC]\n  P3[Phase 3 Listings]\n  P4[Phase 4 Moderation]\n  P5[Phase 5 Marketplace]\n  P6[Phase 6 Matching]\n  P7[Phase 7 Notifications]\n  P8[Phase 8 Compliance]\n\n  P0 --\u003e P1\n  P1 --\u003e P2\n  P2 --\u003e P3\n  P3 --\u003e P4\n  P4 --\u003e P5\n  P5 --\u003e P6\n  P2 --\u003e P6\n  P6 --\u003e P7\n  P4 --\u003e P7\n  P7 --\u003e P8\n&#96;&#96;&#96;\n\n---\n\n## قراردادهای توسعه (هر فاز)\n\n### Git Flow\n- Branch: &#96;feature/phase-N-short-name&#96; از &#96;develop&#96;\n- PR به &#96;develop&#96; با checklist docs (طبق [&#96;documentation-sync-policy.mdc&#96;](.cursor/rules/share/documentation-sync-policy.mdc))\n\n### مستندسازی هر PR\n- به‌روز [&#96;docs/development/API_CONTRACT_REGISTRY.md&#96;](docs/development/API_CONTRACT_REGISTRY.md)\n- به‌روز [&#96;docs/development/PAGE_REVIEW_LOG.md&#96;](docs/development/PAGE_REVIEW_LOG.md)\n- [&#96;backend/TODO.md&#96;](backend/TODO.md) / [&#96;frontend/TODO.md&#96;](frontend/TODO.md)\n\n### Definition of Done (هر فاز)\n1. Backend: migrations + serializer tests + permission tests\n2. Frontend: اتصال API (نه mock) + error states\n3. Manual test checklist در PR body\n4. OpenAPI schema به‌روز (&#96;drf-spectacular&#96;)\n\n---\n\n## تخمین نسبی (تیم ۲ نفر: ۱ BE + ۱ FE)\n\n| فاز | مدت تقریبی | خروجی قابل دمو |\n|-----|------------|----------------|\n| ۰ (تکمیل) | ۳–۵ روز | Auth پایدار |\n| ۱ | ۱ هفته | Landing + Register |\n| ۲ | ۱.۵ هفته | KYC end-to-end |\n| ۳ | ۱.۵ هفته | Create listing |\n| ۴ | ۱ هفته | Moderation |\n| ۵ | ۱ هفته | Marketplace browse |\n| ۶ | ۱.۵ هفته | Matching |\n| ۷ | ۱ هفته | Notifications |\n| ۸ | ۱ هفته | Production-ready MVP |\n| **جمع** | **~۱۰–۱۱ هفته** | |\n\n---\n\n## موارد خارج از scope MVP (YAGNI)\n\n- State machine visualization page (فقط مرجع dev در [&#96;WorkflowPrototypeView&#96;](frontend/src/features/workflow/views/WorkflowPrototypeView.vue))\n- Escrow / payment / in-platform messaging\n- Real SMS/KYC provider (adapter stub کافی است)\n- Analytics dashboard (از AuditEvent بعداً)\n",
+  "todos": [
+    {
+      "content": "فاز ۰: تکمیل API v1، refresh token، routeهای ناقص frontend، رفع listingStore bug",
+      "id": "phase-0-complete",
+      "status": "pending"
+    },
+    {
+      "content": "فاز ۱: Backend identity app + roles؛ Frontend landing + register + role-based routing",
+      "id": "phase-1-identity",
+      "status": "pending"
+    },
+    {
+      "content": "فاز ۲: Verification/Document backend؛ KYC wizard + admin KYC queue frontend",
+      "id": "phase-2-kyc",
+      "status": "pending"
+    },
+    {
+      "content": "فاز ۳: ChequeListing/IssuerProfile/pricing stub؛ wire create listing 3-step wizard",
+      "id": "phase-3-listings",
+      "status": "pending"
+    },
+    {
+      "content": "فاز ۴: Moderation queue API + events؛ wire admin moderation + reject/resubmit flow",
+      "id": "phase-4-moderation",
+      "status": "pending"
+    },
+    {
+      "content": "فاز ۵: Marketplace search/filter API + Redis؛ wire marketplace filters/cards/modal",
+      "id": "phase-5-marketplace",
+      "status": "pending"
+    },
+    {
+      "content": "فاز ۶: Match model + SettlementPort؛ express interest + dashboard match tabs",
+      "id": "phase-6-matching",
+      "status": "pending"
+    },
+    {
+      "content": "فاز ۷: Notification model + Celery SMS stub؛ notification center + activity feed",
+      "id": "phase-7-notifications",
+      "status": "pending"
+    },
+    {
+      "content": "فاز ۸: AuditEvent/FeatureFlag/Celery beat expiry؛ admin stats + error catalog + E2E smoke",
+      "id": "phase-8-compliance",
+      "status": "pending"
+    }
+  ]
+}
+```
+Additional data:
+
+```json
+{
+  "hasOpenedEditor": true,
+  "planId": "cheque_marketplace_phases_38b62a73",
+  "planUri": "file:///Users/alamalhoda/.cursor/plans/cheque_marketplace_phases_38b62a73.plan.md",
+  "reviewData": {
+    "isShowingInput": false,
+    "selectedOption": "none",
+    "status": "Requested"
+  }
+}
+```
+Result:
+
+```json
+{
+  "rejected": {}
+}
+```
+Status: **completed**
+
+
+</details>
+</tool-use>
+
+<tool-use data-tool-type="unknown" data-tool-name="create_plan"><details>
+<summary>Tool use: **create_plan**</summary>
 
 </details></tool-use>
