@@ -3,6 +3,8 @@ from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 
 from doion.users.models import User
 
+LOGIN_REQUIRED_MESSAGE = "Both identifier and password are required."
+
 
 class UserSerializer(serializers.ModelSerializer[User]):
     class Meta:
@@ -44,7 +46,7 @@ class LoginSerializer(serializers.Serializer[User]):
 
         if identifier and password:
             return attrs
-        raise serializers.ValidationError("Both identifier and password are required.")
+        raise serializers.ValidationError(LOGIN_REQUIRED_MESSAGE)
 
 
 class LoginTokenSerializer(TokenObtainPairSerializer):
@@ -82,3 +84,12 @@ class LoginTokenSerializer(TokenObtainPairSerializer):
             "name": self.user.name,
         }
         return data
+
+
+class RefreshSerializer(serializers.Serializer[User]):
+    """Serializer for token refresh."""
+
+    refresh = serializers.CharField(
+        required=True,
+        help_text="Refresh token",
+    )

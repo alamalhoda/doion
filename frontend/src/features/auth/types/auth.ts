@@ -1,16 +1,26 @@
 import { User } from '@/utils/permissions'
 
 export interface LoginRequest {
-  username: string
+  identifier: string
   password: string
 }
 
 export interface LoginResponse {
-  token: string
+  access: string
+  refresh: string
+}
+
+export interface RefreshTokenRequest {
+  refresh: string
+}
+
+export interface RefreshTokenResponse {
+  access: string
 }
 
 export interface AuthState {
   token: string | null
+  refreshToken: string | null
   user: User | null
   isAuthenticated: boolean
   isLoading: boolean

@@ -1,6 +1,5 @@
 import { apiClient } from '@/api/client'
 import { normalizeApiError } from '@/api/errors'
-import type { File as UploadFile } from '@/types/upload'
 
 export class UploadService {
   static async uploadFile(file: File): Promise<{ url: string }> {

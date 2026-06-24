@@ -1,6 +1,21 @@
 // Match and Notification types for the marketplace
 
-import type { MatchStatus } from '../listings/types/listing'
+export type MatchStatus = 'pending' | 'accepted' | 'rejected' | 'settled_off_platform'
+
+export interface ListingSummary {
+  id: string
+  face_amount: number
+  due_date: string
+  status: string
+  title?: string
+  suggested_discount_rate?: number | null // Add this to match.listing?.suggested_discount_rate
+}
+
+export interface UserSummary {
+  id: string
+  username: string
+  full_name?: string
+}
 
 export interface Match {
   id: string
@@ -17,20 +32,6 @@ export interface Match {
   listing?: ListingSummary
   investor?: UserSummary
   check_holder?: UserSummary
-}
-
-export interface ListingSummary {
-  id: string
-  face_amount: number
-  due_date: string
-  status: string
-  title?: string
-}
-
-export interface UserSummary {
-  id: string
-  username: string
-  full_name?: string
 }
 
 export interface CreateMatchRequest {

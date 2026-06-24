@@ -1,18 +1,35 @@
 <template>
   <div class="listing-list">
     <div class="listings-header">
-      <h1 class="listings-title">آگهی‌های من</h1>
-      <button class="btn btn--primary" @click="goToCreate">+ ثبت آگهی جدید</button>
+      <h1 class="listings-title">
+        آگهی‌های من
+      </h1>
+      <button
+        class="btn btn--primary"
+        @click="goToCreate"
+      >
+        + ثبت آگهی جدید
+      </button>
     </div>
 
     <div class="stats-grid-user">
-      <div class="stat-card-user" v-for="stat in stats" :key="stat.label">
-        <div class="stat-value-user">{{ stat.value }}</div>
-        <div class="stat-label-user">{{ stat.label }}</div>
+      <div
+        v-for="stat in stats"
+        :key="stat.label"
+        class="stat-card-user"
+      >
+        <div class="stat-value-user">
+          {{ stat.value }}
+        </div>
+        <div class="stat-label-user">
+          {{ stat.label }}
+        </div>
       </div>
     </div>
 
-    <h2 class="dash-section-title">آگهی‌های جاری</h2>
+    <h2 class="dash-section-title">
+      آگهی‌های جاری
+    </h2>
 
     <div class="listing-rows">
       <div
@@ -22,13 +39,22 @@
         @click="goToDetail(item.id)"
       >
         <div class="listing-row-icon">
-          <svg viewBox="0 0 24 24" width="20" height="20" fill="var(--gold-light)">
+          <svg
+            viewBox="0 0 24 24"
+            width="20"
+            height="20"
+            fill="var(--gold-light)"
+          >
             <path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-2 4h-3v5.5c0 1.38-1.12 2.5-2.5 2.5S9 13.88 9 12.5 10.12 10 11.5 10c.57 0 1.08.19 1.5.5V7h4v0z" />
           </svg>
         </div>
         <div class="listing-row-info">
-          <h4 class="listing-row-title">{{ item.title }}</h4>
-          <p class="listing-row-meta">{{ item.meta }}</p>
+          <h4 class="listing-row-title">
+            {{ item.title }}
+          </h4>
+          <p class="listing-row-meta">
+            {{ item.meta }}
+          </p>
         </div>
         <div class="listing-row-amount">
           {{ formatCurrency(item.amount) }}
@@ -44,6 +70,12 @@
 
 <script setup lang="ts">
 import { ref } from 'vue'
+import { useRouter } from 'vue-router'
+import StatusPill from '@/components/StatusPill.vue'
+import { useFormat } from '@/composables'
+
+const router = useRouter()
+const { formatCurrency } = useFormat()
 
 const stats = ref([
   { label: 'آگهی فعال', value: '۳' },
@@ -79,10 +111,8 @@ const listings = ref([
   },
 ])
 
-const formatCurrency = (value: number) => value.toLocaleString('fa-IR')
-
-const goToCreate = () => navigateTo('/app/listings/create')
-const goToDetail = (id: number) => navigateTo(`/app/listings/${id}`)
+const goToCreate = () => router.push('/app/listings/create')
+const goToDetail = (id: number) => router.push(`/app/listings/${id}`)
 </script>
 
 <style>

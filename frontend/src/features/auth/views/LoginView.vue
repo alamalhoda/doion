@@ -1,13 +1,16 @@
 <template>
   <div class="login-view">
-    <form class="login-form" @submit.prevent="handleLogin">
+    <form
+      class="login-form"
+      @submit.prevent="handleLogin"
+    >
       <h2>{{ $t('auth.login') }}</h2>
 
       <FormField
-        v-model="formData.username"
-        type="text"
-        :label="$t('auth.username')"
-        :error="getFieldError('username')"
+        v-model="formData.identifier"
+        type="tel"
+        :label="$t('auth.identifier')"
+        :error="getFieldError('identifier')"
         required
       />
 
@@ -19,7 +22,10 @@
         required
       />
 
-      <div v-if="error && !hasFieldErrors" class="form-error">
+      <div
+        v-if="error && !hasFieldErrors"
+        class="form-error"
+      >
         {{ error }}
       </div>
 
@@ -29,6 +35,12 @@
         :loading="isLoading"
         :disabled="isLoading"
       />
+
+      <div class="register-link">
+        <RouterLink :to="ROUTES.REGISTER">
+          {{ $t('auth.register_link') }}
+        </RouterLink>
+      </div>
     </form>
   </div>
 </template>
@@ -47,7 +59,7 @@ const { t } = useI18n()
 const authStore = useAuthStore()
 
 const formData = reactive({
-  username: '',
+  identifier: '',
   password: '',
 })
 
@@ -69,7 +81,7 @@ async function handleLogin() {
 
   try {
     await authStore.login({
-      username: formData.username,
+      identifier: formData.identifier,
       password: formData.password,
     })
 
@@ -79,11 +91,12 @@ async function handleLogin() {
     } else {
       router.push(ROUTES.USER_DASHBOARD)
     }
-  } catch (err: any) {
-    if (err.fieldErrors) {
-      fieldErrors.value = err.fieldErrors
+  } catch (err: unknown) {
+    const errorObj = err as { fieldErrors?: Record<string, string[]>; message?: string }
+    if (errorObj.fieldErrors) {
+      fieldErrors.value = errorObj.fieldErrors
     } else {
-      error.value = t(err.message || 'error.unknown')
+      error.value = t(errorObj.message || 'error.unknown')
     }
   } finally {
     isLoading.value = false
@@ -124,5 +137,20 @@ async function handleLogin() {
   border-radius: var(--radius-md);
   color: var(--color-error);
   font-size: var(--font-size-sm);
+}
+
+.register-link {
+  margin-top: var(--spacing-lg);
+  text-align: center;
+}
+
+.register-link a {
+  color: var(--color-primary);
+  text-decoration: none;
+  font-size: var(--font-size-sm);
+}
+
+.register-link a:hover {
+  text-decoration: underline;
 }
 </style>

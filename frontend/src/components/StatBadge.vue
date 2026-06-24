@@ -1,7 +1,13 @@
 <template>
-  <span class="stat-badge" :class="classes">
+  <span
+    class="stat-badge"
+    :class="classes"
+  >
     <span class="stat-badge-value">{{ displayValue }}</span>
-    <span v-if="label" class="stat-badge-label">{{ label }}</span>
+    <span
+      v-if="label"
+      class="stat-badge-label"
+    >{{ label }}</span>
   </span>
 </template>
 

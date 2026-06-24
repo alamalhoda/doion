@@ -1,6 +1,12 @@
 <template>
-  <div class="ds-panel" :class="{ 'ds-panel--sticky': sticky }">
-    <div v-if="title || $slots.header" class="ds-panel-header">
+  <div
+    class="ds-panel"
+    :class="{ 'ds-panel--sticky': sticky }"
+  >
+    <div
+      v-if="title || $slots.header"
+      class="ds-panel-header"
+    >
       <slot name="header">
         <span class="ds-panel-title">{{ title }}</span>
       </slot>
@@ -16,6 +22,7 @@ withDefaults(defineProps<{
   title?: string
   sticky?: boolean
 }>(), {
+  title: '',
   sticky: false,
 })
 </script>

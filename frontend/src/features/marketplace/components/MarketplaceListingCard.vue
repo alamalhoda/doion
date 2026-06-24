@@ -1,5 +1,9 @@
 <template>
-  <div class="listing-card" :class="{ 'listing-card--hoverable': hoverable }" @click="onClick">
+  <div
+    class="listing-card"
+    :class="{ 'listing-card--hoverable': hoverable }"
+    @click="onClick"
+  >
     <div class="card-header">
       <div class="card-issuer">
         <span class="card-issuer-dot" />
@@ -13,29 +17,52 @@
       </div>
       <div class="card-meta">
         <div class="meta-item">
-          <div class="meta-key">بانک</div>
-          <div class="meta-val">{{ listing.bank }}</div>
+          <div class="meta-key">
+            بانک
+          </div>
+          <div class="meta-val">
+            {{ listing.bank }}
+          </div>
         </div>
         <div class="meta-item">
-          <div class="meta-key">سررسید</div>
-          <div class="meta-val">{{ listing.dueDate }}</div>
+          <div class="meta-key">
+            سررسید
+          </div>
+          <div class="meta-val">
+            {{ listing.dueDate }}
+          </div>
         </div>
         <div class="meta-item">
-          <div class="meta-key">روز تا سررسید</div>
-          <div class="meta-val">{{ listing.days }} روز</div>
+          <div class="meta-key">
+            روز تا سررسید
+          </div>
+          <div class="meta-val">
+            {{ listing.days }} روز
+          </div>
         </div>
         <div class="meta-item">
-          <div class="meta-key">نوع صادرکننده</div>
-          <div class="meta-val">{{ listing.issuerType }}</div>
+          <div class="meta-key">
+            نوع صادرکننده
+          </div>
+          <div class="meta-val">
+            {{ listing.issuerType }}
+          </div>
         </div>
       </div>
     </div>
     <div class="card-footer">
       <div>
-        <div class="discount-rate">{{ listing.rate }}</div>
-        <div class="discount-label">نرخ تنزیل پیشنهادی</div>
+        <div class="discount-rate">
+          {{ listing.rate }}
+        </div>
+        <div class="discount-label">
+          نرخ تنزیل پیشنهادی
+        </div>
       </div>
-      <button class="btn btn--sm btn--primary" @click.stop="onInterest">
+      <button
+        class="btn btn--sm btn--primary"
+        @click.stop="onInterest"
+      >
         ابراز تمایل
       </button>
     </div>
@@ -43,13 +70,12 @@
 </template>
 
 <script setup lang="ts">
-import { computed } from 'vue'
 import RiskBadge from '@/components/RiskBadge.vue'
-import type { Listing } from '@/features/listings/types/listing'
+import type { ChequeListing } from '@/features/listings/types/listing'
 
-const props = withDefaults(
+withDefaults(
   defineProps<{
-    listing: Listing
+    listing: ChequeListing & { issuer: string; issuerType: string; bank: string; amount: number; days: number; risk: 'low' | 'mid' | 'high'; rate: string; dueDate: string }
     hoverable?: boolean
   }>(),
   {

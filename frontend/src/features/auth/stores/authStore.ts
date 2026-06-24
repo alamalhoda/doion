@@ -6,6 +6,7 @@ import type { LoginRequest } from '../types/auth'
 
 export const useAuthStore = defineStore('auth', () => {
   const token = ref<string | null>(sessionStorage.getItem('auth_token'))
+  const refreshToken = ref<string | null>(sessionStorage.getItem('refresh_token'))
   const user = ref<User | null>(null)
   const isLoading = ref(false)
   const error = ref<string | null>(null)
@@ -19,15 +20,16 @@ export const useAuthStore = defineStore('auth', () => {
     error.value = null
 
     try {
-      const { token: newToken } = await AuthService.login(credentials)
-      token.value = newToken
-      sessionStorage.setItem('auth_token', newToken)
+      const { access, refresh } = await AuthService.login(credentials)
+      token.value = access
+      refreshToken.value = refresh
+      sessionStorage.setItem('auth_token', access)
+      sessionStorage.setItem('refresh_token', refresh)
 
-      // Fetch current user
-      const currentUser = await AuthService.getCurrentUser(newToken)
+      const currentUser = await AuthService.getCurrentUser()
       user.value = currentUser
-    } catch (err: any) {
-      error.value = err.code || 'UNKNOWN'
+    } catch (err: unknown) {
+      error.value = (err as { code?: string }).code || 'UNKNOWN'
       throw err
     } finally {
       isLoading.value = false
@@ -37,6 +39,7 @@ export const useAuthStore = defineStore('auth', () => {
   function logout() {
     AuthService.logout()
     token.value = null
+    refreshToken.value = null
     user.value = null
     error.value = null
   }
@@ -47,20 +50,22 @@ export const useAuthStore = defineStore('auth', () => {
 
   async function restoreAuth() {
     const storedToken = sessionStorage.getItem('auth_token')
+    const storedRefreshToken = sessionStorage.getItem('refresh_token')
     if (storedToken) {
+      token.value = storedToken
+      refreshToken.value = storedRefreshToken
       try {
-        const currentUser = await AuthService.getCurrentUser(storedToken)
-        token.value = storedToken
+        const currentUser = await AuthService.getCurrentUser()
         user.value = currentUser
       } catch {
         logout()
       }
     }
-    // Return even if no token - this allows app to mount without auth
   }
 
   return {
     token,
+    refreshToken,
     user,
     isLoading,
     error,

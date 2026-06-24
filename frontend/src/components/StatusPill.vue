@@ -1,5 +1,8 @@
 <template>
-  <span class="status-pill" :class="`status-pill--${variant}`">
+  <span
+    class="status-pill"
+    :class="`status-pill--${variant}`"
+  >
     <slot>{{ label }}</slot>
   </span>
 </template>

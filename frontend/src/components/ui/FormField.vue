@@ -1,8 +1,15 @@
 <template>
   <div class="form-field">
-    <label v-if="label" :for="id" class="form-label">
+    <label
+      v-if="label"
+      :for="id"
+      class="form-label"
+    >
       {{ label }}
-      <span v-if="required" class="required">*</span>
+      <span
+        v-if="required"
+        class="required"
+      >*</span>
     </label>
     <component
       :is="inputComponent"
@@ -16,7 +23,12 @@
       :class="{ 'has-error': error }"
       @input="handleInput"
     />
-    <p v-if="error" class="error-message">{{ error }}</p>
+    <p
+      v-if="error"
+      class="error-message"
+    >
+      {{ error }}
+    </p>
   </div>
 </template>
 
@@ -40,13 +52,17 @@ const props = withDefaults(defineProps<Props>(), {
   disabled: false,
   required: false,
   rows: 3,
+  label: '',
+  placeholder: '',
+  id: '',
+  error: '',
 })
 
 const id = computed(() => props.id || `input-${Math.random().toString(36).substr(2, 9)}`)
 
 const inputComponent = computed(() => props.type === 'textarea' ? 'textarea' : 'input')
 
-defineEmits<{
+const emit = defineEmits<{
   'update:modelValue': [value: string]
 }>()
 

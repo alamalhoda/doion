@@ -1,15 +1,31 @@
 <template>
-  <div class="ds-card" :class="[`ds-card--${variant}`, { 'ds-card--hoverable': hoverable, 'ds-card--paddingless': paddingless }]">
-    <div v-if="$slots.header || title" class="ds-card-header">
+  <div
+    class="ds-card"
+    :class="[`ds-card--${variant}`, { 'ds-card--hoverable': hoverable, 'ds-card--paddingless': paddingless }]"
+  >
+    <div
+      v-if="$slots.header || title"
+      class="ds-card-header"
+    >
       <slot name="header">
-        <h3 class="ds-card-title">{{ title }}</h3>
-        <p v-if="subtitle" class="ds-card-subtitle">{{ subtitle }}</p>
+        <h3 class="ds-card-title">
+          {{ title }}
+        </h3>
+        <p
+          v-if="subtitle"
+          class="ds-card-subtitle"
+        >
+          {{ subtitle }}
+        </p>
       </slot>
     </div>
     <div class="ds-card-body">
       <slot />
     </div>
-    <div v-if="$slots.footer" class="ds-card-footer">
+    <div
+      v-if="$slots.footer"
+      class="ds-card-footer"
+    >
       <slot name="footer" />
     </div>
   </div>
@@ -23,6 +39,8 @@ withDefaults(defineProps<{
   hoverable?: boolean
   paddingless?: boolean
 }>(), {
+  title: '',
+  subtitle: '',
   variant: 'default',
   hoverable: false,
   paddingless: false,

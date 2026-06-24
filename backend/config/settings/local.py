@@ -2,6 +2,7 @@ from .base import *  # noqa: F403
 from .base import INSTALLED_APPS
 from .base import MIDDLEWARE
 from .base import env
+from pathlib import Path
 
 # GENERAL
 # ------------------------------------------------------------------------------
@@ -14,6 +15,17 @@ SECRET_KEY = env(
 )
 # https://docs.djangoproject.com/en/dev/ref/settings/#allowed-hosts
 ALLOWED_HOSTS = ["localhost", "0.0.0.0", "127.0.0.1"]  # noqa: S104
+
+# DATABASES - SQLite for local development (PostgreSQL not available)
+# ------------------------------------------------------------------------------
+BASE_DIR = Path(__file__).resolve(strict=True).parent.parent.parent
+DATABASES = {
+    "default": {
+        "ENGINE": "django.db.backends.sqlite3",
+        "NAME": str(BASE_DIR / "db.sqlite3"),
+        "ATOMIC_REQUESTS": True,
+    }
+}
 
 # CACHES
 # ------------------------------------------------------------------------------

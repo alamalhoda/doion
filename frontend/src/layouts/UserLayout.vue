@@ -1,40 +1,35 @@
 <template>
   <div class="user-layout">
-    <!-- Top Navigation (User) -->
-    <nav class="navbar navbar--user">
-      <div class="navbar-inner">
-        <RouterLink to="/app" class="navbar-brand">
-          <span class="navbar-brand-text">چک‌بازار</span>
-        </RouterLink>
+    <Nav variant="user">
+      <template #actions>
+        <Button
+          variant="ghost"
+          @click="handleLogout"
+        >
+          خروج
+        </Button>
+      </template>
+    </Nav>
 
-        <div class="navbar-links">
-          <RouterLink to="/app" class="navbar-link" active-class="active">داشبورد</RouterLink>
-          <RouterLink to="/app/listings" class="navbar-link" active-class="active">آگهی‌های من</RouterLink>
-        </div>
-
-        <div class="navbar-actions">
-          <button class="btn-ghost" @click="handleLogout">
-            خروج
-          </button>
-        </div>
-      </div>
-    </nav>
-
-    <!-- Main Content -->
     <main class="user-main">
       <slot />
     </main>
+
+    <Footer />
   </div>
 </template>
 
 <script setup lang="ts">
+import Nav from '@/components/layout/Nav.vue'
+import Footer from '@/components/layout/Footer.vue'
+import Button from '@/components/ui/Button.vue'
 import { useRouter } from 'vue-router'
 import { useAuthStore } from '@/features/auth/stores/authStore'
 
 const authStore = useAuthStore()
 const router = useRouter()
 
-const handleLogout = async () => {
+async function handleLogout() {
   await authStore.logout()
   router.push('/login')
 }
@@ -50,7 +45,7 @@ const handleLogout = async () => {
 
 .user-main {
   flex: 1;
-  padding: 2rem 1rem;
+  padding: var(--spacing-xl);
   max-width: 1100px;
   width: 100%;
   margin: 0 auto;
@@ -58,7 +53,7 @@ const handleLogout = async () => {
 
 @media (max-width: 768px) {
   .user-main {
-    padding: 1rem 0.75rem;
+    padding: var(--spacing-lg) var(--spacing-md);
   }
 }
 </style>

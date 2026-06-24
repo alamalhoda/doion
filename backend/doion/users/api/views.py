@@ -8,14 +8,21 @@ from rest_framework.mixins import RetrieveModelMixin
 from rest_framework.mixins import UpdateModelMixin
 from rest_framework.response import Response
 from rest_framework.viewsets import GenericViewSet
+from rest_framework_simplejwt.exceptions import ExpiredTokenError
+from rest_framework_simplejwt.exceptions import TokenError
 from rest_framework_simplejwt.tokens import RefreshToken
 
 from doion.users.models import User
 from doion.users.services import LoginService
 
-from .serializers import LoginSerializer, LoginTokenSerializer, UserSerializer
+from .serializers import LoginSerializer
+from .serializers import RefreshSerializer
+from .serializers import UserSerializer
 
 logger = logging.getLogger(__name__)
+
+INVALID_CREDENTIALS_MESSAGE = "Invalid credentials"
+REFRESH_AUTH_ERROR = "Invalid refresh token"
 
 
 class UserViewSet(RetrieveModelMixin, ListModelMixin, UpdateModelMixin, GenericViewSet):
@@ -57,7 +64,7 @@ class LoginViewSet(GenericViewSet):
         )
 
         if user is None:
-            raise AuthenticationFailed("Invalid credentials")
+            raise AuthenticationFailed(INVALID_CREDENTIALS_MESSAGE)
 
         refresh = RefreshToken.for_user(user)
         response_data = {
@@ -72,4 +79,52 @@ class LoginViewSet(GenericViewSet):
         }
 
         logger.info("User %s logged in successfully", user.id)
+        return Response(status=status.HTTP_200_OK, data=response_data)
+
+
+class RefreshViewSet(GenericViewSet):
+    """ViewSet for token refresh using SimpleJWT."""
+
+    serializer_class = RefreshSerializer
+    permission_classes = []
+
+    def create(self, request):
+        """Refresh access token using refresh token.
+
+        Args:
+            request: The HTTP request with refresh token.
+
+        Returns:
+            Response with new access token and user data.
+        """
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+
+        refresh_token = serializer.validated_data["refresh"]
+        try:
+            token = RefreshToken(refresh_token)
+            user_id = token.payload.get("user_id")
+            user = User.objects.get(id=user_id)
+        except (
+            TokenError,
+            ExpiredTokenError,
+            User.DoesNotExist,
+            TypeError,
+            ValueError,
+        ) as exc:
+            raise AuthenticationFailed(REFRESH_AUTH_ERROR) from exc
+
+        new_refresh = RefreshToken.for_user(user)
+        response_data = {
+            "access": str(new_refresh.access_token),
+            "refresh": str(new_refresh),
+            "user": {
+                "id": user.id,
+                "username": user.username,
+                "email": user.email,
+                "name": user.name,
+            },
+        }
+
+        logger.info("User %s refreshed tokens successfully", user.id)
         return Response(status=status.HTTP_200_OK, data=response_data)

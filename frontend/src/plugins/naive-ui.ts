@@ -1,7 +1,8 @@
-import { create, lightTheme, darkTheme } from 'naive-ui'
+import { create } from 'naive-ui'
+import type { GlobalThemeOverrides } from 'naive-ui'
 
 // Naive UI theme override aligned with cheque-marketplace design system
-export const lightDesignTheme = create({
+export const lightDesignTheme: GlobalThemeOverrides = {
   common: {
     primaryColor: '#0C2340',
     primaryColorHover: '#1A3D6B',
@@ -16,13 +17,12 @@ export const lightDesignTheme = create({
     modalColor: '#FFFFFF',
     popoverColor: '#FFFFFF',
     tableColor: '#FFFFFF',
-    textColor: '#1A1613',
-    textColorSecondary: '#4A4540',
-    textColorTertiary: '#7A7570',
+    textColor1: '#1A1613',
+    textColor2: '#4A4540',
+    textColor3: '#7A7570',
     dividerColor: '#E0DDD5',
     borderColor: '#E0DDD5',
-    borderRadius: '6px',
-    borderRadiusLarge: '10px',
+    borderRadius: '10px',
   },
   Button: {
     borderRadiusMedium: '6px',
@@ -32,7 +32,6 @@ export const lightDesignTheme = create({
     fontWeightMedium: '600',
   },
   Input: {
-    borderRadius: '6px',
     borderHover: '#2A5FA8',
     borderFocus: '#2A5FA8',
     boxShadowFocus: '0 0 0 2px rgba(42, 95, 168, 0.12)',
@@ -41,7 +40,7 @@ export const lightDesignTheme = create({
     borderRadius: '10px',
     borderColor: '#E0DDD5',
   },
-  Tab: {
+  Tabs: {
     borderRadius: '6px',
     paddingMedium: '0.4rem 1rem',
   },
@@ -71,9 +70,9 @@ export const lightDesignTheme = create({
     fontSizeSmall: '12px',
     fontSizeMedium: '12px',
   },
-})
+}
 
-export const darkDesignTheme = create({
+export const darkDesignTheme: GlobalThemeOverrides = {
   common: {
     primaryColor: '#EAC84A',
     primaryColorHover: '#F0D675',
@@ -88,13 +87,12 @@ export const darkDesignTheme = create({
     modalColor: '#1a2027',
     popoverColor: '#1a2027',
     tableColor: '#1a2027',
-    textColor: '#e6edf3',
-    textColorSecondary: '#b0b8c4',
-    textColorTertiary: '#7d8590',
+    textColor1: '#e6edf3',
+    textColor2: '#b0b8c4',
+    textColor3: '#7d8590',
     dividerColor: '#2d3748',
     borderColor: '#2d3748',
-    borderRadius: '6px',
-    borderRadiusLarge: '10px',
+    borderRadius: '10px',
   },
   Button: {
     borderRadiusMedium: '6px',
@@ -113,7 +111,7 @@ export const darkDesignTheme = create({
     borderRadius: '10px',
     borderColor: '#2d3748',
   },
-  Tab: {
+  Tabs: {
     borderRadius: '6px',
     paddingMedium: '0.4rem 1rem',
   },
@@ -143,18 +141,21 @@ export const darkDesignTheme = create({
     fontSizeSmall: '12px',
     fontSizeMedium: '12px',
   },
-})
+}
 
-export const goldTheme = create({
+export const goldTheme: GlobalThemeOverrides = {
   common: {
     primaryColor: '#C9960A',
     primaryColorHover: '#EAC84A',
     primaryColorPressed: '#C9960A',
     primaryColorSuppl: '#EAC84A',
   },
-})
+}
 
-export default function setupNaiveUI(app: any) {
+import type { App } from 'vue'
+
+export default function setupNaiveUI(app: App) {
+   
   app.use(create({
     theme: {
       defaultTheme: 'light',
@@ -163,5 +164,5 @@ export default function setupNaiveUI(app: any) {
         dark: darkDesignTheme,
       },
     },
-  }))
+  } as any))
 }

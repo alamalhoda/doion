@@ -2,7 +2,7 @@
 import { defineStore } from 'pinia'
 import { ref, computed } from 'vue'
 import { ListingService } from '../services/listingService'
-import type { ChequeListing, CreateListingRequest, UpdateListingRequest } from '../types/listing'
+import type { ChequeListing, CreateListingRequest, ListingFilters, UpdateListingRequest } from '../types/listing'
 
 export const useListingStore = defineStore('listing', () => {
   const listings = ref<ChequeListing[]>([])
@@ -30,8 +30,8 @@ export const useListingStore = defineStore('listing', () => {
       const listing = await ListingService.createListing(data)
       listings.value.unshift(listing)
       return listing
-    } catch (err: any) {
-      error.value = err.message || 'error.unknown'
+    } catch (err: unknown) {
+      error.value = (err as { message?: string }).message || 'error.unknown'
       throw err
     } finally {
       isLoading.value = false
@@ -45,8 +45,8 @@ export const useListingStore = defineStore('listing', () => {
     try {
       const data = await ListingService.getMyListings()
       listings.value = data
-    } catch (err: any) {
-      error.value = err.message || 'error.unknown'
+    } catch (err: unknown) {
+      error.value = (err as { message?: string }).message || 'error.unknown'
     } finally {
       isLoading.value = false
     }
@@ -65,8 +65,8 @@ export const useListingStore = defineStore('listing', () => {
       if (currentListing.value?.id === id) {
         currentListing.value = updated
       }
-    } catch (err: any) {
-      error.value = err.message || 'error.unknown'
+    } catch (err: unknown) {
+      error.value = (err as { message?: string }).message || 'error.unknown'
       throw err
     } finally {
       isLoading.value = false
@@ -80,8 +80,8 @@ export const useListingStore = defineStore('listing', () => {
     try {
       await ListingService.deleteListing(id)
       listings.value = listings.value.filter(l => l.id !== id)
-    } catch (err: any) {
-      error.value = err.message || 'error.unknown'
+    } catch (err: unknown) {
+      error.value = (err as { message?: string }).message || 'error.unknown'
       throw err
     } finally {
       isLoading.value = false
@@ -96,8 +96,8 @@ export const useListingStore = defineStore('listing', () => {
       const listing = await ListingService.getListing(id)
       currentListing.value = listing
       return listing
-    } catch (err: any) {
-      error.value = err.message || 'error.unknown'
+    } catch (err: unknown) {
+      error.value = (err as { message?: string }).message || 'error.unknown'
       throw err
     } finally {
       isLoading.value = false
@@ -111,8 +111,8 @@ export const useListingStore = defineStore('listing', () => {
     try {
       const data = await ListingService.getMarketplaceListings(params)
       listings.value = data
-    } catch (err: any) {
-      error.value = err.message || 'error.unknown'
+    } catch (err: unknown) {
+      error.value = (err as { message?: string }).message || 'error.unknown'
     } finally {
       isLoading.value = false
     }
@@ -125,8 +125,8 @@ export const useListingStore = defineStore('listing', () => {
     try {
       const data = await ListingService.getAllListings({ status: 'pending_moderation' })
       listings.value = [...listings.value, ...data]
-    } catch (err: any) {
-      error.value = err.message || 'error.unknown'
+    } catch (err: unknown) {
+      error.value = (err as { message?: string }).message || 'error.unknown'
     } finally {
       isLoading.value = false
     }
@@ -145,5 +145,7 @@ export const useListingStore = defineStore('listing', () => {
     updateListing,
     deleteListing,
     fetchListing,
+    fetchMarketplaceListings,
+    fetchAllListings,
   }
 })

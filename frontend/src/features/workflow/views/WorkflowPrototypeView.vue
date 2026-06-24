@@ -30,7 +30,9 @@
 
     <div class="prototype-grid">
       <aside class="timeline-panel">
-        <div class="panel-title">گام‌های جریان</div>
+        <div class="panel-title">
+          گام‌های جریان
+        </div>
         <button
           v-for="step in visibleSteps"
           :key="step.id"
@@ -54,7 +56,10 @@
               <h2>{{ activeStep.title }}</h2>
               <p>{{ activeStep.subtitle }}</p>
             </div>
-            <span class="step-tag" :class="`step-tag--${activeStep.tagType}`">{{ roleLabel }}</span>
+            <span
+              class="step-tag"
+              :class="`step-tag--${activeStep.tagType}`"
+            >{{ roleLabel }}</span>
           </div>
 
           <div class="screen-mock">
@@ -63,29 +68,67 @@
               <span>{{ activeStep.output }}</span>
             </div>
 
-            <div v-if="activeStep.screen === 'register'" class="mock-form">
-              <div class="mock-field"><span>شماره موبایل</span><em>0912...</em></div>
-              <div class="mock-field"><span>نام و نام خانوادگی</span><em>علی رضایی</em></div>
-              <div class="mock-field"><span>نوع کاربر</span><em>دارنده چک</em></div>
-              <div class="mock-field"><span>رمز عبور</span><em>••••••••</em></div>
+            <div
+              v-if="activeStep.screen === 'register'"
+              class="mock-form"
+            >
+              <div class="mock-field">
+                <span>شماره موبایل</span><em>0912...</em>
+              </div>
+              <div class="mock-field">
+                <span>نام و نام خانوادگی</span><em>علی رضایی</em>
+              </div>
+              <div class="mock-field">
+                <span>نوع کاربر</span><em>دارنده چک</em>
+              </div>
+              <div class="mock-field">
+                <span>رمز عبور</span><em>••••••••</em>
+              </div>
             </div>
 
-            <div v-else-if="activeStep.screen === 'kyc'" class="mock-form">
-              <div class="mock-field"><span>کد ملی / شناسه شرکت</span><em>0012345678</em></div>
-              <div class="mock-field"><span>تصویر کارت ملی</span><em>uploaded</em></div>
-              <div class="mock-field"><span>مدارک حقوقی</span><em>pending</em></div>
-              <div class="mock-field"><span>سطح KYC</span><em>در انتظار تأیید</em></div>
+            <div
+              v-else-if="activeStep.screen === 'kyc'"
+              class="mock-form"
+            >
+              <div class="mock-field">
+                <span>کد ملی / شناسه شرکت</span><em>0012345678</em>
+              </div>
+              <div class="mock-field">
+                <span>تصویر کارت ملی</span><em>uploaded</em>
+              </div>
+              <div class="mock-field">
+                <span>مدارک حقوقی</span><em>pending</em>
+              </div>
+              <div class="mock-field">
+                <span>سطح KYC</span><em>در انتظار تأیید</em>
+              </div>
             </div>
 
-            <div v-else-if="activeStep.screen === 'listing'" class="mock-form">
-              <div class="mock-field wide"><span>مبلغ اسمی چک</span><em>۵۰۰,۰۰۰,۰۰۰ ریال</em></div>
-              <div class="mock-field"><span>تاریخ سررسید</span><em>۱۴۰۵/۰۳/۲۰</em></div>
-              <div class="mock-field"><span>صادرکننده</span><em>شرکت نمونه</em></div>
-              <div class="mock-field"><span>نرخ پیشنهادی</span><em>۱۲٪</em></div>
-              <div class="mock-field wide"><span>توضیحات فرصت</span><em>تأمین مالی کوتاه‌مدت...</em></div>
+            <div
+              v-else-if="activeStep.screen === 'listing'"
+              class="mock-form"
+            >
+              <div class="mock-field wide">
+                <span>مبلغ اسمی چک</span><em>۵۰۰,۰۰۰,۰۰۰ ریال</em>
+              </div>
+              <div class="mock-field">
+                <span>تاریخ سررسید</span><em>۱۴۰۵/۰۳/۲۰</em>
+              </div>
+              <div class="mock-field">
+                <span>صادرکننده</span><em>شرکت نمونه</em>
+              </div>
+              <div class="mock-field">
+                <span>نرخ پیشنهادی</span><em>۱۲٪</em>
+              </div>
+              <div class="mock-field wide">
+                <span>توضیحات فرصت</span><em>تأمین مالی کوتاه‌مدت...</em>
+              </div>
             </div>
 
-            <div v-else-if="activeStep.screen === 'moderation'" class="mock-table">
+            <div
+              v-else-if="activeStep.screen === 'moderation'"
+              class="mock-table"
+            >
               <div class="table-row header-row">
                 <span>آگهی</span><span>مبلغ</span><span>ریسک</span><span>وضعیت</span>
               </div>
@@ -97,7 +140,10 @@
               </div>
             </div>
 
-            <div v-else-if="activeStep.screen === 'marketplace'" class="mock-cards">
+            <div
+              v-else-if="activeStep.screen === 'marketplace'"
+              class="mock-cards"
+            >
               <div class="mock-opportunity">
                 <strong>چک شرکت نمونه</strong>
                 <span>۵۰۰M ریال · سررسید ۱۴۰۵/۰۳/۲۰</span>
@@ -110,28 +156,40 @@
               </div>
             </div>
 
-            <div v-else-if="activeStep.screen === 'match'" class="mock-card">
+            <div
+              v-else-if="activeStep.screen === 'match'"
+              class="mock-card"
+            >
               <strong>درخواست علاقه‌مندی</strong>
               <span>سرمایه‌گذار: شرکت تأمین مالی البرز</span>
               <span>پیام: آمادگی بررسی با نرخ ۱۱٪</span>
               <span>نوع تسویه: خارج از پلتفرم</span>
             </div>
 
-            <div v-else-if="activeStep.screen === 'deal'" class="mock-checklist">
-              <div><span></span>مذاکره نرخ و شرایط</div>
-              <div><span></span>امضای قرارداد خارج از پلتفرم</div>
-              <div><span></span>ظهرنویسی یا انتقال چک</div>
-              <div><span></span>تسویه مستقیم بین طرفین</div>
+            <div
+              v-else-if="activeStep.screen === 'deal'"
+              class="mock-checklist"
+            >
+              <div><span />مذاکره نرخ و شرایط</div>
+              <div><span />امضای قرارداد خارج از پلتفرم</div>
+              <div><span />ظهرنویسی یا انتقال چک</div>
+              <div><span />تسویه مستقیم بین طرفین</div>
             </div>
 
-            <div v-else-if="activeStep.screen === 'settlement'" class="mock-card">
+            <div
+              v-else-if="activeStep.screen === 'settlement'"
+              class="mock-card"
+            >
               <strong>ثبت رخداد تسویه خارج از پلتفرم</strong>
               <span>وضعیت: انجام‌شده</span>
               <span>ارجاع خارجی: شماره قرارداد / رسید بانکی</span>
               <span>توضیح: پلتفرم فقط رخداد را ثبت می‌کند.</span>
             </div>
 
-            <div v-else class="mock-table">
+            <div
+              v-else
+              class="mock-table"
+            >
               <div class="table-row header-row">
                 <span>زمان</span><span>بازیگر</span><span>رخداد</span><span>وضعیت</span>
               </div>
@@ -151,7 +209,9 @@
 
       <aside class="data-panel">
         <div class="data-card">
-          <div class="panel-title">ورودی / خروجی / داده‌های لازم</div>
+          <div class="panel-title">
+            ورودی / خروجی / داده‌های لازم
+          </div>
           <div class="data-section">
             <span>بازیگر اصلی</span>
             <strong>{{ activeStep.actor }}</strong>
@@ -159,7 +219,10 @@
           <div class="data-section">
             <span>ورودی‌ها</span>
             <div class="chips">
-              <span v-for="input in activeStep.inputs" :key="input">{{ input }}</span>
+              <span
+                v-for="input in activeStep.inputs"
+                :key="input"
+              >{{ input }}</span>
             </div>
           </div>
           <div class="data-section">
@@ -169,7 +232,10 @@
           <div class="data-section">
             <span>داده‌های سیستم</span>
             <div class="field-list">
-              <span v-for="field in activeStep.dataFields" :key="field">{{ field }}</span>
+              <span
+                v-for="field in activeStep.dataFields"
+                :key="field"
+              >{{ field }}</span>
             </div>
           </div>
         </div>

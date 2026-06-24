@@ -1,11 +1,20 @@
 <template>
   <div class="empty-state">
     <div class="empty-state-icon">
-      <slot name="icon">{{ icon }}</slot>
+      <slot name="icon">
+        {{ icon }}
+      </slot>
     </div>
-    <h3 class="empty-state-title">{{ title }}</h3>
-    <p class="empty-state-description">{{ description }}</p>
-    <div v-if="$slots.actions" class="empty-state-actions">
+    <h3 class="empty-state-title">
+      {{ title }}
+    </h3>
+    <p class="empty-state-description">
+      {{ description }}
+    </p>
+    <div
+      v-if="$slots.actions"
+      class="empty-state-actions"
+    >
       <slot name="actions" />
     </div>
   </div>

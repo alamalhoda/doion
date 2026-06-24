@@ -1,12 +1,18 @@
 <template>
-  <div class="app-button" :class="[variant, { disabled }]">
+  <div
+    class="app-button"
+    :class="[variant, { disabled }]"
+  >
     <button
       :disabled="disabled || loading"
       :type="type"
       @click="$emit('click')"
     >
       {{ label }}
-      <span v-if="loading" class="spinner"></span>
+      <span
+        v-if="loading"
+        class="spinner"
+      />
     </button>
   </div>
 </template>

@@ -30,8 +30,8 @@ export const useMatchStore = defineStore('match', () => {
       const match = await MatchService.createMatch(data)
       matches.value.unshift(match)
       return match
-    } catch (err: any) {
-      error.value = err.message || 'error.unknown'
+    } catch (err: unknown) {
+      error.value = (err as { message?: string }).message || 'error.unknown'
       throw err
     } finally {
       isLoading.value = false
@@ -45,8 +45,8 @@ export const useMatchStore = defineStore('match', () => {
     try {
       const data = await MatchService.getMyMatches()
       matches.value = data
-    } catch (err: any) {
-      error.value = err.message || 'error.unknown'
+    } catch (err: unknown) {
+      error.value = (err as { message?: string }).message || 'error.unknown'
     } finally {
       isLoading.value = false
     }
@@ -65,8 +65,8 @@ export const useMatchStore = defineStore('match', () => {
       if (currentMatch.value?.id === id) {
         currentMatch.value = updated
       }
-    } catch (err: any) {
-      error.value = err.message || 'error.unknown'
+    } catch (err: unknown) {
+      error.value = (err as { message?: string }).message || 'error.unknown'
       throw err
     } finally {
       isLoading.value = false
@@ -81,8 +81,8 @@ export const useMatchStore = defineStore('match', () => {
       const match = await MatchService.getMatch(id)
       currentMatch.value = match
       return match
-    } catch (err: any) {
-      error.value = err.message || 'error.unknown'
+    } catch (err: unknown) {
+      error.value = (err as { message?: string }).message || 'error.unknown'
       throw err
     } finally {
       isLoading.value = false

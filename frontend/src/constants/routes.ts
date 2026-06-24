@@ -13,6 +13,7 @@ export const ROUTES = {
   USER_CREATE_LISTING: '/app/listings/create',
   USER_LISTING_DETAIL: '/app/listings/:id',
   USER_MATCHES: '/app/matches',
+  USER_MATCHES_DETAIL: '/app/matches/:id',
   USER_NOTIFICATIONS: '/app/notifications',
   WORKFLOW_PROTOTYPE: '/app/prototype',
 

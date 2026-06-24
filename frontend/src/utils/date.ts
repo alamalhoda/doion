@@ -1,6 +1,9 @@
 import dayjs from 'dayjs'
 import 'dayjs/locale/fa'
 import 'dayjs/locale/en'
+import relativeTime from 'dayjs/plugin/relativeTime'
+
+dayjs.extend(relativeTime)
 
 export function setupDayjs(locale: string) {
   dayjs.locale(locale === 'fa' ? 'fa' : 'en')

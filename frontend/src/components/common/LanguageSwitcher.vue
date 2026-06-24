@@ -1,8 +1,15 @@
 <template>
   <div class="language-switcher">
-    <select v-model="currentLocale" @change="changeLocale">
-      <option value="fa">{{ $t('language.fa') }}</option>
-      <option value="en">{{ $t('language.en') }}</option>
+    <select
+      v-model="currentLocale"
+      @change="changeLocale"
+    >
+      <option value="fa">
+        {{ $t('language.fa') }}
+      </option>
+      <option value="en">
+        {{ $t('language.en') }}
+      </option>
     </select>
   </div>
 </template>

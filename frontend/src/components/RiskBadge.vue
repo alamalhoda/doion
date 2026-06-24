@@ -1,5 +1,8 @@
 <template>
-  <div class="risk-badge" :class="`risk-badge--${variant}`">
+  <div
+    class="risk-badge"
+    :class="`risk-badge--${risk}`"
+  >
     {{ label }}
   </div>
 </template>

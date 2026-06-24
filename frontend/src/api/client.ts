@@ -11,7 +11,7 @@ export const apiClient = axios.create({
 // Set auth token from sessionStorage when available
 const token = sessionStorage.getItem('auth_token')
 if (token) {
-  apiClient.defaults.headers.common['Authorization'] = `Token ${token}`
+  apiClient.defaults.headers.common['Authorization'] = `Bearer ${token}`
 }
 
 export default apiClient

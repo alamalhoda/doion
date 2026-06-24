@@ -4,15 +4,24 @@
       <h1>{{ $t('notifications.title') }}</h1>
     </div>
 
-    <div v-if="isLoading" class="loading-state">
+    <div
+      v-if="isLoading"
+      class="loading-state"
+    >
       {{ $t('common.loading') }}
     </div>
 
-    <div v-else-if="error" class="error-state">
+    <div
+      v-else-if="error"
+      class="error-state"
+    >
       {{ error }}
     </div>
 
-    <div v-else class="notifications-container">
+    <div
+      v-else
+      class="notifications-container"
+    >
       <div class="notifications-list">
         <NotificationItem
           v-for="notification in notifications"
@@ -23,13 +32,16 @@
         />
       </div>
 
-      <NEmpty v-if="notifications.length === 0" :description="$t('notifications.no_notifications')" />
+      <NEmpty
+        v-if="notifications.length === 0"
+        :description="$t('notifications.no_notifications')"
+      />
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import { ref, computed, onMounted } from 'vue'
+import { computed } from 'vue'
 import { useRouter } from 'vue-router'
 import { NEmpty } from 'naive-ui'
 import { useNotificationStore } from '../stores/notificationStore'
@@ -46,7 +58,9 @@ function markAsRead(id: string): void {
   notificationStore.markAsRead(id)
 }
 
-function handleNotificationClick(notification: any): void {
+import type { Notification } from '../types/notification'
+
+function handleNotificationClick(notification: Notification): void {
   // Navigate based on notification type
   if (notification.type === 'match_created') {
     router.push(`/app/matches/${notification.reference_id}`)

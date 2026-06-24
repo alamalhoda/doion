@@ -3,7 +3,10 @@
     <div class="not-found-content">
       <h1>404</h1>
       <p>{{ $t('error.unknown') }}</p>
-      <router-link :to="ROUTES.LOGIN" class="back-link">
+      <router-link
+        :to="ROUTES.LOGIN"
+        class="back-link"
+      >
         {{ $t('auth.login') }}
       </router-link>
     </div>

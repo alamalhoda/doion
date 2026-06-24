@@ -1,13 +1,21 @@
 <template>
-  <div class="stepper" role="navigation" aria-label="مراحل فرم">
+  <div
+    class="stepper"
+    role="navigation"
+    aria-label="مراحل فرم"
+  >
     <div
       v-for="step in steps"
       :key="step.index"
       class="stepper-step"
       :class="stepClasses(step)"
     >
-      <div class="stepper-circle">{{ step.index }}</div>
-      <div class="stepper-label">{{ step.label }}</div>
+      <div class="stepper-circle">
+        {{ step.index }}
+      </div>
+      <div class="stepper-label">
+        {{ step.label }}
+      </div>
     </div>
   </div>
 </template>

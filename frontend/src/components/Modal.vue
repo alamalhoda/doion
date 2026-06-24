@@ -1,12 +1,32 @@
 <template>
   <Teleport to="body">
     <Transition name="modal">
-      <div v-if="model" class="modal-overlay" @click.self="close">
-        <div class="modal" :style="{ maxWidth }">
+      <div
+        v-if="modelValue"
+        class="modal-overlay"
+        @click.self="close"
+      >
+        <div
+          class="modal"
+          :style="{ maxWidth }"
+        >
           <div class="modal-header">
-            <h3 class="modal-title">{{ title }}</h3>
-            <button class="modal-close" @click="close" aria-label="بستن">
-              <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.5">
+            <h3 class="modal-title">
+              {{ title }}
+            </h3>
+            <button
+              class="modal-close"
+              aria-label="بستن"
+              @click="close"
+            >
+              <svg
+                viewBox="0 0 24 24"
+                width="18"
+                height="18"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2.5"
+              >
                 <path d="M18 6L6 18M6 6l12 12" />
               </svg>
             </button>
@@ -14,7 +34,10 @@
           <div class="modal-body">
             <slot />
           </div>
-          <div v-if="$slots.footer" class="modal-footer">
+          <div
+            v-if="$slots.footer"
+            class="modal-footer"
+          >
             <slot name="footer" />
           </div>
         </div>

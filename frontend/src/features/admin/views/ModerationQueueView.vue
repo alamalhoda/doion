@@ -2,57 +2,115 @@
   <div class="admin-moderation-view">
     <div class="view-header">
       <h1>{{ $t('admin.moderation_title') }}</h1>
-      <p class="subtitle">{{ $t('admin.moderation_subtitle') }}</p>
+      <p class="subtitle">
+        {{ $t('admin.moderation_subtitle') }}
+      </p>
     </div>
 
-    <div v-if="isLoading" class="loading-state">
+    <div
+      v-if="isLoading"
+      class="loading-state"
+    >
       {{ $t('common.loading') }}
     </div>
 
-    <div v-else-if="error" class="error-state">
+    <div
+      v-else-if="error"
+      class="error-state"
+    >
       {{ error }}
     </div>
 
-    <div v-else class="moderation-container">
-      <NTabs v-model:value="activeTab" type="line" animated>
-        <NTabPane name="pending" :tab="$t('admin.pending_review')">
+    <div
+      v-else
+      class="moderation-container"
+    >
+      <NTabs
+        v-model:value="activeTab"
+        type="line"
+        animated
+      >
+        <NTabPane
+          name="pending"
+          :tab="$t('admin.pending_review')"
+        >
           <ModerationCard
             v-for="listing in pendingListings"
             :key="listing.id"
-            :listing="listing"
+            :item="{
+              id: listing.id,
+              issuer: listing.issuer_profile?.name || '',
+              bank: '',
+              amount: listing.face_amount,
+              dueDate: listing.due_date,
+              risk: listing.risk_tier || '',
+            }"
             @approve="handleApprove(listing.id)"
             @reject="handleReject(listing.id)"
             @view-detail="viewListing(listing.id)"
           />
-          <NEmpty v-if="pendingListings.length === 0" :description="$t('admin.no_pending_listings')" />
+          <NEmpty
+            v-if="pendingListings.length === 0"
+            :description="$t('admin.no_pending_listings')"
+          />
         </NTabPane>
 
-        <NTabPane name="approved" :tab="$t('admin.approved')">
+        <NTabPane
+          name="approved"
+          :tab="$t('admin.approved')"
+        >
           <ModerationCard
             v-for="listing in approvedListings"
             :key="listing.id"
-            :listing="listing"
+            :item="{
+              id: listing.id,
+              issuer: listing.issuer_profile?.name || '',
+              bank: '',
+              amount: listing.face_amount,
+              dueDate: listing.due_date,
+              risk: listing.risk_tier || '',
+            }"
             readonly
             @view-detail="viewListing(listing.id)"
           />
-          <NEmpty v-if="approvedListings.length === 0" :description="$t('admin.no_approved_listings')" />
+          <NEmpty
+            v-if="approvedListings.length === 0"
+            :description="$t('admin.no_approved_listings')"
+          />
         </NTabPane>
 
-        <NTabPane name="rejected" :tab="$t('admin.rejected')">
+        <NTabPane
+          name="rejected"
+          :tab="$t('admin.rejected')"
+        >
           <ModerationCard
             v-for="listing in rejectedListings"
             :key="listing.id"
-            :listing="listing"
+            :item="{
+              id: listing.id,
+              issuer: listing.issuer_profile?.name || '',
+              bank: '',
+              amount: listing.face_amount,
+              dueDate: listing.due_date,
+              risk: listing.risk_tier || '',
+            }"
             readonly
             @view-detail="viewListing(listing.id)"
           />
-          <NEmpty v-if="rejectedListings.length === 0" :description="$t('admin.no_rejected_listings')" />
+          <NEmpty
+            v-if="rejectedListings.length === 0"
+            :description="$t('admin.no_rejected_listings')"
+          />
         </NTabPane>
       </NTabs>
     </div>
 
     <!-- Rejection Modal -->
-    <NModal v-model:show="showRejectModal" preset="dialog" :title="$t('admin.reject_listing')">
+    <NModal
+      v-model:show="showRejectModal"
+      preset="dialog"
+      :title="$t('admin.reject_listing')"
+    >
       <div class="reject-form">
         <p>{{ $t('admin.reject_reason_prompt') }}</p>
         <FormField
@@ -83,16 +141,14 @@
 <script setup lang="ts">
 import { ref, computed, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
-import { useI18n } from 'vue-i18n'
 import { NTabs, NTabPane, NModal, NEmpty } from 'naive-ui'
 import { useListingStore } from '@/features/listings/stores/listingStore'
+import type { UpdateListingRequest } from '@/features/listings/types/listing'
 import FormField from '@/components/ui/FormField.vue'
 import AppButton from '@/components/ui/AppButton.vue'
 import ModerationCard from '../components/ModerationCard.vue'
-import type { ChequeListing } from '@/features/listings/types/listing'
 
 const router = useRouter()
-const { t } = useI18n()
 const listingStore = useListingStore()
 
 const activeTab = ref('pending')
@@ -116,7 +172,7 @@ function viewListing(id: string): void {
 async function handleApprove(id: string): Promise<void> {
   isProcessing.value = true
   try {
-    await listingStore.updateListing(id, { status: 'published' } as any)
+    await listingStore.updateListing(id, { status: 'published' } as UpdateListingRequest)
   } catch (err) {
     console.error('Failed to approve listing:', err)
   } finally {
@@ -137,7 +193,7 @@ async function confirmReject(): Promise<void> {
   try {
     await listingStore.updateListing(listingToReject.value, { 
       status: 'rejected' 
-    } as any)
+    } as UpdateListingRequest)
     showRejectModal.value = false
   } catch (err) {
     console.error('Failed to reject listing:', err)

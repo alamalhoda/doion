@@ -15,11 +15,44 @@
   },
   "auth": {
     "login": "Login",
-    "username": "Username",
+    "register": "Register",
+    "phone_number": "Phone Number",
+    "identifier": "Identifier",
+    "email": "Email",
+    "full_name": "Full Name",
     "password": "Password",
+    "confirm_password": "Confirm Password",
     "submit": "Sign In",
     "logout": "Logout",
-    "loading": "Loading..."
+    "loading": "Loading...",
+    "already_have_account": "Already have an account? Sign in",
+    "register_link": "Don't have an account? Register",
+    "check_holder": "Check Holder",
+    "investor": "Investor",
+    "role": "Role",
+    "select_role": "Select a role",
+    "passwords_must_match": "Passwords must match"
+  },
+  "landing": {
+    "hero_title": "Welcome to Cheque Marketplace",
+    "hero_subtitle": "Secure trading platform for cheque transactions",
+    "get_started": "Get Started",
+    "learn_more": "Learn More",
+    "disclaimer": "All transactions are subject to verification and approval. Please read terms carefully.",
+    "stats": {
+      "transactions": "Transactions",
+      "users": "Users",
+      "volume": "Trading Volume"
+    },
+    "steps": {
+      "how_it_works": "How It Works",
+      "step_1": "Create an account",
+      "step_1_desc": "Sign up as a Check Holder or Investor",
+      "step_2": "List or browse cheques",
+      "step_2_desc": "Check Holders list cheques, Investors browse available options",
+      "step_3": "Complete the transaction",
+      "step_3_desc": "Matched parties complete secure transactions"
+    }
   },
   "dashboard": {
     "admin_title": "Admin Dashboard",

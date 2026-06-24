@@ -1,20 +1,43 @@
 <template>
   <nav class="navbar">
     <div class="navbar-inner">
-      <RouterLink to="/" class="navbar-brand">
+      <RouterLink
+        to="/"
+        class="navbar-brand"
+      >
         <span class="navbar-brand-text">پلتفرم چک‌بازار</span>
       </RouterLink>
 
       <div class="navbar-links">
-        <RouterLink to="/" class="navbar-link" active-class="active">داشبورد</RouterLink>
-        <RouterLink to="/management" class="navbar-link" active-class="active">مدیریت</RouterLink>
+        <RouterLink
+          to="/"
+          class="navbar-link"
+          active-class="active"
+        >
+          داشبورد
+        </RouterLink>
+        <RouterLink
+          to="/management"
+          class="navbar-link"
+          active-class="active"
+        >
+          مدیریت
+        </RouterLink>
       </div>
 
       <div class="navbar-actions">
-        <button class="btn-ghost" @click="handleLogout" v-if="isAuthenticated">
+        <button
+          v-if="authStore.isAuthenticated"
+          class="btn-ghost"
+          @click="handleLogout"
+        >
           خروج
         </button>
-        <RouterLink v-else to="/login" class="btn-gold">
+        <RouterLink
+          v-else
+          to="/login"
+          class="btn-gold"
+        >
           ورود
         </RouterLink>
       </div>

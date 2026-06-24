@@ -86,7 +86,6 @@ flowchart LR
 - JWT login با phone/username/email (موجود)
 - افزودن `POST /api/v1/auth/refresh/` و versioning زیر `/api/v1/`
 - Exception handler یکنواخت خطا (فرمت LLD بخش ۹)
-- PostgreSQL در dev (جایگزینی SQLite برای migration واقعی)
 - ثبت قرارداد API در [`docs/development/API_CONTRACT_REGISTRY.md`](docs/development/API_CONTRACT_REGISTRY.md)
 
 ### Frontend (تکمیل)

@@ -1,5 +1,11 @@
 <template>
-  <component :is="tag" class="btn" :class="classes" :disabled="disabled" v-bind="$attrs">
+  <component
+    :is="tag"
+    class="btn"
+    :class="classes"
+    :disabled="disabled"
+    v-bind="$attrs"
+  >
     <slot />
   </component>
 </template>

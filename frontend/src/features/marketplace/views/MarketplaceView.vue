@@ -3,8 +3,12 @@
     <!-- Marketplace Header -->
     <div class="market-header">
       <div class="market-header-inner">
-        <h2 class="market-header-title">آگهی‌های چک</h2>
-        <p class="market-header-subtitle">۲۴ آگهی فعال — به‌روزرسانی لحظه‌ای</p>
+        <h2 class="market-header-title">
+          آگهی‌های چک
+        </h2>
+        <p class="market-header-subtitle">
+          ۲۴ آگهی فعال — به‌روزرسانی لحظه‌ای
+        </p>
       </div>
     </div>
 
@@ -12,19 +16,34 @@
     <div class="market-layout">
       <!-- Filter Panel -->
       <aside class="filter-panel">
-        <div class="filter-title">فیلترها</div>
+        <div class="filter-title">
+          فیلترها
+        </div>
 
         <div class="filter-group">
           <label class="filter-label">سطح ریسک</label>
-          <label v-for="opt in riskOptions" :key="opt.value" class="filter-opt">
-            <input type="checkbox" :checked="opt.checked" />
+          <label
+            v-for="opt in riskOptions"
+            :key="opt.value"
+            class="filter-opt"
+          >
+            <input
+              type="checkbox"
+              :checked="opt.checked"
+            >
             <span>{{ opt.label }}</span>
           </label>
         </div>
 
         <div class="filter-group">
           <label class="filter-label">حداکثر روز تا سررسید</label>
-          <input type="range" class="filter-range" min="7" max="180" value="120" />
+          <input
+            type="range"
+            class="filter-range"
+            min="7"
+            max="180"
+            value="120"
+          >
           <div class="filter-range-vals">
             <span>۷ روز</span>
             <span>۱۲۰ روز</span>
@@ -33,7 +52,14 @@
 
         <div class="filter-group">
           <label class="filter-label">حداقل مبلغ (میلیون ریال)</label>
-          <input type="range" class="filter-range" min="50" max="2000" value="50" step="50" />
+          <input
+            type="range"
+            class="filter-range"
+            min="50"
+            max="2000"
+            value="50"
+            step="50"
+          >
           <div class="filter-range-vals">
             <span>۵۰م</span>
             <span>۵۰</span>
@@ -42,13 +68,23 @@
 
         <div class="filter-group">
           <label class="filter-label">نوع صادرکننده</label>
-          <label v-for="opt in issuerOptions" :key="opt.value" class="filter-opt">
-            <input type="checkbox" :checked="opt.checked" />
+          <label
+            v-for="opt in issuerOptions"
+            :key="opt.value"
+            class="filter-opt"
+          >
+            <input
+              type="checkbox"
+              :checked="opt.checked"
+            >
             <span>{{ opt.label }}</span>
           </label>
         </div>
 
-        <button class="btn btn--primary btn--block" @click="applyFilters">
+        <button
+          class="btn btn--primary btn--block"
+          @click="applyFilters"
+        >
           اعمال فیلتر
         </button>
       </aside>
@@ -85,27 +121,47 @@
               </div>
               <div class="card-meta">
                 <div class="meta-item">
-                  <div class="meta-key">بانک</div>
-                  <div class="meta-val">{{ item.bank }}</div>
+                  <div class="meta-key">
+                    بانک
+                  </div>
+                  <div class="meta-val">
+                    {{ item.bank }}
+                  </div>
                 </div>
                 <div class="meta-item">
-                  <div class="meta-key">سررسید</div>
-                  <div class="meta-val">{{ item.dueDate }}</div>
+                  <div class="meta-key">
+                    سررسید
+                  </div>
+                  <div class="meta-val">
+                    {{ item.dueDate }}
+                  </div>
                 </div>
                 <div class="meta-item">
-                  <div class="meta-key">روز تا سررسید</div>
-                  <div class="meta-val">{{ item.days }} روز</div>
+                  <div class="meta-key">
+                    روز تا سررسید
+                  </div>
+                  <div class="meta-val">
+                    {{ item.days }} روز
+                  </div>
                 </div>
                 <div class="meta-item">
-                  <div class="meta-key">نوع صادرکننده</div>
-                  <div class="meta-val">{{ item.issuerType }}</div>
+                  <div class="meta-key">
+                    نوع صادرکننده
+                  </div>
+                  <div class="meta-val">
+                    {{ item.issuerType }}
+                  </div>
                 </div>
               </div>
             </div>
             <div class="card-footer">
               <div>
-                <div class="discount-rate">{{ item.rate }}</div>
-                <div class="discount-label">نرخ تنزیل پیشنهادی</div>
+                <div class="discount-rate">
+                  {{ item.rate }}
+                </div>
+                <div class="discount-label">
+                  نرخ تنزیل پیشنهادی
+                </div>
               </div>
               <button
                 class="btn btn--sm btn--primary"
@@ -128,6 +184,12 @@
 
 <script setup lang="ts">
 import { ref } from 'vue'
+import { useRouter } from 'vue-router'
+import RiskBadge from '@/components/RiskBadge.vue'
+import { useFormat } from '@/composables'
+
+const router = useRouter()
+const { formatCurrency } = useFormat()
 
 interface Listing {
   id: number
@@ -161,8 +223,6 @@ const listings = ref<Listing[]>([
   { id: 6, issuer: 'علی محمدی تجارت', issuerType: 'حقوقی', bank: 'بانک ملی', amount: 350000000, days: 75, risk: 'mid', rate: '۷.۵٪', dueDate: '۱۴۰۴/۰۴/۲۸' },
 ])
 
-const formatCurrency = (value: number) => value.toLocaleString('fa-IR')
-
 const applyFilters = () => {
   console.log('Filters applied')
 }
@@ -172,7 +232,7 @@ const expressInterest = (id: number) => {
 }
 
 const viewDetail = (id: number) => {
-  navigateTo(`/app/listings/${id}`)
+  router.push(`/app/listings/${id}`)
 }
 </script>
 

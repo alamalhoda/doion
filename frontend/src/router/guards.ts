@@ -4,14 +4,22 @@ import { canAccessAdmin, canAccessUser } from '@/utils/permissions'
 import { ROUTES } from '@/constants/routes'
 
 export function setupRouterGuards(router: Router) {
-  router.beforeEach(async (to, _from) => {
+  router.beforeEach(async (to, __from) => {
     const authStore = useAuthStore()
     const isAuthenticated = authStore.isAuthenticated
     const user = authStore.user
 
-    // Public routes
+    // Landing route - public, show to everyone
+    if (to.meta.public && to.path === '/') {
+      if (isAuthenticated) {
+        return canAccessAdmin(user) ? ROUTES.ADMIN_DASHBOARD : ROUTES.USER_DASHBOARD
+      }
+      return true
+    }
+
+    // Public routes (auth pages)
     if (to.meta.public) {
-      if (isAuthenticated && to.path === ROUTES.LOGIN) {
+      if (isAuthenticated) {
         return canAccessAdmin(user) ? ROUTES.ADMIN_DASHBOARD : ROUTES.USER_DASHBOARD
       }
       return true

@@ -10,16 +10,20 @@
 
     <div class="notification-content">
       <div class="notification-header">
-        <h4 class="notification-title">{{ notification.title }}</h4>
+        <h4 class="notification-title">
+          {{ notification.title }}
+        </h4>
         <NButton 
           v-if="notification.status === 'pending'"
           size="tiny" 
-          @click.stop="$emit('markRead')"
+          @click.stop="emit('markRead')"
         >
           {{ $t('notifications.mark_read') }}
         </NButton>
       </div>
-      <p class="notification-message">{{ notification.message }}</p>
+      <p class="notification-message">
+        {{ notification.message }}
+      </p>
       <span class="notification-time">{{ formatTime(notification.created_at) }}</span>
     </div>
   </div>
@@ -27,16 +31,13 @@
 
 <script setup lang="ts">
 import { computed } from 'vue'
+import type { Component } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { NIcon, NButton } from 'naive-ui'
 import { CheckmarkCircle, AlertCircle, ChatboxEllipses, Cash, DocumentText } from '@vicons/ionicons5'
 import type { Notification } from '../types/notification'
 
-interface Props {
-  notification: Notification
-}
-
-defineProps<Props>()
+const { notification } = defineProps<{ notification: Notification }>()
 const emit = defineEmits<{
   markRead: []
   click: []
@@ -45,14 +46,14 @@ const emit = defineEmits<{
 const { t } = useI18n()
 
 const iconForType = computed(() => {
-  const icons: Record<string, any> = {
+  const icons: Record<string, Component> = {
     match_created: ChatboxEllipses,
     listing_approved: CheckmarkCircle,
     listing_rejected: AlertCircle,
     match_accepted: Cash,
     match_rejected: DocumentText,
   }
-  return icons[props.notification.type] || CheckmarkCircle
+  return icons[notification.type] || CheckmarkCircle
 })
 
 function handleClick(): void {

@@ -2,9 +2,14 @@
   <div class="user-dashboard">
     <!-- Page Header -->
     <div class="user-header">
-      <h1 class="user-header-title">داشبورد من</h1>
+      <h1 class="user-header-title">
+        داشبورد من
+      </h1>
       <div class="user-header-actions">
-        <button class="btn btn--primary" @click="goToCreate">
+        <button
+          class="btn btn--primary"
+          @click="goToCreate"
+        >
           + ثبت آگهی جدید
         </button>
       </div>
@@ -12,9 +17,17 @@
 
     <!-- Stats Grid -->
     <section class="stats-grid-user">
-      <div class="stat-card-user" v-for="stat in stats" :key="stat.label">
-        <div class="stat-value-user">{{ stat.value }}</div>
-        <div class="stat-label-user">{{ stat.label }}</div>
+      <div
+        v-for="stat in stats"
+        :key="stat.label"
+        class="stat-card-user"
+      >
+        <div class="stat-value-user">
+          {{ stat.value }}
+        </div>
+        <div class="stat-label-user">
+          {{ stat.label }}
+        </div>
       </div>
     </section>
 
@@ -32,8 +45,13 @@
     </div>
 
     <!-- Tab: My Listings -->
-    <div v-if="activeTab === 'listings'" class="dash-section">
-      <h2 class="dash-section-title">آگهی‌های جاری</h2>
+    <div
+      v-if="activeTab === 'listings'"
+      class="dash-section"
+    >
+      <h2 class="dash-section-title">
+        آگهی‌های جاری
+      </h2>
 
       <div class="listing-rows">
         <div
@@ -43,13 +61,22 @@
           @click="goToDetail(item.id)"
         >
           <div class="listing-row-icon">
-            <svg viewBox="0 0 24 24" width="20" height="20" fill="var(--gold-light)">
+            <svg
+              viewBox="0 0 24 24"
+              width="20"
+              height="20"
+              fill="var(--gold-light)"
+            >
               <path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-2 4h-3v5.5c0 1.38-1.12 2.5-2.5 2.5S9 13.88 9 12.5 10.12 10 11.5 10c.57 0 1.08.19 1.5.5V7h4v0z" />
             </svg>
           </div>
           <div class="listing-row-info">
-            <h4 class="listing-row-title">{{ item.title }}</h4>
-            <p class="listing-row-meta">{{ item.meta }}</p>
+            <h4 class="listing-row-title">
+              {{ item.title }}
+            </h4>
+            <p class="listing-row-meta">
+              {{ item.meta }}
+            </p>
           </div>
           <div class="listing-row-amount">
             {{ formatCurrency(item.amount) }}
@@ -63,8 +90,13 @@
     </div>
 
     <!-- Tab: Matches -->
-    <div v-if="activeTab === 'matches'" class="dash-section">
-      <h2 class="dash-section-title">تطابق‌های اخیر</h2>
+    <div
+      v-if="activeTab === 'matches'"
+      class="dash-section"
+    >
+      <h2 class="dash-section-title">
+        تطابق‌های اخیر
+      </h2>
       <EmptyState
         title="تطابق جدیدی یافت نشده"
         description="هنگام یافتن تطابق، اینجا نمایش داده می‌شود."
@@ -72,18 +104,30 @@
     </div>
 
     <!-- Tab: Activity -->
-    <div v-if="activeTab === 'activity'" class="dash-section">
-      <h2 class="dash-section-title">فعالیت اخیر</h2>
+    <div
+      v-if="activeTab === 'activity'"
+      class="dash-section"
+    >
+      <h2 class="dash-section-title">
+        فعالیت اخیر
+      </h2>
       <div class="activity-list">
         <div
           v-for="activity in activities"
           :key="activity.id"
           class="activity-item"
         >
-          <div class="activity-dot" :style="{ background: activity.dotColor }" />
+          <div
+            class="activity-dot"
+            :style="{ background: activity.dotColor }"
+          />
           <div class="activity-content">
-            <div class="activity-title">{{ activity.title }}</div>
-            <div class="activity-time">{{ activity.time }}</div>
+            <div class="activity-title">
+              {{ activity.title }}
+            </div>
+            <div class="activity-time">
+              {{ activity.time }}
+            </div>
           </div>
         </div>
       </div>
@@ -93,6 +137,11 @@
 
 <script setup lang="ts">
 import { ref } from 'vue'
+import { useRouter } from 'vue-router'
+import StatusPill from '@/components/StatusPill.vue'
+import EmptyState from '@/components/EmptyState.vue'
+
+const router = useRouter()
 
 const activeTab = ref('listings')
 
@@ -109,7 +158,14 @@ const stats = ref([
   { label: 'مجموع آگهی', value: '۱.۲ میلیارد' },
 ])
 
-const myListings = ref([
+const myListings = ref<{
+  id: number
+  title: string
+  meta: string
+  amount: number
+  status: string
+  statusVariant: 'published' | 'pending' | 'matched' | 'reviewing' | 'rejected' | 'approved' | 'kyc-pending'
+}[]>([
   {
     id: 1,
     title: 'چک بانک ملت — شرکت آسان‌پرداخت',
@@ -148,11 +204,11 @@ const formatCurrency = (value: number) => {
 }
 
 const goToCreate = () => {
-  navigateTo('/app/listings/create')
+  router.push('/app/listings/create')
 }
 
 const goToDetail = (id: number) => {
-  navigateTo(`/app/listings/${id}`)
+  router.push(`/app/listings/${id}`)
 }
 </script>
 

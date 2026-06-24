@@ -1,51 +1,76 @@
 <template>
-  <Card title="آگهی در انتظار بررسی" hoverable class="moderation-card">
+  <Card
+    title="آگهی در انتظار بررسی"
+    hoverable
+    class="moderation-card"
+  >
     <template #footer>
       <div class="moderation-actions">
-        <Button variant="teal" size="sm" @click="approve">تأیید</Button>
-        <Button variant="danger" size="sm" @click="reject">رد</Button>
+        <Button
+          variant="teal"
+          size="sm"
+          @click="approve"
+        >
+          تأیید
+        </Button>
+        <Button
+          variant="danger"
+          size="sm"
+          @click="reject"
+        >
+          رد
+        </Button>
       </div>
     </template>
 
     <div class="moderation-meta">
       <div class="moderation-row">
         <span class="moderation-label">صادرکننده:</span>
-        <span class="moderation-value">{{ item.issuer }}</span>
+        <span class="moderation-value">{{ item.issuer || '' }}</span>
       </div>
       <div class="moderation-row">
         <span class="moderation-label">بانک:</span>
-        <span class="moderation-value">{{ item.bank }}</span>
+        <span class="moderation-value">{{ item.bank || '' }}</span>
       </div>
       <div class="moderation-row">
         <span class="moderation-label">مبلغ:</span>
-        <span class="moderation-value moderation-value--amount">{{ formatCurrency(item.amount) }} ریال</span>
+        <span class="moderation-value moderation-value--amount">{{ formatCurrency(item.amount ?? 0) }} ریال</span>
       </div>
       <div class="moderation-row">
         <span class="moderation-label">سررسید:</span>
-        <span class="moderation-value">{{ item.dueDate }}</span>
+        <span class="moderation-value">{{ item.dueDate || '' }}</span>
       </div>
       <div class="moderation-row">
         <span class="moderation-label">ریسک:</span>
-        <RiskBadge :risk="item.risk" />
+        <span class="moderation-value">{{ item.risk || '' }}</span>
       </div>
     </div>
   </Card>
 </template>
 
 <script setup lang="ts">
-import { computed } from 'vue'
 import Card from '@/components/Card.vue'
 import Button from '@/components/AppButton.vue'
-import RiskBadge from '@/components/RiskBadge.vue'
-import type { ModerationItem } from '@/features/admin/components/ModerationCard'
 
-const props = defineProps<{
-  item: ModerationItem
-}>()
+interface ModerationItem {
+  id: string | number
+  issuer?: string
+  bank?: string
+  amount?: number
+  dueDate?: string
+  risk?: string
+}
+
+const props = withDefaults(
+  defineProps<{
+    item: ModerationItem
+  }>(),
+  {}
+)
 
 const emit = defineEmits<{
-  (e: 'approve', id: string): void
-  (e: 'reject', id: string): void
+  (e: 'approve', id: string | number): void
+  (e: 'reject', id: string | number): void
 }>()
 
 const formatCurrency = (value: number) => value.toLocaleString('fa-IR')

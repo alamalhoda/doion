@@ -3,7 +3,7 @@ import { normalizeApiError } from './errors'
 import router from '@/router'
 import { ROUTES } from '@/constants/routes'
 
-export function setupInterceptors(store: any) {
+export function setupInterceptors(store: { clearAuth: () => void }) {
   // Response interceptor
   apiClient.interceptors.response.use(
     (response) => response,
@@ -27,7 +27,7 @@ export function setupInterceptors(store: any) {
   apiClient.interceptors.request.use((config) => {
     const token = sessionStorage.getItem('auth_token')
     if (token) {
-      config.headers['Authorization'] = `Token ${token}`
+      config.headers['Authorization'] = `Bearer ${token}`
     }
     return config
   })

@@ -1,6 +1,9 @@
 <template>
   <div class="register-view">
-    <form class="register-form" @submit.prevent="handleRegister">
+    <form
+      class="register-form"
+      @submit.prevent="handleRegister"
+    >
       <h2>{{ $t('auth.register') }}</h2>
 
       <FormField
@@ -52,7 +55,10 @@
         required
       />
 
-      <div v-if="error && !hasFieldErrors" class="form-error">
+      <div
+        v-if="error && !hasFieldErrors"
+        class="form-error"
+      >
         {{ error }}
       </div>
 
@@ -64,7 +70,9 @@
       />
 
       <div class="login-link">
-        <RouterLink :to="ROUTES.LOGIN">{{ $t('auth.already_have_account') }}</RouterLink>
+        <RouterLink :to="ROUTES.LOGIN">
+          {{ $t('auth.already_have_account') }}
+        </RouterLink>
       </div>
     </form>
   </div>
@@ -128,11 +136,12 @@ async function handleRegister() {
     
     // Navigate to login after successful registration
     router.push(ROUTES.LOGIN)
-  } catch (err: any) {
-    if (err.fieldErrors) {
-      fieldErrors.value = err.fieldErrors
+  } catch (err: unknown) {
+    const errorObj = err as { fieldErrors?: Record<string, string[]>; message?: string }
+    if (errorObj.fieldErrors) {
+      fieldErrors.value = errorObj.fieldErrors
     } else {
-      error.value = t(err.message || 'error.unknown')
+      error.value = t(errorObj.message || 'error.unknown')
     }
   } finally {
     isLoading.value = false

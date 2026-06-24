@@ -58,8 +58,8 @@ export const useNotificationStore = defineStore('notification', () => {
       ]
       
       unreadCount.value = unreadNotifications.value.length
-    } catch (err: any) {
-      error.value = err.message || 'error.unknown'
+    } catch (err: unknown) {
+      error.value = (err as { message?: string }).message || 'error.unknown'
     } finally {
       isLoading.value = false
     }

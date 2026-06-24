@@ -44,3 +44,5 @@ Thumbs.db
 # Project specific
 .kilo/
 *.local
+backend/db.sqlite3
+.cursor/.DS_Store

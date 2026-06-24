@@ -1,20 +1,35 @@
 <template>
-  <div class="listing-card-compact" :class="{ 'listing-card-compact--clickable': clickable }" @click="onClick">
+  <div
+    class="listing-card-compact"
+    :class="{ 'listing-card-compact--clickable': clickable }"
+    @click="onClick"
+  >
     <div class="row-icon">
-      <svg viewBox="0 0 24 24" width="20" height="20" fill="var(--gold-light)">
+      <svg
+        viewBox="0 0 24 24"
+        width="20"
+        height="20"
+        fill="var(--gold-light)"
+      >
         <path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-2 4h-3v5.5c0 1.38-1.12 2.5-2.5 2.5S9 13.88 9 12.5 10.12 10 11.5 10c.57 0 1.08.19 1.5.5V7h4v0z" />
       </svg>
     </div>
     <div class="row-info">
-      <div class="row-title">{{ listing.title }}</div>
-      <div class="row-meta">{{ listing.meta }}</div>
+      <div class="row-title">
+        {{ listing.title }}
+      </div>
+      <div class="row-meta">
+        {{ listing.meta }}
+      </div>
     </div>
     <div class="row-amount">
-      {{ formatCurrency(listing.amount) }}
+      {{ formatCurrency(listing.face_amount) }}
       <small>ریال</small>
     </div>
     <div class="row-status">
-      <StatusPill :variant="statusVariant">{{ listing.statusLabel }}</StatusPill>
+      <StatusPill :variant="statusVariant">
+        {{ listing.statusLabel }}
+      </StatusPill>
     </div>
   </div>
 </template>
@@ -22,11 +37,11 @@
 <script setup lang="ts">
 import { computed } from 'vue'
 import StatusPill from '@/components/StatusPill.vue'
-import type { Listing } from '@/features/listings/types/listing'
+import type { ChequeListing } from '@/features/listings/types/listing'
 
 const props = withDefaults(
   defineProps<{
-    listing: Listing
+    listing: ChequeListing & { title: string; meta: string; statusLabel: string; statusVariant: 'published' | 'matched' | 'pending' | 'reviewing' | 'rejected' | 'approved' | 'kyc-pending' }
     clickable?: boolean
   }>(),
   {
@@ -44,8 +59,14 @@ const statusVariant = computed(() => {
       return 'published'
     case 'matched':
       return 'matched'
-    case 'pending':
+    case 'pending_moderation':
       return 'pending'
+    case 'rejected':
+      return 'rejected'
+    case 'settled':
+      return 'matched'
+    case 'expired':
+      return 'rejected'
     default:
       return 'reviewing'
   }

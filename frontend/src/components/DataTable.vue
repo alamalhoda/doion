@@ -2,7 +2,10 @@
 <template>
   <div class="data-table-container">
     <!-- Optional toolbar -->
-    <div v-if="$slots.toolbar" class="data-table-toolbar">
+    <div
+      v-if="$slots.toolbar"
+      class="data-table-toolbar"
+    >
       <slot name="toolbar" />
     </div>
 
@@ -17,24 +20,43 @@
             >
               {{ col.label }}
             </th>
-            <th v-if="hasActions" style="width: 120px; text-align: center">
-            عملیات
-          </th>
+            <th
+              v-if="hasActions"
+              style="width: 120px; text-align: center"
+            >
+              عملیات
+            </th>
           </tr>
         </thead>
         <tbody>
-          <tr v-if="loading" class="data-table-loading">
+          <tr
+            v-if="loading"
+            class="data-table-loading"
+          >
             <td :colspan="columns.length + (hasActions ? 1 : 0)">
               <div class="data-table-loading-indicator">
                 <span class="data-table-loading-text">در حال بارگذاری...</span>
               </div>
             </td>
           </tr>
-          <tr v-else-if="data.length === 0" class="data-table-empty">
+          <tr
+            v-else-if="data.length === 0"
+            class="data-table-empty"
+          >
             <td :colspan="columns.length + (hasActions ? 1 : 0)">
               <div class="data-table-empty-content">
-                <svg class="data-table-empty-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
-                  <path stroke-linecap="round" stroke-linejoin="round" d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4" />
+                <svg
+                  class="data-table-empty-icon"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="1.5"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4"
+                  />
                 </svg>
                 <span>داده‌ای برای نمایش وجود ندارد</span>
               </div>
@@ -42,7 +64,7 @@
           </tr>
           <tr
             v-for="(row, idx) in data"
-            :key="row.id || idx"
+            :key="getRowKey(row, idx)"
             class="data-table-row"
             :class="{ 'data-table-row--clickable': clickable }"
             @click="onRowClick(row)"
@@ -54,14 +76,33 @@
               :style="{ textAlign: col.align || 'right' }"
             >
               <!-- Custom slot for cell -->
-              <slot v-if="$slots[`cell-${col.key}`]" :name="`cell-${col.key}`" :row="row" :value="row[col.key]" />
+              <slot
+                v-if="$slots[`cell-${col.key}`]"
+                :name="`cell-${String(col.key)}`"
+                :row="row"
+                :value="row[String(col.key)]"
+              />
               <!-- Badge slot for status-like columns -->
-              <slot v-else-if="$slots.badge" name="badge" :row="row" :col="col" />
+              <slot
+                v-else-if="$slots.badge"
+                name="badge"
+                :row="row"
+                :col="col"
+              />
               <!-- Default text -->
-              <span v-else class="data-table-text">{{ row[col.key] }}</span>
+              <span
+                v-else
+                class="data-table-text"
+              >{{ row[String(col.key)] }}</span>
             </td>
-            <td v-if="hasActions" class="data-table-cell data-table-actions">
-              <slot name="actions" :row="row" />
+            <td
+              v-if="hasActions"
+              class="data-table-cell data-table-actions"
+            >
+              <slot
+                name="actions"
+                :row="row"
+              />
             </td>
           </tr>
         </tbody>
@@ -69,7 +110,10 @@
     </div>
 
     <!-- Optional pagination -->
-    <div v-if="showPagination" class="data-table-pagination">
+    <div
+      v-if="showPagination"
+      class="data-table-pagination"
+    >
       <slot name="pagination" />
     </div>
   </div>
@@ -95,6 +139,11 @@ interface Props {
 
 defineProps<Props>()
 
+const getRowKey = (row: Record<string, unknown>, idx: number): string | number => {
+  const id = row.id
+  return typeof id === 'string' || typeof id === 'number' ? id : idx
+}
+
 const slots = useSlots()
 const hasActions = computed(() => slots.actions !== undefined)
 
@@ -103,7 +152,7 @@ const emit = defineEmits<{
 }>()
 
 const onRowClick = (row: Record<string, unknown>) => {
-  if (!hasActions) {
+  if (!hasActions.value) {
     emit('row-click', row)
   }
 }

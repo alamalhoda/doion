@@ -29,15 +29,24 @@ urlpatterns = [
 
 # API URLS
 urlpatterns += [
-    # API base url
-    path("api/", include("config.api_router")),
-    # DRF auth token
-    path("api/auth-token/", obtain_auth_token, name="obtain_auth_token"),
-    path("api/schema/", SpectacularAPIView.as_view(), name="api-schema"),
+    # API v1 base url
+    path("api/v1/", include("config.api_router")),
+    # Schema and docs under v1
+    path("api/v1/schema/", SpectacularAPIView.as_view(), name="api-schema"),
     path(
-        "api/docs/",
+        "api/v1/docs/",
         SpectacularSwaggerView.as_view(url_name="api-schema"),
         name="api-docs",
+    ),
+    # Legacy API base url (backward compatibility)
+    path("api/", include("config.api_router")),
+    # DRF auth token (legacy)
+    path("api/auth-token/", obtain_auth_token, name="obtain_auth_token"),
+    path("api/schema/", SpectacularAPIView.as_view(), name="api-schema-legacy"),
+    path(
+        "api/docs/",
+        SpectacularSwaggerView.as_view(url_name="api-schema-legacy"),
+        name="api-docs-legacy",
     ),
 ]
 

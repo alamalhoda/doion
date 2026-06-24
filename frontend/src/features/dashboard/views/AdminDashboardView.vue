@@ -3,21 +3,39 @@
     <!-- Page Header -->
     <div class="page-header">
       <div class="page-header-inner">
-        <h1 class="page-header-title">داشبورد مدیریت</h1>
-        <p class="page-header-subtitle">خلاصه وضعیت پلتفرم</p>
+        <h1 class="page-header-title">
+          داشبورد مدیریت
+        </h1>
+        <p class="page-header-subtitle">
+          خلاصه وضعیت پلتفرم
+        </p>
       </div>
     </div>
 
     <!-- Stats Bar -->
     <section class="stats-bar">
       <div class="stats-grid">
-        <div class="stat-card" v-for="stat in stats" :key="stat.label">
-          <div class="stat-icon" :style="{ background: stat.iconBg }">
-            <span v-if="stat.icon" class="stat-icon-emoji">{{ stat.icon }}</span>
+        <div
+          v-for="stat in stats"
+          :key="stat.label"
+          class="stat-card"
+        >
+          <div
+            class="stat-icon"
+            :style="{ background: stat.iconBg }"
+          >
+            <span
+              v-if="stat.icon"
+              class="stat-icon-emoji"
+            >{{ stat.icon }}</span>
           </div>
           <div>
-            <div class="stat-value">{{ stat.value }}</div>
-            <div class="stat-label">{{ stat.label }}</div>
+            <div class="stat-value">
+              {{ stat.value }}
+            </div>
+            <div class="stat-label">
+              {{ stat.label }}
+            </div>
           </div>
         </div>
       </div>
@@ -26,15 +44,26 @@
     <!-- Main Content -->
     <div class="admin-content">
       <div class="admin-section">
-        <h2 class="admin-section-title">آگهی‌های در انتظار بررسی</h2>
-        <p class="admin-section-subtitle">آگهی‌های ثبت‌شده را بررسی و تأیید یا رد کنید</p>
+        <h2 class="admin-section-title">
+          آگهی‌های در انتظار بررسی
+        </h2>
+        <p class="admin-section-subtitle">
+          آگهی‌های ثبت‌شده را بررسی و تأیید یا رد کنید
+        </p>
 
-        <DataTable :columns="listingColumns" :data="pendingListings" clickable>
+        <DataTable
+          :columns="listingColumns"
+          :data="pendingListings"
+          clickable
+        >
           <template #cell-risk="{ row }">
-            <RiskBadge :risk="row.risk as 'low'|'mid'|'high'" />
+            <RiskBadge :risk="getRisk(row)" />
           </template>
           <template #actions="{ row }">
-            <button class="btn btn--sm btn--teal" @click="viewListing(row)">
+            <button
+              class="btn btn--sm btn--teal"
+              @click="viewListing(row)"
+            >
               بررسی
             </button>
           </template>
@@ -80,6 +109,10 @@ const stats = ref([
 
 const viewListing = (row: Listing) => {
   console.log('View listing:', row)
+}
+
+function getRisk(row: Listing): 'low' | 'mid' | 'high' {
+  return row.risk
 }
 </script>
 

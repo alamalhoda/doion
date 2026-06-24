@@ -1,8 +1,16 @@
 <template>
-  <div class="match-card" @click="handleClick">
+  <div
+    class="match-card"
+    @click="handleClick"
+  >
     <div class="card-header">
-      <h3 class="listing-title">{{ match.listing?.title || $t('listings.untitled_listing') }}</h3>
-      <NTag :type="statusTagType" size="small">
+      <h3 class="listing-title">
+        {{ match.listing?.title || $t('listings.untitled_listing') }}
+      </h3>
+      <NTag
+        :type="statusTagType"
+        size="small"
+      >
         {{ statusText }}
       </NTag>
     </div>
@@ -15,7 +23,7 @@
         </div>
         <div class="info-item">
           <span class="label">{{ $t('matches.discount_rate') }}</span>
-          <span class="value">{{ match.final_discount_rate || match.proposed_discount_rate || '-' }}%</span>
+          <span class="value">{{ match.final_discount_rate || match.listing?.suggested_discount_rate || '-' }}%</span>
         </div>
         <div class="info-item">
           <span class="label">{{ $t('matches.counterparty') }}</span>
@@ -27,9 +35,14 @@
         </div>
       </div>
 
-      <div v-if="match.message" class="message-preview">
+      <div
+        v-if="match.message"
+        class="message-preview"
+      >
         <span class="label">{{ $t('matches.last_message') }}</span>
-        <p class="message-text">{{ truncateMessage(match.message) }}</p>
+        <p class="message-text">
+          {{ truncateMessage(match.message) }}
+        </p>
       </div>
     </div>
 
@@ -49,7 +62,7 @@ interface Props {
   match: Match
 }
 
-defineProps<Props>()
+const props = defineProps<Props>()
 const emit = defineEmits<{
   click: []
 }>()
@@ -63,7 +76,7 @@ const statusTagType = computed(() => {
     rejected: 'error',
     settled_off_platform: 'success',
   }
-  return statusMap[match.status] || 'default'
+  return statusMap[props.match.status] || 'default'
 })
 
 const statusText = computed(() => {
@@ -73,12 +86,12 @@ const statusText = computed(() => {
     rejected: t('matches.status_rejected'),
     settled_off_platform: t('matches.status_settled'),
   }
-  return statusMap[match.status] || match.status
+  return statusMap[props.match.status] || props.match.status
 })
 
 const counterpartyName = computed(() => {
   // For check holders, show investor; for investors, show check holder
-  return match.investor?.full_name || match.check_holder?.full_name || t('common.unknown')
+  return props.match.investor?.full_name || props.match.check_holder?.full_name || t('common.unknown')
 })
 
 const settlementTypeText = computed(() => {
@@ -87,7 +100,7 @@ const settlementTypeText = computed(() => {
     escrow: t('matches.escrow'),
     principal_ledger: t('matches.principal_ledger'),
   }
-  return map[match.settlement_type] || match.settlement_type
+  return map[props.match.settlement_type] || props.match.settlement_type
 })
 
 function handleClick(): void {
