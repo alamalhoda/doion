@@ -9,6 +9,7 @@ export const dashboardRoutes: RouteRecordRaw[] = [
   {
     path: ROUTES.ADMIN_DASHBOARD,
     component: AdminLayout,
+    meta: { requiresAdmin: true },
     children: [
       {
         path: '',
@@ -19,6 +20,7 @@ export const dashboardRoutes: RouteRecordRaw[] = [
   {
     path: ROUTES.USER_DASHBOARD,
     component: UserLayout,
+    meta: { requiresUser: true },
     children: [
       {
         path: '',

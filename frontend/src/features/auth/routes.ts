@@ -8,6 +8,7 @@ export const authRoutes: RouteRecordRaw[] = [
   {
     path: ROUTES.LOGIN,
     component: AuthLayout,
+    meta: { public: true },
     children: [
       {
         path: '',
@@ -18,6 +19,7 @@ export const authRoutes: RouteRecordRaw[] = [
   {
     path: ROUTES.REGISTER,
     component: AuthLayout,
+    meta: { public: true },
     children: [
       {
         path: '',

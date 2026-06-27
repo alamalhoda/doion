@@ -1,115 +1,122 @@
 <template>
-  <div class="listing-detail">
-    <button
-      class="back-btn"
-      @click="goBack"
-    >
-      <svg
-        viewBox="0 0 24 24"
-        width="20"
-        height="20"
-        fill="none"
-        stroke="currentColor"
-        stroke-width="2"
-      >
-        <path d="M15 18l-6-6 6-6" />
-      </svg>
-      بازگشت
-    </button>
-
-    <div class="detail-header">
-      <div class="detail-header-info">
-        <h1 class="detail-title">
-          {{ listing.title }}
-        </h1>
-        <p class="detail-subtitle">
-          {{ listing.issuer }} · {{ listing.bank }}
-        </p>
-      </div>
-      <RiskBadge :risk="listing.risk" />
-    </div>
-
-    <div class="amount-box">
-      <div>
-        <div class="amount-box-label">
-          مبلغ اسمی چک
-        </div>
-        <div class="amount-box-value">
-          <small>ریال</small>{{ formatCurrency(listing.amount) }}
-        </div>
-      </div>
-    </div>
-
-    <div class="detail-section">
-      <div class="detail-section-title">
-        اطلاعات چک
-      </div>
-      <div class="detail-grid">
-        <div class="detail-field">
-          <div class="detail-field-key">
-            بانک صادرکننده
-          </div>
-          <div class="detail-field-val">
-            {{ listing.bank }}
-          </div>
-        </div>
-        <div class="detail-field">
-          <div class="detail-field-key">
-            تاریخ سررسید
-          </div>
-          <div class="detail-field-val">
-            {{ listing.dueDate }}
-          </div>
-        </div>
-        <div class="detail-field">
-          <div class="detail-field-key">
-            روز تا سررسید
-          </div>
-          <div class="detail-field-val">
-            {{ listing.days }} روز
-          </div>
-        </div>
-        <div class="detail-field">
-          <div class="detail-field-key">
-            نوع صادرکننده
-          </div>
-          <div class="detail-field-val">
-            {{ listing.issuerType }}
-          </div>
-        </div>
-        <div class="detail-field">
-          <div class="detail-field-key">
-            نرخ تنزیل پیشنهادی
-          </div>
-          <div class="detail-field-val detail-field-val--teal">
-            {{ listing.rate }}
-          </div>
-        </div>
-        <div class="detail-field">
-          <div class="detail-field-key">
-            شماره صیاد
-          </div>
-          <div class="detail-field-val">
-            {{ listing.sayad }}
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <div class="detail-actions">
+  <ComingSoonView
+    title="جزئیات آگهی"
+    description="مشاهده جزئیات آگهی چک"
+    phase="فاز ۳"
+  >
+    <div class="listing-detail">
       <button
-        class="btn btn--teal btn--lg"
-        @click="expressInterest"
+        class="back-btn"
+        @click="goBack"
       >
-        ابراز تمایل به خرید
+        <svg
+          viewBox="0 0 24 24"
+          width="20"
+          height="20"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+        >
+          <path d="M15 18l-6-6 6-6" />
+        </svg>
+        بازگشت
       </button>
+
+      <div class="detail-header">
+        <div class="detail-header-info">
+          <h1 class="detail-title">
+            {{ listing.title }}
+          </h1>
+          <p class="detail-subtitle">
+            {{ listing.issuer }} · {{ listing.bank }}
+          </p>
+        </div>
+        <RiskBadge :risk="listing.risk" />
+      </div>
+
+      <div class="amount-box">
+        <div>
+          <div class="amount-box-label">
+            مبلغ اسمی چک
+          </div>
+          <div class="amount-box-value">
+            <small>ریال</small>{{ formatCurrency(listing.amount) }}
+          </div>
+        </div>
+      </div>
+
+      <div class="detail-section">
+        <div class="detail-section-title">
+          اطلاعات چک
+        </div>
+        <div class="detail-grid">
+          <div class="detail-field">
+            <div class="detail-field-key">
+              بانک صادرکننده
+            </div>
+            <div class="detail-field-val">
+              {{ listing.bank }}
+            </div>
+          </div>
+          <div class="detail-field">
+            <div class="detail-field-key">
+              تاریخ سررسید
+            </div>
+            <div class="detail-field-val">
+              {{ listing.dueDate }}
+            </div>
+          </div>
+          <div class="detail-field">
+            <div class="detail-field-key">
+              روز تا سررسید
+            </div>
+            <div class="detail-field-val">
+              {{ listing.days }} روز
+            </div>
+          </div>
+          <div class="detail-field">
+            <div class="detail-field-key">
+              نوع صادرکننده
+            </div>
+            <div class="detail-field-val">
+              {{ listing.issuerType }}
+            </div>
+          </div>
+          <div class="detail-field">
+            <div class="detail-field-key">
+              نرخ تنزیل پیشنهادی
+            </div>
+            <div class="detail-field-val detail-field-val--teal">
+              {{ listing.rate }}
+            </div>
+          </div>
+          <div class="detail-field">
+            <div class="detail-field-key">
+              شماره صیاد
+            </div>
+            <div class="detail-field-val">
+              {{ listing.sayad }}
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="detail-actions">
+        <button
+          class="btn btn--gold btn--lg"
+          @click="expressInterest"
+        >
+          ابراز تمایل به خرید
+        </button>
+      </div>
     </div>
-  </div>
+  </ComingSoonView>
 </template>
 
 <script setup lang="ts">
 import { ref } from 'vue'
 import { useRouter } from 'vue-router'
+import ComingSoonView from '@/components/ComingSoonView.vue'
 
 interface Listing {
   id: number

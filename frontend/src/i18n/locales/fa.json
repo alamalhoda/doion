@@ -16,6 +16,7 @@
   "auth": {
     "login": "ورود",
     "register": "ثبت نام",
+    "username": "نام کاربری",
     "phone_number": "شماره تلفن",
     "identifier": "شناسه",
     "email": "ایمیل",
@@ -31,7 +32,13 @@
     "investor": "سرمایه‌گذار",
     "role": "نقش",
     "select_role": "یک نقش انتخاب کنید",
-    "passwords_must_match": "رمز عبورها باید مطابقت داشته باشند"
+    "passwords_must_match": "رمز عبورها باید مطابقت داشته باشند",
+    "otp_title": "تأیید شماره تلفن",
+    "otp_description": "کد تأیید ارسال‌شده به شماره تلفن خود را وارد کنید",
+    "otp_code": "کد تأیید",
+    "otp_submit": "تأیید",
+    "otp_resend": "ارسال مجدد",
+    "otp_success": "شماره تلفن تأیید شد"
   },
   "landing": {
     "hero_title": "به بازارچه چک خوش آمدید",

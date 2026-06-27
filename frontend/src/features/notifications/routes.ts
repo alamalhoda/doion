@@ -7,7 +7,7 @@ export const notificationRoutes: RouteRecordRaw[] = [
   {
     path: ROUTES.USER_NOTIFICATIONS,
     component: UserLayout,
-    meta: { requiresAuth: true },
+    meta: { requiresUser: true },
     children: [
       {
         path: '',

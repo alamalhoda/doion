@@ -1,7 +1,14 @@
 export const ROUTES = {
+  // Public
+  LANDING: '/',
+
   // Auth
   LOGIN: '/login',
   REGISTER: '/register',
+
+  // Identity
+  IDENTITY_ME: '/identity/me',
+  IDENTITY_PROFILE: '/identity/profile',
   
   // Admin
   ADMIN_DASHBOARD: '/admin',

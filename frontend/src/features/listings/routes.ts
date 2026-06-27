@@ -9,7 +9,7 @@ export const listingRoutes: RouteRecordRaw[] = [
   {
     path: ROUTES.USER_CREATE_LISTING,
     component: UserLayout,
-    meta: { requiresAuth: true },
+    meta: { requiresUser: true },
     children: [
       {
         path: '',
@@ -20,7 +20,7 @@ export const listingRoutes: RouteRecordRaw[] = [
   {
     path: ROUTES.USER_LISTINGS,
     component: UserLayout,
-    meta: { requiresAuth: true },
+    meta: { requiresUser: true },
     children: [
       {
         path: '',
@@ -31,7 +31,7 @@ export const listingRoutes: RouteRecordRaw[] = [
   {
     path: ROUTES.USER_LISTING_DETAIL,
     component: UserLayout,
-    meta: { requiresAuth: true },
+    meta: { requiresUser: true },
     children: [
       {
         path: '',

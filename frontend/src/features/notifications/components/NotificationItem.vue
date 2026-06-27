@@ -80,9 +80,48 @@ function formatTime(dateStr: string): string {
   display: flex;
   gap: var(--spacing-md);
   padding: var(--spacing-md);
-  border-bottom: 1px solid var(--color-border);
+  border-bottom: 1px solid var(--border);
   cursor: pointer;
   transition: background 0.2s;
+}
+
+.notification-item:last-child {
+  border-bottom: none;
+}
+
+.notification-item:hover {
+  background: var(--surface2);
+}
+
+.notification-item.unread {
+  background: var(--teal-light);
+}
+
+.notification-icon {
+  padding: var(--spacing-sm);
+  background: var(--teal-light);
+  border-radius: 50%;
+  color: var(--teal);
+  flex-shrink: 0;
+}
+
+.notification-title {
+  margin: 0;
+  font-size: var(--font-size-sm);
+  color: var(--text1);
+  font-weight: 500;
+}
+
+.notification-message {
+  margin: 0 0 var(--spacing-sm);
+  font-size: var(--font-size-xs);
+  color: var(--text2);
+  line-height: 1.5;
+}
+
+.notification-time {
+  font-size: var(--font-size-xs);
+  color: var(--text3);
 }
 
 .notification-item:last-child {

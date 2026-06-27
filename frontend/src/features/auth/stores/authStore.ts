@@ -3,6 +3,8 @@ import { ref, computed } from 'vue'
 import { canAccessAdmin, canAccessUser, type User } from '@/utils/permissions'
 import { AuthService } from '../services/authService'
 import type { LoginRequest } from '../types/auth'
+import { apiClient } from '@/api/client'
+import { normalizeApiError } from '@/api/errors'
 
 export const useAuthStore = defineStore('auth', () => {
   const token = ref<string | null>(sessionStorage.getItem('auth_token'))
@@ -36,6 +38,28 @@ export const useAuthStore = defineStore('auth', () => {
     }
   }
 
+  async function register(data: {
+    username: string
+    email: string
+    name: string
+    phone: string
+    role: 'check_holder' | 'investor'
+    password: string
+    password_confirm: string
+  }) {
+    isLoading.value = true
+    error.value = null
+
+    try {
+      await apiClient.post('/api/v1/identity/register/', data)
+    } catch (err: unknown) {
+      error.value = (err as { code?: string }).code || 'UNKNOWN'
+      throw normalizeApiError(err)
+    } finally {
+      isLoading.value = false
+    }
+  }
+
   function logout() {
     AuthService.logout()
     token.value = null
@@ -54,10 +78,17 @@ export const useAuthStore = defineStore('auth', () => {
     if (storedToken) {
       token.value = storedToken
       refreshToken.value = storedRefreshToken
-      try {
-        const currentUser = await AuthService.getCurrentUser()
-        user.value = currentUser
-      } catch {
+    }
+    try {
+      const currentUser = await AuthService.getCurrentUser()
+      user.value = currentUser
+      if (!token.value && currentUser) {
+        token.value = 'session-based'
+      }
+    } catch {
+      // If we have a stored token but /me/ fails, clear auth
+      // If no stored token, user simply isn't logged in — that's fine
+      if (token.value) {
         logout()
       }
     }
@@ -73,6 +104,7 @@ export const useAuthStore = defineStore('auth', () => {
     isAdmin,
     isUser,
     login,
+    register,
     logout,
     clearAuth,
     restoreAuth,

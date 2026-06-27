@@ -82,50 +82,50 @@ function handleInput(event: Event): void {
   display: block;
   margin-bottom: var(--spacing-sm);
   font-weight: 500;
-  color: var(--color-text-primary);
+  color: var(--text2);
   font-size: var(--font-size-sm);
 }
 
 .required {
-  color: var(--color-error);
+  color: var(--red);
   margin-left: 2px;
 }
 
 .form-input {
   width: 100%;
   padding: var(--spacing-sm) var(--spacing-md);
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius-md);
-  background: var(--color-bg-primary);
-  color: var(--color-text-primary);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  background: var(--surface);
+  color: var(--text1);
   font-size: var(--font-size-sm);
-  transition: border-color 0.2s;
+  transition: border-color var(--transition-fast);
   font-family: inherit;
 }
 
 .form-input:focus {
   outline: none;
-  border-color: var(--color-primary);
-  box-shadow: 0 0 0 3px rgba(24, 144, 255, 0.1);
+  border-color: var(--navy-light);
+  box-shadow: 0 0 0 3px rgba(42, 95, 168, 0.08);
 }
 
 .form-input.has-error {
-  border-color: var(--color-error);
+  border-color: var(--red);
 }
 
 .form-input.has-error:focus {
-  box-shadow: 0 0 0 3px rgba(255, 77, 79, 0.1);
+  box-shadow: 0 0 0 3px rgba(192, 57, 43, 0.08);
 }
 
 .form-input:disabled {
-  background: var(--color-gray-100);
+  background: var(--surface2);
   cursor: not-allowed;
   opacity: 0.6;
 }
 
 .error-message {
   margin-top: var(--spacing-sm);
-  color: var(--color-error);
+  color: var(--red);
   font-size: var(--font-size-xs);
 }
 </style>

@@ -10,11 +10,15 @@ export function setupInterceptors(store: { clearAuth: () => void }) {
     async (error) => {
       // Check for 401 (Unauthenticated)
       if (error.response?.status === 401) {
-        // Clear auth state
-        store.clearAuth()
+        // Only redirect if we had a token (user was logged in but session expired)
+        const token = sessionStorage.getItem('auth_token')
+        if (token) {
+          // Clear auth state
+          store.clearAuth()
 
-        // Redirect to login via router
-        await router.push(ROUTES.LOGIN)
+          // Redirect to login via router
+          await router.push(ROUTES.LOGIN)
+        }
       }
 
       // Normalize and rethrow

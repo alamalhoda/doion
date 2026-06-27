@@ -50,7 +50,7 @@
 
 <script setup lang="ts">
 import Card from '@/components/Card.vue'
-import Button from '@/components/AppButton.vue'
+import Button from '@/components/ui/Button.vue'
 
 interface ModerationItem {
   id: string | number

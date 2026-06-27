@@ -12,7 +12,10 @@
     </Nav>
 
     <main class="user-main">
-      <slot />
+      <!-- باید RouterView باشد نه slot: این یک layout والد برای مسیرهای تودرتو است
+           و Vue Router کامپوننت کودک (مثل UserDashboardView) را اینجا رندر می‌کند.
+           slot فقط محتوای استاتیک پاس می‌دهد و کودک route را نمایش نمی‌دهد. -->
+      <RouterView />
     </main>
 
     <Footer />

@@ -126,8 +126,8 @@ function truncateMessage(message: string): string {
 
 <style scoped>
 .match-card {
-  background: var(--color-bg-secondary);
-  border: 1px solid var(--color-border);
+  background: var(--surface);
+  border: 1px solid var(--border);
   border-radius: var(--radius-lg);
   padding: var(--spacing-lg);
   margin-bottom: var(--spacing-md);
@@ -136,7 +136,7 @@ function truncateMessage(message: string): string {
 }
 
 .match-card:hover {
-  box-shadow: var(--shadow-md);
+  box-shadow: var(--shadow);
   transform: translateY(-2px);
 }
 
@@ -149,7 +149,7 @@ function truncateMessage(message: string): string {
 
 .listing-title {
   font-size: var(--font-size-md);
-  color: var(--color-text-primary);
+  color: var(--text1);
   margin: 0;
   flex: 1;
 }
@@ -172,35 +172,35 @@ function truncateMessage(message: string): string {
 
 .label {
   font-size: var(--font-size-xs);
-  color: var(--color-text-secondary);
+  color: var(--text2);
   margin-bottom: var(--spacing-xs);
 }
 
 .value {
   font-size: var(--font-size-sm);
-  color: var(--color-text-primary);
+  color: var(--text1);
   font-weight: 500;
 }
 
 .message-preview {
   padding: var(--spacing-sm);
-  background: var(--color-bg-primary);
+  background: var(--surface2);
   border-radius: var(--radius-sm);
 }
 
 .message-text {
   margin: var(--spacing-xs) 0 0;
   font-size: var(--font-size-sm);
-  color: var(--color-text-secondary);
+  color: var(--text2);
 }
 
 .card-footer {
   padding-top: var(--spacing-md);
-  border-top: 1px solid var(--color-border);
+  border-top: 1px solid var(--border);
 }
 
 .created-at {
   font-size: var(--font-size-xs);
-  color: var(--color-text-tertiary);
+  color: var(--text3);
 }
 </style>

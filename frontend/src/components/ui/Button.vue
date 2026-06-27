@@ -33,7 +33,7 @@
 import Icon from './Icon.vue'
 
 interface Props {
-  variant?: 'primary' | 'secondary' | 'ghost' | 'danger' | 'success'
+  variant?: 'primary' | 'secondary' | 'ghost' | 'danger' | 'success' | 'teal' | 'gold'
   type?: 'button' | 'submit' | 'reset'
   disabled?: boolean
   loading?: boolean
@@ -64,13 +64,14 @@ const emit = defineEmits<{
   align-items: center;
   justify-content: center;
   gap: var(--spacing-sm);
-  padding: var(--spacing-sm) var(--spacing-lg);
-  border-radius: var(--radius-md);
+  padding: 0.6rem 1.75rem;
+  border-radius: var(--radius-sm);
   font-size: var(--font-size-sm);
-  font-weight: var(--font-weight-medium);
+  font-weight: var(--font-weight-semibold);
   cursor: pointer;
   transition: all var(--transition-base);
   border: 1px solid transparent;
+  line-height: 1.5;
 }
 
 .btn:disabled {
@@ -79,49 +80,68 @@ const emit = defineEmits<{
 }
 
 .btn--primary {
-  background: var(--color-primary);
+  background: var(--navy);
   color: #fff;
 }
 
 .btn--primary:hover:not(:disabled) {
-  background: var(--color-primary-dark);
+  background: var(--navy-mid);
 }
 
 .btn--secondary {
   background: var(--surface2);
-  color: var(--color-text-primary);
-  border-color: var(--color-border);
+  color: var(--text1);
+  border-color: var(--border);
 }
 
 .btn--secondary:hover:not(:disabled) {
-  background: var(--color-gray-100);
+  background: var(--border);
 }
 
 .btn--ghost {
   background: transparent;
-  color: var(--color-text-primary);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  color: #fff;
 }
 
 .btn--ghost:hover:not(:disabled) {
-  background: var(--color-gray-100);
+  background: rgba(255, 255, 255, 0.1);
 }
 
 .btn--danger {
-  background: var(--color-error);
+  background: var(--red);
   color: #fff;
 }
 
 .btn--danger:hover:not(:disabled) {
-  background: #ff2c2c;
+  opacity: 0.9;
 }
 
 .btn--success {
-  background: var(--color-success);
+  background: var(--teal);
   color: #fff;
 }
 
 .btn--success:hover:not(:disabled) {
   opacity: 0.9;
+}
+
+.btn--teal {
+  background: var(--teal);
+  color: #fff;
+}
+
+.btn--teal:hover:not(:disabled) {
+  opacity: 0.9;
+}
+
+.btn--gold {
+  background: var(--gold);
+  color: #1A1200;
+}
+
+.btn--gold:hover:not(:disabled) {
+  background: var(--gold-light);
 }
 
 .btn--block {

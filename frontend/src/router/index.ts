@@ -8,6 +8,7 @@ import { marketplaceRoutes } from '@/features/marketplace/routes'
 import { matchRoutes } from '@/features/matches/routes'
 import { notificationRoutes } from '@/features/notifications/routes'
 import { workflowRoutes } from '@/features/workflow/routes'
+import { userRoutes } from '@/features/users/routes'
 import { landingRoutes } from '@/features/landing/routes'
 import NotFoundView from '@/views/NotFoundView.vue'
 import { ROUTES } from '@/constants/routes'
@@ -22,6 +23,7 @@ const routes: RouteRecordRaw[] = [
   ...matchRoutes,
   ...notificationRoutes,
   ...workflowRoutes,
+  ...userRoutes,
   {
     path: ROUTES.NOT_FOUND,
     component: NotFoundView,

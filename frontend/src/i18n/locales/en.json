@@ -16,6 +16,7 @@
   "auth": {
     "login": "Login",
     "register": "Register",
+    "username": "Username",
     "phone_number": "Phone Number",
     "identifier": "Identifier",
     "email": "Email",
@@ -31,7 +32,13 @@
     "investor": "Investor",
     "role": "Role",
     "select_role": "Select a role",
-    "passwords_must_match": "Passwords must match"
+    "passwords_must_match": "Passwords must match",
+    "otp_title": "Phone Verification",
+    "otp_description": "Enter the verification code sent to your phone",
+    "otp_code": "Verification Code",
+    "otp_submit": "Verify",
+    "otp_resend": "Resend",
+    "otp_success": "Phone number verified"
   },
   "landing": {
     "hero_title": "Welcome to Cheque Marketplace",

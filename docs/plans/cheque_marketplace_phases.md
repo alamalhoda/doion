@@ -4,10 +4,10 @@ overview: برنامه فازبندی‌شده برای تبدیل دو پروت
 todos:
   - id: phase-0-platform-setup-refactoring
     content: "فاز ۰: ریفکتورینگ architecture frontend (composables, ui atoms, layout organisms) + API v1 versioning"
-    status: pending
+    status: completed
   - id: phase-1-identity-landing
     content: "فاز ۱: Backend identity app + roles؛ Frontend landing + register + role-based routing + atomic components"
-    status: pending
+    status: completed
   - id: phase-2-kyc-wizard
     content: "فاز ۲: Verification/Document backend؛ KYC wizard organisms + admin KYC queue responsive"
     status: pending
@@ -38,9 +38,9 @@ isProject: false
 
 | لایه | وضعیت | مرجع |
 |------|--------|------|
-| Backend | فقط scaffold: `doion.users` + JWT login | [`backend/doion/users/`](backend/doion/users/) |
-| Frontend | Vue 3 + design tokens + UI shells با **mock data** | [`frontend/src/features/`](frontend/src/features/) |
-| مستندات | LLD، معماری، state machines، design system آماده | [`docs/cheque-platform-low-level-design.md`](docs/cheque-platform-low-level-design.md)، [`ai-preview/mvp-spec.md`](ai-preview/mvp-spec.md) |
+| Backend | `doion.users` + JWT login + `doion.core` + `doion.identity` + role field + register API | [`backend/doion/`](backend/doion/) |
+| Frontend | Vue 3 + design tokens + UI shells + landing + register + role badge | [`frontend/src/features/`](frontend/src/features/) |
+| مستندات | LLD، معماری، state machines، design system، API contract | [`docs/cheque-platform-low-level-design.md`](docs/cheque-platform-low-level-design.md)، [`ai-preview/mvp-spec.md`](ai-preview/mvp-spec.md)، [`docs/development/API_CONTRACT_REGISTRY.md`](docs/development/API_CONTRACT_REGISTRY.md) |
 
 **نقشه پروتوتایپ → محصول:**
 
@@ -78,7 +78,7 @@ flowchart LR
 
 ---
 
-## فاز ۰ — پلتفرم پایه (انجام‌شده / تکمیل جزئی)
+## فاز ۰ — پلتفرم پایه (انجام‌شده)
 
 **هدف:** زیرساخت مشترک backend و frontend آماده vertical sliceها باشد.
 
@@ -107,7 +107,7 @@ flowchart LR
 
 ---
 
-## فاز ۱ — Identity، نقش‌ها و Landing عمومی
+## فاز ۱ — Identity، نقش‌ها و Landing عمومی (انجام‌شده)
 
 **پروتوتایپ:** Hero، stats bar، «چطور کار می‌کند»، footer — [`cheque-marketplace-prototype.html`](ai-preview/cheque-marketplace-prototype.html) (صفحه landing)
 

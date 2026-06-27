@@ -98,7 +98,7 @@ const listings = ref([
     title: 'چک بانک صادرات — محمدرضا احمدی',
     meta: 'سررسید: ۱۴۰۴/۰۵/۱۰ · ۹۵ روز دیگر · ۱ تطابق قطعی',
     amount: 120000000,
-    status: 'تط_matchیافته',
+    status: 'تطابق‌یافته',
     statusVariant: 'matched',
   },
   {

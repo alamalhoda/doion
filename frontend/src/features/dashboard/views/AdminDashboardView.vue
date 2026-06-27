@@ -101,10 +101,10 @@ const pendingListings = ref<Listing[]>([
 ])
 
 const stats = ref([
-  { label: 'در انتظار بررسی', value: '۷', iconBg: '#fef3e6', icon: '⏳' },
-  { label: 'تأیید شده (امروز)', value: '۳۴', iconBg: '#e6f4f3', icon: '✅' },
-  { label: 'رد شده (امروز)', value: '۵', iconBg: '#fdecea', icon: '❌' },
-  { label: 'میانگین ساعت بررسی', value: '۶.۲', iconBg: '#fdf5dc', icon: '⏱️' },
+  { label: 'در انتظار بررسی', value: '۷', iconBg: 'var(--orange-light)', icon: '⏳' },
+  { label: 'تأیید شده (امروز)', value: '۳۴', iconBg: 'var(--teal-light)', icon: '✅' },
+  { label: 'رد شده (امروز)', value: '۵', iconBg: 'var(--red-light)', icon: '❌' },
+  { label: 'میانگین ساعت بررسی', value: '۶.۲', iconBg: 'var(--gold-pale)', icon: '⏱️' },
 ])
 
 const viewListing = (row: Listing) => {

@@ -148,8 +148,17 @@ npm run preview
 
 ## ⏭️ Phase 1 TODO (Next Steps)
 
-- [ ] Backend: Expose `role` field on User model (replace `is_staff` mapping)
-- [ ] Implement user CRUD (list, detail, edit, delete) → `features/users/`
+- [x] Backend: Expose `role` field on User model (replace `is_staff` mapping)
+- [x] Backend: Create `doion.identity` app with register/profile/me endpoints
+- [x] Backend: Create `doion.core` app with base models and permissions
+- [x] Backend: Django Groups signal (CheckHolder, Investor, Moderator, Admin)
+- [x] Frontend: Wire RegisterView to real API with role selection
+- [x] Frontend: Update authStore with register action
+- [x] Frontend: Update UserDashboardView with role badge
+- [x] Frontend: Align UserRole type to snake_case (matching backend)
+- [x] Frontend: Add LANDING route constant
+- [x] Docs: Update API Contract Registry with Phase 1 endpoints
+- [ ] Backend: Implement user CRUD (list, detail, edit, delete) → `features/users/`
 - [ ] Implement task CRUD → `features/tasks/`
 - [ ] Add table views with pagination (use `usePagination()`)
 - [ ] Implement file upload endpoint integration
@@ -301,6 +310,6 @@ npm run preview
 
 ---
 
-**Status:** ✅ COMPLETE
+**Status:** ✅ COMPLETE (Phase 0 + Phase 1)
 
-Phase 0 scaffold is **production-ready**. Next: Phase 1 features (CRUD, advanced forms, etc.)
+Phase 0 scaffold and Phase 1 Identity/Registration are **production-ready**. Next: Phase 2 (KYC) and remaining Phase 1 items (CRUD, tests, etc.)

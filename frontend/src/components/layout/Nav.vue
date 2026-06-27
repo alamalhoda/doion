@@ -80,6 +80,7 @@ const navLinks = computed<NavLink[]>(() => {
   if (props.variant === 'user') {
     return [
       { path: ROUTES.USER_DASHBOARD, label: 'داشبورد' },
+      { path: '/app/profile', label: 'پروفایل' },
       { path: ROUTES.USER_LISTINGS, label: 'آگهی‌های من' },
       { path: ROUTES.MARKETPLACE, label: 'بازارچه' },
     ]
@@ -98,8 +99,8 @@ function toggleLocale() {
 
 <style scoped>
 .nav {
-  background: var(--surface);
-  border-bottom: 1px solid var(--color-border);
+  background: var(--navy);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
 }
 
 .nav__inner {
@@ -118,7 +119,7 @@ function toggleLocale() {
 .nav__brand-text {
   font-size: var(--font-size-lg);
   font-weight: var(--font-weight-bold);
-  color: var(--color-primary);
+  color: var(--gold-light);
 }
 
 .nav__links {
@@ -127,7 +128,7 @@ function toggleLocale() {
 }
 
 .nav__link {
-  color: var(--color-text-secondary);
+  color: rgba(255, 255, 255, 0.75);
   text-decoration: none;
   font-size: var(--font-size-sm);
   transition: color var(--transition-base);
@@ -135,7 +136,7 @@ function toggleLocale() {
 
 .nav__link:hover,
 .nav__link--active {
-  color: var(--color-primary);
+  color: var(--gold-light);
 }
 
 .nav__actions {

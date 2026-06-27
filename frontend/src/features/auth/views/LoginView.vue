@@ -46,7 +46,7 @@
 </template>
 
 <script setup lang="ts">
-import { reactive, ref, computed } from 'vue'
+import { reactive, ref, computed, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { useI18n } from 'vue-i18n'
 import { useAuthStore } from '../stores/authStore'
@@ -68,6 +68,29 @@ const isLoading = ref(false)
 const error = ref<string | null>(null)
 
 const hasFieldErrors = computed(() => Object.keys(fieldErrors.value).length > 0)
+
+onMounted(async () => {
+  if (authStore.isAuthenticated) {
+    if (authStore.isAdmin) {
+      router.push(ROUTES.ADMIN_DASHBOARD)
+    } else {
+      router.push(ROUTES.USER_DASHBOARD)
+    }
+    return
+  }
+  try {
+    await authStore.restoreAuth()
+    if (authStore.isAuthenticated) {
+      if (authStore.isAdmin) {
+        router.push(ROUTES.ADMIN_DASHBOARD)
+      } else {
+        router.push(ROUTES.USER_DASHBOARD)
+      }
+    }
+  } catch {
+    // User not authenticated, stay on login page
+  }
+})
 
 function getFieldError(field: string): string | undefined {
   const errors = fieldErrors.value[field]
@@ -117,7 +140,7 @@ async function handleLogin() {
   width: 100%;
   max-width: 400px;
   padding: var(--spacing-xl);
-  background: var(--color-white);
+  background: var(--surface);
   border-radius: var(--radius-lg);
   box-shadow: var(--shadow-lg);
 }
@@ -125,17 +148,17 @@ async function handleLogin() {
 .login-form h2 {
   margin-bottom: var(--spacing-xl);
   text-align: center;
-  color: var(--color-text-primary);
+  color: var(--navy);
   font-size: var(--font-size-lg);
 }
 
 .form-error {
   padding: var(--spacing-md);
   margin-bottom: var(--spacing-lg);
-  background: #fff2f0;
-  border: 1px solid var(--color-error);
-  border-radius: var(--radius-md);
-  color: var(--color-error);
+  background: var(--red-light);
+  border: 1px solid var(--red);
+  border-radius: var(--radius-sm);
+  color: var(--red);
   font-size: var(--font-size-sm);
 }
 
@@ -145,7 +168,7 @@ async function handleLogin() {
 }
 
 .register-link a {
-  color: var(--color-primary);
+  color: var(--navy);
   text-decoration: none;
   font-size: var(--font-size-sm);
 }

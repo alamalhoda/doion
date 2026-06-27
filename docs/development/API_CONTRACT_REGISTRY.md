@@ -1,6 +1,6 @@
 # API Contract Registry
 
-This document tracks Phase-0 API endpoints and error envelope format for the Cheque Marketplace backend.
+This document tracks all API endpoints and error envelope format for the Cheque Marketplace backend.
 
 ## Error Envelope Format
 
@@ -53,7 +53,9 @@ Authenticate user and return JWT tokens.
     "id": 1,
     "username": "johndoe",
     "email": "john@example.com",
-    "name": "John Doe"
+    "name": "John Doe",
+    "phone": "09123456789",
+    "role": "check_holder"
   }
 }
 ```
@@ -72,14 +74,7 @@ Refresh access token using refresh token.
 **Response (200):**
 ```json
 {
-  "access": "new_jwt_access_token",
-  "refresh": "new_jwt_refresh_token",
-  "user": {
-    "id": 1,
-    "username": "johndoe",
-    "email": "john@example.com",
-    "name": "John Doe"
-  }
+  "access": "new_jwt_access_token"
 }
 ```
 
@@ -96,9 +91,168 @@ Get current authenticated user's profile.
   "username": "johndoe",
   "email": "john@example.com",
   "name": "John Doe",
-  "url": "http://api.example.com/api/v1/users/johndoe/"
+  "phone": "09123456789",
+  "role": "check_holder",
+  "is_verified": false
 }
 ```
+
+#### PATCH /api/v1/users/me/
+
+Update current user's profile.
+
+**Request Body:**
+```json
+{
+  "name": "John Updated",
+  "email": "john.new@example.com",
+  "phone": "09129876543"
+}
+```
+
+**Response (200):** Same as GET /users/me/
+
+---
+
+## Phase-1 Endpoints
+
+### Identity
+
+#### POST /api/v1/identity/register/
+
+Register a new user with role selection.
+
+**Request Body:**
+```json
+{
+  "username": "johndoe",
+  "email": "john@example.com",
+  "name": "John Doe",
+  "phone": "09123456789",
+  "role": "check_holder",
+  "password": "securepassword123",
+  "password_confirm": "securepassword123"
+}
+```
+
+**Constraints:**
+- `username`: required, unique, max 150 chars
+- `email`: optional
+- `phone`: optional, unique, max 20 chars
+- `role`: required, one of `check_holder` | `investor`
+- `password`: required, min 8 chars
+- `password_confirm`: must match `password`
+
+**Response (201):**
+```json
+{
+  "access": "jwt_access_token",
+  "refresh": "jwt_refresh_token",
+  "user": {
+    "id": 1,
+    "username": "johndoe",
+    "email": "john@example.com",
+    "name": "John Doe",
+    "role": "check_holder"
+  }
+}
+```
+
+**Error Response (400):**
+```json
+{
+  "error": {
+    "code": "VALIDATION_ERROR",
+    "message": "Registration failed",
+    "details": {
+      "username": ["This username is already taken."],
+      "phone": ["This phone number is already registered."],
+      "password_confirm": ["Passwords do not match."]
+    }
+  }
+}
+```
+
+#### GET /api/v1/identity/me/
+
+Get current user's profile (alias of /users/me/).
+
+**Response (200):**
+```json
+{
+  "id": 1,
+  "username": "johndoe",
+  "email": "john@example.com",
+  "name": "John Doe",
+  "phone": "09123456789",
+  "role": "check_holder",
+  "is_verified": false
+}
+```
+
+#### PATCH /api/v1/identity/me/
+
+Update current user's profile.
+
+**Request Body:**
+```json
+{
+  "name": "John Updated",
+  "email": "john.new@example.com",
+  "phone": "09129876543"
+}
+```
+
+**Response (200):** Same as GET /identity/me/
+
+#### GET /api/v1/identity/profile/
+
+Get detailed profile with bio and verification status.
+
+**Response (200):**
+```json
+{
+  "id": 1,
+  "username": "johndoe",
+  "email": "john@example.com",
+  "name": "John Doe",
+  "phone": "09123456789",
+  "role": "check_holder",
+  "bio": "",
+  "is_verified": false,
+  "created_at": "2026-06-24T14:30:00Z",
+  "updated_at": "2026-06-24T14:30:00Z"
+}
+```
+
+#### PATCH /api/v1/identity/profile/
+
+Update detailed profile.
+
+**Request Body:**
+```json
+{
+  "name": "John Updated",
+  "email": "john.new@example.com",
+  "phone": "09129876543",
+  "bio": "Experienced investor"
+}
+```
+
+**Note:** `role` and `is_verified` are read-only via this endpoint.
+
+**Response (200):** Same as GET /identity/profile/
+
+---
+
+## Role Values
+
+| Value | Label (FA) | Label (EN) | Description |
+|-------|------------|------------|-------------|
+| `check_holder` | دارنده چک | Check Holder | Can create and list cheques |
+| `investor` | سرمایه‌گذار | Investor | Can browse and express interest |
+| `moderator` | مدیر | Moderator | Can moderate listings and KYC |
+| `admin` | مدیر کل | Admin | Full platform access |
 
 ---
 

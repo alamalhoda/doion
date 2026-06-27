@@ -217,14 +217,14 @@ onMounted(() => {
   margin-bottom: var(--spacing-xl);
 }
 
-.view-header h1 {
-  color: var(--color-text-primary);
+  .view-header h1 {
+  color: var(--text1);
   font-size: var(--font-size-xl);
   margin-bottom: var(--spacing-sm);
 }
 
 .subtitle {
-  color: var(--color-text-secondary);
+  color: var(--text2);
   font-size: var(--font-size-md);
 }
 
@@ -232,7 +232,7 @@ onMounted(() => {
 .error-state {
   padding: var(--spacing-xl);
   text-align: center;
-  color: var(--color-text-secondary);
+  color: var(--text2);
 }
 
 .reject-form {
@@ -241,6 +241,6 @@ onMounted(() => {
 
 .reject-form p {
   margin-bottom: var(--spacing-md);
-  color: var(--color-text-secondary);
+  color: var(--text2);
 }
 </style>

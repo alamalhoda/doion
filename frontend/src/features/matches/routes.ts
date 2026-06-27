@@ -8,7 +8,7 @@ export const matchRoutes: RouteRecordRaw[] = [
   {
     path: ROUTES.USER_MATCHES,
     component: UserLayout,
-    meta: { requiresAuth: true },
+    meta: { requiresUser: true },
     children: [
       {
         path: '',

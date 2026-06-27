@@ -7,7 +7,7 @@ export const marketplaceRoutes: RouteRecordRaw[] = [
   {
     path: ROUTES.MARKETPLACE,
     component: UserLayout,
-    meta: { requiresAuth: true },
+    meta: { requiresUser: true },
     children: [
       {
         path: '',

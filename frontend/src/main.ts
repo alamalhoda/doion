@@ -32,6 +32,11 @@ const authStore = useAuthStore()
 setupInterceptors(authStore)
 
 // Restore auth state before mount
+console.log('[main] Starting restoreAuth...')
 void authStore.restoreAuth().then(() => {
+  console.log('[main] restoreAuth complete:', {
+    isAuthenticated: authStore.isAuthenticated,
+    user: authStore.user ? { username: authStore.user.username, role: authStore.user.role } : null,
+  })
   app.mount('#app')
 })

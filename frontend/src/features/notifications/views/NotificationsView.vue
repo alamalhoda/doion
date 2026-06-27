@@ -1,43 +1,49 @@
 <template>
-  <div class="notifications-view">
-    <div class="view-header">
-      <h1>{{ $t('notifications.title') }}</h1>
-    </div>
-
-    <div
-      v-if="isLoading"
-      class="loading-state"
-    >
-      {{ $t('common.loading') }}
-    </div>
-
-    <div
-      v-else-if="error"
-      class="error-state"
-    >
-      {{ error }}
-    </div>
-
-    <div
-      v-else
-      class="notifications-container"
-    >
-      <div class="notifications-list">
-        <NotificationItem
-          v-for="notification in notifications"
-          :key="notification.id"
-          :notification="notification"
-          @mark-read="markAsRead(notification.id)"
-          @click="handleNotificationClick(notification)"
-        />
+  <ComingSoonView
+    title="اعلان‌ها"
+    description="مشاهده اعلان‌های سیستم"
+    phase="فاز ۷"
+  >
+    <div class="notifications-view">
+      <div class="view-header">
+        <h1>{{ $t('notifications.title') }}</h1>
       </div>
 
-      <NEmpty
-        v-if="notifications.length === 0"
-        :description="$t('notifications.no_notifications')"
-      />
+      <div
+        v-if="isLoading"
+        class="loading-state"
+      >
+        {{ $t('common.loading') }}
+      </div>
+
+      <div
+        v-else-if="error"
+        class="error-state"
+      >
+        {{ error }}
+      </div>
+
+      <div
+        v-else
+        class="notifications-container"
+      >
+        <div class="notifications-list">
+          <NotificationItem
+            v-for="notification in notifications"
+            :key="notification.id"
+            :notification="notification"
+            @mark-read="markAsRead(notification.id)"
+            @click="handleNotificationClick(notification)"
+          />
+        </div>
+
+        <NEmpty
+          v-if="notifications.length === 0"
+          :description="$t('notifications.no_notifications')"
+        />
+      </div>
     </div>
-  </div>
+  </ComingSoonView>
 </template>
 
 <script setup lang="ts">
@@ -46,6 +52,7 @@ import { useRouter } from 'vue-router'
 import { NEmpty } from 'naive-ui'
 import { useNotificationStore } from '../stores/notificationStore'
 import NotificationItem from '../components/NotificationItem.vue'
+import ComingSoonView from '@/components/ComingSoonView.vue'
 
 const router = useRouter()
 const notificationStore = useNotificationStore()
@@ -61,7 +68,6 @@ function markAsRead(id: string): void {
 import type { Notification } from '../types/notification'
 
 function handleNotificationClick(notification: Notification): void {
-  // Navigate based on notification type
   if (notification.type === 'match_created') {
     router.push(`/app/matches/${notification.reference_id}`)
   } else if (notification.type === 'listing_approved') {
@@ -80,8 +86,8 @@ function handleNotificationClick(notification: Notification): void {
   margin-bottom: var(--spacing-xl);
 }
 
-.view-header h1 {
-  color: var(--color-text-primary);
+  .view-header h1 {
+  color: var(--text1);
   font-size: var(--font-size-xl);
 }
 
@@ -89,13 +95,13 @@ function handleNotificationClick(notification: Notification): void {
 .error-state {
   padding: var(--spacing-xl);
   text-align: center;
-  color: var(--color-text-secondary);
+  color: var(--text2);
 }
 
 .notifications-container {
-  background: var(--color-bg-secondary);
+  background: var(--surface);
   border-radius: var(--radius-lg);
-  border: 1px solid var(--color-border);
+  border: 1px solid var(--border);
   overflow: hidden;
 }
 </style>

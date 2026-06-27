@@ -25,9 +25,9 @@ interface Stat {
 }
 
 const stats: Stat[] = [
-  { key: 'transactions', value: '1,250+', label: t('landing.stats.transactions') },
-  { key: 'users', value: '500+', label: t('landing.stats.users') },
-  { key: 'volume', value: '2.5B IRR', label: t('landing.stats.volume') },
+  { key: 'transactions', value: '۱٬۲۵۰+', label: t('landing.stats.transactions') },
+  { key: 'users', value: '۵۰۰+', label: t('landing.stats.users') },
+  { key: 'volume', value: '۲.۵ میلیارد ریال', label: t('landing.stats.volume') },
 ]
 </script>
 

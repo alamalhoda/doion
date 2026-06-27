@@ -1,6 +1,6 @@
 // Cheque Listing types for the marketplace
 
-export type UserRole = 'CheckHolder' | 'Investor' | 'InstitutionalInvestor' | 'Moderator' | 'Admin'
+export type UserRole = 'check_holder' | 'investor' | 'institutional_investor' | 'moderator' | 'admin'
 
 export type ListingStatus = 'pending_moderation' | 'published' | 'rejected' | 'matched' | 'settled' | 'expired'
 

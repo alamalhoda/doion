@@ -7,10 +7,11 @@ LOGIN_REQUIRED_MESSAGE = "Both identifier and password are required."
 
 
 class UserSerializer(serializers.ModelSerializer[User]):
+    role = serializers.CharField(read_only=True)
+
     class Meta:
         model = User
-        fields = ["id", "username", "email", "name", "url"]
-
+        fields = ["id", "username", "email", "name", "phone", "role", "url"]
         extra_kwargs = {
             "url": {"view_name": "api:user-detail", "lookup_field": "username"},
         }
@@ -82,6 +83,8 @@ class LoginTokenSerializer(TokenObtainPairSerializer):
             "username": self.user.username,
             "email": self.user.email,
             "name": self.user.name,
+            "phone": self.user.phone or "",
+            "role": self.user.role,
         }
         return data
 

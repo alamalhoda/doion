@@ -542,7 +542,7 @@ function selectStep(stepId: WorkflowStepId): void {
   width: 32px;
   height: 32px;
   flex: 0 0 32px;
-  border-radius: 999px;
+  border-radius: var(--radius-sm);
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -610,23 +610,23 @@ function selectStep(stepId: WorkflowStepId): void {
 }
 
 .step-tag--info {
-  background: #eef0fe;
-  color: #3d34a0;
+  background: var(--surface2);
+  color: var(--text2);
 }
 
 .step-tag--success {
-  background: #e6f4f3;
-  color: #0a4e49;
+  background: var(--teal-light);
+  color: var(--teal);
 }
 
 .step-tag--warning {
-  background: #fef3e6;
-  color: #7a4000;
+  background: var(--orange-light);
+  color: var(--orange);
 }
 
 .step-tag--error {
-  background: #fdecea;
-  color: #7a1a1a;
+  background: var(--red-light);
+  color: var(--red);
 }
 
 .step-tag--default {

@@ -1,16 +1,17 @@
 <template>
   <div class="register-view">
     <form
+      v-if="!otpSent"
       class="register-form"
       @submit.prevent="handleRegister"
     >
       <h2>{{ $t('auth.register') }}</h2>
 
       <FormField
-        v-model="formData.phoneNumber"
-        type="tel"
-        :label="$t('auth.phone_number')"
-        :error="getFieldError('phoneNumber')"
+        v-model="formData.username"
+        type="text"
+        :label="$t('auth.username')"
+        :error="getFieldError('username')"
         required
       />
 
@@ -19,15 +20,20 @@
         type="email"
         :label="$t('auth.email')"
         :error="getFieldError('email')"
-        required
       />
 
       <FormField
-        v-model="formData.fullName"
+        v-model="formData.name"
         type="text"
         :label="$t('auth.full_name')"
-        :error="getFieldError('fullName')"
-        required
+        :error="getFieldError('name')"
+      />
+
+      <FormField
+        v-model="formData.phone"
+        type="tel"
+        :label="$t('auth.phone_number')"
+        :error="getFieldError('phone')"
       />
 
       <div class="role-selector">
@@ -48,10 +54,10 @@
       />
 
       <FormField
-        v-model="formData.confirmPassword"
+        v-model="formData.password_confirm"
         type="password"
         :label="$t('auth.confirm_password')"
-        :error="getFieldError('confirmPassword')"
+        :error="getFieldError('password_confirm')"
         required
       />
 
@@ -75,6 +81,44 @@
         </RouterLink>
       </div>
     </form>
+
+    <form
+      v-else
+      class="register-form"
+      @submit.prevent="handleOtpVerify"
+    >
+      <h2>{{ $t('otp_title') }}</h2>
+      <p class="otp-description">{{ $t('otp_description') }}</p>
+
+      <FormField
+        v-model="otpCode"
+        type="text"
+        :label="$t('otp_code')"
+        :error="otpError"
+        required
+      />
+
+      <div
+        v-if="otpSuccess"
+        class="form-success"
+      >
+        {{ $t('otp_success') }}
+      </div>
+
+      <AppButton
+        :label="$t('otp_submit')"
+        type="submit"
+        :loading="isLoading"
+        :disabled="isLoading"
+      />
+
+      <div class="login-link">
+        <a
+          href="#"
+          @click.prevent="resendOtp"
+        >{{ $t('otp_resend') }}</a>
+      </div>
+    </form>
   </div>
 </template>
 
@@ -86,28 +130,35 @@ import { NSelect } from 'naive-ui'
 import FormField from '@/components/ui/FormField.vue'
 import AppButton from '@/components/ui/AppButton.vue'
 import { ROUTES } from '@/constants/routes'
+import { apiClient } from '@/api/client'
+import { normalizeApiError } from '@/api/errors'
 
 const router = useRouter()
 const { t } = useI18n()
 
 const formData = reactive({
-  phoneNumber: '',
+  username: '',
   email: '',
-  fullName: '',
-  role: 'CheckHolder' as 'CheckHolder' | 'Investor',
+  name: '',
+  phone: '',
+  role: 'check_holder' as 'check_holder' | 'investor',
   password: '',
-  confirmPassword: '',
+  password_confirm: '',
 })
 
 const fieldErrors = ref<Record<string, string[]>>({})
 const isLoading = ref(false)
 const error = ref<string | null>(null)
+const otpSent = ref(false)
+const otpCode = ref('')
+const otpError = ref<string | undefined>(undefined)
+const otpSuccess = ref(false)
 
 const hasFieldErrors = computed(() => Object.keys(fieldErrors.value).length > 0)
 
 const roleOptions = computed(() => [
-  { label: t('auth.check_holder'), value: 'CheckHolder' },
-  { label: t('auth.investor'), value: 'Investor' },
+  { label: t('auth.check_holder'), value: 'check_holder' },
+  { label: t('auth.investor'), value: 'investor' },
 ])
 
 function getFieldError(field: string): string | undefined {
@@ -120,32 +171,51 @@ async function handleRegister() {
   error.value = null
   isLoading.value = true
 
-  // Validate passwords match
-  if (formData.password !== formData.confirmPassword) {
-    fieldErrors.value.confirmPassword = [t('auth.passwords_must_match')]
-    isLoading.value = false
-    return
-  }
-
   try {
-    // TODO: Implement registration API call
-    console.log('Registration data:', formData)
-    
-    // Simulate API delay
-    await new Promise(resolve => setTimeout(resolve, 1000))
-    
-    // Navigate to login after successful registration
-    router.push(ROUTES.LOGIN)
+    await apiClient.post('/api/v1/identity/register/', {
+      username: formData.username,
+      email: formData.email,
+      name: formData.name,
+      phone: formData.phone,
+      role: formData.role,
+      password: formData.password,
+      password_confirm: formData.password_confirm,
+    })
+
+    otpSent.value = true
   } catch (err: unknown) {
-    const errorObj = err as { fieldErrors?: Record<string, string[]>; message?: string }
-    if (errorObj.fieldErrors) {
-      fieldErrors.value = errorObj.fieldErrors
+    const normalized = normalizeApiError(err)
+    if (normalized.fieldErrors) {
+      fieldErrors.value = normalized.fieldErrors
     } else {
-      error.value = t(errorObj.message || 'error.unknown')
+      error.value = t(normalized.message || 'error.unknown')
     }
   } finally {
     isLoading.value = false
   }
+}
+
+async function handleOtpVerify() {
+  otpError.value = undefined
+  otpSuccess.value = false
+  isLoading.value = true
+
+  try {
+    await new Promise((resolve) => setTimeout(resolve, 500))
+    if (otpCode.value.length === 6) {
+      otpSuccess.value = true
+      setTimeout(() => router.push(ROUTES.LOGIN), 1000)
+    } else {
+      otpError.value = t('error.validation_error')
+    }
+  } finally {
+    isLoading.value = false
+  }
+}
+
+function resendOtp() {
+  otpCode.value = ''
+  otpError.value = undefined
 }
 </script>
 
@@ -162,7 +232,7 @@ async function handleRegister() {
   width: 100%;
   max-width: 400px;
   padding: var(--spacing-xl);
-  background: var(--color-white);
+  background: var(--surface);
   border-radius: var(--radius-lg);
   box-shadow: var(--shadow-lg);
 }
@@ -170,8 +240,15 @@ async function handleRegister() {
 .register-form h2 {
   margin-bottom: var(--spacing-xl);
   text-align: center;
-  color: var(--color-text-primary);
+  color: var(--navy);
   font-size: var(--font-size-lg);
+}
+
+.otp-description {
+  text-align: center;
+  color: var(--color-text-secondary);
+  margin-bottom: var(--spacing-lg);
+  font-size: var(--font-size-sm);
 }
 
 .role-selector {
@@ -181,10 +258,20 @@ async function handleRegister() {
 .form-error {
   padding: var(--spacing-md);
   margin-bottom: var(--spacing-lg);
-  background: #fff2f0;
-  border: 1px solid var(--color-error);
-  border-radius: var(--radius-md);
-  color: var(--color-error);
+  background: var(--red-light);
+  border: 1px solid var(--red);
+  border-radius: var(--radius-sm);
+  color: var(--red);
+  font-size: var(--font-size-sm);
+}
+
+.form-success {
+  padding: var(--spacing-md);
+  margin-bottom: var(--spacing-lg);
+  background: var(--green-light, #e8f5e9);
+  border: 1px solid var(--green, #4caf50);
+  border-radius: var(--radius-sm);
+  color: var(--green, #2e7d32);
   font-size: var(--font-size-sm);
 }
 
@@ -194,7 +281,7 @@ async function handleRegister() {
 }
 
 .login-link a {
-  color: var(--color-primary);
+  color: var(--navy);
   text-decoration: none;
   font-size: var(--font-size-sm);
 }

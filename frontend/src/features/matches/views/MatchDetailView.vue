@@ -21,8 +21,8 @@
   margin-bottom: var(--spacing-xl);
 }
 
-.view-header h1 {
-  color: var(--color-text-primary);
+  .view-header h1 {
+  color: var(--text1);
   font-size: var(--font-size-xl);
 }
 </style>
