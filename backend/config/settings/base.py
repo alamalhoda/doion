@@ -95,6 +95,7 @@ LOCAL_APPS = [
     "doion.core",
     "doion.users",
     "doion.identity",
+    "doion.documents",
     # Your stuff: custom apps go here
 ]
 # https://docs.djangoproject.com/en/dev/ref/settings/#installed-apps

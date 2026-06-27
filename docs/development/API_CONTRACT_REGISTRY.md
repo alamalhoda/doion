@@ -245,6 +245,104 @@ Update detailed profile.
 
 ---
 
+## Phase-2 Endpoints
+
+### KYC/Verifications
+
+#### POST /api/v1/verifications/
+Start KYC verification process.
+
+**Request (multipart/form-data):**
+```json
+{
+  "full_name": "رضا کریمی",
+  "national_id": "0012345678",
+  "company_name": "شرکتExample"
+}
+```
+With files: `national_id_front`, `national_id_back` (required), `selfie` (optional).
+
+**Response 201:**
+```json
+{
+  "id": "uuid",
+  "full_name": "رضا کریمی",
+  "national_id": "0012345678",
+  "company_name": "شرکتExample",
+  "status": "pending",
+  "documents": [
+    { "id": "uuid", "document_type": "national_id_front", "file": "/media/documents/...", "file_size": 102400 }
+  ]
+}
+```
+
+**Errors:** `VALIDATION_ERROR` if fields missing or files invalid.
+
+#### GET /api/v1/verifications/me/
+Get current user's latest verification.
+
+**Response 200:**
+```json
+{
+  "id": "uuid",
+  "full_name": "رضا کریمی",
+  "national_id": "0012345678",
+  "company_name": "شرکتExample",
+  "status": "approved",
+  "rejection_reason": null,
+  "rejection_code": null,
+  "documents": []
+}
+```
+
+**Errors:** `404` if no verification exists.
+
+### Moderation — KYC Queue
+
+#### GET /api/v1/moderation/kyc/
+List pending KYC verifications (Moderator/Admin only).
+
+**Response 200:**
+```json
+{
+  "results": [
+    {
+      "id": "uuid",
+      "full_name": "رضا کریمی",
+      "national_id": "0012345678",
+      "company_name": "شرکتExample",
+      "status": "pending",
+      "documents": [...],
+      "created_at": "2026-06-28T10:00:00Z"
+    }
+  ]
+}
+```
+
+#### POST /api/v1/moderation/kyc/{id}/decision/
+Approve or reject a KYC verification.
+
+**Request:**
+```json
+{
+  "decision": "approve"  // or "reject"
+}
+```
+
+**Response 200 (approve):**
+```json
+{ "status": "approved" }
+```
+
+**Response 200 (reject):**
+```json
+{ "status": "rejected" }
+```
+
+**Error:** `400` if `decision` is missing or invalid. `403` if user is not moderator/admin.
+
+---
+
 ## Role Values
 
 | Value | Label (FA) | Label (EN) | Description |

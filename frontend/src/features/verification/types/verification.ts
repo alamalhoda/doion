@@ -1,8 +1,14 @@
 // Verification/KYC types
 
-export type VerificationType = 'individual' | 'corporate'
+export const VerificationStatus = {
+  PENDING: 'pending',
+  APPROVED: 'approved',
+  REJECTED: 'rejected',
+} as const
 
-export type VerificationStatus = 'pending' | 'approved' | 'rejected'
+export type VerificationStatus = typeof VerificationStatus[keyof typeof VerificationStatus]
+
+export type VerificationType = 'individual' | 'corporate'
 
 export type KycLevel = 'basic' | 'advanced' | 'full'
 

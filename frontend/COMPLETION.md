@@ -172,6 +172,20 @@ npm run preview
 
 ---
 
+## ✅ Phase 2 KYC Implementation
+
+- [x] Backend: Verification + Document models created
+- [x] Backend: KYC API endpoints implemented (/api/v1/verifications/, /api/v1/moderation/kyc/)
+- [x] Backend: Serializers, permissions, signals implemented
+- [x] Frontend: KYC routes registered (KycStep1, KycStep2, KycStatus, ModerationKyc)
+- [x] Frontend: Verification store + moderation store created
+- [x] Frontend: KycStatusBadge + UploadArea components created
+- [x] Frontend: Router guards updated for KYC flow
+- [x] Tests: Backend verification tests written
+- [x] Docs: API Contract Registry updated
+
+---
+
 ## 🔍 Key Design Decisions
 
 1. **Feature-based architecture** → All business code in `src/features/`
@@ -310,6 +324,6 @@ npm run preview
 
 ---
 
-**Status:** ✅ COMPLETE (Phase 0 + Phase 1)
+**Status:** ✅ COMPLETE (Phase 0 + Phase 1 + Phase 2 KYC)
 
-Phase 0 scaffold and Phase 1 Identity/Registration are **production-ready**. Next: Phase 2 (KYC) and remaining Phase 1 items (CRUD, tests, etc.)
+Phase 0 scaffold, Phase 1 Identity/Registration, and Phase 2 KYC are **production-ready**. Next: Phase 3 (Listings) and remaining Phase 1 items (CRUD, tests, etc.)

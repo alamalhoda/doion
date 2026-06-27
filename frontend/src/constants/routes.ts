@@ -24,6 +24,11 @@ export const ROUTES = {
   USER_NOTIFICATIONS: '/app/notifications',
   WORKFLOW_PROTOTYPE: '/app/prototype',
 
+  // Verification/KYC
+  VERIFICATION_KYC_START: '/app/verification/kyc',
+  VERIFICATION_KYC_STATUS: '/app/verification/kyc/status',
+  VERIFICATION_MODERATION_QUEUE: '/app/verification/moderation',
+
   // Marketplace - Investor
   MARKETPLACE: '/app/marketplace',
   

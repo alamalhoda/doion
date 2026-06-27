@@ -1,16 +1,9 @@
 from django.contrib.auth.models import Group
 from django.db import transaction
 from rest_framework import serializers
-from rest_framework import status
-from rest_framework.decorators import action
-from rest_framework.mixins import RetrieveModelMixin
-from rest_framework.mixins import UpdateModelMixin
-from rest_framework.permissions import AllowAny
-from rest_framework.permissions import IsAuthenticated
-from rest_framework.response import Response
-from rest_framework.viewsets import GenericViewSet
 
-from doion.identity.models import Profile
+from doion.documents.models import Document
+from doion.identity.models import Profile, Verification
 from doion.users.models import User
 
 
@@ -117,3 +110,88 @@ class UserMeSerializer(serializers.ModelSerializer):
             setattr(user, attr, value)
         user.save()
         return user
+
+
+class DocumentSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Document
+        fields = ["id", "document_type", "file", "file_size"]
+
+
+class VerificationSerializer(serializers.ModelSerializer):
+    documents = DocumentSerializer(many=True, read_only=True)
+
+    class Meta:
+        model = Verification
+        fields = [
+            "id",
+            "full_name",
+            "national_id",
+            "company_name",
+            "status",
+            "rejection_reason",
+            "rejection_code",
+            "documents",
+        ]
+        read_only_fields = [
+            "id",
+            "status",
+            "rejection_reason",
+            "rejection_code",
+            "documents",
+        ]
+
+
+class VerificationCreateSerializer(serializers.ModelSerializer):
+    national_id_front = serializers.FileField(write_only=True)
+    national_id_back = serializers.FileField(write_only=True)
+    selfie = serializers.FileField(write_only=True, required=False)
+
+    class Meta:
+        model = Verification
+        fields = [
+            "full_name",
+            "national_id",
+            "company_name",
+            "national_id_front",
+            "national_id_back",
+            "selfie",
+        ]
+
+    def create(self, validated_data):
+        front = validated_data.pop("national_id_front")
+        back = validated_data.pop("national_id_back")
+        selfie = validated_data.pop("selfie", None)
+
+        verification = Verification.objects.create(**validated_data)
+
+        Document.objects.create(
+            owner=verification.user,
+            related_object_type="verification",
+            related_object_id=verification.id,
+            document_type=Document.DocumentType.NATIONAL_ID_FRONT,
+            file=front,
+            file_size=front.size,
+        )
+        Document.objects.create(
+            owner=verification.user,
+            related_object_type="verification",
+            related_object_id=verification.id,
+            document_type=Document.DocumentType.NATIONAL_ID_BACK,
+            file=back,
+            file_size=back.size,
+        )
+        if selfie:
+            Document.objects.create(
+                owner=verification.user,
+                related_object_type="verification",
+                related_object_id=verification.id,
+                document_type=Document.DocumentType.SELFIE,
+                file=selfie,
+                file_size=selfie.size,
+            )
+
+        from doion.identity.signals import verification_submitted
+        verification_submitted.send(sender=self.__class__, verification=verification)
+
+        return verification

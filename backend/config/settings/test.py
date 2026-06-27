@@ -2,6 +2,8 @@
 With these settings, tests run faster.
 """
 
+from pathlib import Path
+
 from .base import *  # noqa: F403
 from .base import TEMPLATES
 from .base import env
@@ -29,6 +31,19 @@ EMAIL_BACKEND = "django.core.mail.backends.locmem.EmailBackend"
 # DEBUGGING FOR TEMPLATES
 # ------------------------------------------------------------------------------
 TEMPLATES[0]["OPTIONS"]["debug"] = True  # type: ignore[index]
+
+# DATABASES
+# ------------------------------------------------------------------------------
+BASE_DIR = Path(__file__).resolve().parent.parent.parent
+DATABASES = {
+    "default": {
+        "ENGINE": "django.db.backends.sqlite3",
+        "NAME": BASE_DIR / "test_db.sqlite3",
+    }
+}
+
+# Allow sites app to use its default migrations in test environment
+MIGRATION_MODULES = {}
 
 # MEDIA
 # ------------------------------------------------------------------------------

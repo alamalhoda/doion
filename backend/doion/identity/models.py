@@ -18,7 +18,6 @@ class Profile(TimeStampedModel):
         related_name="profile",
     )
     role = models.CharField(
-        _("Role"),
         max_length=20,
         choices=Role.choices,
         default=Role.CHECK_HOLDER,
@@ -31,4 +30,30 @@ class Profile(TimeStampedModel):
         verbose_name_plural = _("Profiles")
 
     def __str__(self):
-        return f"{self.user.username} ({self.role})"
+        return f"{self.user.username} - {self.role}"
+
+
+class Verification(TimeStampedModel):
+    class Status(models.TextChoices):
+        PENDING = "pending", _("Pending")
+        APPROVED = "approved", _("Approved")
+        REJECTED = "rejected", _("Rejected")
+
+    user = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+        related_name="verifications",
+    )
+    full_name = models.CharField(max_length=255)
+    national_id = models.CharField(max_length=10, blank=True)
+    company_name = models.CharField(max_length=255, blank=True)
+    status = models.CharField(max_length=20, choices=Status.choices, default=Status.PENDING)
+    rejection_reason = models.TextField(blank=True)
+    rejection_code = models.CharField(max_length=20, blank=True)
+
+    class Meta:
+        verbose_name = _("Verification")
+        verbose_name_plural = _("Verifications")
+
+    def __str__(self):
+        return f"{self.user.username} - {self.status}"

@@ -2,6 +2,7 @@ from django.conf import settings
 from rest_framework.routers import DefaultRouter
 from rest_framework.routers import SimpleRouter
 
+from doion.identity.api.urls import urlpatterns as verification_urlpatterns
 from doion.identity.urls import urlpatterns as identity_urls
 from doion.users.api.views import LoginViewSet
 from doion.users.api.views import RefreshViewSet
@@ -14,4 +15,4 @@ router.register("auth/login", LoginViewSet, basename="login")
 router.register("auth/refresh", RefreshViewSet, basename="refresh")
 
 app_name = "api"
-urlpatterns = router.urls + identity_urls
+urlpatterns = router.urls + identity_urls + verification_urlpatterns

@@ -10,25 +10,27 @@ import { notificationRoutes } from '@/features/notifications/routes'
 import { workflowRoutes } from '@/features/workflow/routes'
 import { userRoutes } from '@/features/users/routes'
 import { landingRoutes } from '@/features/landing/routes'
+import { verificationRoutes } from '@/features/verification/routes'
 import NotFoundView from '@/views/NotFoundView.vue'
 import { ROUTES } from '@/constants/routes'
 
 const routes: RouteRecordRaw[] = [
-  ...landingRoutes,
-  ...authRoutes,
-  ...adminRoutes,
-  ...dashboardRoutes,
-  ...listingRoutes,
-  ...marketplaceRoutes,
-  ...matchRoutes,
-  ...notificationRoutes,
-  ...workflowRoutes,
-  ...userRoutes,
-  {
-    path: ROUTES.NOT_FOUND,
-    component: NotFoundView,
-  },
-]
+   ...landingRoutes,
+   ...authRoutes,
+   ...adminRoutes,
+   ...dashboardRoutes,
+   ...listingRoutes,
+   ...marketplaceRoutes,
+   ...matchRoutes,
+   ...notificationRoutes,
+   ...workflowRoutes,
+   ...userRoutes,
+   ...verificationRoutes,
+   {
+     path: ROUTES.NOT_FOUND,
+     component: NotFoundView,
+   },
+ ]
 
 const router = createRouter({
   history: createWebHistory(),
