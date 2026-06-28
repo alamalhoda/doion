@@ -1,37 +1,46 @@
 <template>
-  <ComingSoonView
-    title="جزئیات آگهی"
-    description="مشاهده جزئیات آگهی چک"
-    phase="فاز ۳"
-  >
-    <div class="listing-detail">
-      <button
-        class="back-btn"
-        @click="goBack"
+  <div class="listing-detail">
+    <button
+      class="back-btn"
+      @click="goBack"
+    >
+      <svg
+        viewBox="0 0 24 24"
+        width="20"
+        height="20"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="2"
       >
-        <svg
-          viewBox="0 0 24 24"
-          width="20"
-          height="20"
-          fill="none"
-          stroke="currentColor"
-          stroke-width="2"
-        >
-          <path d="M15 18l-6-6 6-6" />
-        </svg>
-        بازگشت
-      </button>
+        <path d="M15 18l-6-6 6-6" />
+      </svg>
+      بازگشت
+    </button>
 
+    <div v-if="isLoading" class="loading-state">
+      در حال بارگذاری...
+    </div>
+
+    <div v-else-if="error" class="error-state">
+      {{ error }}
+      <button class="btn btn--secondary btn--sm" @click="fetchListing">
+        تلاش مجدد
+      </button>
+    </div>
+
+    <div v-else-if="listing" class="detail-content">
       <div class="detail-header">
         <div class="detail-header-info">
           <h1 class="detail-title">
-            {{ listing.title }}
+            {{ listing.bank_name }} — {{ listing.issuer_name }}
           </h1>
           <p class="detail-subtitle">
-            {{ listing.issuer }} · {{ listing.bank }}
+            نوع صادرکننده: {{ issuerTypeLabel }}
           </p>
         </div>
-        <RiskBadge :risk="listing.risk" />
+        <StatusPill :variant="statusVariant">
+          {{ statusLabel }}
+        </StatusPill>
       </div>
 
       <div class="amount-box">
@@ -40,7 +49,7 @@
             مبلغ اسمی چک
           </div>
           <div class="amount-box-value">
-            <small>ریال</small>{{ formatCurrency(listing.amount) }}
+            <small>ریال</small> {{ formattedAmount }}
           </div>
         </div>
       </div>
@@ -55,7 +64,7 @@
               بانک صادرکننده
             </div>
             <div class="detail-field-val">
-              {{ listing.bank }}
+              {{ listing.bank_name }}
             </div>
           </div>
           <div class="detail-field">
@@ -63,7 +72,7 @@
               تاریخ سررسید
             </div>
             <div class="detail-field-val">
-              {{ listing.dueDate }}
+              {{ formattedDueDate }}
             </div>
           </div>
           <div class="detail-field">
@@ -71,7 +80,7 @@
               روز تا سررسید
             </div>
             <div class="detail-field-val">
-              {{ listing.days }} روز
+              {{ daysRemaining }} روز
             </div>
           </div>
           <div class="detail-field">
@@ -79,7 +88,7 @@
               نوع صادرکننده
             </div>
             <div class="detail-field-val">
-              {{ listing.issuerType }}
+              {{ issuerTypeLabel }}
             </div>
           </div>
           <div class="detail-field">
@@ -87,7 +96,7 @@
               نرخ تنزیل پیشنهادی
             </div>
             <div class="detail-field-val detail-field-val--teal">
-              {{ listing.rate }}
+              {{ formattedRate }}
             </div>
           </div>
           <div class="detail-field">
@@ -95,10 +104,19 @@
               شماره صیاد
             </div>
             <div class="detail-field-val">
-              {{ listing.sayad }}
+              {{ listing.cheque_serial_number }}
             </div>
           </div>
         </div>
+      </div>
+
+      <div v-if="listing.description" class="detail-section">
+        <div class="detail-section-title">
+          توضیحات
+        </div>
+        <p class="detail-description">
+          {{ listing.description }}
+        </p>
       </div>
 
       <div class="detail-actions">
@@ -110,54 +128,117 @@
         </button>
       </div>
     </div>
-  </ComingSoonView>
+  </div>
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue'
-import { useRouter } from 'vue-router'
-import ComingSoonView from '@/components/ComingSoonView.vue'
+import { computed, onMounted } from 'vue'
+import { useRoute, useRouter } from 'vue-router'
+import { useListingStore } from '../stores/listingStore'
+import { useFormat } from '@/composables'
+import { useToast } from '@/composables'
+import StatusPill from '@/components/StatusPill.vue'
 
-interface Listing {
-  id: number
-  title: string
-  issuer: string
-  bank: string
-  amount: number
-  days: number
-  risk: 'low' | 'mid' | 'high'
-  rate: string
-  dueDate: string
-  issuerType: string
-  sayad: string
-}
-
+const route = useRoute()
 const router = useRouter()
+const store = useListingStore()
+const { formatCurrency, formatPersianNumber } = useFormat()
+const { showToast } = useToast()
 
-const listing = ref<Listing>({
-  id: 1,
-  title: 'چک ۵۰۰ میلیونی — شرکت آسان‌پرداخت',
-  issuer: 'شرکت آسان‌پرداخت',
-  bank: 'بانک ملت',
-  amount: 500000000,
-  days: 45,
-  risk: 'low',
-  rate: '۳.۸٪',
-  dueDate: '۱۴۰۴/۰۳/۲۰',
-  issuerType: 'حقوقی',
-  sayad: '۱۴۰۲۱۰۳۵۶۸۷۱۲۳',
+const isLoading = computed(() => store.isLoading)
+const error = computed(() => store.error)
+const listing = computed(() => store.currentListing)
+
+const issuerTypeLabel = computed(() => {
+  return listing.value?.issuer_type === 'legal' ? 'حقوقی (شرکت)' : 'حقیقی (شخص)'
 })
 
-const formatCurrency = (value: number) => value.toLocaleString('fa-IR')
+const statusVariant = computed(() => {
+  if (!listing.value) return 'published'
+  switch (listing.value.status) {
+    case 'published':
+      return 'published'
+    case 'pending_moderation':
+      return 'pending_moderation'
+    case 'matched':
+      return 'matched'
+    case 'rejected':
+      return 'rejected'
+    default:
+      return 'published'
+  }
+})
 
-const goBack = () => router.push('/app/listings')
+const statusLabel = computed(() => {
+  if (!listing.value) return ''
+  switch (listing.value.status) {
+    case 'published':
+      return 'منتشر شده'
+    case 'pending_moderation':
+      return 'در انتظار بررسی'
+    case 'matched':
+      return 'تطابق یافته'
+    case 'rejected':
+      return 'رد شده'
+    case 'expired':
+      return 'منقضی شده'
+    case 'withdrawn':
+      return 'برگشت داده شده'
+    case 'settled_off_platform':
+      return 'تسویه شده'
+    default:
+      return listing.value.status
+  }
+})
 
-const expressInterest = () => {
-  console.log('Express interest:', listing.value.id)
+const formattedAmount = computed(() => {
+  if (!listing.value) return '-'
+  return formatPersianNumber(formatCurrency(listing.value.face_amount))
+})
+
+const formattedDueDate = computed(() => {
+  if (!listing.value) return '-'
+  return formatPersianNumber(listing.value.due_date)
+})
+
+const daysRemaining = computed(() => {
+  if (!listing.value) return 0
+  const due = new Date(listing.value.due_date)
+  const now = new Date()
+  const diff = Math.ceil((due.getTime() - now.getTime()) / (1000 * 60 * 60 * 24))
+  return Math.max(0, diff)
+})
+
+const formattedRate = computed(() => {
+  if (!listing.value || listing.value.suggested_discount_rate == null) return '-'
+  return formatPersianNumber(formatCurrency(Number(listing.value.suggested_discount_rate)))
+})
+
+onMounted(() => {
+  const id = route.params.id as string
+  if (id) {
+    fetchListing(id)
+  }
+})
+
+async function fetchListing(id: string) {
+  try {
+    await store.fetchListing(id)
+  } catch {
+    // error handled by store
+  }
+}
+
+function goBack() {
+  window.history.length > 1 ? window.history.back() : router.push('/app/listings')
+}
+
+function expressInterest() {
+  showToast('درخواست شما ثبت شد', 'success')
 }
 </script>
 
-<style>
+<style scoped>
 .listing-detail {
   max-width: 780px;
   margin: 0 auto;
@@ -180,6 +261,26 @@ const expressInterest = () => {
 
 .back-btn:hover {
   color: var(--navy);
+}
+
+.loading-state,
+.error-state {
+  text-align: center;
+  padding: 2rem;
+  color: var(--text3);
+}
+
+.error-state {
+  color: var(--red);
+}
+
+.detail-content {
+  animation: fadeIn 0.2s ease-in-out;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
 }
 
 .detail-header {
@@ -282,6 +383,13 @@ const expressInterest = () => {
 
 .detail-field-val--teal {
   color: var(--teal);
+}
+
+.detail-description {
+  font-size: var(--font-size-base);
+  color: var(--text2);
+  margin: 0;
+  line-height: 1.6;
 }
 
 /* Actions */

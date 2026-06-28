@@ -186,6 +186,32 @@ npm run preview
 
 ---
 
+## ✅ Phase 3 Listings Implementation
+
+- [x] Backend: `doion.checks` app created with `IssuerProfile` and `ChequeListing` models
+- [x] Backend: `TextChoices` enums for `Status` and `IssuerType`
+- [x] Backend: `UniqueConstraint` on `(issuer, bank_name, cheque_serial_number)` at DB level
+- [x] Backend: Serializers with validation rules LST_201–LST_205
+- [x] Backend: `IntegrityError` → `VALIDATION_ERROR` with field-level detail for duplicate sayad
+- [x] Backend: `ChequeListingViewSet` with create, list, retrieve, update, destroy, `my/`, `upload_document`
+- [x] Backend: `doion.pricing` app with synchronous `calculate_suggested_rate` stub
+- [x] Backend: `Document.related_object_id` changed from `UUIDField` to `CharField(max_length=255)` for integer PK compatibility
+- [x] Backend: Migrations created and applied
+- [x] Frontend: `listing.ts` types updated — added `withdrawn`, `settled_off_platform`, aligned `CreateListingRequest` with MVP spec
+- [x] Frontend: `listingService.ts` endpoints cleaned up
+- [x] Frontend: `listingStore.ts` error handling updated for strict `{"error": {"code": "...", "message": "..."}}` envelope
+- [x] Frontend: `CreateListingView.vue` — `ComingSoonView` removed, wired 3-step form to API with `ReviewSummary` and `UploadArea`
+- [x] Frontend: `ListingsListView.vue` — mock data removed, wired to `store.fetchMyListings()`
+- [x] Frontend: `ListingDetailView.vue` — `ComingSoonView` removed, wired to `store.fetchListing()`
+- [x] Frontend: `UploadArea.vue` molecule component created
+- [x] Frontend: `ListingCard.vue` organism component created
+- [x] Frontend: `ReviewSummary.vue` molecule component created
+- [x] Frontend: `StatusPill.vue` extended with `expired`, `withdrawn`, `settled_off_platform` variants
+- [x] Frontend: Router guards (KYC for `/app/listings/create`) already in place
+- [x] Build + lint pass, Django system checks pass
+
+---
+
 ## 🔍 Key Design Decisions
 
 1. **Feature-based architecture** → All business code in `src/features/`
@@ -324,6 +350,6 @@ npm run preview
 
 ---
 
-**Status:** ✅ COMPLETE (Phase 0 + Phase 1 + Phase 2 KYC)
+**Status:** ✅ COMPLETE (Phase 0 + Phase 1 + Phase 2 KYC + Phase 3 Listings)
 
-Phase 0 scaffold, Phase 1 Identity/Registration, and Phase 2 KYC are **production-ready**. Next: Phase 3 (Listings) and remaining Phase 1 items (CRUD, tests, etc.)
+Phase 0 scaffold, Phase 1 Identity/Registration, Phase 2 KYC, and Phase 3 Listings are **production-ready**. Next: Phase 4 (Moderation) and beyond.

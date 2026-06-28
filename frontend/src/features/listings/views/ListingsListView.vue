@@ -31,91 +31,78 @@
       آگهی‌های جاری
     </h2>
 
-    <div class="listing-rows">
-      <div
+    <div v-if="isLoading" class="loading-state">
+      در حال بارگذاری...
+    </div>
+
+    <div v-else-if="error" class="error-state">
+      {{ error }}
+      <button class="btn btn--secondary btn--sm" @click="fetchListings">
+        تلاش مجدد
+      </button>
+    </div>
+
+    <div v-else-if="listings.length === 0" class="empty-state">
+      شما تا کنون آگهی ثبت نکرده‌اید.
+    </div>
+
+    <div v-else class="listing-rows">
+      <ListingCard
         v-for="item in listings"
         :key="item.id"
-        class="listing-row"
-        @click="goToDetail(item.id)"
-      >
-        <div class="listing-row-icon">
-          <svg
-            viewBox="0 0 24 24"
-            width="20"
-            height="20"
-            fill="var(--gold-light)"
-          >
-            <path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-2 4h-3v5.5c0 1.38-1.12 2.5-2.5 2.5S9 13.88 9 12.5 10.12 10 11.5 10c.57 0 1.08.19 1.5.5V7h4v0z" />
-          </svg>
-        </div>
-        <div class="listing-row-info">
-          <h4 class="listing-row-title">
-            {{ item.title }}
-          </h4>
-          <p class="listing-row-meta">
-            {{ item.meta }}
-          </p>
-        </div>
-        <div class="listing-row-amount">
-          {{ formatCurrency(item.amount) }}
-          <small>ریال</small>
-        </div>
-        <StatusPill :variant="item.statusVariant">
-          {{ item.status }}
-        </StatusPill>
-      </div>
+        :listing="item"
+      />
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue'
+import { ref, computed, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
-import StatusPill from '@/components/StatusPill.vue'
+import { useListingStore } from '../stores/listingStore'
 import { useFormat } from '@/composables'
+import ListingCard from '../components/ListingCard.vue'
 
 const router = useRouter()
-const { formatCurrency } = useFormat()
+const store = useListingStore()
+const { formatPersianNumber } = useFormat()
+
+const isLoading = computed(() => store.isLoading)
+const error = computed(() => store.error)
+const listings = computed(() => store.listings)
 
 const stats = ref([
-  { label: 'آگهی فعال', value: '۳' },
-  { label: 'در انتظار بررسی', value: '۱' },
-  { label: 'تطابق یافته', value: '۲' },
-  { label: 'مجموع آگهی', value: '۱.۲ میلیارد' },
+  { label: 'آگهی فعال', value: '۰' },
+  { label: 'در انتظار بررسی', value: '۰' },
+  { label: 'تطابق یافته', value: '۰' },
+  { label: 'مجموع آگهی', value: '۰' },
 ])
 
-const listings = ref([
-  {
-    id: 1,
-    title: 'چک بانک ملت — شرکت آسان‌پرداخت',
-    meta: 'سررسید: ۱۴۰۴/۰۳/۲۰ · ۴۵ روز دیگر · ۳ درخواست سرمایه‌گذار',
-    amount: 500000000,
-    status: 'منتشر شده',
-    statusVariant: 'published',
-  },
-  {
-    id: 2,
-    title: 'چک بانک صادرات — محمدرضا احمدی',
-    meta: 'سررسید: ۱۴۰۴/۰۵/۱۰ · ۹۵ روز دیگر · ۱ تطابق قطعی',
-    amount: 120000000,
-    status: 'تطابق‌یافته',
-    statusVariant: 'matched',
-  },
-  {
-    id: 3,
-    title: 'چک بانک پارسیان — شرکت فناوری ایده‌آل',
-    meta: 'ثبت‌شده: دیروز · در انتظار تأیید مدیریت',
-    amount: 600000000,
-    status: 'در انتظار بررسی',
-    statusVariant: 'pending',
-  },
-])
+onMounted(() => {
+  fetchListings()
+  updateStats()
+})
 
-const goToCreate = () => router.push('/app/listings/create')
-const goToDetail = (id: number) => router.push(`/app/listings/${id}`)
+function fetchListings() {
+  store.fetchMyListings().catch(() => {})
+}
+
+function updateStats() {
+  const list = store.listings
+  stats.value = [
+    { label: 'آگهی فعال', value: formatPersianNumber(list.filter(l => l.status === 'published').length) },
+    { label: 'در انتظار بررسی', value: formatPersianNumber(list.filter(l => l.status === 'pending_moderation').length) },
+    { label: 'تطابق یافته', value: formatPersianNumber(list.filter(l => l.status === 'matched').length) },
+    { label: 'مجموع آگهی', value: formatPersianNumber(list.length) },
+  ]
+}
+
+function goToCreate() {
+  router.push('/app/listings/create')
+}
 </script>
 
-<style>
+<style scoped>
 .listing-list {
   max-width: 1100px;
   margin: 0 auto;
@@ -177,74 +164,21 @@ const goToDetail = (id: number) => router.push(`/app/listings/${id}`)
   gap: 0.75rem;
 }
 
-.listing-row {
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: var(--radius);
-  padding: 1rem 1.25rem;
-  display: grid;
-  grid-template-columns: auto 1fr auto auto;
-  gap: 1rem;
-  align-items: center;
-  transition: border-color var(--transition-fast);
-  cursor: pointer;
-}
-
-.listing-row:hover {
-  border-color: var(--border2);
-}
-
-.listing-row-icon {
-  width: 40px;
-  height: 40px;
-  background: var(--navy);
-  border-radius: var(--radius-sm);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.listing-row-title {
-  font-size: var(--font-size-md);
-  font-weight: var(--font-weight-semibold);
-  color: var(--navy);
-  margin: 0 0 0.2rem;
-}
-
-.listing-row-meta {
-  font-size: var(--font-size-xs);
+.loading-state,
+.empty-state,
+.error-state {
+  text-align: center;
+  padding: 2rem;
   color: var(--text3);
-  margin: 0;
 }
 
-.listing-row-amount {
-  font-size: var(--font-size-md);
-  font-weight: var(--font-weight-semibold);
-  color: var(--text1);
-  text-align: left;
-}
-
-.listing-row-amount small {
-  font-size: var(--font-size-xs);
-  color: var(--text3);
-  font-weight: var(--font-weight-normal);
+.error-state {
+  color: var(--red);
 }
 
 @media (max-width: 768px) {
   .stats-grid-user {
     grid-template-columns: repeat(2, 1fr);
-  }
-
-  .listing-row {
-    grid-template-columns: 1fr auto;
-  }
-
-  .listing-row-icon {
-    display: none;
-  }
-
-  .listing-row-amount {
-    text-align: right;
   }
 }
 </style>

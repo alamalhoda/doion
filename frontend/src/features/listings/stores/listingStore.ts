@@ -4,21 +4,26 @@ import { ref, computed } from 'vue'
 import { ListingService } from '../services/listingService'
 import type { ChequeListing, CreateListingRequest, ListingFilters, UpdateListingRequest } from '../types/listing'
 
+function extractErrorMessage(err: unknown): string {
+  const anyErr = err as { response?: { data?: { error?: { message?: string } } } }
+  return anyErr?.response?.data?.error?.message || (err as Error).message || 'error.unknown'
+}
+
 export const useListingStore = defineStore('listing', () => {
   const listings = ref<ChequeListing[]>([])
   const currentListing = ref<ChequeListing | null>(null)
   const isLoading = ref(false)
   const error = ref<string | null>(null)
 
-  const pendingListings = computed(() => 
+  const pendingListings = computed(() =>
     listings.value.filter(l => l.status === 'pending_moderation')
   )
 
-  const publishedListings = computed(() => 
+  const publishedListings = computed(() =>
     listings.value.filter(l => l.status === 'published')
   )
 
-  const matchedListings = computed(() => 
+  const matchedListings = computed(() =>
     listings.value.filter(l => l.status === 'matched')
   )
 
@@ -31,7 +36,7 @@ export const useListingStore = defineStore('listing', () => {
       listings.value.unshift(listing)
       return listing
     } catch (err: unknown) {
-      error.value = (err as { message?: string }).message || 'error.unknown'
+      error.value = extractErrorMessage(err)
       throw err
     } finally {
       isLoading.value = false
@@ -46,13 +51,13 @@ export const useListingStore = defineStore('listing', () => {
       const data = await ListingService.getMyListings()
       listings.value = data
     } catch (err: unknown) {
-      error.value = (err as { message?: string }).message || 'error.unknown'
+      error.value = extractErrorMessage(err)
     } finally {
       isLoading.value = false
     }
   }
 
-  async function updateListing(id: string, data: UpdateListingRequest): Promise<void> {
+  async function updateListing(id: string | number, data: UpdateListingRequest): Promise<void> {
     isLoading.value = true
     error.value = null
 
@@ -66,14 +71,14 @@ export const useListingStore = defineStore('listing', () => {
         currentListing.value = updated
       }
     } catch (err: unknown) {
-      error.value = (err as { message?: string }).message || 'error.unknown'
+      error.value = extractErrorMessage(err)
       throw err
     } finally {
       isLoading.value = false
     }
   }
 
-  async function deleteListing(id: string): Promise<void> {
+  async function deleteListing(id: string | number): Promise<void> {
     isLoading.value = true
     error.value = null
 
@@ -81,14 +86,14 @@ export const useListingStore = defineStore('listing', () => {
       await ListingService.deleteListing(id)
       listings.value = listings.value.filter(l => l.id !== id)
     } catch (err: unknown) {
-      error.value = (err as { message?: string }).message || 'error.unknown'
+      error.value = extractErrorMessage(err)
       throw err
     } finally {
       isLoading.value = false
     }
   }
 
-  async function fetchListing(id: string): Promise<ChequeListing> {
+  async function fetchListing(id: string | number): Promise<ChequeListing> {
     isLoading.value = true
     error.value = null
 
@@ -97,7 +102,7 @@ export const useListingStore = defineStore('listing', () => {
       currentListing.value = listing
       return listing
     } catch (err: unknown) {
-      error.value = (err as { message?: string }).message || 'error.unknown'
+      error.value = extractErrorMessage(err)
       throw err
     } finally {
       isLoading.value = false
@@ -112,7 +117,7 @@ export const useListingStore = defineStore('listing', () => {
       const data = await ListingService.getMarketplaceListings(params)
       listings.value = data
     } catch (err: unknown) {
-      error.value = (err as { message?: string }).message || 'error.unknown'
+      error.value = extractErrorMessage(err)
     } finally {
       isLoading.value = false
     }
@@ -126,7 +131,7 @@ export const useListingStore = defineStore('listing', () => {
       const data = await ListingService.getAllListings({ status: 'pending_moderation' })
       listings.value = [...listings.value, ...data]
     } catch (err: unknown) {
-      error.value = (err as { message?: string }).message || 'error.unknown'
+      error.value = extractErrorMessage(err)
     } finally {
       isLoading.value = false
     }

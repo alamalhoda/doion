@@ -1,10 +1,9 @@
 <template>
   <div
-    class="listing-card-compact"
-    :class="{ 'listing-card-compact--clickable': clickable }"
-    @click="onClick"
+    class="listing-card"
+    @click="goToDetail"
   >
-    <div class="row-icon">
+    <div class="listing-card-icon">
       <svg
         viewBox="0 0 24 24"
         width="20"
@@ -14,73 +13,98 @@
         <path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-2 4h-3v5.5c0 1.38-1.12 2.5-2.5 2.5S9 13.88 9 12.5 10.12 10 11.5 10c.57 0 1.08.19 1.5.5V7h4v0z" />
       </svg>
     </div>
-    <div class="row-info">
-      <div class="row-title">
-        {{ listing.title }}
-      </div>
-      <div class="row-meta">
-        {{ listing.meta }}
-      </div>
+    <div class="listing-card-info">
+      <h4 class="listing-card-title">
+        {{ listing.bank_name }} — {{ listing.issuer_name }}
+      </h4>
+      <p class="listing-card-meta">
+        سررسید: {{ formattedDueDate }} · {{ daysRemaining }} روز دیگر
+      </p>
     </div>
-    <div class="row-amount">
-      {{ formatCurrency(listing.face_amount) }}
+    <div class="listing-card-amount">
+      {{ formattedAmount }}
       <small>ریال</small>
     </div>
-    <div class="row-status">
-      <StatusPill :variant="statusVariant">
-        {{ listing.statusLabel }}
-      </StatusPill>
-    </div>
+    <StatusPill :variant="statusVariant">
+      {{ statusLabel }}
+    </StatusPill>
   </div>
 </template>
 
 <script setup lang="ts">
 import { computed } from 'vue'
+import { useRouter } from 'vue-router'
+import { useFormat } from '@/composables'
 import StatusPill from '@/components/StatusPill.vue'
-import type { ChequeListing } from '@/features/listings/types/listing'
+import type { ChequeListing } from '../types/listing'
 
-const props = withDefaults(
-  defineProps<{
-    listing: ChequeListing & { title: string; meta: string; statusLabel: string; statusVariant: 'published' | 'matched' | 'pending' | 'reviewing' | 'rejected' | 'approved' | 'kyc-pending' }
-    clickable?: boolean
-  }>(),
-  {
-    clickable: true,
-  }
-)
-
-const emit = defineEmits<{
-  (e: 'click'): void
+const props = defineProps<{
+  listing: ChequeListing
 }>()
+
+const router = useRouter()
+const { formatCurrency, formatPersianNumber } = useFormat()
 
 const statusVariant = computed(() => {
   switch (props.listing.status) {
     case 'published':
       return 'published'
+    case 'pending_moderation':
+      return 'pending_moderation'
     case 'matched':
       return 'matched'
-    case 'pending_moderation':
-      return 'pending'
     case 'rejected':
       return 'rejected'
-    case 'settled':
-      return 'matched'
     case 'expired':
-      return 'rejected'
-    default:
       return 'reviewing'
+    default:
+      return 'published'
   }
 })
 
-const formatCurrency = (value: number) => value.toLocaleString('fa-IR')
+const statusLabel = computed(() => {
+  switch (props.listing.status) {
+    case 'published':
+      return 'منتشر شده'
+    case 'pending_moderation':
+      return 'در انتظار بررسی'
+    case 'matched':
+      return 'تطابق یافته'
+    case 'rejected':
+      return 'رد شده'
+    case 'expired':
+      return 'منقضی شده'
+    case 'withdrawn':
+      return 'برگشت داده شده'
+    case 'settled_off_platform':
+      return 'تسویه شده'
+    default:
+      return props.listing.status
+  }
+})
 
-const onClick = () => {
-  if (props.clickable) emit('click')
+const formattedAmount = computed(() => {
+  return formatPersianNumber(formatCurrency(props.listing.face_amount))
+})
+
+const formattedDueDate = computed(() => {
+  return formatPersianNumber(props.listing.due_date)
+})
+
+const daysRemaining = computed(() => {
+  const due = new Date(props.listing.due_date)
+  const now = new Date()
+  const diff = Math.ceil((due.getTime() - now.getTime()) / (1000 * 60 * 60 * 24))
+  return formatPersianNumber(String(Math.max(0, diff)))
+})
+
+function goToDetail() {
+  router.push(`/app/listings/${props.listing.id}`)
 }
 </script>
 
-<style>
-.listing-card-compact {
+<style scoped>
+.listing-card {
   background: var(--surface);
   border: 1px solid var(--border);
   border-radius: var(--radius);
@@ -89,18 +113,15 @@ const onClick = () => {
   grid-template-columns: auto 1fr auto auto;
   gap: 1rem;
   align-items: center;
-  transition: border-color 0.2s;
-}
-
-.listing-card-compact--clickable {
+  transition: border-color var(--transition-fast);
   cursor: pointer;
 }
 
-.listing-card-compact--clickable:hover {
+.listing-card:hover {
   border-color: var(--border2);
 }
 
-.row-icon {
+.listing-card-icon {
   width: 40px;
   height: 40px;
   background: var(--navy);
@@ -110,46 +131,42 @@ const onClick = () => {
   justify-content: center;
 }
 
-.row-title {
+.listing-card-title {
   font-size: var(--font-size-md);
   font-weight: var(--font-weight-semibold);
   color: var(--navy);
   margin: 0 0 0.2rem;
 }
 
-.row-meta {
+.listing-card-meta {
   font-size: var(--font-size-xs);
   color: var(--text3);
   margin: 0;
 }
 
-.row-amount {
+.listing-card-amount {
   font-size: var(--font-size-md);
   font-weight: var(--font-weight-semibold);
   color: var(--text1);
   text-align: left;
 }
 
-.row-amount small {
+.listing-card-amount small {
   font-size: var(--font-size-xs);
   color: var(--text3);
   font-weight: var(--font-weight-normal);
 }
 
-.row-status {
-  text-align: left;
-}
-
 @media (max-width: 768px) {
-  .listing-card-compact {
+  .listing-card {
     grid-template-columns: 1fr auto;
   }
 
-  .row-icon {
+  .listing-card-icon {
     display: none;
   }
 
-  .row-amount {
+  .listing-card-amount {
     text-align: right;
   }
 }

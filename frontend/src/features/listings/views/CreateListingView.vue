@@ -1,336 +1,293 @@
 <template>
-  <ComingSoonView
-    title="ثبت آگهی جدید"
-    description="ثبت آگهی چک در ۳ مرحله"
-    phase="فاز ۳"
-  >
-    <div class="create-listing">
-      <div class="create-header">
-        <h1 class="create-title">
-          ثبت آگهی چک
-        </h1>
-        <p class="create-subtitle">
-          اطلاعات چک خود را وارد کنید تا سرمایه‌گذاران مناسب پیدا کنند.
-        </p>
-      </div>
+  <div class="create-listing">
+    <div class="create-header">
+      <h1 class="create-title">
+        ثبت آگهی چک
+      </h1>
+      <p class="create-subtitle">
+        اطلاعات چک خود را وارد کنید تا سرمایه‌گذاران مناسب پیدا کنند.
+      </p>
+    </div>
 
-      <Stepper
-        :steps="steps"
-        :current="currentStep"
-      />
+    <Stepper
+      :steps="steps"
+      :current="currentStep"
+    />
 
-      <div class="form-panel">
-        <!-- Step 1: Cheque Info -->
-        <div v-if="currentStep === 1">
-          <div class="form-grid-2">
-            <div class="form-row">
-              <label class="form-label">مبلغ اسمی چک <span class="required">*</span></label>
-              <input
-                v-model="form.amount"
-                class="form-input"
-                placeholder="مثال: ۵۰۰٬۰۰۰٬۰۰۰"
-              >
-              <div class="form-hint">
-                واحد: ریال
-              </div>
-            </div>
-            <div class="form-row">
-              <label class="form-label">تاریخ سررسید <span class="required">*</span></label>
-              <input
-                v-model="form.dueDate"
-                class="form-input"
-                placeholder="مثال: ۱۴۰۴/۰۶/۱۵"
-              >
-            </div>
-          </div>
-
-          <div class="form-grid-2">
-            <div class="form-row">
-              <label class="form-label">نام بانک صادرکننده <span class="required">*</span></label>
-              <select
-                v-model="form.bank"
-                class="form-input"
-              >
-                <option value="">
-                  انتخاب بانک
-                </option>
-                <option>بانک ملی ایران</option>
-                <option>بانک صادرات</option>
-                <option>بانک تجارت</option>
-                <option>بانک ملت</option>
-                <option>بانک پارسیان</option>
-                <option>بانک پاسارگاد</option>
-                <option>سایر</option>
-              </select>
-            </div>
-            <div class="form-row">
-              <label class="form-label">شماره صیاد چک <span class="required">*</span></label>
-              <input
-                v-model="form.sayad"
-                class="form-input"
-                placeholder="کد ۱۶ رقمی صیاد"
-              >
-              <div class="form-hint">
-                از سامانه صیاد بانک مرکزی
-              </div>
-            </div>
-          </div>
-
+    <div class="form-panel">
+      <!-- Step 1: Cheque Info -->
+      <div v-if="currentStep === 1">
+        <div class="form-grid-2">
           <div class="form-row">
-            <label class="form-label">نوع صادرکننده چک <span class="required">*</span></label>
-            <div class="form-radio-group">
-              <label class="form-radio">
-                <input
-                  v-model="form.issuerType"
-                  type="radio"
-                  value="legal"
-                >
-                <span>حقوقی (شرکت)</span>
-              </label>
-              <label class="form-radio">
-                <input
-                  v-model="form.issuerType"
-                  type="radio"
-                  value="natural"
-                >
-                <span>حقیقی (شخص)</span>
-              </label>
-            </div>
-          </div>
-
-          <div class="form-grid-2">
-            <div class="form-row">
-              <label class="form-label">نام صادرکننده <span class="required">*</span></label>
-              <input
-                v-model="form.issuer"
-                class="form-input"
-                placeholder="نام کامل یا نام شرکت"
-              >
-            </div>
-            <div class="form-row">
-              <label class="form-label">کد ملی / شناسه ملی <span class="required">*</span></label>
-              <input
-                v-model="form.nationalId"
-                class="form-input"
-                placeholder="۱۰ رقم"
-              >
-            </div>
-          </div>
-
-          <div class="form-row">
-            <label class="form-label">توضیحات تکمیلی</label>
-            <textarea
-              v-model="form.notes"
-              class="form-input form-textarea"
-              rows="3"
-              placeholder="هر اطلاعات اضافی درباره صادرکننده یا دلیل نقد کردن چک..."
-            />
-          </div>
-
-          <div class="rate-banner">
-            <strong>نرخ تنزیل پیشنهادی:</strong> بر اساس اطلاعات وارد‌شده، سامانه نرخی بین ۳٪ تا ۸٪ پیشنهاد خواهد داد. نرخ نهایی توسط سرمایه‌گذار تعیین می‌شود.
-          </div>
-
-          <div class="form-actions">
-            <button
-              class="btn btn--primary"
-              @click="goStep(2)"
+            <label class="form-label">مبلغ اسمی چک <span class="required">*</span></label>
+            <input
+              v-model="form.amount"
+              class="form-input"
+              placeholder="مثال: ۵۰۰٬۰۰۰٬۰۰۰"
+              type="number"
+              min="1"
             >
-              ادامه — بارگذاری مدارک
-            </button>
+            <div class="form-hint">
+              واحد: ریال
+            </div>
+          </div>
+          <div class="form-row">
+            <label class="form-label">تاریخ سررسید <span class="required">*</span></label>
+            <input
+              v-model="form.dueDate"
+              class="form-input"
+              placeholder="مثال: ۱۴۰۴/۰۶/۱۵"
+              type="date"
+            >
           </div>
         </div>
 
-        <!-- Step 2: Documents -->
-        <div v-if="currentStep === 2">
+        <div class="form-grid-2">
           <div class="form-row">
-            <label class="form-label">تصویر چک <span class="required">*</span></label>
-            <div
-              class="upload-area"
-              @click="toast('در نسخه نمونه، بارگذاری فایل فعال نیست')"
+            <label class="form-label">نام بانک صادرکننده <span class="required">*</span></label>
+            <select
+              v-model="form.bank"
+              class="form-input"
             >
-              <div class="upload-icon">
-                📄
-              </div>
-              <p>تصویر واضح از جلو و پشت چک را بارگذاری کنید</p>
-              <p class="upload-hint">
-                فرمت‌های مجاز: JPG، PNG، PDF — حداکثر ۵ مگابایت
-              </p>
-            </div>
+              <option value="">
+                انتخاب بانک
+              </option>
+              <option>بانک ملی ایران</option>
+              <option>بانک صادرات</option>
+              <option>بانک تجارت</option>
+              <option>بانک ملت</option>
+              <option>بانک پارسیان</option>
+              <option>بانک پاسارگاد</option>
+              <option>سایر</option>
+            </select>
           </div>
-
           <div class="form-row">
-            <label class="form-label">مدارک صادرکننده <span class="required">*</span></label>
-            <div
-              class="upload-area"
-              @click="toast('در نسخه نمونه، بارگذاری فایل فعال نیست')"
+            <label class="form-label">شماره صیاد چک <span class="required">*</span></label>
+            <input
+              v-model="form.sayad"
+              class="form-input"
+              placeholder="کد ۱۶ رقمی صیاد"
+              maxlength="16"
             >
-              <div class="upload-icon">
-                🪪
-              </div>
-              <p>تصویر کارت ملی یا شناسه صادرکننده</p>
+            <div class="form-hint">
+              از سامانه صیاد بانک مرکزی
             </div>
-          </div>
-
-          <div class="form-row">
-            <label class="form-label">مدارک تکمیلی (اختیاری)</label>
-            <div
-              class="upload-area"
-              @click="toast('در نسخه نمونه، بارگذاری فایل فعال نیست')"
-            >
-              <div class="upload-icon">
-                📋
-              </div>
-              <p>گواهی امضاء، قرارداد مرتبط، یا سایر مستندات</p>
-            </div>
-          </div>
-
-          <div class="form-actions">
-            <button
-              class="btn btn--secondary"
-              @click="goStep(1)"
-            >
-              بازگشت
-            </button>
-            <button
-              class="btn btn--primary"
-              @click="goStep(3)"
-            >
-              ادامه — تأیید نهایی
-            </button>
           </div>
         </div>
 
-        <!-- Step 3: Review -->
-        <div v-if="currentStep === 3">
-          <div class="review-box">
-            <div class="review-title">
-              خلاصه آگهی شما
-            </div>
-            <div class="review-grid">
-              <div class="review-item">
-                <div class="review-key">
-                  مبلغ
-                </div>
-                <div class="review-value">
-                  ۵۰۰٬۰۰۰٬۰۰۰ ریال
-                </div>
-              </div>
-              <div class="review-item">
-                <div class="review-key">
-                  سررسید
-                </div>
-                <div class="review-value">
-                  ۱۴۰۴/۰۶/۱۵
-                </div>
-              </div>
-              <div class="review-item">
-                <div class="review-key">
-                  بانک
-                </div>
-                <div class="review-value">
-                  بانک ملت
-                </div>
-              </div>
-              <div class="review-item">
-                <div class="review-key">
-                  سطح ریسک
-                </div>
-                <div class="review-value review-value--teal">
-                  کم ریسک
-                </div>
-              </div>
-              <div class="review-item">
-                <div class="review-key">
-                  نرخ تنزیل پیشنهادی
-                </div>
-                <div class="review-value review-value--teal">
-                  ۴.۲٪
-                </div>
-              </div>
-              <div class="review-item">
-                <div class="review-key">
-                  وضعیت
-                </div>
-                <div class="review-value review-value--orange">
-                  در انتظار بررسی
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <div class="info-banner">
-            پس از ثبت، آگهی شما توسط تیم بررسی (Moderation) پلتفرم بازبینی می‌شود. در صورت تأیید، در اسرع وقت منتشر خواهد شد.
-          </div>
-
-          <div class="form-row">
-            <label class="form-checkbox">
-              <input type="checkbox">
-              <span>قوانین و مقررات پلتفرم را خوانده‌ام و می‌پذیرم. درک می‌کنم که چک‌بازار صرفاً یک بازارچه اطلاعاتی است و مسئولیت صحت حقوقی معامله با طرفین است.</span>
+        <div class="form-row">
+          <label class="form-label">نوع صادرکننده چک <span class="required">*</span></label>
+          <div class="form-radio-group">
+            <label class="form-radio">
+              <input
+                v-model="form.issuerType"
+                type="radio"
+                value="legal"
+              >
+              <span>حقوقی (شرکت)</span>
+            </label>
+            <label class="form-radio">
+              <input
+                v-model="form.issuerType"
+                type="radio"
+                value="natural"
+              >
+              <span>حقیقی (شخص)</span>
             </label>
           </div>
+        </div>
 
-          <div class="form-actions">
-            <button
-              class="btn btn--secondary"
-              @click="goStep(2)"
+        <div class="form-grid-2">
+          <div class="form-row">
+            <label class="form-label">نام صادرکننده <span class="required">*</span></label>
+            <input
+              v-model="form.issuer"
+              class="form-input"
+              placeholder="نام کامل یا نام شرکت"
             >
-              بازگشت
-            </button>
-            <button
-              class="btn btn--primary"
-              @click="submit"
+          </div>
+          <div class="form-row">
+            <label class="form-label">کد ملی / شناسه ملی <span class="required">*</span></label>
+            <input
+              v-model="form.nationalId"
+              class="form-input"
+              placeholder="۱۰ رقم"
             >
-              ثبت نهایی آگهی
-            </button>
           </div>
         </div>
 
-        <!-- Success -->
-        <div
-          v-if="currentStep === 'success'"
-          class="success-box"
-        >
-          <div class="success-icon">
-            ✓
-          </div>
-          <h3 class="success-title">
-            آگهی شما با موفقیت ثبت شد!
-          </h3>
-          <p class="success-text">
-            آگهی در صف بررسی قرار گرفت. پس از تأیید توسط تیم مدیریت، در بازارچه منتشر می‌شود.
-          </p>
-          <div class="success-actions">
-            <button
-              class="btn btn--primary"
-              @click="goToDashboard"
+        <div class="form-row">
+          <label class="form-label">توضیحات تکمیلی</label>
+          <textarea
+            v-model="form.notes"
+            class="form-input form-textarea"
+            rows="3"
+            placeholder="هر اطلاعات اضافی درباره صادرکننده یا دلیل نقد کردن چک..."
+          />
+        </div>
+
+        <div class="rate-banner">
+          <strong>نرخ تنزیل پیشنهادی:</strong> بر اساس اطلاعات وارد‌شده، سامانه نرخی بین ۳٪ تا ۸٪ پیشنهاد خواهد داد. نرخ نهایی توسط سرمایه‌گذار تعیین می‌شود.
+        </div>
+
+        <div class="form-actions">
+          <button
+            class="btn btn--primary"
+            :disabled="!isStep1Valid"
+            @click="goStep(2)"
+          >
+            ادامه — بارگذاری مدارک
+          </button>
+        </div>
+      </div>
+
+      <!-- Step 2: Documents -->
+      <div v-if="currentStep === 2">
+        <div class="form-row">
+          <label class="form-label">تصویر چک <span class="required">*</span></label>
+          <UploadArea
+            accept="image/*,.pdf"
+            :max-size="5 * 1024 * 1024"
+            label="تصویر واضح از جلو و پشت چک را بارگذاری کنید"
+            hint="فرمت‌های مجاز: JPG، PNG، PDF — حداکثر ۵ مگابایت"
+            document-type="cheque_image"
+            @change="onChequeImageChange"
+            @error="onUploadError"
+          />
+        </div>
+
+        <div class="form-row">
+          <label class="form-label">مدارک صادرکننده <span class="required">*</span></label>
+          <UploadArea
+            accept="image/*,.pdf"
+            :max-size="5 * 1024 * 1024"
+            label="تصویر کارت ملی یا شناسه صادرکننده"
+            document-type="id_document"
+            @change="onIdDocChange"
+            @error="onUploadError"
+          />
+        </div>
+
+        <div class="form-row">
+          <label class="form-label">مدارک تکمیلی (اختیاری)</label>
+          <UploadArea
+            accept="image/*,.pdf"
+            :max-size="5 * 1024 * 1024"
+            label="گواهی امضاء، قرارداد مرتبط، یا سایر مستندات"
+            document-type="supplementary"
+            @change="onSupplementaryChange"
+            @error="onUploadError"
+          />
+        </div>
+
+        <div class="form-actions">
+          <button
+            class="btn btn--secondary"
+            @click="goStep(1)"
+          >
+            بازگشت
+          </button>
+          <button
+            class="btn btn--primary"
+            :disabled="!hasChequeImage"
+            @click="goStep(3)"
+          >
+            ادامه — تأیید نهایی
+          </button>
+        </div>
+      </div>
+
+      <!-- Step 3: Review -->
+      <div v-if="currentStep === 3">
+        <ReviewSummary :listing="reviewListing" />
+
+        <div class="info-banner">
+          پس از ثبت، آگهی شما توسط تیم بررسی (Moderation) پلتفرم بازبینی می‌شود. در صورت تأیید، در اسرع وقت منتشر خواهد شد.
+        </div>
+
+        <div class="form-row">
+          <label class="form-checkbox">
+            <input
+              v-model="acceptedTerms"
+              type="checkbox"
             >
-              مشاهده داشبورد
-            </button>
-            <button
-              class="btn btn--secondary"
-              @click="goToMarketplace"
-            >
-              بازگشت به بازارچه
-            </button>
-          </div>
+            <span>قوانین و مقررات پلتفرم را خوانده‌ام و می‌پذیرم. درک می‌کنم که چک‌بازار صرفاً یک بازارچه اطلاعاتی است و مسئولیت صحت حقوقی معامله با طرفین است.</span>
+          </label>
+        </div>
+
+        <div v-if="error" class="error-banner">
+          {{ error }}
+        </div>
+
+        <div class="form-actions">
+          <button
+            class="btn btn--secondary"
+            @click="goStep(2)"
+            :disabled="isSubmitting"
+          >
+            بازگشت
+          </button>
+          <button
+            class="btn btn--primary"
+            :disabled="!acceptedTerms || isSubmitting"
+            @click="submit"
+          >
+            {{ isSubmitting ? 'در حال ثبت...' : 'ثبت نهایی آگهی' }}
+          </button>
+        </div>
+      </div>
+
+      <!-- Success -->
+      <div
+        v-if="currentStep === 'success'"
+        class="success-box"
+      >
+        <div class="success-icon">
+          ✓
+        </div>
+        <h3 class="success-title">
+          آگهی شما با موفقیت ثبت شد!
+        </h3>
+        <p class="success-text">
+          آگهی در صف بررسی قرار گرفت. پس از تأیید توسط تیم مدیریت، در بازارچه منتشر می‌شود.
+        </p>
+        <div class="success-actions">
+          <button
+            class="btn btn--primary"
+            @click="goToDashboard"
+          >
+            مشاهده داشبورد
+          </button>
+          <button
+            class="btn btn--secondary"
+            @click="goToMarketplace"
+          >
+            بازگشت به بازارچه
+          </button>
         </div>
       </div>
     </div>
-  </ComingSoonView>
+  </div>
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue'
+import { ref, computed } from 'vue'
 import { useRouter } from 'vue-router'
 import Stepper from '@/components/Stepper.vue'
 import { useToast } from '@/composables'
-import ComingSoonView from '@/components/ComingSoonView.vue'
+import { useListingStore } from '../stores/listingStore'
+import UploadArea from '../components/UploadArea.vue'
+import ReviewSummary from '../components/ReviewSummary.vue'
+import type { ChequeListing } from '../types/listing'
+import { ListingService } from '../services/listingService'
 
 const router = useRouter()
 const { showToast } = useToast()
+const listingStore = useListingStore()
 
 const currentStep = ref<number | string>(1)
+const isSubmitting = ref(false)
+const acceptedTerms = ref(false)
 
 const steps = [
   { index: 1, label: 'اطلاعات چک' },
@@ -339,33 +296,131 @@ const steps = [
 ]
 
 const form = ref({
-  amount: '',
+  amount: null as number | null,
   dueDate: '',
   bank: '',
   sayad: '',
-  issuerType: 'natural',
+  issuerType: 'natural' as 'legal' | 'natural',
   issuer: '',
   nationalId: '',
   notes: '',
 })
 
-const goStep = (step: number | string) => {
+const chequeImageFile = ref<File | null>(null)
+const idDocFile = ref<File | null>(null)
+
+const error = computed(() => listingStore.error)
+
+const isStep1Valid = computed(() => {
+  return (
+    form.value.amount != null &&
+    form.value.amount > 0 &&
+    form.value.dueDate &&
+    form.value.bank &&
+    form.value.sayad &&
+    form.value.sayad.length === 16 &&
+    form.value.issuer &&
+    form.value.nationalId
+  )
+})
+
+const hasChequeImage = computed(() => chequeImageFile.value !== null)
+
+const reviewListing = computed<ChequeListing>(() => ({
+  id: 0,
+  owner_id: 0,
+  issuer_id: 0,
+  bank_name: form.value.bank,
+  cheque_serial_number: form.value.sayad,
+  face_amount: form.value.amount || 0,
+  due_date: form.value.dueDate,
+  issuer_type: form.value.issuerType,
+  issuer_name: form.value.issuer,
+  issuer_national_id: form.value.nationalId,
+  description: form.value.notes,
+  suggested_discount_rate: null,
+  risk_tier: null,
+  status: 'pending_moderation',
+  created_at: new Date().toISOString(),
+  updated_at: new Date().toISOString(),
+}))
+
+function goStep(step: number | string) {
   currentStep.value = step
 }
 
-const submit = () => {
-  currentStep.value = 'success'
+function onChequeImageChange(fileList: FileList) {
+  chequeImageFile.value = fileList[0]
 }
 
-const goToDashboard = () => router.push('/app')
-const goToMarketplace = () => router.push('/app/listings')
+function onIdDocChange(fileList: FileList) {
+  idDocFile.value = fileList[0]
+}
 
-const toast = (msg: string) => {
-  showToast(msg, 'info')
+function onSupplementaryChange(_fileList: FileList) {
+}
+
+function onUploadError(message: string) {
+  showToast(message, 'error')
+}
+
+async function submit() {
+  if (!acceptedTerms.value) {
+    showToast('لطفاً قوانین و مقررات را تأیید کنید', 'warning')
+    return
+  }
+
+  isSubmitting.value = true
+  listingStore.error = null
+
+  try {
+    const listing = await listingStore.createListing({
+      issuer: 1,
+      bank_name: form.value.bank,
+      cheque_serial_number: form.value.sayad,
+      face_amount: form.value.amount || 0,
+      due_date: form.value.dueDate,
+      issuer_type: form.value.issuerType,
+      issuer_name: form.value.issuer,
+      issuer_national_id: form.value.nationalId,
+      description: form.value.notes,
+    })
+
+    if (chequeImageFile.value) {
+      try {
+        await ListingService.uploadDocument(listing.id, chequeImageFile.value, 'cheque_image')
+      } catch (docErr) {
+        showToast('آگهی ثبت شد اما در آپلود تصویر چک خطا رخ داد', 'warning')
+      }
+    }
+
+    if (idDocFile.value) {
+      try {
+        await ListingService.uploadDocument(listing.id, idDocFile.value, 'id_document')
+      } catch {
+        showToast('در آپلود مدارک صادرکننده خطا رخ داد', 'warning')
+      }
+    }
+
+    currentStep.value = 'success'
+    showToast('آگهی شما با موفقیت ثبت شد', 'success')
+  } catch {
+    showToast('خطا در ثبت آگهی. لطفاً دوباره تلاش کنید.', 'error')
+  } finally {
+    isSubmitting.value = false
+  }
+}
+
+function goToDashboard() {
+  router.push('/app')
+}
+
+function goToMarketplace() {
+  router.push('/app/listings')
 }
 </script>
 
-<style>
+<style scoped>
 .create-listing {
   max-width: 680px;
   margin: 0 auto;
@@ -505,85 +560,6 @@ const toast = (msg: string) => {
   margin-bottom: 1rem;
 }
 
-/* Upload Area */
-.upload-area {
-  border: 2px dashed var(--border);
-  border-radius: var(--radius);
-  padding: 2rem;
-  text-align: center;
-  cursor: pointer;
-  transition: all var(--transition-fast);
-}
-
-.upload-area:hover {
-  border-color: var(--navy-light);
-  background: rgba(26, 61, 107, 0.03);
-}
-
-.upload-icon {
-  font-size: 2rem;
-  margin-bottom: 0.5rem;
-}
-
-.upload-area p {
-  font-size: var(--font-size-base);
-  color: var(--text3);
-  margin: 0;
-}
-
-.upload-hint {
-  font-size: var(--font-size-xs);
-  margin-top: 0.3rem;
-}
-
-/* Review Box */
-.review-box {
-  background: var(--surface2);
-  border-radius: var(--radius);
-  padding: 1.25rem;
-  margin-bottom: 1.25rem;
-}
-
-.review-title {
-  font-size: var(--font-size-xs);
-  font-weight: var(--font-weight-semibold);
-  color: var(--text3);
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-  margin-bottom: 0.75rem;
-}
-
-.review-grid {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 0.75rem;
-}
-
-.review-item {
-  display: flex;
-  flex-direction: column;
-  gap: 0.2rem;
-}
-
-.review-key {
-  font-size: var(--font-size-xs);
-  color: var(--text3);
-}
-
-.review-value {
-  font-size: var(--font-size-base);
-  font-weight: var(--font-weight-semibold);
-  color: var(--navy);
-}
-
-.review-value--teal {
-  color: var(--teal);
-}
-
-.review-value--orange {
-  color: var(--orange);
-}
-
 /* Info Banner */
 .info-banner {
   background: var(--teal-light);
@@ -592,6 +568,17 @@ const toast = (msg: string) => {
   padding: 0.85rem 1rem;
   font-size: var(--font-size-sm);
   color: var(--teal);
+  margin-bottom: 1.25rem;
+}
+
+/* Error Banner */
+.error-banner {
+  background: var(--red-light);
+  border: 1px solid rgba(220, 38, 38, 0.2);
+  border-radius: var(--radius-sm);
+  padding: 0.85rem 1rem;
+  font-size: var(--font-size-sm);
+  color: var(--red);
   margin-bottom: 1.25rem;
 }
 

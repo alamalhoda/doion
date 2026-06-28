@@ -15,21 +15,21 @@ export class ListingService {
     return response.data
   }
 
-  static async getListing(id: string): Promise<ChequeListing> {
+  static async getListing(id: string | number): Promise<ChequeListing> {
     const response = await apiClient.get(this.basePath + `/${id}/`)
     return response.data
   }
 
-  static async updateListing(id: string, data: UpdateListingRequest): Promise<ChequeListing> {
+  static async updateListing(id: string | number, data: UpdateListingRequest): Promise<ChequeListing> {
     const response = await apiClient.patch(this.basePath + `/${id}/`, data)
     return response.data
   }
 
-  static async deleteListing(id: string): Promise<void> {
+  static async deleteListing(id: string | number): Promise<void> {
     await apiClient.delete(this.basePath + `/${id}/`)
   }
 
-  static async uploadDocument(listingId: string, file: File, documentType: string): Promise<void> {
+  static async uploadDocument(listingId: string | number, file: File, documentType: string): Promise<void> {
     const formData = new FormData()
     formData.append('file', file)
     formData.append('document_type', documentType)
@@ -44,7 +44,7 @@ export class ListingService {
   }
 
   static async getMarketplaceListings(params?: ListingFilters & { page?: number; page_size?: number }): Promise<ChequeListing[]> {
-    const response = await apiClient.get(this.basePath + '/marketplace/', { params })
+    const response = await apiClient.get(this.basePath + '/', { params })
     return response.data
   }
 }

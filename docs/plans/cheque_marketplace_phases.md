@@ -10,10 +10,10 @@ todos:
     status: completed
   - id: phase-2-kyc-wizard
     content: "فاز ۲: Verification/Document backend؛ KYC wizard organisms + admin KYC queue responsive"
-    status: pending
+    status: completed
   - id: phase-3-listings-registry
     content: "فاز ۳: ChequeListing/IssuerProfile/pricing stub؛ create listing 3-step wizard (full atomic design)"
-    status: pending
+    status: completed
   - id: phase-4-moderation-queue
     content: "فاز ۴: Moderation queue API + events؛ admin moderation organisms + reject/resubmit flow"
     status: pending

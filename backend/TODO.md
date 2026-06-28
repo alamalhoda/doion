@@ -18,9 +18,21 @@
 - [ ] Add rate limiting to register endpoint
 - [ ] Add OpenAPI schema annotations (drf-spectacular)
 
-## Phase 2 — KYC
+## Phase 2 — KYC — Completed
 
-- [ ] Create `doion.identity` Verification model + state machine
-- [ ] Create `doion.documents` app with Document model
-- [ ] KYC upload endpoints
-- [ ] Moderation queue endpoints
+- [x] Create `doion.identity` Verification model + state machine
+- [x] Create `doion.documents` app with Document model
+- [x] KYC upload endpoints
+- [x] Moderation queue endpoints
+
+## Phase 3 — Listings — Completed
+
+- [x] Create `doion.checks` app with `IssuerProfile` and `ChequeListing` models
+- [x] `TextChoices` enums for `Status` and `IssuerType`
+- [x] `UniqueConstraint` on `(issuer, bank_name, cheque_serial_number)` at DB level
+- [x] Serializers with validation rules LST_201–LST_205
+- [x] `IntegrityError` → `VALIDATION_ERROR` with field-level detail for duplicate sayad
+- [x] `ChequeListingViewSet` with create, list, retrieve, update, destroy, `my/`, `upload_document`
+- [x] Create `doion.pricing` app with synchronous `calculate_suggested_rate` stub
+- [x] Change `Document.related_object_id` from `UUIDField` to `CharField(max_length=255)` for integer PK compatibility
+- [x] Migrations created and applied

@@ -12,7 +12,7 @@ import { computed } from 'vue'
 
 const props = withDefaults(
   defineProps<{
-    variant?: 'published' | 'pending' | 'matched' | 'reviewing' | 'rejected' | 'approved' | 'kyc-pending'
+    variant?: 'published' | 'pending_moderation' | 'matched' | 'reviewing' | 'rejected' | 'approved' | 'kyc-pending' | 'expired' | 'withdrawn' | 'settled_off_platform'
   }>(),
   {
     variant: 'published',
@@ -23,7 +23,7 @@ const label = computed(() => {
   switch (props.variant) {
     case 'published':
       return 'منتشر شده'
-    case 'pending':
+    case 'pending_moderation':
       return 'در انتظار بررسی'
     case 'matched':
       return 'تطابق یافته'
@@ -35,6 +35,12 @@ const label = computed(() => {
       return 'تایید شده'
     case 'kyc-pending':
       return 'در انتظار کایسی'
+    case 'expired':
+      return 'منقضی شده'
+    case 'withdrawn':
+      return 'برگشت داده شده'
+    case 'settled_off_platform':
+      return 'تسویه شده'
     default:
       return ''
   }
@@ -58,7 +64,7 @@ const label = computed(() => {
   color: #0a4e49;
 }
 
-.status-pill--pending {
+.status-pill--pending_moderation {
   background: #fef3e6;
   color: #7a4000;
 }
@@ -86,5 +92,20 @@ const label = computed(() => {
 .status-pill--kyc-pending {
   background: #eef0fe;
   color: #3d34a0;
+}
+
+.status-pill--expired {
+  background: var(--surface2);
+  color: var(--text2);
+}
+
+.status-pill--withdrawn {
+  background: #fef3e6;
+  color: #7a4000;
+}
+
+.status-pill--settled_off_platform {
+  background: #e6f4f3;
+  color: #0a4e49;
 }
 </style>

@@ -15,7 +15,7 @@ class Document(TimeStampedModel):
 
     owner = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
     related_object_type = models.CharField(max_length=50)
-    related_object_id = models.UUIDField()
+    related_object_id = models.CharField(max_length=255)
     document_type = models.CharField(max_length=30, choices=DocumentType.choices)
     file = models.FileField(upload_to="documents/%Y/%m/%d/")
     file_size = models.PositiveIntegerField(help_text=_("File size in bytes"))

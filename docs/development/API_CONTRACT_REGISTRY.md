@@ -26,6 +26,17 @@ All API errors follow a consistent envelope format:
 | `NOT_FOUND_ERROR` | 404 | Requested resource not found |
 | `SERVER_ERROR` | 500 | Unexpected server error |
 
+### Listing-Specific Error Codes
+
+| Code | HTTP Status | Field/Detail | Description |
+|------|-------------|--------------|-------------|
+| `LST_201` | 400 | `face_amount` | Face amount must be greater than zero |
+| `LST_202` | 400 | `due_date` | Due date must be in the future |
+| `LST_203` | 400 | `cheque_serial_number` | Sayad number must be exactly 16 digits |
+| `LST_204` | 400 | `cheque_serial_number` | Duplicate cheque for this issuer/bank (unique constraint) |
+| `LST_205` | 400 | `non_field_errors` | Daily limit of 10 listings reached |
+| `LST_206` | 400 | `documents` | At least one cheque image is required |
+
 ---
 
 ## Phase-0 Endpoints
@@ -340,6 +351,147 @@ Approve or reject a KYC verification.
 ```
 
 **Error:** `400` if `decision` is missing or invalid. `403` if user is not moderator/admin.
+
+---
+
+## Phase-3 Endpoints
+
+### Listings
+
+#### POST /api/v1/listings/
+
+Create a new cheque listing. Requires KYC_APPROVED status.
+
+**Request Body:**
+```json
+{
+  "issuer": 1,
+  "bank_name": "بانک ملت",
+  "cheque_serial_number": "1234567890123456",
+  "face_amount": 500000000,
+  "due_date": "2026-12-31",
+  "issuer_type": "legal",
+  "issuer_name": "شرکت فناوری نوین",
+  "issuer_national_id": "1234567890",
+  "description": "توضیحات تکمیلی"
+}
+```
+
+**Response (201):**
+```json
+{
+  "id": 1,
+  "owner_id": 1,
+  "issuer_profile": {
+    "id": 1,
+    "national_or_company_id": "1234567890",
+    "name": "شرکت فناوری نوین",
+    "credit_score": 750
+  },
+  "bank_name": "بانک ملت",
+  "cheque_serial_number": "1234567890123456",
+  "face_amount": 500000000,
+  "due_date": "2026-12-31",
+  "issuer_type": "legal",
+  "issuer_name": "شرکت فناوری نوین",
+  "issuer_national_id": "1234567890",
+  "description": "توضیحات تکمیلی",
+  "suggested_discount_rate": 6.0,
+  "risk_tier": "medium",
+  "status": "pending_moderation",
+  "created_at": "2026-06-28T10:00:00Z",
+  "updated_at": "2026-06-28T10:00:00Z"
+}
+```
+
+**Validation Rules:**
+- `face_amount`: required, must be > 0 (LST_201)
+- `due_date`: required, must be in the future (LST_202)
+- `cheque_serial_number`: required, exactly 16 digits, numeric (LST_203)
+- `issuer`: required, must be a valid IssuerProfile ID
+- `bank_name`: required, max 100 chars
+- `issuer_type`: required, one of `legal` | `natural`
+- `issuer_name`: required, max 255 chars
+- `issuer_national_id`: required, max 20 chars
+- Daily limit: max 10 listings per user per day (LST_205)
+
+**Errors:**
+- `VALIDATION_ERROR` with field-level details for LST_201–LST_205
+- `VALIDATION_ERROR` with `cheque_serial_number` detail for duplicate (LST_204)
+
+#### PATCH /api/v1/listings/{id}/
+
+Update an existing listing. Only allowed when status is `pending_moderation` or `rejected`, and only by the listing owner.
+
+**Request Body:** Same fields as POST (all optional for PATCH)
+
+**Response (200):** Updated listing object (same shape as POST response)
+
+**Errors:**
+- `PERMISSION_ERROR` if listing is not in editable status
+- `PERMISSION_ERROR` if user is not the owner
+
+#### GET /api/v1/listings/my/
+
+List current user's listings.
+
+**Response (200):**
+```json
+{
+  "results": [
+    {
+      "id": 1,
+      "owner_id": 1,
+      "issuer_profile": { ... },
+      "bank_name": "بانک ملت",
+      "cheque_serial_number": "1234567890123456",
+      "face_amount": 500000000,
+      "due_date": "2026-12-31",
+      "issuer_type": "legal",
+      "issuer_name": "شرکت فناوری نوین",
+      "issuer_national_id": "1234567890",
+      "description": "توضیحات",
+      "suggested_discount_rate": 6.0,
+      "risk_tier": "medium",
+      "status": "pending_moderation",
+      "created_at": "2026-06-28T10:00:00Z",
+      "updated_at": "2026-06-28T10:00:00Z"
+    }
+  ]
+}
+```
+
+#### GET /api/v1/listings/{id}/
+
+Get listing detail. Available to owner or public (depending on status).
+
+**Response (200):** Same shape as POST response
+
+**Errors:**
+- `NOT_FOUND_ERROR` if listing does not exist
+- `PERMISSION_ERROR` if user cannot access this listing
+
+#### POST /api/v1/listings/{id}/documents/
+
+Upload a document for a listing. Only the owner can upload.
+
+**Request (multipart/form-data):**
+- `file`: binary file (image/pdf)
+- `document_type`: string (e.g. `cheque_image`, `id_document`, `supplementary`)
+
+**Response (201):**
+```json
+{
+  "id": "uuid",
+  "document_type": "cheque_image",
+  "file": "/media/documents/2026/06/28/cheque.jpg",
+  "file_size": 102400
+}
+```
+
+**Errors:**
+- `PERMISSION_ERROR` if user is not the owner
+- `LST_206` if no cheque image uploaded (validated at submission time)
 
 ---
 
