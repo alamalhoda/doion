@@ -1,0 +1,49 @@
+import { ref } from 'vue'
+
+interface ApiError {
+  code: string
+  message: string
+  details?: Record<string, unknown>
+}
+
+interface RequestOptions {
+  retries?: number
+  retryDelay?: number
+}
+
+export function useApi<T>(
+  apiFn: () => Promise<T>,
+  options: RequestOptions = {}
+) {
+  const data = ref<T | null>(null) as { value: T | null }
+  const error = ref<ApiError | null>(null)
+  const isLoading = ref(false)
+
+  const { retries = 0, retryDelay = 1000 } = options
+
+  async function execute(attempt = 0): Promise<T | null> {
+    isLoading.value = true
+    error.value = null
+
+    try {
+      const result = await apiFn()
+      data.value = result
+      return result
+    } catch (err: unknown) {
+      const anyErr = err as { response?: { data?: { error?: ApiError } } }
+      const apiError = anyErr?.response?.data?.error
+
+      if (apiError && attempt < retries) {
+        await new Promise((r) => setTimeout(r, retryDelay))
+        return execute(attempt + 1)
+      }
+
+      error.value = apiError || { code: 'UNKNOWN_ERROR', message: 'An unexpected error occurred' }
+      return null
+    } finally {
+      isLoading.value = false
+    }
+  }
+
+  return { data, error, isLoading, execute }
+}

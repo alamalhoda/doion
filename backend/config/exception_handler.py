@@ -7,6 +7,8 @@ from rest_framework.exceptions import ValidationError
 from rest_framework.response import Response
 from rest_framework.views import exception_handler
 
+from doion.moderation.exceptions import ModerationError
+
 
 def custom_exception_handler(
     exc: Exception,
@@ -47,6 +49,9 @@ def custom_exception_handler(
     elif isinstance(exc, NotFound):
         error_code = "NOT_FOUND_ERROR"
         error_message = str(exc.detail) if exc.detail else "Resource not found"
+    elif isinstance(exc, ModerationError):
+        error_code = exc.default_code
+        error_message = str(exc.detail) if exc.detail else exc.default_detail
     else:
         error_code = "SERVER_ERROR"
         error_message = "An unexpected error occurred"

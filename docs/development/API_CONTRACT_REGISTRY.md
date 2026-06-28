@@ -37,6 +37,18 @@ All API errors follow a consistent envelope format:
 | `LST_205` | 400 | `non_field_errors` | Daily limit of 10 listings reached |
 | `LST_206` | 400 | `documents` | At least one cheque image is required |
 
+### Moderation-Specific Error Codes
+
+| Code | HTTP Status | Field/Detail | Description |
+|------|-------------|--------------|-------------|
+| `MOD_101` | — | `rejection_code` | Incomplete information |
+| `MOD_102` | — | `rejection_code` | Poor quality image |
+| `MOD_103` | — | `rejection_code` | Invalid cheque |
+| `MOD_104` | — | `rejection_code` | Duplicate listing |
+| `MOD_105` | — | `rejection_code` | Risk too high |
+| `MOD_106` | — | `rejection_code` | Other |
+| `MOD_306` | 400 | `non_field_errors` | Maximum resubmission limit exceeded (3 rejects) |
+
 ---
 
 ## Phase-0 Endpoints
@@ -492,6 +504,111 @@ Upload a document for a listing. Only the owner can upload.
 **Errors:**
 - `PERMISSION_ERROR` if user is not the owner
 - `LST_206` if no cheque image uploaded (validated at submission time)
+
+---
+
+## Phase-4 Endpoints
+
+### Moderation — Listing Queue
+
+#### GET /api/v1/moderation/queue/
+
+List all listings with `pending_moderation` status (Moderator/Admin only). Supports pagination.
+
+**Response 200:**
+```json
+{
+  "count": 2,
+  "next": null,
+  "previous": null,
+  "results": [
+    {
+      "id": 1,
+      "owner_id": 1,
+      "issuer_profile": {
+        "id": 1,
+        "national_or_company_id": "1234767890",
+        "name": "شرکت فناوری نوین",
+        "credit_score": 750
+      },
+      "bank_name": "بانک ملت",
+      "cheque_serial_number": "1234567890123456",
+      "face_amount": 500000000,
+      "due_date": "2026-12-31",
+      "issuer_type": "legal",
+      "issuer_name": "شرکت فناوری نوین",
+      "issuer_national_id": "1234567890",
+      "description": "توضیحات تکمیلی",
+      "suggested_discount_rate": 6.0,
+      "risk_tier": "medium",
+      "status": "pending_moderation",
+      "rejection_reason": "",
+      "rejection_code": null,
+      "resubmit_count": 0,
+      "created_at": "2026-06-28T10:00:00Z",
+      "updated_at": "2026-06-28T10:00:00Z"
+    }
+  ]
+}
+```
+
+**Errors:**
+- `401` if not authenticated
+- `403` if user is not moderator or admin
+
+#### POST /api/v1/moderation/{id}/decision/
+
+Approve or reject a listing (Moderator/Admin only).
+
+**Request (approve):**
+```json
+{
+  "decision": "approve"
+}
+```
+
+**Request (reject):**
+```json
+{
+  "decision": "reject",
+  "rejection_code": "MOD_101",
+  "rejection_note": "اطلاعات ناقص است"
+}
+```
+
+**Response 201 (approve):**
+```json
+{
+  "id": 1,
+  "listing": 1,
+  "moderator": 5,
+  "decision": "approved",
+  "rejection_code": null,
+  "rejection_code_display": null,
+  "rejection_note": "",
+  "created_at": "2026-06-28T11:00:00Z"
+}
+```
+
+**Response 201 (reject):**
+```json
+{
+  "id": 2,
+  "listing": 1,
+  "moderator": 5,
+  "decision": "rejected",
+  "rejection_code": "MOD_101",
+  "rejection_code_display": "Incomplete information",
+  "rejection_note": "اطلاعات ناقص است",
+  "created_at": "2026-06-28T11:00:00Z"
+}
+```
+
+**Errors:**
+- `401` if not authenticated
+- `403` if user is not moderator or admin
+- `400` `VALIDATION_ERROR` if `rejection_code` is missing on reject
+- `400` `MOD_306` if listing has been rejected 3 times already (max resubmission limit exceeded)
 
 ---
 

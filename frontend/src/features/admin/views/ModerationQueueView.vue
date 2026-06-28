@@ -40,7 +40,7 @@
             :item="{
               id: listing.id,
               issuer: listing.issuer_profile?.name || '',
-              bank: '',
+              bank: listing.bank_name || '',
               amount: listing.face_amount,
               dueDate: listing.due_date,
               risk: listing.risk_tier || '',
@@ -62,15 +62,17 @@
           <ModerationCard
             v-for="listing in approvedListings"
             :key="listing.id"
+            readonly
             :item="{
               id: listing.id,
               issuer: listing.issuer_profile?.name || '',
-              bank: '',
+              bank: listing.bank_name || '',
               amount: listing.face_amount,
               dueDate: listing.due_date,
               risk: listing.risk_tier || '',
+              rejection_code: listing.rejection_code || '',
+              rejection_note: listing.rejection_reason || '',
             }"
-            readonly
             @view-detail="viewListing(listing.id)"
           />
           <NEmpty
@@ -86,15 +88,17 @@
           <ModerationCard
             v-for="listing in rejectedListings"
             :key="listing.id"
+            readonly
             :item="{
               id: listing.id,
               issuer: listing.issuer_profile?.name || '',
-              bank: '',
+              bank: listing.bank_name || '',
               amount: listing.face_amount,
               dueDate: listing.due_date,
               risk: listing.risk_tier || '',
+              rejection_code: listing.rejection_code || '',
+              rejection_note: listing.rejection_reason || '',
             }"
-            readonly
             @view-detail="viewListing(listing.id)"
           />
           <NEmpty
@@ -105,7 +109,7 @@
       </NTabs>
     </div>
 
-    <!-- Rejection Modal -->
+      <!-- Rejection Modal -->
     <NModal
       v-model:show="showRejectModal"
       preset="dialog"
@@ -114,7 +118,14 @@
       <div class="reject-form">
         <p>{{ $t('admin.reject_reason_prompt') }}</p>
         <FormField
-          v-model="rejectionReason"
+          v-model="rejectionCode"
+          type="select"
+          :label="$t('admin.rejection_code')"
+          :options="rejectionCodeOptions"
+          required
+        />
+        <FormField
+          v-model="rejectionNote"
           type="textarea"
           :label="$t('admin.rejection_reason')"
           :rows="3"
@@ -143,7 +154,8 @@ import { ref, computed, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { NTabs, NTabPane, NModal, NEmpty } from 'naive-ui'
 import { useListingStore } from '@/features/listings/stores/listingStore'
-import type { UpdateListingRequest } from '@/features/listings/types/listing'
+import { ListingService } from '@/features/listings/services/listingService'
+import { REJECTION_CODE_LABELS, type RejectionCode } from '@/features/listings/types/listing'
 import FormField from '@/components/ui/FormField.vue'
 import AppButton from '@/components/ui/AppButton.vue'
 import ModerationCard from '../components/ModerationCard.vue'
@@ -153,15 +165,20 @@ const listingStore = useListingStore()
 
 const activeTab = ref('pending')
 const showRejectModal = ref(false)
-const rejectionReason = ref('')
+const rejectionCode = ref<RejectionCode | ''>('')
+const rejectionNote = ref('')
 const isProcessing = ref(false)
 const listingToReject = ref<string | null>(null)
+
+const rejectionCodeOptions = Object.entries(REJECTION_CODE_LABELS).map(
+  ([value, label]) => ({ value, label })
+)
 
 const isLoading = computed(() => listingStore.isLoading)
 const error = computed(() => listingStore.error)
 const pendingListings = computed(() => listingStore.pendingListings)
 const approvedListings = computed(() => listingStore.publishedListings)
-const rejectedListings = computed(() => 
+const rejectedListings = computed(() =>
   listingStore.listings.filter(l => l.status === 'rejected')
 )
 
@@ -172,7 +189,8 @@ function viewListing(id: string): void {
 async function handleApprove(id: string): Promise<void> {
   isProcessing.value = true
   try {
-    await listingStore.updateListing(id, { status: 'published' } as UpdateListingRequest)
+    await ListingService.moderateListing(id, { decision: 'approve' })
+    await listingStore.fetchAllListings()
   } catch (err) {
     console.error('Failed to approve listing:', err)
   } finally {
@@ -182,19 +200,23 @@ async function handleApprove(id: string): Promise<void> {
 
 function handleReject(id: string): void {
   listingToReject.value = id
-  rejectionReason.value = ''
+  rejectionCode.value = ''
+  rejectionNote.value = ''
   showRejectModal.value = true
 }
 
 async function confirmReject(): Promise<void> {
-  if (!listingToReject.value || !rejectionReason.value) return
-  
+  if (!listingToReject.value || !rejectionCode.value || !rejectionNote.value) return
+
   isProcessing.value = true
   try {
-    await listingStore.updateListing(listingToReject.value, { 
-      status: 'rejected' 
-    } as UpdateListingRequest)
+    await ListingService.moderateListing(listingToReject.value, {
+      decision: 'reject',
+      rejection_code: rejectionCode.value,
+      rejection_note: rejectionNote.value,
+    })
     showRejectModal.value = false
+    await listingStore.fetchAllListings()
   } catch (err) {
     console.error('Failed to reject listing:', err)
   } finally {

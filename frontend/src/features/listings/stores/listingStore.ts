@@ -129,7 +129,7 @@ export const useListingStore = defineStore('listing', () => {
 
     try {
       const data = await ListingService.getAllListings({ status: 'pending_moderation' })
-      listings.value = [...listings.value, ...data]
+      listings.value = data
     } catch (err: unknown) {
       error.value = extractErrorMessage(err)
     } finally {

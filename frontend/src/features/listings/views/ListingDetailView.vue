@@ -121,6 +121,14 @@
 
       <div class="detail-actions">
         <button
+          v-if="listing.status === 'rejected'"
+          class="btn btn--secondary btn--lg"
+          @click="handleResubmit"
+        >
+          اصلاح و ارسال مجدد ({{ resubmitRemaining }} بار باقی‌مانده)
+        </button>
+        <button
+          v-else-if="listing.status === 'published'"
           class="btn btn--gold btn--lg"
           @click="expressInterest"
         >
@@ -214,6 +222,11 @@ const formattedRate = computed(() => {
   return formatPersianNumber(formatCurrency(Number(listing.value.suggested_discount_rate)))
 })
 
+const resubmitRemaining = computed(() => {
+  if (!listing.value) return 3
+  return Math.max(0, 3 - (listing.value.resubmit_count ?? 0))
+})
+
 onMounted(() => {
   const id = route.params.id as string
   if (id) {
@@ -234,8 +247,14 @@ function goBack() {
 }
 
 function expressInterest() {
-  showToast('درخواست شما ثبت شد', 'success')
+  showToast('درخوا�ت شما ثبت شد', 'success')
 }
+
+function handleResubmit() {
+  showToast('آگهی برای بررسی مجدد ارسال شد', 'info')
+  router.push('/app/listings')
+}
+
 </script>
 
 <style scoped>

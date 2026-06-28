@@ -1,7 +1,9 @@
 import type { RouteRecordRaw } from 'vue-router'
 import { ROUTES } from '@/constants/routes'
 import AdminLayout from '@/layouts/AdminLayout.vue'
-import ModerationQueueView from './views/ModerationQueueView.vue'
+
+const ModerationQueueView = () => import('./views/ModerationQueueView.vue')
+const ModerationDetailView = () => import('./views/ModerationDetailView.vue')
 
 export const adminRoutes: RouteRecordRaw[] = [
   {
@@ -11,7 +13,14 @@ export const adminRoutes: RouteRecordRaw[] = [
     children: [
       {
         path: '',
+        name: 'admin-moderation-queue',
         component: ModerationQueueView,
+      },
+      {
+        path: ':id',
+        name: 'admin-moderation-detail',
+        component: ModerationDetailView,
+        props: true,
       },
     ],
   },

@@ -63,6 +63,21 @@ class ChequeListing(TimeStampedModel):
         choices=Status.choices,
         default=Status.PENDING_MODERATION,
     )
+    rejection_reason = models.TextField(blank=True, default="")
+    rejection_code = models.CharField(
+        max_length=20,
+        choices=[
+            ("MOD_101", "Incomplete information"),
+            ("MOD_102", "Poor quality image"),
+            ("MOD_103", "Invalid cheque"),
+            ("MOD_104", "Duplicate listing"),
+            ("MOD_105", "Risk too high"),
+            ("MOD_106", "Other"),
+        ],
+        null=True,
+        blank=True,
+    )
+    resubmit_count = models.PositiveIntegerField(default=0)
 
     class Meta:
         verbose_name = _("Cheque Listing")

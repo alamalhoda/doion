@@ -43,7 +43,24 @@
 
     <!-- Main Content -->
     <div class="admin-content">
-      <div class="admin-section">
+      <div
+        v-if="isLoading"
+        class="admin-loading"
+      >
+        {{ $t('common.loading') }}
+      </div>
+
+      <div
+        v-else-if="error"
+        class="admin-error"
+      >
+        {{ error }}
+      </div>
+
+      <div
+        v-else
+        class="admin-section"
+      >
         <h2 class="admin-section-title">
           آگهی‌های در انتظار بررسی
         </h2>
@@ -74,7 +91,11 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue'
+import { ref, computed, onMounted } from 'vue'
+import { useListingStore }ings/stores/listingStore'
+import { ListingService } from '@/features/listings/services/listingService'
+
+const listingStore = useListingStore()
 
 interface Listing {
   id: number
@@ -94,26 +115,67 @@ const listingColumns = [
   { key: 'status', label: 'وضعیت' },
 ]
 
-const pendingListings = ref<Listing[]>([
-  { id: 1, title: 'چک ۵۰۰M — شرکت آسان‌پرداخت', issuer: 'شرکت آسان‌پرداخت', amount: 500000000, dueDate: '۱۴۰۴/۰۳/۲۰', risk: 'low' },
-  { id: 2, title: 'چک ۱۲۰M — محمدرضا احمدی', issuer: 'محمدرضا احمدی', amount: 120000000, dueDate: '۱۴۰۴/۰۵/۱۰', risk: 'mid' },
-  { id: 3, title: 'چک ۲۵۰M — شرکت تجارت گستر', issuer: 'شرکت تجارت گستر', amount: 250000000, dueDate: '۱۴۰۴/۰۲/۱۵', risk: 'low' },
+const isLoading = ref(false)
+const error = ref<string | null>(null)
+
+const pendingListings = computed(() =>
+  listingStore.listings
+    .filter((l) => l.status === 'pending_moderation')
+    .slice(0, 5)
+    .map((l) => ({
+      id: l.id,
+      title: `${l.cheque_serial_number} — ${l.issuer_name}`,
+      issuer: l.issuer_profile?.name || l.issuer_name,
+      amount: l.face_amount,
+      dueDate: l.due_date,
+      risk: (l.risk_tier || 'low') as 'low' | 'mid' | 'high',
+      status: l.status,
+    }))
+)
+
+const pendingCount = computed(() =>
+  listingStore.listings.filter((l) => l.status === 'pending_moderation').length
+)
+
+const publishedCount = computed(() =>
+  listingStore.listings.filter((l) => l.status === 'published').length
+)
+
+const rejectedCount = computed(() =>
+  listingStore.listings.filter((l) => l.status === 'rejected').length
+)
+
+const stats = computed(() => [
+  { label: 'در انتظار بررسی', value: pendingCount.value.toString(), iconBg: 'var(--orange-light)', icon: '⏳' },
+  { label: 'تأیید شده', value: publishedCount.value.toString(), iconBg: 'var(--teal-light)', icon: '✅' },
+  { label: 'رد شده', value: rejectedCount.value.toString(), iconBg: 'var(--red-light)', icon: '❌' },
+  { label: 'کل آگهی‌ها', value: listingStore.listings.length.toString(), iconBg: 'var(--gold-pale)', icon: '�' },
 ])
 
-const stats = ref([
-  { label: 'در انتظار بررسی', value: '۷', iconBg: 'var(--orange-light)', icon: '⏳' },
-  { label: 'تأیید شده (امروز)', value: '۳۴', iconBg: 'var(--teal-light)', icon: '✅' },
-  { label: 'رد شده (امروز)', value: '۵', iconBg: 'var(--red-light)', icon: '❌' },
-  { label: 'میانگین ساعت بررسی', value: '۶.۲', iconBg: 'var(--gold-pale)', icon: '⏱️' },
-])
+async function loadData(): Promise<void> {
+  isLoading.value = true
+  error.value = null
+  try {
+    await listingStore.fetchAllListings()
+  } catch (err: unknown) {
+    const anyErr = err as { response?: { data?: { error?: { message?: string } } } }
+    error.value = anyErr?.response?.data?.error?.message || 'error.unknown'
+  } finally {
+    isLoading.value = false
+  }
+}
 
-const viewListing = (row: Listing) => {
-  console.log('View listing:', row)
+function viewListing(id: number): void {
+  console.log('View listing:', id)
 }
 
 function getRisk(row: Listing): 'low' | 'mid' | 'high' {
   return row.risk
 }
+
+onMounted(() => {
+  loadData()
+})
 </script>
 
 <style>
@@ -238,5 +300,12 @@ function getRisk(row: Listing): 'low' | 'mid' | 'high' {
   .stats-bar {
     padding: 1rem;
   }
+}
+
+.admin-loading,
+.admin-error {
+  padding: var(--spacing-xl);
+  text-align: center;
+  color: var(--text2);
 }
 </style>

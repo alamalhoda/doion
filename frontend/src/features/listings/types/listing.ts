@@ -4,6 +4,17 @@ export type UserRole = 'check_holder' | 'investor' | 'institutional_investor' | 
 
 export type ListingStatus = 'pending_moderation' | 'published' | 'rejected' | 'matched' | 'expired' | 'withdrawn' | 'settled_off_platform'
 
+export type RejectionCode = 'MOD_101' | 'MOD_102' | 'MOD_103' | 'MOD_104' | 'MOD_105' | 'MOD_106'
+
+export const REJECTION_CODE_LABELS: Record<RejectionCode, string> = {
+  MOD_101: 'Incomplete information',
+  MOD_102: 'Poor quality image',
+  MOD_103: 'Invalid cheque',
+  MOD_104: 'Duplicate listing',
+  MOD_105: 'Risk too high',
+  MOD_106: 'Other',
+}
+
 export type MatchStatus = 'pending' | 'accepted' | 'rejected' | 'settled_off_platform'
 
 export type VerificationStatus = 'pending' | 'approved' | 'rejected'
@@ -31,6 +42,9 @@ export interface ChequeListing {
   suggested_discount_rate?: number | null
   risk_tier?: 'low' | 'medium' | 'high' | null
   status: ListingStatus
+  rejection_reason?: string
+  rejection_code?: RejectionCode | null
+  resubmit_count?: number
   created_at: string
   updated_at: string
 }
@@ -71,4 +85,21 @@ export interface ListingFilters {
   risk_tier?: 'low' | 'medium' | 'high'
   status?: ListingStatus
   search?: string
+}
+
+export interface ModerateDecisionRequest {
+  decision: 'approve' | 'reject'
+  rejection_code?: RejectionCode
+  rejection_note?: string
+}
+
+export interface ModerationDecisionResponse {
+  id: string
+  listing: number
+  moderator: number | null
+  decision: 'approve' | 'reject'
+  rejection_code: RejectionCode | null
+  rejection_code_display: string | null
+  rejection_note: string
+  created_at: string
 }

@@ -1,12 +1,13 @@
 <template>
   <Card
-    title="آگهی در انتظار بررسی"
+    :title="item.issuer || ''"
     hoverable
     class="moderation-card"
   >
     <template #footer>
       <div class="moderation-actions">
         <Button
+          v-if="!readonly"
           variant="teal"
           size="sm"
           @click="approve"
@@ -14,11 +15,19 @@
           تأیید
         </Button>
         <Button
+          v-if="!readonly"
           variant="danger"
           size="sm"
           @click="reject"
         >
           رد
+        </Button>
+        <Button
+          variant="secondary"
+          size="sm"
+          @click="$emit('view-detail', item.id)"
+        >
+          جزئیات
         </Button>
       </div>
     </template>
@@ -44,6 +53,20 @@
         <span class="moderation-label">ریسک:</span>
         <span class="moderation-value">{{ item.risk || '' }}</span>
       </div>
+      <div
+        v-if="readonly && item.rejection_code"
+        class="moderation-row"
+      >
+        <span class="moderation-label">کد رد:</span>
+        <span class="moderation-value">{{ item.rejection_code }}</span>
+      </div>
+      <div
+        v-if="readonly && item.rejection_note"
+        class="moderation-row"
+      >
+        <span class="moderation-label">دلیل رد:</span>
+        <span class="moderation-value">{{ item.rejection_note }}</span>
+      </div>
     </div>
   </Card>
 </template>
@@ -64,19 +87,28 @@ interface ModerationItem {
 const props = withDefaults(
   defineProps<{
     item: ModerationItem
+    readonly?: boolean
   }>(),
-  {}
+  {
+    readonly: false,
+  }
 )
 
 const emit = defineEmits<{
   (e: 'approve', id: string | number): void
   (e: 'reject', id: string | number): void
+  (e: 'view-detail', id: string | number): void
 }>()
 
 const formatCurrency = (value: number) => value.toLocaleString('fa-IR')
 
-const approve = () => emit('approve', props.item.id)
-const reject = () => emit('reject', props.item.id)
+const approve = () => {
+  if (!props.readonly) emit('approve', props.item.id)
+}
+
+const reject = () => {
+  if (!props.readonly) emit('reject', props.item.id)
+}
 </script>
 
 <style scoped>
