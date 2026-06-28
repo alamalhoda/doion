@@ -1,6 +1,12 @@
 <template>
-  <n-space vertical :size="24">
-    <n-space align="start" :size="12">
+  <n-space
+    vertical
+    :size="24"
+  >
+    <n-space
+      align="start"
+      :size="12"
+    >
       <n-h2>{{ t('moderation.kyc.title') }}</n-h2>
       <n-tag :type="pendingCount > 0 ? 'error' : 'success'">
         {{ pendingCount }} {{ t('moderation.pending_items') }}

@@ -227,6 +227,24 @@ npm run preview
 
 ---
 
+## ✅ Phase 5 Marketplace (Backend Ready)
+
+- [x] Backend: `doion.marketplace` app created with `MarketplaceViewSet`
+- [x] Backend: `MarketplaceSerializer` + `MarketplaceFilter` (django-filter) implemented
+- [x] Backend: Endpoint exposes only `status=published` listings for investor browse
+- [x] Backend: Filtering by `risk_tier`, `issuer_type`, `min_amount`, `max_amount`, `max_days_to_due`, `bank_name`
+- [x] Backend: Ordering by `created_at`, `face_amount`, `suggested_discount_rate`, `due_date`
+- [x] Backend: Emulated pagination via override params (`page`, `page_size`, max 50)
+- [x] Backend: Cache headers (60s TTL) on list responses
+- [x] Backend: `interest_count` annotated as 0 (placeholder for future interest feature)
+- [x] Backend: Route registered under `/api/v1/marketplace/listings/`
+- [x] Backend: Tests written (36 marketplace + moderation + identity tests pass)
+- [x] Docs: API Contract Registry updated with Phase 5 endpoint
+- [ ] Frontend: Marketplace feature shell pending (`features/marketplace/`)
+- [ ] Frontend: Filter sidebar + listing grid UI pending
+
+---
+
 ## 📁 File Checklist
 
 ### Configuration Files
@@ -350,6 +368,6 @@ npm run preview
 
 ---
 
-**Status:** ✅ COMPLETE (Phase 0 + Phase 1 + Phase 2 KYC + Phase 3 Listings + Phase 4 Moderation)
+**Status:** ✅ COMPLETE (Phase 0 + Phase 1 + Phase 2 KYC + Phase 3 Listings + Phase 4 Moderation + Phase 5 Marketplace API)
 
 Phase 0 scaffold, Phase 1 Identity/Registration, Phase 2 KYC, Phase 3 Listings, and Phase 4 Moderation are **production-ready**. Next: Phase 5 (Marketplace) and beyond.

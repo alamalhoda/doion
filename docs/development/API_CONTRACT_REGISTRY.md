@@ -612,6 +612,75 @@ Approve or reject a listing (Moderator/Admin only).
 
 ---
 
+## Phase-5 Endpoints
+
+### Marketplace — Published Listings
+
+#### GET /api/v1/marketplace/listings/
+
+List all `published` cheque listings for investor browsing. Supports pagination (page_size=20, max=50), filtering, and ordering. Read-only.
+
+**Query Parameters:**
+| Param | Type | Description |
+|-------|------|-------------|
+| `page` | int | Page number (default: 1) |
+| `page_size` | int | Results per page (default: 20, max: 50) |
+| `risk_tier` | string | Filter by risk tier: `low`, `medium`, `high` |
+| `min_amount` | number | Minimum face amount (ریال) |
+| `max_amount` | number | Maximum face amount (ریال) |
+| `max_days_to_due` | number | Maximum days until due date |
+| `issuer_type` | string | Filter by issuer type: `legal`, `natural` |
+| `bank_name` | string | Partial match on bank name (icontains) |
+| `search` | string | Search by bank name |
+| `ordering` | string | Sort field: `created_at`, `-created_at`, `face_amount`, `-face_amount`, `suggested_discount_rate`, `-suggested_discount_rate`, `due_date`, `-due_date` |
+
+**Response 200:**
+```json
+{
+  "count": 24,
+  "next": null,
+  "previous": null,
+  "results": [
+    {
+      "id": 1,
+      "owner_id": 1,
+      "issuer_profile": {
+        "id": 1,
+        "national_or_company_id": "1234767890",
+        "name": "شرکت فناوری نوین",
+        "credit_score": 750
+      },
+      "bank_name": "بانک ملت",
+      "cheque_serial_number": "1111222233334444",
+      "face_amount": 500000000,
+      "due_date": "2026-12-31",
+      "issuer_type": "legal",
+      "issuer_name": "شرکت فناوری نوین",
+      "issuer_national_id": "1234567890",
+      "description": "",
+      "suggested_discount_rate": 3.5,
+      "risk_tier": "low",
+      "status": "published",
+      "days_to_due": 60,
+      "interest_count": 0,
+      "published_at": "2026-06-28T10:00:00Z",
+      "created_at": "2026-06-28T10:00:00Z",
+      "updated_at": "2026-06-28T10:00:00Z"
+    }
+  ]
+}
+```
+
+**Errors:**
+- `401` if not authenticated
+- `404` if endpoint does not exist (mounted under `/api/v1/marketplace/`)
+
+**Cache:**
+- TTL 60s on list responses
+- Invalidated on `ChequeListing` status change to `published`, `rejected`, `expired`, or `withdrawn`
+
+---
+
 ## Role Values
 
 | Value | Label (FA) | Label (EN) | Description |

@@ -45,6 +45,9 @@ export interface ChequeListing {
   rejection_reason?: string
   rejection_code?: RejectionCode | null
   resubmit_count?: number
+  days_to_due?: number
+  interest_count?: number
+  published_at?: string
   created_at: string
   updated_at: string
 }

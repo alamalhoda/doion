@@ -1,10 +1,10 @@
-import io
-from django.core.files.uploadedfile import SimpleUploadedFile
 import pytest
+from django.core.files.uploadedfile import SimpleUploadedFile
 from rest_framework import status
 from rest_framework.test import APIClient
 
-from doion.identity.models import Profile, Verification
+from doion.identity.models import Profile
+from doion.identity.models import Verification
 from doion.users.models import User
 
 
@@ -86,17 +86,17 @@ class TestVerificationAPI:
         url = "/api/v1/verifications/"
         response = api_client.get(url)
         assert response.status_code == status.HTTP_200_OK
-        assert len(response.data) == 2
+        assert len(response.data["results"]) == 2
 
     def test_regular_user_cannot_see_other_verifications(
-        self, authenticated_client, test_user_with_profile
+        self, authenticated_client, test_user_with_profile,
     ):
         user2 = User.objects.create_user(username="user2", password="pass", role="check_holder")
         Verification.objects.create(user=user2, full_name="User2", national_id="2222222222")
         url = "/api/v1/verifications/"
         response = authenticated_client.get(url)
         assert response.status_code == status.HTTP_200_OK
-        assert len(response.data) == 0
+        assert len(response.data["results"]) == 0
 
     def test_moderator_can_approve_verification(self, api_client, moderator_user):
         Profile.objects.get_or_create(user=moderator_user, defaults={"role": moderator_user.role})

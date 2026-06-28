@@ -29,8 +29,16 @@
     <section class="actions">
       <h3>دسترسی سریع</h3>
       <div class="action-buttons">
-        <AppButton label="مشاهده پروفایل" variant="primary" @click="goToProfile" />
-        <AppButton label="ثبت آگهی جدید" variant="secondary" @click="goToCreate" />
+        <AppButton
+          label="مشاهده پروفایل"
+          variant="primary"
+          @click="goToProfile"
+        />
+        <AppButton
+          label="ثبت آگهی جدید"
+          variant="secondary"
+          @click="goToCreate"
+        />
       </div>
     </section>
   </div>

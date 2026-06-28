@@ -215,15 +215,18 @@
           </label>
         </div>
 
-        <div v-if="error" class="error-banner">
+        <div
+          v-if="error"
+          class="error-banner"
+        >
           {{ error }}
         </div>
 
         <div class="form-actions">
           <button
             class="btn btn--secondary"
-            @click="goStep(2)"
             :disabled="isSubmitting"
+            @click="goStep(2)"
           >
             بازگشت
           </button>

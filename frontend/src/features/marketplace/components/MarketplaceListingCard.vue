@@ -7,13 +7,13 @@
     <div class="card-header">
       <div class="card-issuer">
         <span class="card-issuer-dot" />
-        {{ listing.issuer }}
+        {{ issuerName }}
       </div>
-      <RiskBadge :risk="listing.risk" />
+      <RiskBadge :risk="riskTier" />
     </div>
     <div class="card-body">
       <div class="card-amount">
-        <span>ریال</span>{{ formatCurrency(listing.amount) }}
+        <span>ریال</span>{{ formattedAmount }}
       </div>
       <div class="card-meta">
         <div class="meta-item">
@@ -21,7 +21,7 @@
             بانک
           </div>
           <div class="meta-val">
-            {{ listing.bank }}
+            {{ listing.bank_name }}
           </div>
         </div>
         <div class="meta-item">
@@ -29,7 +29,7 @@
             سررسید
           </div>
           <div class="meta-val">
-            {{ listing.dueDate }}
+            {{ formattedDueDate }}
           </div>
         </div>
         <div class="meta-item">
@@ -37,7 +37,7 @@
             روز تا سررسید
           </div>
           <div class="meta-val">
-            {{ listing.days }} روز
+            {{ listing.days_to_due ?? '-' }} روز
           </div>
         </div>
         <div class="meta-item">
@@ -45,7 +45,7 @@
             نوع صادرکننده
           </div>
           <div class="meta-val">
-            {{ listing.issuerType }}
+            {{ issuerTypeLabel }}
           </div>
         </div>
       </div>
@@ -53,29 +53,39 @@
     <div class="card-footer">
       <div>
         <div class="discount-rate">
-          {{ listing.rate }}
+          {{ formattedRate }}
         </div>
         <div class="discount-label">
           نرخ تنزیل پیشنهادی
         </div>
       </div>
       <button
+        v-if="hoverable"
         class="btn btn--sm btn--primary"
         @click.stop="onInterest"
       >
         ابراز تمایل
+      </button>
+      <button
+        v-else
+        class="btn btn--sm btn--gold"
+        disabled
+      >
+        مشاهده
       </button>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
+import { computed } from 'vue'
 import RiskBadge from '@/components/RiskBadge.vue'
 import type { ChequeListing } from '@/features/listings/types/listing'
+import { useFormat } from '@/composables'
 
-withDefaults(
+const props = withDefaults(
   defineProps<{
-    listing: ChequeListing & { issuer: string; issuerType: string; bank: string; amount: number; days: number; risk: 'low' | 'mid' | 'high'; rate: string; dueDate: string }
+    listing: ChequeListing
     hoverable?: boolean
   }>(),
   {
@@ -88,10 +98,38 @@ const emit = defineEmits<{
   (e: 'interest'): void
 }>()
 
-const formatCurrency = (value: number) => value.toLocaleString('fa-IR')
+const { formatCurrency, formatNumber } = useFormat()
 
-const onClick = () => emit('click')
-const onInterest = () => emit('interest')
+const issuerName = computed(() => {
+  return props.listing.issuer_profile?.name || props.listing.issuer_name || '-'
+})
+
+const riskTier = computed(() => {
+  if (!props.listing.risk_tier) return 'low'
+  const map: Record<string, 'low' | 'mid' | 'high'> = { low: 'low', medium: 'mid', high: 'high' }
+  return map[props.listing.risk_tier] || 'low'
+})
+
+const formattedAmount = computed(() => formatCurrency(props.listing.face_amount))
+
+const formattedDueDate = computed(() => props.listing.due_date)
+
+const issuerTypeLabel = computed(() => {
+  return props.listing.issuer_type === 'legal' ? 'حقوقی' : 'حقیقی'
+})
+
+const formattedRate = computed(() => {
+  if (!props.listing.suggested_discount_rate) return '-'
+  return `${formatNumber(props.listing.suggested_discount_rate)}٪`
+})
+
+function onClick() {
+  emit('click')
+}
+
+function onInterest() {
+  emit('interest')
+}
 </script>
 
 <style>

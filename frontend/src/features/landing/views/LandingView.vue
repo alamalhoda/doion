@@ -3,6 +3,46 @@
     <HeroSection />
     <StatsBar />
 
+    <section class="latest-section">
+      <h2 class="latest__title">
+        آخرین آگهی‌ها
+      </h2>
+      <div
+        v-if="isLoading"
+        class="latest-grid"
+      >
+        <div
+          v-for="n in 4"
+          :key="n"
+          class="listing-card listing-card--skeleton"
+        >
+          <div class="skeleton-header" />
+          <div class="skeleton-body">
+            <div class="skeleton-amount" />
+            <div class="skeleton-meta" />
+          </div>
+          <div class="skeleton-footer" />
+        </div>
+      </div>
+      <div
+        v-else-if="listings.length === 0"
+        class="empty-state"
+      >
+        آگهی فعالی موجود نیست.
+      </div>
+      <div
+        v-else
+        class="latest-grid"
+      >
+        <MarketplaceListingCard
+          v-for="item in listings"
+          :key="item.id"
+          :listing="item"
+          :hoverable="false"
+        />
+      </div>
+    </section>
+
     <section class="steps-section">
       <h2 class="steps__title">
         {{ $t('landing.steps.how_it_works') }}
@@ -31,25 +71,38 @@
 </template>
 
 <script setup lang="ts">
+import { ref, onMounted } from 'vue'
 import HeroSection from '../components/HeroSection.vue'
 import StatsBar from '../components/StatsBar.vue'
 import StepCard from '../components/StepCard.vue'
 import FooterDisclaimer from '../components/FooterDisclaimer.vue'
+import MarketplaceListingCard from '@/features/marketplace/components/MarketplaceListingCard.vue'
+import { ListingService } from '@/features/listings/services/listingService'
+import type { ChequeListing } from '@/features/listings/types/listing'
+
+const isLoading = ref(false)
+const listings = ref<ChequeListing[]>([])
+
+onMounted(async () => {
+  isLoading.value = true
+  try {
+    const data = await ListingService.getMarketplaceListings({ page_size: 4 })
+    listings.value = data.results
+  } catch {
+    listings.value = []
+  } finally {
+    isLoading.value = false
+  }
+})
 </script>
 
 <style scoped>
-.landing-view {
-  min-height: 100vh;
-  display: flex;
-  flex-direction: column;
-}
-
-.steps-section {
+.latest-section {
   padding: var(--spacing-2xl) var(--spacing-xl);
   background: var(--bg);
 }
 
-.steps__title {
+.latest__title {
   text-align: center;
   font-size: var(--font-size-xl);
   font-weight: var(--font-weight-bold);
@@ -57,17 +110,29 @@ import FooterDisclaimer from '../components/FooterDisclaimer.vue'
   color: var(--color-text-primary);
 }
 
-.steps__grid {
-  display: flex;
+.latest-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
   gap: var(--spacing-lg);
   max-width: 1200px;
   margin: 0 auto;
-  flex-wrap: wrap;
+}
+
+@media (max-width: 1024px) {
+  .latest-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
 }
 
 @media (max-width: 768px) {
-  .steps__grid {
-    flex-direction: column;
+  .latest-grid {
+    grid-template-columns: 1fr;
   }
+}
+
+.empty-state {
+  text-align: center;
+  padding: 3rem 1rem;
+  color: var(--text3);
 }
 </style>

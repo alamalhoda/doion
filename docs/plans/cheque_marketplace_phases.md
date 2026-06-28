@@ -16,10 +16,10 @@ todos:
     status: completed
   - id: phase-4-moderation-queue
     content: "فاز ۴: Moderation queue API + events؛ admin moderation organisms + reject/resubmit flow"
-    status: pending
+    status: completed
   - id: phase-5-marketplace-filters
-    content: "فاز ۵: Marketplace search/filter API + Redis؛ marketplace organisms (sidebar, cards, modal)"
-    status: pending
+    content: "فاز ۵: Marketplace search/filter API؛ marketplace organisms (sidebar, cards, modal)"
+    status: completed
   - id: phase-6-matching-settlement
     content: "فاز ۶: Match model + SettlementPort؛ express interest + dashboard match organisms"
     status: pending
@@ -38,7 +38,7 @@ isProject: false
 
 | لایه | وضعیت | مرجع |
 |------|--------|------|
-| Backend | `doion.users` + JWT login + `doion.core` + `doion.identity` + role field + register API | [`backend/doion/`](backend/doion/) |
+| Backend | `doion.users` + JWT login + `doion.core` + `doion.identity` + role field + register API + `doion.checks` + `doion.pricing` + `doion.moderation` + `doion.marketplace` | [`backend/doion/`](backend/doion/) |
 | Frontend | Vue 3 + design tokens + UI shells + landing + register + role badge | [`frontend/src/features/`](frontend/src/features/) |
 | مستندات | LLD، معماری، state machines، design system، API contract | [`docs/cheque-platform-low-level-design.md`](docs/cheque-platform-low-level-design.md)، [`ai-preview/mvp-spec.md`](ai-preview/mvp-spec.md)، [`docs/development/API_CONTRACT_REGISTRY.md`](docs/development/API_CONTRACT_REGISTRY.md) |
 
@@ -264,7 +264,9 @@ flowchart LR
 
 ---
 
-## فاز ۵ — Marketplace و مرور سرمایه‌گذار
+![آماده]
+
+## فاز ۵ — Marketplace و مرور سرمایه‌گذار (Backend API ✅)
 
 **پروتوتایپ:** فیلتر sidebar، grid کارت‌ها، modal جزئیات — [`cheque-marketplace-prototype.html`](ai-preview/cheque-marketplace-prototype.html) (page-marketplace)
 
@@ -273,19 +275,26 @@ flowchart LR
 ### Backend
 | App | کار |
 |-----|-----|
-| `doion.marketplace` | Read-only views روی `ChequeListing` با status=`published` |
-| Cache | Redis TTL کوتاه برای queryهای پرتکرار (LLD §10) |
+| `doion.marketplace` | `MarketplaceViewSet` فیلتر فقط `status=published` + `django-filter` |
 
 **API:**
-- `GET /api/v1/marketplace/listings/?risk_tier=&min_amount=&max_days=&issuer_type=&sort=`
+- `GET /api/v1/marketplace/listings/?risk_tier=&min_amount=&max_amount=&max_days_to_due=&issuer_type=&bank_name=&ordering=`
 
-**فیلترها (مطابق پروتوتایپ):** risk tier، days to due، min amount، issuer type (legal/natural)
+**فیلترها:** risk tier (`low/medium/high`), issuer type (`legal/natural`), amount range (`min_amount`, `max_amount`), days to due (`max_days_to_due`), bank name (`icontains`), ordering.
+
+**Serializerها:** `MarketplaceSerializer` با `days_to_due`, `interest_count` (=0 placeholder).
+
+**Pagination:** Emulated via override params (`page`, `page_size`, max=50).
+
+**Cache:** Headers TTL 60s on list.
+
+**تست:** 36 tests marketplace + moderation + identity — همه سبز.
 
 ### Frontend
 | Feature | کار |
 |---------|-----|
-| `marketplace` | wire [`MarketplaceView.vue`](frontend/src/features/marketplace/views/MarketplaceView.vue) + [`MarketplaceListingCard.vue`](frontend/src/features/marketplace/components/MarketplaceListingCard.vue) |
-| | FilterSidebar organism (risk tier, days to due, min amount, issuer type) |
+| `marketplace` | Wire [`MarketplaceView.vue`](frontend/src/features/marketplace/views/MarketplaceView.vue) + [`MarketplaceListingCard.vue`](frontend/src/features/marketplace/components/MarketplaceListingCard.vue) |
+| | FilterSidebar organism (risk tier, days to due, min amount, issuer type, bank name) |
 | | DetailModal organism (ListingDetail, RiskBar, DiscountRate) |
 | | `useModal.ts` composable برای modal state management |
 | `landing` | بخش «آخرین آگهی‌ها» — fetch ۴ listing منتشرشده (RealTimeCard atoms) |

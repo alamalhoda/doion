@@ -6,126 +6,184 @@
           آگهی‌های چک
         </h2>
         <p class="market-header-subtitle">
-          ۲۴ آگهی فعال — به‌روزرسانی لحظه‌ای
+          {{ totalCount.toLocaleString('fa-IR') }} آگهی فعال — به‌روزرسانی لحظه‌ای
         </p>
       </div>
     </div>
 
     <div class="market-layout">
-      <aside class="filter-panel">
-        <div class="filter-title">
-          فیلترها
-        </div>
-        <div class="filter-group">
-          <label class="filter-label">سطح ریسک</label>
-          <label
-            v-for="opt in riskOptions"
-            :key="opt.value"
-            class="filter-opt"
-          >
-            <input
-              type="checkbox"
-              :checked="opt.checked"
-            >
-            <span>{{ opt.label }}</span>
-          </label>
-        </div>
-        <button
-          class="btn btn--primary btn--block"
-          @click="applyFilters"
-        >
-          اعمال فیلتر
-        </button>
-      </aside>
+      <FilterSidebar
+        v-model="localFilters"
+        @apply="applyFilters"
+        @reset="resetFilters"
+      />
 
       <div class="market-main">
         <div class="market-toolbar">
-          <span class="market-count">نمایش ۲۰ از ۲۴ آگهی</span>
-          <select class="sort-select">
-            <option>مرتب‌سازی: جدیدترین</option>
-            <option>بیشترین نرخ تنزیل</option>
-            <option>کمترین ریسک</option>
+          <span class="market-count">
+            نمایش {{ startIndex.toLocaleString('fa-IR') }} تا {{ endIndex.toLocaleString('fa-IR') }} از {{ totalCount.toLocaleString('fa-IR') }} آگهی
+          </span>
+          <select
+            class="sort-select"
+            :value="store.sortBy"
+            @change="onSortChange"
+          >
+            <option value="-created_at">
+              مرتب‌سازی: جدیدترین
+            </option>
+            <option value="created_at">
+              مرتب‌سازی: قدیمی‌ترین
+            </option>
+            <option value="-face_amount">
+              بیشترین مبلغ
+            </option>
+            <option value="face_amount">
+              کمترین مبلغ
+            </option>
+            <option value="-suggested_discount_rate">
+              بیشترین نرخ تنزیل
+            </option>
+            <option value="due_date">
+              نزدیک‌ترین سررسید
+            </option>
           </select>
         </div>
 
-        <div class="listings-grid">
+        <div
+          v-if="store.isLoading"
+          class="listings-grid"
+        >
           <div
-            v-for="item in listings"
-            :key="item.id"
-            class="listing-card"
+            v-for="n in 4"
+            :key="n"
+            class="listing-card listing-card--skeleton"
           >
-            <div class="card-header">
-              <div class="card-issuer">
-                <span class="card-issuer-dot" />
-                {{ item.issuer }}
-              </div>
-              <RiskBadge :risk="item.risk" />
+            <div class="skeleton-header" />
+            <div class="skeleton-body">
+              <div class="skeleton-amount" />
+              <div class="skeleton-meta" />
             </div>
-            <div class="card-body">
-              <div class="card-amount">
-                <span>ریال</span>{{ formatCurrency(item.amount) }}
-              </div>
-              <div class="card-meta">
-                <div class="meta-item">
-                  <div class="meta-key">بانک</div>
-                  <div class="meta-val">{{ item.bank }}</div>
-                </div>
-                <div class="meta-item">
-                  <div class="meta-key">سررسید</div>
-                  <div class="meta-val">{{ item.dueDate }}</div>
-                </div>
-              </div>
-            </div>
-            <div class="card-footer">
-              <div>
-                <div class="discount-rate">{{ item.rate }}</div>
-                <div class="discount-label">نرخ تنزیل پیشنهادی</div>
-              </div>
-            <button class="btn btn--sm btn--gold">
-              ابراز تمایل
-            </button>
-            </div>
+            <div class="skeleton-footer" />
           </div>
+        </div>
+
+        <div
+          v-else-if="error"
+          class="error-state"
+        >
+          {{ error }}
+          <button
+            class="btn btn--secondary btn--sm"
+            @click="store.fetchListings()"
+          >
+            تلاش مجدد
+          </button>
+        </div>
+
+        <div
+          v-else-if="store.listings.length === 0"
+          class="empty-state"
+        >
+          آگهی‌ای با فیلترهای انتخابی شما یافت نشد.
+        </div>
+
+        <div
+          v-else
+          class="listings-grid"
+        >
+          <div
+            v-for="item in store.listings"
+            :key="item.id"
+            class="listing-card-wrapper"
+          >
+            <MarketplaceListingCard
+              :listing="item"
+              :hoverable="true"
+              @click="openDetail(item)"
+            />
+          </div>
+        </div>
+
+        <div
+          v-if="totalPages > 1"
+          class="market-pagination"
+        >
+          <button
+            class="btn btn--secondary btn--sm"
+            :disabled="store.page <= 1"
+            @click="store.setPage(store.page - 1)"
+          >
+            قبلی
+          </button>
+          <span class="pagination-info">
+            صفحه {{ store.page.toLocaleString('fa-IR') }} از {{ totalPages.toLocaleString('fa-IR') }}
+          </span>
+          <button
+            class="btn btn--secondary btn--sm"
+            :disabled="store.page >= totalPages"
+            @click="store.setPage(store.page + 1)"
+          >
+            بعدی
+          </button>
         </div>
       </div>
     </div>
+
+    <ListingDetailModal
+      v-model="showDetail"
+      :listing="selectedListing"
+    />
   </div>
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue'
-import { useRouter } from 'vue-router'
-import RiskBadge from '@/components/RiskBadge.vue'
-import { useFormat } from '@/composables'
+import { ref, computed, onMounted, watch } from 'vue'
+import { useMarketplaceStore, type MarketplaceFilters } from '../stores/marketplaceStore'
+import type { ChequeListing } from '@/features/listings/types/listing'
+import MarketplaceListingCard from '../components/MarketplaceListingCard.vue'
+import FilterSidebar from '../components/FilterSidebar.vue'
+import ListingDetailModal from '../components/ListingDetailModal.vue'
 
-const router = useRouter()
-const { formatCurrency } = useFormat()
+const store = useMarketplaceStore()
 
-interface Listing {
-  id: number
-  issuer: string
-  bank: string
-  amount: number
-  risk: 'low' | 'mid' | 'high'
-  rate: string
-  dueDate: string
+const localFilters = ref<MarketplaceFilters>({ ...store.filters })
+const showDetail = ref(false)
+const selectedListing = ref<ChequeListing | null>(null)
+
+const error = computed(() => store.error)
+const totalCount = computed(() => store.totalCount)
+const totalPages = computed(() => Math.max(1, Math.ceil(store.totalCount / store.pageSize)))
+const startIndex = computed(() => (store.page - 1) * store.pageSize + 1)
+const endIndex = computed(() => Math.min(store.page * store.pageSize, store.totalCount))
+
+onMounted(() => {
+  store.fetchListings()
+})
+
+watch(() => ({ ...store.filters }), (newVal) => {
+  localFilters.value = { ...newVal }
+}, { deep: true })
+
+function applyFilters() {
+  store.filters = { ...localFilters.value }
+  store.fetchListings()
 }
 
-const riskOptions = ref([
-  { value: 'low', label: 'کم ریسک', checked: true },
-  { value: 'mid', label: 'ریسک متوسط', checked: true },
-  { value: 'high', label: 'پر ریسک', checked: false },
-])
+function resetFilters() {
+  store.resetFilters()
+  localFilters.value = {}
+  store.fetchListings()
+}
 
-const listings = ref<Listing[]>([
-  { id: 1, issuer: 'شرکت آسان‌پرداخت', bank: 'بانک ملت', amount: 500000000, risk: 'low', rate: '۳.۸٪', dueDate: '۱۴۰۴/۰۳/۲۰' },
-  { id: 2, issuer: 'محمدرضا احمدی', bank: 'بانک صادرات', amount: 120000000, risk: 'mid', rate: '۶.۸٪', dueDate: '۱۴۰۴/۰۵/۱۰' },
-  { id: 3, issuer: 'شرکت تجارت گستر', bank: 'بانک تجارت', amount: 250000000, risk: 'low', rate: '۲.۵٪', dueDate: '۱۴۰۴/۰۲/۱۵' },
-  { id: 4, issuer: 'مهران صادقی', bank: 'بانک ملی', amount: 80000000, risk: 'high', rate: '۱۲٪', dueDate: '۱۴۰۴/۰۷/۰۱' },
-])
+function onSortChange(event: Event) {
+  const value = (event.target as HTMLSelectElement).value
+  store.setSort(value)
+  store.fetchListings()
+}
 
-const applyFilters = () => {
-  console.log('Filters applied')
+function openDetail(item: ChequeListing) {
+  selectedListing.value = item
+  showDetail.value = true
 }
 </script>
 
@@ -173,52 +231,6 @@ const applyFilters = () => {
   }
 }
 
-.filter-panel {
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: var(--radius-lg);
-  padding: 1.25rem;
-}
-
-.filter-title {
-  font-size: var(--font-size-xs);
-  font-weight: var(--font-weight-semibold);
-  color: var(--text2);
-  text-transform: uppercase;
-  letter-spacing: 0.08em;
-  margin-bottom: 1rem;
-  padding-bottom: 0.5rem;
-  border-bottom: 1px solid var(--border);
-}
-
-.filter-group {
-  margin-bottom: 1.25rem;
-}
-
-.filter-label {
-  display: block;
-  font-size: var(--font-size-base);
-  font-weight: var(--font-weight-medium);
-  color: var(--text2);
-  margin-bottom: 0.5rem;
-}
-
-.filter-opt {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  cursor: pointer;
-  font-size: var(--font-size-base);
-  color: var(--text2);
-  margin-bottom: 0.35rem;
-}
-
-.filter-opt input[type='checkbox'] {
-  accent-color: var(--navy);
-  width: 15px;
-  height: 15px;
-}
-
 .market-toolbar {
   display: flex;
   align-items: center;
@@ -253,111 +265,77 @@ const applyFilters = () => {
   }
 }
 
-.card-header {
-  background: var(--navy);
-  padding: 0.85rem 1.1rem;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  position: relative;
-  overflow: hidden;
+.listing-card-wrapper {
+  display: contents;
 }
 
-.card-header::after {
-  content: '';
-  position: absolute;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  height: 2px;
-  background: repeating-linear-gradient(
-    90deg,
-    rgba(201, 150, 10, 0.4) 0,
-    rgba(201, 150, 10, 0.4) 12px,
-    transparent 12px,
-    transparent 18px
-  );
+.error-state {
+  text-align: center;
+  padding: 2rem;
+  color: var(--red);
 }
 
-.card-issuer {
-  color: rgba(255, 255, 255, 0.85);
-  font-size: var(--font-size-xs);
-  display: flex;
-  align-items: center;
-  gap: 0.4rem;
-}
-
-.card-issuer-dot {
-  width: 6px;
-  height: 6px;
-  border-radius: 50%;
-  background: var(--gold-light);
-}
-
-.card-body {
-  padding: 1.1rem;
-}
-
-.card-amount {
-  font-size: 1.65rem;
-  font-weight: var(--font-weight-bold);
-  color: var(--navy);
-  font-variant-numeric: tabular-nums;
-  border: 1px solid var(--border);
-  border-radius: var(--radius-sm);
-  padding: 0.4rem 0.75rem;
-  display: inline-block;
-  margin-bottom: 0.85rem;
-  background: var(--surface2);
-}
-
-.card-amount span {
-  font-size: var(--font-size-xs);
-  font-weight: var(--font-weight-normal);
-  color: var(--text3);
-  margin-left: 0.3rem;
-}
-
-.card-meta {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 0.6rem 0.5rem;
-}
-
-.meta-item {
-  display: flex;
-  flex-direction: column;
-  gap: 0.1rem;
-}
-
-.meta-key {
-  font-size: var(--font-size-xs);
+.empty-state {
+  text-align: center;
+  padding: 3rem 1rem;
   color: var(--text3);
 }
 
-.meta-val {
+.market-pagination {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+  margin-top: 2rem;
+}
+
+.pagination-info {
   font-size: var(--font-size-base);
-  font-weight: var(--font-weight-medium);
   color: var(--text2);
 }
 
-.card-footer {
-  border-top: 1px solid var(--border);
-  padding: 0.75rem 1.1rem;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
+.listing-card--skeleton {
+  pointer-events: none;
 }
 
-.discount-rate {
-  font-size: 1.15rem;
-  font-weight: var(--font-weight-bold);
-  color: var(--teal);
+.skeleton-header {
+  height: 52px;
+  background: linear-gradient(90deg, #e2e8f0 25%, #f1f5f9 50%, #e2e8f0 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite;
 }
 
-.discount-label {
-  font-size: var(--font-size-xs);
-  color: var(--text3);
-  font-weight: var(--font-weight-normal);
+.skeleton-body {
+  padding: 1.1rem;
+}
+
+.skeleton-amount {
+  height: 36px;
+  width: 60%;
+  background: linear-gradient(90deg, #e2e8f0 25%, #f1f5f9 50%, #e2e8f0 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite;
+  border-radius: var(--radius-sm);
+  margin-bottom: 0.85rem;
+}
+
+.skeleton-meta {
+  height: 40px;
+  background: linear-gradient(90deg, #e2e8f0 25%, #f1f5f9 50%, #e2e8f0 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite;
+  border-radius: var(--radius-sm);
+}
+
+.skeleton-footer {
+  height: 52px;
+  background: linear-gradient(90deg, #e2e8f0 25%, #f1f5f9 50%, #e2e8f0 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite;
+}
+
+@keyframes shimmer {
+  0% { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
 }
 </style>

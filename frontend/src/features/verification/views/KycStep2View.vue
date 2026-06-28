@@ -1,21 +1,32 @@
 <template>
-  <n-space vertical :size="24">
-    <n-space align="start" :size="12">
+  <n-space
+    vertical
+    :size="24"
+  >
+    <n-space
+      align="start"
+      :size="12"
+    >
       <n-h2>{{ t('kyc.step2.title') }}</n-h2>
-      <n-p text-color="gray">{{ t('kyc.step2.description') }}</n-p>
+      <n-p text-color="gray">
+        {{ t('kyc.step2.description') }}
+      </n-p>
     </n-space>
 
     <n-card :bordered="false">
-      <n-space vertical :size="20">
+      <n-space
+        vertical
+        :size="20"
+      >
         <UploadArea
           accept=".jpg,.jpeg,.png"
-          :maxSize="5 * 1024 * 1024"
+          :max-size="5 * 1024 * 1024"
           document-type="national_id_front"
           @uploaded="onUploaded('national_id_front', $event)"
         />
         <UploadArea
           accept=".jpg,.jpeg,.png"
-          :maxSize="5 * 1024 * 1024"
+          :max-size="5 * 1024 * 1024"
           document-type="national_id_back"
           @uploaded="onUploaded('national_id_back', $event)"
         />

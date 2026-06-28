@@ -1,8 +1,8 @@
 import pytest
 from rest_framework.test import APIClient
 
-from doion.checks.models import ChequeListing, IssuerProfile
-from doion.moderation.models import ModerationDecision
+from doion.checks.models import ChequeListing
+from doion.checks.models import IssuerProfile
 from doion.users.tests.factories import UserFactory
 
 

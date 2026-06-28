@@ -2,7 +2,7 @@
 import { defineStore } from 'pinia'
 import { ref, computed } from 'vue'
 import { ListingService } from '../services/listingService'
-import type { ChequeListing, CreateListingRequest, ListingFilters, UpdateListingRequest } from '../types/listing'
+import type { ChequeListing, CreateListingRequest, UpdateListingRequest } from '../types/listing'
 
 function extractErrorMessage(err: unknown): string {
   const anyErr = err as { response?: { data?: { error?: { message?: string } } } }
@@ -109,20 +109,6 @@ export const useListingStore = defineStore('listing', () => {
     }
   }
 
-  async function fetchMarketplaceListings(params?: ListingFilters & { page?: number; page_size?: number }): Promise<void> {
-    isLoading.value = true
-    error.value = null
-
-    try {
-      const data = await ListingService.getMarketplaceListings(params)
-      listings.value = data
-    } catch (err: unknown) {
-      error.value = extractErrorMessage(err)
-    } finally {
-      isLoading.value = false
-    }
-  }
-
   async function fetchAllListings(): Promise<void> {
     isLoading.value = true
     error.value = null
@@ -150,7 +136,6 @@ export const useListingStore = defineStore('listing', () => {
     updateListing,
     deleteListing,
     fetchListing,
-    fetchMarketplaceListings,
     fetchAllListings,
   }
 })

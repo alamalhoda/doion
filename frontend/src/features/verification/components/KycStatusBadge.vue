@@ -1,5 +1,8 @@
 <template>
-  <n-tag :type="statusType" :size="size">
+  <n-tag
+    :type="statusType"
+    :size="size"
+  >
     {{ status }}
   </n-tag>
 </template>

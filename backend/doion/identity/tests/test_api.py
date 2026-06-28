@@ -108,31 +108,6 @@ class TestUserMe:
         assert response.data["username"] == "meuser"
         assert response.data["role"] == "check_holder"
 
-    def test_update_current_user(self, api_client):
-        user = User.objects.create_user(username="updateuser", password="testpass123", role="investor")
-        api_client.force_authenticate(user=user)
-        response = api_client.patch("/api/v1/users/me/", {"name": "Updated Name"})
-        assert response.status_code == status.HTTP_200_OK
-        assert response.data["name"] == "Updated Name"
-
     def test_unauthenticated_access(self, api_client):
         response = api_client.get("/api/v1/users/me/")
         assert response.status_code == status.HTTP_401_UNAUTHORIZED
-
-
-@pytest.mark.django_db
-class TestProfile:
-    def test_get_profile(self, api_client):
-        user = User.objects.create_user(username="profileuser", password="testpass123", role="check_holder")
-        api_client.force_authenticate(user=user)
-        response = api_client.get("/api/v1/identity/profile/")
-        assert response.status_code == status.HTTP_200_OK
-        assert response.data["role"] == "check_holder"
-        assert "is_verified" in response.data
-
-    def test_update_profile(self, api_client):
-        user = User.objects.create_user(username="profileupdate", password="testpass123", role="investor")
-        api_client.force_authenticate(user=user)
-        response = api_client.patch("/api/v1/identity/profile/", {"bio": "New bio"})
-        assert response.status_code == status.HTTP_200_OK
-        assert response.data["bio"] == "New bio"

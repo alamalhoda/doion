@@ -1,37 +1,73 @@
 <template>
-  <n-space vertical :size="24">
-    <n-space align="start" :size="12">
+  <n-space
+    vertical
+    :size="24"
+  >
+    <n-space
+      align="start"
+      :size="12"
+    >
       <n-h2>{{ t('kyc.status.title') }}</n-h2>
     </n-space>
 
-    <n-card v-if="verification" :bordered="false">
-      <n-descriptions :column="1" label-placement="left">
+    <n-card
+      v-if="verification"
+      :bordered="false"
+    >
+      <n-descriptions
+        :column="1"
+        label-placement="left"
+      >
         <n-descriptions-item :label="t('kyc.status')">
           <KycStatusBadge :status="verification.status" />
         </n-descriptions-item>
-        <n-descriptions-item v-if="verification.rejection_reason" :label="t('kyc.reason')">
+        <n-descriptions-item
+          v-if="verification.rejection_reason"
+          :label="t('kyc.reason')"
+        >
           {{ verification.rejection_reason }}
         </n-descriptions-item>
-        <n-descriptions-item v-if="verification.rejection_code" :label="t('kyc.rejection_code')">
-          <n-tag type="error">{{ verification.rejection_code }}</n-tag>
+        <n-descriptions-item
+          v-if="verification.rejection_code"
+          :label="t('kyc.rejection_code')"
+        >
+          <n-tag type="error">
+            {{ verification.rejection_code }}
+          </n-tag>
         </n-descriptions-item>
         <n-descriptions-item :label="t('kyc.submitted_at')">
           {{ formattedDate }}
         </n-descriptions-item>
       </n-descriptions>
 
-      <n-space style="margin-top: 16px" :size="12">
-        <n-button v-if="verification.status === 'rejected'" type="primary" @click="resubmit">
+      <n-space
+        style="margin-top: 16px"
+        :size="12"
+      >
+        <n-button
+          v-if="verification.status === 'rejected'"
+          type="primary"
+          @click="resubmit"
+        >
           {{ t('kyc.resubmit') }}
         </n-button>
-        <n-button v-if="verification.status === 'approved'" @click="goToDashboard">
+        <n-button
+          v-if="verification.status === 'approved'"
+          @click="goToDashboard"
+        >
           {{ t('kyc.go_to_dashboard') }}
         </n-button>
       </n-space>
     </n-card>
 
-    <n-empty v-else :description="t('kyc.no_verification_found')">
-      <n-button type="primary" @click="goToStart">
+    <n-empty
+      v-else
+      :description="t('kyc.no_verification_found')"
+    >
+      <n-button
+        type="primary"
+        @click="goToStart"
+      >
         {{ t('kyc.start_verification') }}
       </n-button>
     </n-empty>

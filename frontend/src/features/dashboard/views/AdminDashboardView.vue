@@ -92,7 +92,7 @@
 
 <script setup lang="ts">
 import { ref, computed, onMounted } from 'vue'
-import { useListingStore }ings/stores/listingStore'
+import { useListingStore } from '@/features/listings/stores/listingStore'
 import { ListingService } from '@/features/listings/services/listingService'
 
 const listingStore = useListingStore()

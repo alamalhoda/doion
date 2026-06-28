@@ -1,5 +1,10 @@
 <template>
-  <div class="upload-area" @dragover.prevent @drop.prevent @drop="onDrop">
+  <div
+    class="upload-area"
+    @dragover.prevent
+    @drop.prevent
+    @drop="onDrop"
+  >
     <n-upload
       :action="uploadUrl"
       :headers="headers"
@@ -13,7 +18,10 @@
     >
       <div class="upload-zone">
         <n-icon :size="40">
-          <svg viewBox="0 0 24 24" fill="currentColor"><path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/></svg>
+          <svg
+            viewBox="0 0 24 24"
+            fill="currentColor"
+          ><path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z" /></svg>
         </n-icon>
         <n-p>{{ dragLabel }}</n-p>
       </div>

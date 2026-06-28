@@ -88,7 +88,9 @@
       @submit.prevent="handleOtpVerify"
     >
       <h2>{{ $t('otp_title') }}</h2>
-      <p class="otp-description">{{ $t('otp_description') }}</p>
+      <p class="otp-description">
+        {{ $t('otp_description') }}
+      </p>
 
       <FormField
         v-model="otpCode"

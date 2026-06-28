@@ -5,6 +5,7 @@ import type { ChequeListing, CreateListingRequest, UpdateListingRequest, Listing
 export class ListingService {
   private static basePath = '/api/v1/listings'
   private static moderationPath = '/api/v1/moderation'
+  private static marketplacePath = '/api/v1/marketplace'
 
   static async createListing(data: CreateListingRequest): Promise<ChequeListing> {
     const response = await apiClient.post(this.basePath + '/', data)
@@ -44,8 +45,8 @@ export class ListingService {
     return response.data
   }
 
-  static async getMarketplaceListings(params?: ListingFilters & { page?: number; page_size?: number }): Promise<ChequeListing[]> {
-    const response = await apiClient.get(this.basePath + '/', { params })
+  static async getMarketplaceListings(params?: Record<string, unknown>): Promise<{ count: number; next: string | null; previous: string | null; results: ChequeListing[] }> {
+    const response = await apiClient.get(this.marketplacePath + '/listings/', { params })
     return response.data
   }
 

@@ -81,7 +81,7 @@ class TestModerationServiceReject:
         listing = self._create_listing(user)
 
         decision = ModerationService.reject_listing(
-            listing.id, user, "MOD_101", "اطلا�ات ناقص"
+            listing.id, user, "MOD_101", "اطلاعات ناقص",
         )
 
         listing.refresh_from_db()
@@ -93,11 +93,11 @@ class TestModerationServiceReject:
 
     def test_reject_already_rejected_increments(self, user):
         listing = self._create_listing(
-            user, status=ChequeListing.Status.REJECTED, resubmit_count=1
+            user, status=ChequeListing.Status.REJECTED, resubmit_count=1,
         )
 
         ModerationService.reject_listing(
-            listing.id, user, "MOD_102", "تصویر بی کیفیت"
+            listing.id, user, "MOD_102", "تصویر بی کیفیت",
         )
 
         listing.refresh_from_db()
@@ -105,12 +105,12 @@ class TestModerationServiceReject:
 
     def test_reject_after_three_resubmits_raises_mod_306(self, user):
         listing = self._create_listing(
-            user, status=ChequeListing.Status.PENDING_MODERATION, resubmit_count=3
+            user, status=ChequeListing.Status.PENDING_MODERATION, resubmit_count=3,
         )
 
         with pytest.raises(ModerationResubmitLimitExceeded) as exc_info:
             ModerationService.reject_listing(
-                listing.id, user, "MOD_101", "reject again"
+                listing.id, user, "MOD_101", "reject again",
             )
 
         assert exc_info.value.default_code == "MOD_306"
@@ -123,5 +123,5 @@ class TestModerationServiceReject:
 
         with pytest.raises(ValueError, match="not in pending moderation"):
             ModerationService.reject_listing(
-                listing.id, user, "MOD_101", "should fail"
+                listing.id, user, "MOD_101", "should fail",
             )

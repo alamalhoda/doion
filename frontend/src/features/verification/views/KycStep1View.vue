@@ -1,23 +1,61 @@
 <template>
-  <n-space vertical :size="24">
-    <n-space align="start" :size="12">
+  <n-space
+    vertical
+    :size="24"
+  >
+    <n-space
+      align="start"
+      :size="12"
+    >
       <n-h2>{{ t('kyc.step1.title') }}</n-h2>
-      <n-p text-color="gray">{{ t('kyc.step1.description') }}</n-p>
+      <n-p text-color="gray">
+        {{ t('kyc.step1.description') }}
+      </n-p>
     </n-space>
 
     <n-card :bordered="false">
-      <n-form :model="formData" :rules="rules" ref="formRef">
-        <n-form-item :label="t('kyc.full_name')" path="full_name">
-          <n-input v-model:value="formData.full_name" :placeholder="t('kyc.full_name_placeholder')" clearable />
+      <n-form
+        ref="formRef"
+        :model="formData"
+        :rules="rules"
+      >
+        <n-form-item
+          :label="t('kyc.full_name')"
+          path="full_name"
+        >
+          <n-input
+            v-model:value="formData.full_name"
+            :placeholder="t('kyc.full_name_placeholder')"
+            clearable
+          />
         </n-form-item>
-        <n-form-item :label="t('kyc.national_id')" path="national_id">
-          <n-input v-model:value="formData.national_id" :placeholder="t('kyc.national_id_placeholder')" maxlength="10" clearable />
+        <n-form-item
+          :label="t('kyc.national_id')"
+          path="national_id"
+        >
+          <n-input
+            v-model:value="formData.national_id"
+            :placeholder="t('kyc.national_id_placeholder')"
+            maxlength="10"
+            clearable
+          />
         </n-form-item>
-        <n-form-item :label="t('kyc.company_name')" path="company_name">
-          <n-input v-model:value="formData.company_name" :placeholder="t('kyc.company_name_placeholder')" clearable />
+        <n-form-item
+          :label="t('kyc.company_name')"
+          path="company_name"
+        >
+          <n-input
+            v-model:value="formData.company_name"
+            :placeholder="t('kyc.company_name_placeholder')"
+            clearable
+          />
         </n-form-item>
         <n-space justify="end">
-          <n-button type="primary" :loading="store.loading" @click="handleSubmit">
+          <n-button
+            type="primary"
+            :loading="store.loading"
+            @click="handleSubmit"
+          >
             {{ t('kyc.next_step') }}
           </n-button>
         </n-space>

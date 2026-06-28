@@ -17,18 +17,30 @@
       بازگشت
     </button>
 
-    <div v-if="isLoading" class="loading-state">
+    <div
+      v-if="isLoading"
+      class="loading-state"
+    >
       در حال بارگذاری...
     </div>
 
-    <div v-else-if="error" class="error-state">
+    <div
+      v-else-if="error"
+      class="error-state"
+    >
       {{ error }}
-      <button class="btn btn--secondary btn--sm" @click="fetchListing">
+      <button
+        class="btn btn--secondary btn--sm"
+        @click="fetchListing"
+      >
         تلاش مجدد
       </button>
     </div>
 
-    <div v-else-if="listing" class="detail-content">
+    <div
+      v-else-if="listing"
+      class="detail-content"
+    >
       <div class="detail-header">
         <div class="detail-header-info">
           <h1 class="detail-title">
@@ -110,7 +122,10 @@
         </div>
       </div>
 
-      <div v-if="listing.description" class="detail-section">
+      <div
+        v-if="listing.description"
+        class="detail-section"
+      >
         <div class="detail-section-title">
           توضیحات
         </div>

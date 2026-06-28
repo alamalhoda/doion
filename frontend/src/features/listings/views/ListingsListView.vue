@@ -31,22 +31,37 @@
       آگهی‌های جاری
     </h2>
 
-    <div v-if="isLoading" class="loading-state">
+    <div
+      v-if="isLoading"
+      class="loading-state"
+    >
       در حال بارگذاری...
     </div>
 
-    <div v-else-if="error" class="error-state">
+    <div
+      v-else-if="error"
+      class="error-state"
+    >
       {{ error }}
-      <button class="btn btn--secondary btn--sm" @click="fetchListings">
+      <button
+        class="btn btn--secondary btn--sm"
+        @click="fetchListings"
+      >
         تلاش مجدد
       </button>
     </div>
 
-    <div v-else-if="listings.length === 0" class="empty-state">
+    <div
+      v-else-if="listings.length === 0"
+      class="empty-state"
+    >
       شما تا کنون آگهی ثبت نکرده‌اید.
     </div>
 
-    <div v-else class="listing-rows">
+    <div
+      v-else
+      class="listing-rows"
+    >
       <ListingCard
         v-for="item in listings"
         :key="item.id"
