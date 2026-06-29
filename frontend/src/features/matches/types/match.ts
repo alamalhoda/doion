@@ -1,6 +1,6 @@
 // Match and Notification types for the marketplace
 
-export type MatchStatus = 'pending' | 'accepted' | 'rejected' | 'settled_off_platform'
+export type MatchStatus = 'pending' | 'accepted' | 'rejected' | 'settled_off_platform' | 'cancelled' | 'declined' | 'off_platform_confirmed' | 'settled'
 
 export interface ListingSummary {
   id: string
@@ -8,13 +8,13 @@ export interface ListingSummary {
   due_date: string
   status: string
   title?: string
-  suggested_discount_rate?: number | null // Add this to match.listing?.suggested_discount_rate
+  suggested_discount_rate?: number | null
 }
 
 export interface UserSummary {
   id: string
   username: string
-  full_name?: string
+  full_name: string
 }
 
 export interface Match {
@@ -40,10 +40,8 @@ export interface CreateMatchRequest {
   proposed_discount_rate?: number
 }
 
-export interface UpdateMatchStatusRequest {
-  status: MatchStatus
-  final_discount_rate?: number
-  terms?: string
+export interface DeclineMatchRequest {
+  note?: string
 }
 
 export interface Notification {

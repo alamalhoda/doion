@@ -79,9 +79,12 @@
 
 <script setup lang="ts">
 import { computed } from 'vue'
+import { useDialog, useNotification } from 'naive-ui'
+import { useRouter } from 'vue-router'
 import RiskBadge from '@/components/RiskBadge.vue'
 import type { ChequeListing } from '@/features/listings/types/listing'
 import { useFormat } from '@/composables'
+import { useMatchStore } from '@/features/matches/stores/matchStore'
 
 const props = withDefaults(
   defineProps<{
@@ -95,9 +98,12 @@ const props = withDefaults(
 
 const emit = defineEmits<{
   (e: 'click'): void
-  (e: 'interest'): void
 }>()
 
+const router = useRouter()
+const matchStore = useMatchStore()
+const dialog = useDialog()
+const notification = useNotification()
 const { formatCurrency, formatNumber } = useFormat()
 
 const issuerName = computed(() => {
@@ -127,8 +133,43 @@ function onClick() {
   emit('click')
 }
 
-function onInterest() {
-  emit('interest')
+async function onInterest() {
+  const confirmed = await showConfirmation()
+  if (confirmed) {
+    try {
+      await matchStore.createMatch({ listingId: props.listing.id, message: '' })
+      notification.success({
+        title: 'درخواست تطبیق ثبت شد',
+        content: 'درخواست شما با موفقیت ثبت شد. منتظر تایید صاحب چک باشید.',
+        duration: 3000,
+      })
+      router.push('/app/matches')
+    } catch (error) {
+      notification.error({
+        title: 'خطا در ثبت درخواست',
+        content: extractErrorMessage(error),
+        duration: 3000,
+      })
+    }
+  }
+}
+
+function showConfirmation(): Promise<boolean> {
+  return new Promise((resolve) => {
+    dialog.warning({
+      title: 'تایید درخواست تطبیق',
+      content: 'آیا مایلید درخواست تطبیق برای این آگهی چک را ثبت کنید؟',
+      positiveText: 'تایید',
+      negativeText: 'انصراف',
+      onPositiveClick: () => resolve(true),
+      onNegativeClick: () => resolve(false),
+    })
+  })
+}
+
+function extractErrorMessage(err: unknown): string {
+  const anyErr = err as { response?: { data?: { error?: { message?: string } } } }
+  return anyErr?.response?.data?.error?.message || (err as Error)?.message || 'خطایی رخ داد'
 }
 </script>
 

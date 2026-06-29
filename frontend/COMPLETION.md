@@ -240,8 +240,27 @@ npm run preview
 - [x] Backend: Route registered under `/api/v1/marketplace/listings/`
 - [x] Backend: Tests written (36 marketplace + moderation + identity tests pass)
 - [x] Docs: API Contract Registry updated with Phase 5 endpoint
-- [ ] Frontend: Marketplace feature shell pending (`features/marketplace/`)
-- [ ] Frontend: Filter sidebar + listing grid UI pending
+- [x] Frontend: Marketplace feature shell created (`features/marketplace/`)
+- [x] Frontend: FilterSidebar + MarketplaceListingCard + ListingDetailModal components created
+- [x] Frontend: MarketplaceView.vue wired to API with filtering and pagination
+
+## ✅ Phase 6 Matching & Settlement
+
+- [x] Backend: `doion.matching` app created with `Match`, `SettlementPort`, `OffPlatformSettlement` models
+- [x] Backend: `Status` and `SettlementType` enums in `constants.py`
+- [x] Backend: `MatchingService` with `create_match`, `accept_match`, `decline_match`, `cancel_match`, `confirm_off_platform`
+- [x] Backend: Signals: `MatchCreated`, `MatchAccepted`, `MatchDeclined`, `MatchCancelled`, `SettlementConfirmed`
+- [x] Backend: `MatchViewSet` with role-based queryset filtering
+- [x] Backend: Migrations created and applied
+- [x] Backend: Fixed signals.py to import Status from constants
+- [x] Frontend: `features/matches/` types, services, store, views, and components created
+- [x] Frontend: `MatchService` with all endpoints (createMatch, getMyMatches, getMatch, accept/decline/cancel/confirmOffPlatform)
+- [x] Frontend: `matchStore` with all state/computed/actions for match management
+- [x] Frontend: `MatchesListView.vue` with tabs (pending, accepted, completed)
+- [x] Frontend: `MatchDetailView.vue` with accept/decline/cancel/confirm actions
+- [x] Frontend: `MatchCard.vue` molecule component with status tags
+- [x] Frontend: `MarketplaceListingCard.vue` confirmation dialog for express interest
+- [x] Docs: API Contract Registry updated with Phase 6 endpoint
 
 ---
 
@@ -368,6 +387,6 @@ npm run preview
 
 ---
 
-**Status:** ✅ COMPLETE (Phase 0 + Phase 1 + Phase 2 KYC + Phase 3 Listings + Phase 4 Moderation + Phase 5 Marketplace API)
+**Status:** ✅ COMPLETE (Phase 0 + Phase 1 + Phase 2 KYC + Phase 3 Listings + Phase 4 Moderation + Phase 5 Marketplace + Phase 6 Matching)
 
-Phase 0 scaffold, Phase 1 Identity/Registration, Phase 2 KYC, Phase 3 Listings, and Phase 4 Moderation are **production-ready**. Next: Phase 5 (Marketplace) and beyond.
+Phase 0 scaffold, Phase 1 Identity/Registration, Phase 2 KYC, Phase 3 Listings, Phase 4 Moderation, Phase 5 Marketplace, and Phase 6 Matching are **production-ready**. Next: Phase 7 (Notifications) and Phase 8 (Compliance).

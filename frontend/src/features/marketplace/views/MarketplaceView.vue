@@ -19,6 +19,27 @@
       />
 
       <div class="market-main">
+        <div
+          v-if="!isInvestor || !isVerified"
+          class="market-guard"
+        >
+          <h3 class="guard-title">
+            {{ $t('marketplace.guard_title') }}
+          </h3>
+          <p class="guard-desc">
+            {{ $t('marketplace.guard_desc') }}
+          </p>
+          <AppButton
+            :label="$t('marketplace.complete_kyc')"
+            variant="primary"
+            @click="goToVerification"
+          />
+        </div>
+
+        <div
+          v-else
+          class="market-content"
+        >
         <div class="market-toolbar">
           <span class="market-count">
             نمایش {{ startIndex.toLocaleString('fa-IR') }} تا {{ endIndex.toLocaleString('fa-IR') }} از {{ totalCount.toLocaleString('fa-IR') }} آگهی
@@ -96,11 +117,11 @@
             :key="item.id"
             class="listing-card-wrapper"
           >
-            <MarketplaceListingCard
-              :listing="item"
-              :hoverable="true"
-              @click="openDetail(item)"
-            />
+<MarketplaceListingCard
+               :listing="item"
+               :hoverable="true"
+               @click="openDetail(item)"
+             />
           </div>
         </div>
 
@@ -138,13 +159,19 @@
 
 <script setup lang="ts">
 import { ref, computed, onMounted, watch } from 'vue'
+import { useRouter } from 'vue-router'
 import { useMarketplaceStore, type MarketplaceFilters } from '../stores/marketplaceStore'
 import type { ChequeListing } from '@/features/listings/types/listing'
 import MarketplaceListingCard from '../components/MarketplaceListingCard.vue'
 import FilterSidebar from '../components/FilterSidebar.vue'
 import ListingDetailModal from '../components/ListingDetailModal.vue'
+import AppButton from '@/components/ui/AppButton.vue'
+import { useAuthStore } from '@/features/auth/stores/authStore'
+import { isInvestor } from '@/utils/permissions'
 
 const store = useMarketplaceStore()
+const router = useRouter()
+const authStore = useAuthStore()
 
 const localFilters = ref<MarketplaceFilters>({ ...store.filters })
 const showDetail = ref(false)
@@ -155,6 +182,10 @@ const totalCount = computed(() => store.totalCount)
 const totalPages = computed(() => Math.max(1, Math.ceil(store.totalCount / store.pageSize)))
 const startIndex = computed(() => (store.page - 1) * store.pageSize + 1)
 const endIndex = computed(() => Math.min(store.page * store.pageSize, store.totalCount))
+
+const user = computed(() => authStore.user)
+const isInvestor = computed(() => isInvestor(user.value))
+const isVerified = computed(() => user.value?.is_verified || false)
 
 onMounted(() => {
   store.fetchListings()
@@ -184,6 +215,10 @@ function onSortChange(event: Event) {
 function openDetail(item: ChequeListing) {
   selectedListing.value = item
   showDetail.value = true
+}
+
+function goToVerification() {
+  router.push('/app/verification')
 }
 </script>
 
@@ -215,6 +250,22 @@ function openDetail(item: ChequeListing) {
   margin: 0;
 }
 
+.market-guard {
+  text-align: center;
+  padding: 3rem 1.5rem;
+}
+
+.guard-title {
+  color: var(--text1);
+  font-size: var(--font-size-lg);
+  margin: 0 0 0.5rem;
+}
+
+.guard-desc {
+  color: var(--text2);
+  margin: 0 0 1.5rem;
+}
+
 .market-layout {
   max-width: 1100px;
   margin: 0 auto;
@@ -223,6 +274,10 @@ function openDetail(item: ChequeListing) {
   grid-template-columns: 240px 1fr;
   gap: 1.5rem;
   align-items: start;
+}
+
+.market-content {
+  width: 100%;
 }
 
 @media (max-width: 768px) {

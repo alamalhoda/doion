@@ -36,3 +36,28 @@
 - [x] Create `doion.pricing` app with synchronous `calculate_suggested_rate` stub
 - [x] Change `Document.related_object_id` from `UUIDField` to `CharField(max_length=255)` for integer PK compatibility
 - [x] Migrations created and applied
+
+## Phase 4 — Moderation — Completed
+
+- [x] Create `doion.moderation` app with `ModerationDecision` model
+- [x] Moderation queue API with filtering, pagination
+- [x] Decision endpoint (approve/reject) with rejection_code enum
+- [x] Migrations created and applied
+
+## Phase 5 — Marketplace — Completed
+
+- [x] Create `doion.marketplace` app
+- [x] `MarketplaceViewSet` listing only `published` listings
+- [x] Filtering by risk_tier, amount range, days_to_due, issuer_type, bank_name
+- [x] Ordering support
+- [x] Migrations created and applied
+
+## Phase 6 — Matching & Settlement — Completed
+
+- [x] Create `doion.matching` app with `Match`, `SettlementPort`, `OffPlatformSettlement` models
+- [x] `Status` and `SettlementType` enums in `constants.py`
+- [x] `MatchingService` with `create_match`, `accept_match`, `decline_match`, `cancel_match`, `confirm_off_platform`
+- [x] Signals: `MatchCreated`, `MatchAccepted`, `MatchDeclined`, `MatchCancelled`, `SettlementConfirmed`
+- [x] `MatchViewSet` with role-based filtering
+- [x] Migrations created and applied
+- [x] Fixed signals.py to import Status from constants (was causing 21 test failures)

@@ -681,6 +681,195 @@ List all `published` cheque listings for investor browsing. Supports pagination 
 
 ---
 
+## Phase-6 Endpoints
+
+### Matches
+
+#### POST /api/v1/matches/
+
+Create a new match (investor expresses interest in a listing). Creates `Match` with `status=pending`.
+
+**Request Body:**
+```json
+{
+  "listing_id": 1,
+  "message": ""
+}
+```
+
+**Constraints:**
+- `listing_id`: required, must be a valid, published listing ID
+- Only users with `investor` role and `is_verified=true` can create matches
+- Investor cannot match their own listing
+
+**Response (201):**
+```json
+{
+  "id": 1,
+  "listing": {
+    "id": 1,
+    "bank_name": "بانک ملت",
+    "face_amount": 500000000,
+    "due_date": "2026-12-31",
+    "risk_tier": "low",
+    "status": "published"
+  },
+  "investor": {
+    "id": 1,
+    "username": "investor1",
+    "full_name": "سرمایه‌گذار"
+  },
+  "check_holder": {
+    "id": 2,
+    "username": "holder1",
+    "full_name": "دارنده چک"
+  },
+  "status": "pending",
+  "settlement_type": "off_platform",
+  "final_discount_rate": null,
+  "terms": "",
+  "message": "",
+  "created_at": "2026-06-29T10:00:00Z",
+  "updated_at": "2026-06-29T10:00:00Z"
+}
+```
+
+**Error Response (400):**
+```json
+{
+  "error": {
+    "code": "PERMISSION_ERROR",
+    "message": "Only investors can create matches"
+  }
+}
+```
+
+**Errors:**
+- `MATCH_101` if listing is not published
+- `MATCH_102` if user is not an investor
+- `MATCH_103` if user tries to match their own listing
+
+#### GET /api/v1/matches/
+
+List current user's matches. Results filtered by role:
+- Investors see matches where they are the `investor`
+- Check holders see matches where they are the `check_holder`
+
+**Response (200):**
+```json
+{
+  "results": [Match objects...]
+}
+```
+
+#### GET /api/v1/matches/{id}/
+
+Get match details. Only accessible to `investor` or `check_holder` parties.
+
+**Response (200):** Same shape as POST response
+**Errors:**
+- `NOT_FOUND_ERROR` if match does not exist
+- `PERMISSION_ERROR` if user is not a party to this match
+
+#### POST /api/v1/matches/{id}/accept/
+
+Accept a match (check holder only). Transition: `pending` → `accepted`. Also sets listing status to `matched`.
+
+**Response (200):**
+```json
+{
+  "id": 1,
+  "status": "accepted",
+  ...
+}
+```
+
+**Errors:**
+- `MATCH_201` if match is not pending
+- `MATCH_202` if user is not the check holder
+
+#### POST /api/v1/matches/{id}/decline/
+
+Decline a match (check holder only). Transition: `pending` → `declined`.
+
+**Request Body (optional):**
+```json
+{
+  "note": "سیستم‌عاملی ندارم"
+}
+```
+
+**Response (200):**
+```json
+{
+  "id": 1,
+  "status": "declined",
+  "message": "سیستم‌عاملی ندارم",
+  ...
+}
+```
+
+**Errors:**
+- `MATCH_201` if match is not pending
+- `MATCH_202` if user is not the check holder
+
+#### POST /api/v1/matches/{id}/cancel/
+
+Cancel a match (investor or check holder). Transition: `pending` or `accepted` → `cancelled`. Restores listing to `published` if it was `matched`.
+
+**Response (200):**
+```json
+{
+  "id": 1,
+  "status": "cancelled",
+  ...
+}
+```
+
+**Errors:**
+- `MATCH_301` if match cannot be cancelled in current status
+- `MATCH_302` if user is not a party to the match
+
+#### POST /api/v1/matches/{id}/confirm-off-platform/
+
+Confirm off-platform settlement (check holder only after match is accepted). Transition: `accepted` → `off_platform_confirmed`. Creates `OffPlatformSettlement` record.
+
+**Response (200):**
+```json
+{
+  "id": 1,
+  "status": "off_platform_confirmed",
+  "off_platform_settlement": {
+    "id": 1,
+    "match": 1,
+    "confirmation_code": "",
+    "confirmed_by": 2,
+    "confirmed_at": "2026-06-29T12:00:00Z"
+  },
+  ...
+}
+```
+
+**Errors:**
+- `MATCH_401` if match is not accepted
+- `MATCH_402` if user is not the check holder
+
+### Match-Specific Error Codes
+
+| Code | HTTP Status | Field/Detail | Description |
+|------|-------------|--------------|-------------|
+| `MATCH_101` | 400 | `listing_id` | Listing is not in published state |
+| `MATCH_102` | 400 | `non_field_errors` | Only investors can create matches |
+| `MATCH_103` | 400 | `non_field_errors` | Cannot match your own listing |
+| `MATCH_201` | 400 | `non_field_errors` | Match is not in pending state |
+| `MATCH_202` | 400 | `non_field_errors` | Only the check holder can accept/decline |
+| `MATCH_301` | 400 | `non_field_errors` | Match cannot be cancelled in current status |
+| `MATCH_302` | 400 | `non_field_errors` | You are not a party to this match |
+| `MATCH_401` | 400 | `non_field_errors` | Match must be accepted to confirm settlement |
+| `MATCH_402` | 400 | `non_field_errors` | Only the check holder can confirm settlement |
+
+---
+
 ## Role Values
 
 | Value | Label (FA) | Label (EN) | Description |

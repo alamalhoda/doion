@@ -22,7 +22,7 @@ todos:
     status: completed
   - id: phase-6-matching-settlement
     content: "فاز ۶: Match model + SettlementPort؛ express interest + dashboard match organisms"
-    status: pending
+    status: completed
   - id: phase-7-notifications-center
     content: "فاز ۷: Notification model + Celery SMS stub؛ notification organisms + activity feed"
     status: pending

@@ -56,6 +56,8 @@
 import { computed } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { NTag } from 'naive-ui'
+import { useAuthStore } from '@/features/auth/stores/authStore'
+import { isInvestor } from '@/utils/permissions'
 import type { Match } from '../types/match'
 
 interface Props {
@@ -66,15 +68,21 @@ const props = defineProps<Props>()
 const emit = defineEmits<{
   click: []
 }>()
-
 const { t } = useI18n()
+const authStore = useAuthStore()
+
+const user = computed(() => authStore.user)
+const isInvestorRole = computed(() => isInvestor(user.value))
 
 const statusTagType = computed(() => {
-  const statusMap: Record<string, 'info' | 'success' | 'warning' | 'error'> = {
+  const statusMap: Record<string, 'info' | 'success' | 'warning' | 'error' | 'default'> = {
     pending: 'info',
     accepted: 'warning',
-    rejected: 'error',
+    declined: 'error',
+    cancelled: 'error',
     settled_off_platform: 'success',
+    off_platform_confirmed: 'success',
+    settled: 'success',
   }
   return statusMap[props.match.status] || 'default'
 })
@@ -85,13 +93,19 @@ const statusText = computed(() => {
     accepted: t('matches.status_accepted'),
     rejected: t('matches.status_rejected'),
     settled_off_platform: t('matches.status_settled'),
+    cancelled: t('matches.status_cancelled'),
+    declined: t('matches.status_declined'),
+    off_platform_confirmed: t('matches.status_off_platform_confirmed'),
+    settled: t('matches.status_settled'),
   }
   return statusMap[props.match.status] || props.match.status
 })
 
 const counterpartyName = computed(() => {
-  // For check holders, show investor; for investors, show check holder
-  return props.match.investor?.full_name || props.match.check_holder?.full_name || t('common.unknown')
+  // For investor, show check_holder; for check_holder, show investor
+  return isInvestorRole.value
+    ? props.match.check_holder?.full_name || t('common.unknown')
+    : props.match.investor?.full_name || t('common.unknown')
 })
 
 const settlementTypeText = computed(() => {
