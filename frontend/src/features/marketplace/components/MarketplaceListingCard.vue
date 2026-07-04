@@ -137,7 +137,7 @@ async function onInterest() {
   const confirmed = await showConfirmation()
   if (confirmed) {
     try {
-      await matchStore.createMatch({ listingId: props.listing.id, message: '' })
+      await matchStore.createMatch({ listing_id: props.listing.id, message: '' })
       notification.success({
         title: 'درخواست تطبیق ثبت شد',
         content: 'درخواست شما با موفقیت ثبت شد. منتظر تایید صاحب چک باشید.',
