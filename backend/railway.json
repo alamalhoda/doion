@@ -1,7 +1,4 @@
 {
-  "builder": "nixpacks",
-  "nixpacks": {
-    "providers": ["python"]
-  }
+  "$schema": "https://railway.com/railway.schema.json"
 }
 
