@@ -681,6 +681,138 @@ List all `published` cheque listings for investor browsing. Supports pagination 
 
 ---
 
+## Phase-7 Endpoints
+
+### Notifications
+
+#### `GET /api/v1/notifications/`
+
+List user's notifications with pagination and filtering.
+
+**Query Parameters:**
+| Param | Type | Description |
+|-------|------|-------------|
+| `type` | string | Filter by notification type: `match_created`, `match_accepted`, `match_declined`, `match_cancelled`, `settlement_confirmed`, `listing_published`, `listing_rejected`, `listing_expired`, `kyc_approved`, `kyc_rejected`, `new_moderation_item` |
+| `is_read` | boolean | Filter by read status: `true` or `false` |
+| `page` | int | Page number (default: 1) |
+| `page_size` | int | Results per page (default: 20) |
+
+**Response 200:**
+```json
+{
+  "count": 5,
+  "next": null,
+  "previous": null,
+  "unread_count": 3,
+  "results": [
+    {
+      "id": "uuid",
+      "type": "match_created",
+      "channel": "in_app",
+      "status": "pending",
+      "title": "درخواست خرید جدید",
+      "message": "یک سرمایه‌گذار به آگهی چک شما علاقه‌مند شده است",
+      "related_object_type": "cheque_listing",
+      "related_object_id": "uuid",
+      "read_at": null,
+      "sent_at": "2025-04-25T14:00:00Z",
+      "created_at": "2025-04-25T14:00:00Z"
+    }
+  ]
+}
+```
+
+**Errors:**
+- `NOTIF_401` - Authentication required (401)
+- `NOTIF_403` - Permission denied (403)
+
+---
+
+#### `PATCH /api/v1/notifications/{id}/`
+
+Mark a notification as read.
+
+**Request Body:**
+```json
+{
+  "is_read": true
+}
+```
+
+**Response 200:**
+```json
+{
+  "id": "uuid",
+  "type": "match_created",
+  "channel": "in_app",
+  "status": "read",
+  "title": "...",
+  "message": "...",
+  "related_object_type": "cheque_listing",
+  "related_object_id": "uuid",
+  "read_at": "2025-04-25T15:00:00Z",
+  "sent_at": "2025-04-25T14:00:00Z",
+  "created_at": "2025-04-25T14:00:00Z"
+}
+```
+
+---
+
+#### `POST /api/v1/notifications/mark-all-read/`
+
+Mark all user notifications as read.
+
+**Response 200:**
+```json
+{
+  "message": "3 notifications marked as read"
+}
+```
+
+---
+
+#### `GET /api/v1/notifications/preferences/`
+
+Get user notification preferences.
+
+**Response 200:**
+```json
+{
+  "in_app_enabled": true,
+  "sms_enabled": false,
+  "email_enabled": true
+}
+```
+
+---
+
+#### `PATCH /api/v1/notifications/preferences/`
+
+Update user notification preferences.
+
+**Request Body:**
+```json
+{
+  "in_app_enabled": true,
+  "sms_enabled": true,
+  "email_enabled": true
+}
+```
+
+**Response 200:**
+```json
+{
+  "in_app_enabled": true,
+  "sms_enabled": true,
+  "email_enabled": true
+}
+```
+
+**Errors:**
+- `NOTIF_403` - Preference mismatch or invalid field
+
+---
+
 ## Role Values
 
 | Value | Label (FA) | Label (EN) | Description |

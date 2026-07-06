@@ -1,11 +1,11 @@
 <template>
-  <div 
-    class="notification-item" 
-    :class="{ unread: notification.status === 'pending' }"
+  <div
+    class="notification-item"
+    :class="{ unread: notification.status !== 'read' }"
     @click="handleClick"
   >
     <div class="notification-icon">
-      <NIcon :component="iconForType" />
+      <Icon :name="iconName" :size="20" />
     </div>
 
     <div class="notification-content">
@@ -13,13 +13,9 @@
         <h4 class="notification-title">
           {{ notification.title }}
         </h4>
-        <NButton 
-          v-if="notification.status === 'pending'"
-          size="tiny" 
-          @click.stop="emit('markRead')"
-        >
-          {{ $t('notifications.mark_read') }}
-        </NButton>
+        <span class="notification-type">
+          {{ typeLabel }}
+        </span>
       </div>
       <p class="notification-message">
         {{ notification.message }}
@@ -31,30 +27,50 @@
 
 <script setup lang="ts">
 import { computed } from 'vue'
-import type { Component } from 'vue'
 import { useI18n } from 'vue-i18n'
-import { NIcon, NButton } from 'naive-ui'
-import { CheckmarkCircle, AlertCircle, ChatboxEllipses, Cash, DocumentText } from '@vicons/ionicons5'
+import Icon from '@/components/ui/Icon.vue'
 import type { Notification } from '../types/notification'
-
-const { notification } = defineProps<{ notification: Notification }>()
-const emit = defineEmits<{
-  markRead: []
-  click: []
-}>()
 
 const { t } = useI18n()
 
-const iconForType = computed(() => {
-  const icons: Record<string, Component> = {
-    match_created: ChatboxEllipses,
-    listing_approved: CheckmarkCircle,
-    listing_rejected: AlertCircle,
-    match_accepted: Cash,
-    match_rejected: DocumentText,
-  }
-  return icons[notification.type] || CheckmarkCircle
-})
+const props = defineProps<{
+  notification: Notification
+}>()
+
+const emit = defineEmits<{
+  click: []
+}>()
+
+const typeLabelMap: Record<string, string> = {
+  match_created: 'درخواست خرید',
+  match_accepted: 'پذیرش درخواست',
+  match_declined: 'رد درخواست',
+  match_cancelled: 'لغو تطابق',
+  settlement_confirmed: 'تأیید تسویه',
+  listing_published: 'آگهی منتشر شد',
+  listing_rejected: 'آگهی رد شد',
+  listing_expired: 'آگهی منقضی شد',
+  kyc_approved: 'تأیید هویت',
+  kyc_rejected: 'رد هویت',
+  new_moderation_item: 'مورد جدید برای بررسی',
+}
+
+const iconMap: Record<string, string> = {
+  match_created: 'alert',
+  match_accepted: 'check',
+  match_declined: 'close',
+  match_cancelled: 'alert',
+  settlement_confirmed: 'check',
+  listing_published: 'check',
+  listing_rejected: 'alert',
+  listing_expired: 'menu',
+  kyc_approved: 'check',
+  kyc_rejected: 'alert',
+  new_moderation_item: 'search',
+}
+
+const iconName = computed(() => iconMap[props.notification.type] || 'notifications')
+const typeLabel = computed(() => typeLabelMap[props.notification.type] || props.notification.type)
 
 function handleClick(): void {
   emit('click')
@@ -64,7 +80,7 @@ function formatTime(dateStr: string): string {
   const date = new Date(dateStr)
   const now = new Date()
   const diffHours = Math.floor((now.getTime() - date.getTime()) / (1000 * 60 * 60))
-  
+
   if (diffHours < 1) {
     return t('notifications.just_now')
   } else if (diffHours < 24) {
@@ -94,46 +110,12 @@ function formatTime(dateStr: string): string {
 }
 
 .notification-item.unread {
-  background: var(--teal-light);
-}
-
-.notification-icon {
-  padding: var(--spacing-sm);
-  background: var(--teal-light);
-  border-radius: 50%;
-  color: var(--teal);
-  flex-shrink: 0;
-}
-
-.notification-title {
-  margin: 0;
-  font-size: var(--font-size-sm);
-  color: var(--text1);
-  font-weight: 500;
-}
-
-.notification-message {
-  margin: 0 0 var(--spacing-sm);
-  font-size: var(--font-size-xs);
-  color: var(--text2);
-  line-height: 1.5;
-}
-
-.notification-time {
-  font-size: var(--font-size-xs);
-  color: var(--text3);
-}
-
-.notification-item:last-child {
-  border-bottom: none;
-}
-
-.notification-item:hover {
-  background: var(--color-bg-primary);
-}
-
-.notification-item.unread {
   background: var(--color-primary-light);
+}
+
+.notification-item.unread:hover {
+  background: var(--color-primary-light);
+  opacity: 0.9;
 }
 
 .notification-icon {
@@ -142,10 +124,19 @@ function formatTime(dateStr: string): string {
   border-radius: 50%;
   color: var(--color-primary);
   flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.notification-item.unread .notification-icon {
+  background: var(--color-primary);
+  color: #fff;
 }
 
 .notification-content {
   flex: 1;
+  min-width: 0;
 }
 
 .notification-header {
@@ -153,6 +144,7 @@ function formatTime(dateStr: string): string {
   justify-content: space-between;
   align-items: center;
   margin-bottom: var(--spacing-xs);
+  gap: var(--spacing-sm);
 }
 
 .notification-title {
@@ -160,6 +152,14 @@ function formatTime(dateStr: string): string {
   font-size: var(--font-size-sm);
   color: var(--color-text-primary);
   font-weight: 500;
+  line-height: 1.4;
+}
+
+.notification-type {
+  font-size: var(--font-size-xs);
+  color: var(--color-text-tertiary);
+  white-space: nowrap;
+  flex-shrink: 0;
 }
 
 .notification-message {

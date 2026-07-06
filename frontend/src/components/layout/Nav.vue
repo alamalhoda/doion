@@ -25,6 +25,22 @@
 
       <div class="nav__actions">
         <slot name="actions" />
+
+        <RouterLink
+          v-if="showNotifications"
+          :to="ROUTES.USER_NOTIFICATIONS"
+          class="nav__notification"
+        >
+          <Icon
+            name="notifications"
+            :size="20"
+          />
+          <span
+            v-if="unreadCount > 0"
+            class="nav__notification-badge"
+          >{{ unreadCount > 99 ? '99+' : unreadCount }}</span>
+        </RouterLink>
+
         <Button
           v-if="showLanguageSwitcher"
           variant="ghost"
@@ -38,10 +54,12 @@
 </template>
 
 <script setup lang="ts">
-import { computed } from 'vue'
+import { computed, onMounted, onUnmounted } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { ROUTES } from '@/constants/routes'
 import Button from '@/components/ui/Button.vue'
+import Icon from '@/components/ui/Icon.vue'
+import { useNotificationStore } from '@/features/notifications/stores/notificationStore'
 
 interface NavLink {
   path: string
@@ -60,6 +78,7 @@ const props = withDefaults(defineProps<Props>(), {
 })
 
 const { locale } = useI18n()
+const notificationStore = useNotificationStore()
 
 const appName = 'چک‌بازار'
 const currentLocale = computed(() => locale.value)
@@ -89,6 +108,24 @@ const navLinks = computed<NavLink[]>(() => {
 })
 
 const showLinks = computed(() => props.variant !== 'default')
+const showNotifications = computed(() => props.variant === 'user')
+
+const unreadCount = computed(() => notificationStore.unreadCount)
+
+let pollingTimer: ReturnType<typeof setInterval> | null = null
+
+onMounted(() => {
+  notificationStore.fetchUnreadCount()
+  pollingTimer = setInterval(() => {
+    notificationStore.fetchUnreadCount()
+  }, 30000)
+})
+
+onUnmounted(() => {
+  if (pollingTimer) {
+    clearInterval(pollingTimer)
+  }
+})
 
 function toggleLocale() {
   locale.value = currentLocale.value === 'fa' ? 'en' : 'fa'
@@ -143,5 +180,38 @@ function toggleLocale() {
   display: flex;
   align-items: center;
   gap: var(--spacing-sm);
+}
+
+.nav__notification {
+  position: relative;
+  color: rgba(255, 255, 255, 0.75);
+  text-decoration: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--spacing-xs);
+  border-radius: var(--radius-sm);
+  transition: color var(--transition-base);
+}
+
+.nav__notification:hover {
+  color: var(--gold-light);
+}
+
+.nav__notification-badge {
+  position: absolute;
+  top: -4px;
+  right: -4px;
+  background: var(--color-warning);
+  color: #fff;
+  font-size: 10px;
+  font-weight: var(--font-weight-bold);
+  min-width: 18px;
+  height: 18px;
+  border-radius: 9px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 4px;
 }
 </style>
