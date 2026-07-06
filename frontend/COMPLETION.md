@@ -368,6 +368,33 @@ npm run preview
 
 ---
 
-**Status:** ✅ COMPLETE (Phase 0 + Phase 1 + Phase 2 KYC + Phase 3 Listings + Phase 4 Moderation + Phase 5 Marketplace API)
+**Status:** ✅ COMPLETE (Phase 0 + Phase 1 + Phase 2 KYC + Phase 3 Listings + Phase 4 Moderation + Phase 5 Marketplace API + Phase 7 Notifications)
 
-Phase 0 scaffold, Phase 1 Identity/Registration, Phase 2 KYC, Phase 3 Listings, and Phase 4 Moderation are **production-ready**. Next: Phase 5 (Marketplace) and beyond.
+Phase 0 scaffold, Phase 1 Identity/Registration, Phase 2 KYC, Phase 3 Listings, Phase 4 Moderation, Phase 5 Marketplace API, and Phase 7 Notifications are **production-ready**. Next: Phase 8 Compliance/Hardening.
+
+---
+
+## ✅ Phase 7 Notifications Implementation
+
+### Backend
+- [x] `doion.notifications` app created with `Notification` and `NotificationPreference` models
+- [x] `NotificationViewSet` with list, retrieve, mark-read, mark-all-read, preferences actions
+- [x] Index optimization on `(user, -created_at)` and `(user, status, -created_at)`
+- [x] TextChoices for `NotificationType`, `NotificationChannel`, `NotificationStatus`
+- [x] `doion.integrations` app with `SMSLog` model and `send_sms` stub service
+- [x] Signal handlers for `ChequeListingPublished` and `ListingRejected`
+- [x] Helper functions for Match events (created, accepted, declined, cancelled, settled)
+- [x] Celery task `expire_listings` for expired listings (every 60 minutes)
+- [x] Notification URLs registered in api_router
+- [x] Tests: test_models.py, test_views.py, test_signals.py, test_services.py, test_celery_task.py
+
+### Frontend
+- [x] `types/notification.ts` — Updated with all 11 notification types, NotificationPreferences, MarkReadRequest
+- [x] `services/notificationService.ts` — Created with getNotifications, getNotification, markRead, markAllRead, getPreferences, updatePreferences
+- [x] `stores/notificationStore.ts` — Replaced mock data with real API calls, added computed/read/write actions
+- [x] `views/NotificationsView.vue` — Removed ComingSoonView wrapper, added tabs (all/match/listing/KYC/moderation/preferences)
+- [x] `components/NotificationItem.vue` — Updated icons and styling for all notification types
+- [x] `components/NotificationSidebar.vue` — Created with filter tabs and unread badge
+- [x] `composables/usePolling.ts` — Created usePolling and useUnreadCount hooks
+- [x] `layouts/Nav.vue` — Added notification bell icon with unread count badge
+- [x] Tests: notificationService.test.ts, notificationStore.test.ts, NotificationsView.test.ts, NotificationItem.test.ts

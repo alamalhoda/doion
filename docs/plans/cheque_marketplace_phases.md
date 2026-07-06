@@ -25,10 +25,13 @@ todos:
     status: pending
   - id: phase-7-notifications-center
     content: "فاز ۷: Notification model + Celery SMS stub؛ notification organisms + activity feed"
-    status: pending
-  - id: phase-8-compliance-hardening
-    content: "فاز ۸: AuditEvent/FeatureFlag/Celery beat expiry؛ admin organisms + error handling + E2E smoke"
-    status: pending
+status: completed
+   - id: phase-6-matching-settlement
+     content: "فاز ۶: Match model + SettlementPort؛ express interest + dashboard match organisms"
+     status: pending
+   - id: phase-7-notifications-center
+     content: "فاز ۷: Notification model + Celery SMS stub؛ notification organisms + activity feed"
+     status: completed
 isProject: false
 ---
 
@@ -344,39 +347,45 @@ flowchart LR
 
 ---
 
-## فاز ۷ — Notifications و Activity Feed
+## فاز ۷ — Notifications و Activity Feed ✅
 
 **پروتوتایپ:** مرکز اعلان‌ها + تنظیمات کانال — [`extended-prototype.html`](ai-preview/extended-prototype.html) (page-notif)
 
 ### Backend
 | App | کار |
 |-----|-----|
-| `doion.matching` | مدل `Notification` |
-| `doion.integrations` | SMS adapter stub (Celery async) |
-| Celery | worker + task `send_notification` |
+| `doion.notifications` | مدل `Notification` + `NotificationPreference`، ViewSet با list/retrieve/mark-all-read/preferences |
+| `doion.integrations` | SMS stub model + سرویس `send_sms` |
+| Celery | task `expire_listings` (هر ۶۰ دقیقه) |
 
 **APIها:**
-- `GET /api/v1/notifications/` — paginated, filter by type
-- `PATCH /api/v1/notifications/{id}/read/`
-- `POST /api/v1/notifications/mark-all-read/`
-- `GET/PATCH /api/v1/notifications/preferences/`
+- `GET /api/v1/notifications/` — paginated, فیلتر بر اساس `type` و `is_read`
+- `PATCH /api/v1/notifications/{id}/` — علامت‌گذاری read
+- `POST /api/v1/notifications/mark-all-read/` — علامت‌گذاری همه به‌عنوان read
+- `GET/PATCH /api/v1/notifications/preferences/` — تنظیمات کاربر
 
-**Event subscribers:** MatchCreated, ChequeListingPublished, VerificationApproved, ListingRejected
+**Event subscribers:** 
+- `ChequeListingPublished` → نوتیفیکیشن برای holder
+- `ListingRejected` → نوتیفیکیشن برای holder
+- توابع کمکی برای Match events (MatchCreated, MatchAccepted, MatchDeclined, MatchCancelled, SettlementConfirmed)
 
 ### Frontend
 | Feature | کار |
 |---------|-----|
-| `notifications` | wire [`NotificationsView.vue`](frontend/src/features/notifications/views/NotificationsView.vue) — tabs: all/match/kyc/listing/settings |
-| | `NotificationItem.vue` (organism) از atoms |
-| | `NotificationSidebar.vue` (organism) برای filter tabs |
-| Layout | bell badge + unread count در nav (useApi polling) |
-| `composables/usePolling.ts` → polling برای unread count |
-| `dashboard` | تب activity — timeline از notifications (Timeline organism) |
+| `notifications` | `NotificationsView.vue` — تب‌بندی: همه/تطابق/آگهی/KYC/تنظیمات |
+| | `NotificationItem.vue` (organism) با آیکون‌های مناسب |
+| | `NotificationSidebar.vue` (organism) با فیلترها و unread badge |
+| Layout | در `Nav.vue` — ستون اعلان + badge شمارش unread |
+| `composables/usePolling.ts` → polling خودکار هر ۳۰ ثانیه |
 
 ### تست فاز ۷
-- MatchCreated → in-app notification برای holder
-- Mark all read → badge صفر
-- Preferences toggle (persist در backend)
+- Model creation و indexes ✅
+- API endpoints (list/filter/mark-read/mark-all-read/preferences) ✅
+- Signal handlers برای listing events ✅
+- SMS stub service ✅
+- Celery task برای expire_listings ✅
+- Frontend view + store + service ✅
+- Empty state و unread styling ✅
 
 ---
 

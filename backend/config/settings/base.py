@@ -100,6 +100,8 @@ LOCAL_APPS = [
     "doion.pricing",
     "doion.moderation",
     "doion.marketplace",
+    "doion.notifications",
+    "doion.integrations",
 ]
 # https://docs.djangoproject.com/en/dev/ref/settings/#installed-apps
 INSTALLED_APPS = DJANGO_APPS + THIRD_PARTY_APPS + LOCAL_APPS
@@ -330,3 +332,15 @@ SPECTACULAR_SETTINGS = {
 }
 # Your stuff...
 # ------------------------------------------------------------------------------
+
+# Celery
+CELERY_BROKER_URL = env("CELERY_BROKER_URL", default="redis://localhost:6379/0")
+CELERY_RESULT_BACKEND = CELERY_BROKER_URL
+CELERY_TASK_ALWAYS_EAGER = env.bool("CELERY_TASK_ALWAYS_EAGER", default=False)
+
+CELERY_BEAT_SCHEDULE = {
+    "expire-listings-every-hour": {
+        "task": "doion.integrations.tasks.expire_listings",
+        "schedule": 3600.0,
+    },
+}
