@@ -6,8 +6,11 @@ export interface ApiError {
   raw?: unknown
 }
 
+import type { DomainErrorCode } from './errorCodes'
+
 export interface NormalizedError extends ApiError {
   code:
+    | DomainErrorCode
     | 'VALIDATION_ERROR'
     | 'FORBIDDEN'
     | 'UNAUTHENTICATED'

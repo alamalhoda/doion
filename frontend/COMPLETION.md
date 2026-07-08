@@ -398,3 +398,24 @@ Phase 0 scaffold, Phase 1 Identity/Registration, Phase 2 KYC, Phase 3 Listings, 
 - [x] `composables/usePolling.ts` — Created usePolling and useUnreadCount hooks
 - [x] `layouts/Nav.vue` — Added notification bell icon with unread count badge
 - [x] Tests: notificationService.test.ts, notificationStore.test.ts, NotificationsView.test.ts, NotificationItem.test.ts
+
+---
+
+## ✅ Phase 8 Compliance/Hardening
+
+### Frontend
+- [x] `StatCard` organism component created for admin dashboard stats
+- [x] `Skeleton` organism component created for loading states
+- [x] `ErrorBoundary` organism component created for error handling
+- [x] `useErrorHandler` composable created for centralized error handling
+- [x] Error-code catalog added to i18n locales (`error.unknown`, `error.validation_error`, `error.unauthenticated`, `error.forbidden`, `error.network_error`, `error.mod_306`)
+- [x] Admin real stats via `AdminDashboardView` wired to `adminStore.fetchStats()` with stat cards
+- [x] Feature-flags UI: `FeatureFlagsView.vue` with data table, switch toggles, loading/error states
+- [x] Feature-flags route registered (`admin-feature-flags` at `/admin/feature-flags`)
+- [x] Feature-flags Nav link added in `layouts/Nav.vue` for admin variant
+- [x] `adminService.ts` created with `fetchStats`, `fetchFlags`, `updateFlag`
+- [x] `adminStore.ts` created with Pinia state, actions, and getters
+- [x] i18n keys added: stat keys, `feature_flags_title`, `feature_flags_loading`, `retry`, `loading`
+- [x] Admin dashboard and feature-flags views migrated to i18n for chrome/title strings
+- [x] Tests: `adminService.test.ts`, `adminStore.test.ts`
+
