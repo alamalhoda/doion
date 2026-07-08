@@ -8,6 +8,7 @@ from doion.identity.api.urls import urlpatterns as verification_urlpatterns
 from doion.identity.urls import urlpatterns as identity_urls
 from doion.integrations.urls import urlpatterns as integrations_urlpatterns
 from doion.marketplace.urls import urlpatterns as marketplace_urlpatterns
+from doion.matching.urls import urlpatterns as matching_urlpatterns
 from doion.moderation.urls import urlpatterns as moderation_urlpatterns
 from doion.notifications.urls import urlpatterns as notifications_urlpatterns
 from doion.users.api.views import LoginViewSet
@@ -26,6 +27,7 @@ urlpatterns = (
     + verification_urlpatterns
     + checks_urlpatterns
     + marketplace_urlpatterns
+    + matching_urlpatterns
     + moderation_urlpatterns
     + notifications_urlpatterns
     + integrations_urlpatterns
