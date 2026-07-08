@@ -80,3 +80,42 @@
 - [x] Create `doion.pricing` app with synchronous `calculate_suggested_rate` stub
 - [x] Change `Document.related_object_id` from `UUIDField` to `CharField(max_length=255)` for integer PK compatibility
 - [x] Migrations created and applied
+
+## Phase 6 — Matching — ACTUALLY NOT IMPLEMENTED
+
+> The items below are claimed complete in the original TODO but are **false**: the
+> `doion.matching` app source files (`models.py`, `views.py`, `urls.py`, `serializers.py`,
+> etc.) are absent from the working tree and were never committed to git; the app is not in
+> `INSTALLED_APPS`. Phase 8 was implemented independently of matching. Phase 6 must be
+> re-implemented (per LLD / mvp-spec §1.3) on a dedicated `feature/phase-6-*` branch before
+> the `matching_enabled` flag can be consumed by a live matching service.
+
+- [ ] Match model + state machine
+- [ ] Settlement Port implementation
+- [ ] Express interest endpoint (`POST /api/v1/matches/`)
+- [ ] Match status transitions + listing `MATCHED` side-effect
+- [ ] Wire notification match-event handlers (currently orphaned functions in `notifications/signals.py`)
+- [ ] Frontend `matchService.ts` still uses mock data
+
+## Phase 8 — Compliance, Jobs & Hardening — Completed
+
+- [x] Create `doion.compliance` app with `AuditEvent` and `FeatureFlag` models
+- [x] `AuditEvent` indexes on `(event_type, -created_at)` and `actor`
+- [x] `FeatureFlag.is_enabled(key, default)` classmethod
+- [x] Seed `matching_enabled` and `notifications_sms_enabled` flags on `post_migrate`
+- [x] `FeatureFlagViewSet`: `GET/PATCH /api/v1/compliance/feature-flags/` and `/{key}/` (Moderator/Admin; system flags protected)
+- [x] `ComplianceStatsView`: `GET /api/v1/compliance/stats/` aggregate admin stats
+- [x] `AuditEventViewSet`: `GET /api/v1/compliance/audit/` (paginated)
+- [x] Compliance URLs wired into `config/api_router.py`; app added to `LOCAL_APPS`
+- [x] Audit hooks on `ChequeListingPublished`, `ListingRejected`, KYC approved/rejected, and `FeatureFlag` changes
+- [x] Celery app instance (`config/celery.py`) + guarded `shared_task` `expire_listings`; Beat schedule already in settings
+- [x] DRF throttling: anon 100/min, user 1000/min, `listing_create` scope 10/day (ChequeListing create)
+- [x] `CorrelationIDMiddleware` (`X-Correlation-ID`) + structlog JSON logging config (guarded imports so app boots without the packages)
+- [x] Resolved `urls.W005` namespace warning in `config/urls.py`
+- [x] Tests: `test_models.py`, `test_views.py`, `test_celery.py` (expire_listings → EXPIRED), `test_audit.py`
+- [x] `docs/development/API_CONTRACT_REGISTRY.md` updated with Phase 8 endpoints + error-code catalog
+
+### Phase 8 — Remaining (requires shell, blocked in this environment)
+- [ ] `python manage.py makemigrations` + `migrate` (generates compliance 0001 and the pending integrations/moderation/notifications migrations)
+- [ ] `pip install celery structlog` (deps already declared in pyproject.toml)
+- [ ] Run `python manage.py test doion.compliance` to confirm green
