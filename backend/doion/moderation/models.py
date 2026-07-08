@@ -36,7 +36,7 @@ class ModerationDecision(TimeStampedModel):
         verbose_name = _("Moderation Decision")
         verbose_name_plural = _("Moderation Decisions")
         indexes = [
-            models.Index(fields=["listing", "-created_at"]),
+            models.Index(fields=["listing", "-created_at"], name="moderation__listing_8f3c0e_idx"),
         ]
 
     def __str__(self):

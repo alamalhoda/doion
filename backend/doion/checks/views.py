@@ -7,6 +7,8 @@ from rest_framework.decorators import action
 from rest_framework.parsers import FormParser, MultiPartParser
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
+from rest_framework.settings import api_settings
+from rest_framework.throttling import ScopedRateThrottle
 from rest_framework.viewsets import ModelViewSet, GenericViewSet
 
 from doion.checks.models import ChequeListing
@@ -15,7 +17,8 @@ from doion.checks.serializers import (
     ChequeListingCreateSerializer,
     ChequeListingSerializer,
     DocumentUploadSerializer,
-    IssuerProfileSerializer)
+    IssuerProfileSerializer,
+)
 from doion.core.permissions import IsCheckHolder
 
 
@@ -33,6 +36,16 @@ class IssuerProfileViewSet(ModelViewSet):
 class ChequeListingViewSet(ModelViewSet):
     serializer_class = ChequeListingSerializer
     permission_classes = [IsAuthenticated]
+    throttle_classes = list(api_settings.DEFAULT_THROTTLE_CLASSES)
+
+    def get_throttles(self):
+        if self.action == "create":
+            return [throttle() for throttle in self.throttle_classes] + [
+                ScopedRateThrottle()
+            ]
+        return super().get_throttles()
+
+    throttle_scope = "listing_create"
 
     def get_queryset(self):
         user = self.request.user
