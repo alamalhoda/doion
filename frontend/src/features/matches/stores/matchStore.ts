@@ -18,8 +18,8 @@ export const useMatchStore = defineStore('match', () => {
     matches.value.filter(m => m.status === 'accepted')
   )
 
-  const rejectedMatches = computed(() => 
-    matches.value.filter(m => m.status === 'rejected' || m.status === 'settled_off_platform')
+  const completedMatches = computed(() =>
+    matches.value.filter(m => m.status === 'declined' || m.status === 'cancelled' || m.status === 'off_platform_confirmed' || m.status === 'settled')
   )
 
   async function createMatch(data: CreateMatchRequest): Promise<Match> {
@@ -96,7 +96,7 @@ export const useMatchStore = defineStore('match', () => {
     error,
     pendingMatches,
     acceptedMatches,
-    rejectedMatches,
+    completedMatches,
     createMatch,
     fetchMyMatches,
     updateMatchStatus,
