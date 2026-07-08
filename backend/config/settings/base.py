@@ -102,6 +102,7 @@ LOCAL_APPS = [
     "doion.marketplace",
     "doion.notifications",
     "doion.integrations",
+    "doion.compliance",
 ]
 # https://docs.djangoproject.com/en/dev/ref/settings/#installed-apps
 INSTALLED_APPS = DJANGO_APPS + THIRD_PARTY_APPS + LOCAL_APPS
@@ -150,6 +151,7 @@ AUTH_PASSWORD_VALIDATORS = [
 # https://docs.djangoproject.com/en/dev/ref/settings/#middleware
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
+    "config.middleware.CorrelationIDMiddleware",
     "corsheaders.middleware.CorsMiddleware",
     "whitenoise.middleware.WhiteNoiseMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
@@ -267,15 +269,32 @@ LOGGING = {
             "format": "%(levelname)s %(asctime)s %(module)s %(process)d %(thread)d %(message)s",
         },
     },
+    "filters": {
+        "correlation_id": {
+            "()": "config.middleware.CorrelationIdFilter",
+        },
+    },
     "handlers": {
         "console": {
             "level": "DEBUG",
             "class": "logging.StreamHandler",
             "formatter": "verbose",
+            "filters": ["correlation_id"],
         },
     },
     "root": {"level": "INFO", "handlers": ["console"]},
 }
+
+try:
+    import structlog  # noqa: F401
+
+    LOGGING["formatters"]["structlog_json"] = {
+        "()": "structlog.stdlib.ProcessorFormatter",
+        "processor": structlog.processors.JSONRenderer(),
+    }
+    LOGGING["handlers"]["console"]["formatter"] = "structlog_json"
+except ImportError:
+    pass
 
 REDIS_URL = env("REDIS_URL", default="redis://localhost:6379/0")
 REDIS_SSL = REDIS_URL.startswith("rediss://")
@@ -311,6 +330,15 @@ REST_FRAMEWORK = {
     "EXCEPTION_HANDLER": "config.exception_handler.custom_exception_handler",
     "DEFAULT_PAGINATION_CLASS": "rest_framework.pagination.PageNumberPagination",
     "PAGE_SIZE": 20,
+    "DEFAULT_THROTTLE_CLASSES": [
+        "rest_framework.throttling.AnonRateThrottle",
+        "rest_framework.throttling.UserRateThrottle",
+    ],
+    "DEFAULT_THROTTLE_RATES": {
+        "anon": "100/minute",
+        "user": "1000/minute",
+        "listing_create": "10/day",
+    },
 }
 
 # django-simplejwt - https://django-rest-framework-simplejwt.readthedocs.io/
