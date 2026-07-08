@@ -13,6 +13,7 @@ export const ROUTES = {
   // Admin
   ADMIN_DASHBOARD: '/admin',
   ADMIN_MODERATION_QUEUE: '/admin/moderation',
+  ADMIN_FEATURE_FLAGS: '/admin/feature-flags',
   
   // User - Check Holder
   USER_DASHBOARD: '/app',

@@ -4,6 +4,7 @@ import AdminLayout from '@/layouts/AdminLayout.vue'
 
 const ModerationQueueView = () => import('./views/ModerationQueueView.vue')
 const ModerationDetailView = () => import('./views/ModerationDetailView.vue')
+const FeatureFlagsView = () => import('./views/FeatureFlagsView.vue')
 
 export const adminRoutes: RouteRecordRaw[] = [
   {
@@ -21,6 +22,18 @@ export const adminRoutes: RouteRecordRaw[] = [
         name: 'admin-moderation-detail',
         component: ModerationDetailView,
         props: true,
+      },
+    ],
+  },
+  {
+    path: ROUTES.ADMIN_FEATURE_FLAGS,
+    component: AdminLayout,
+    meta: { requiresAuth: true, requiresAdmin: true },
+    children: [
+      {
+        path: '',
+        name: 'admin-feature-flags',
+        component: FeatureFlagsView,
       },
     ],
   },

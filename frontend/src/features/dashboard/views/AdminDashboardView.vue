@@ -4,10 +4,10 @@
     <div class="page-header">
       <div class="page-header-inner">
         <h1 class="page-header-title">
-          داشبورد مدیریت
+          {{ $t('dashboard.admin_title') }}
         </h1>
         <p class="page-header-subtitle">
-          خلاصه وضعیت پلتفرم
+          {{ $t('admin.dashboard_subtitle') }}
         </p>
       </div>
     </div>
@@ -15,29 +15,14 @@
     <!-- Stats Bar -->
     <section class="stats-bar">
       <div class="stats-grid">
-        <div
-          v-for="stat in stats"
-          :key="stat.label"
-          class="stat-card"
-        >
-          <div
-            class="stat-icon"
-            :style="{ background: stat.iconBg }"
-          >
-            <span
-              v-if="stat.icon"
-              class="stat-icon-emoji"
-            >{{ stat.icon }}</span>
-          </div>
-          <div>
-            <div class="stat-value">
-              {{ stat.value }}
-            </div>
-            <div class="stat-label">
-              {{ stat.label }}
-            </div>
-          </div>
-        </div>
+        <StatCard
+          v-for="card in statCards"
+          :key="card.title"
+          :title="card.title"
+          :value="card.value"
+          :icon="card.icon"
+          :variant="card.variant"
+        />
       </div>
     </section>
 
@@ -47,14 +32,27 @@
         v-if="isLoading"
         class="admin-loading"
       >
-        {{ $t('common.loading') }}
+        <Skeleton :lines="4" />
       </div>
 
       <div
         v-else-if="error"
         class="admin-error"
       >
-        {{ error }}
+        <EmptyState
+          :title="$t('admin.error_title')"
+          :description="$t('admin.error_description')"
+          icon="⚠️"
+        >
+          <template #actions>
+            <Button
+              variant="primary"
+              @click="retry"
+            >
+              {{ $t('common.retry') }}
+            </Button>
+          </template>
+        </EmptyState>
       </div>
 
       <div
@@ -62,10 +60,10 @@
         class="admin-section"
       >
         <h2 class="admin-section-title">
-          آگهی‌های در انتظار بررسی
+          {{ $t('admin.pending_section_title') }}
         </h2>
         <p class="admin-section-subtitle">
-          آگهی‌های ثبت‌شده را بررسی و تأیید یا رد کنید
+          {{ $t('admin.pending_section_subtitle') }}
         </p>
 
         <DataTable
@@ -92,19 +90,36 @@
 
 <script setup lang="ts">
 import { ref, computed, onMounted } from 'vue'
+import { useI18n } from 'vue-i18n'
+import { useAdminStore } from '@/features/admin/stores/adminStore'
 import { useListingStore } from '@/features/listings/stores/listingStore'
-import { ListingService } from '@/features/listings/services/listingService'
+import StatCard from '@/components/ui/StatCard.vue'
+import Skeleton from '@/components/ui/Skeleton.vue'
+import EmptyState from '@/components/EmptyState.vue'
+import Button from '@/components/ui/Button.vue'
 
+const { t } = useI18n()
+const adminStore = useAdminStore()
 const listingStore = useListingStore()
 
-interface Listing {
-  id: number
-  title: string
-  issuer: string
-  amount: number
-  dueDate: string
-  risk: 'low' | 'mid' | 'high'
-}
+const isLoading = computed(() => adminStore.isLoading)
+const error = computed(() => adminStore.error)
+
+const statCards = computed(() => {
+  const s = adminStore.stats
+  if (!s) return []
+
+  return [
+    { title: t('admin.stat_total_listings'), value: s.listings.total, icon: '📋', variant: 'default' as const },
+    { title: t('admin.stat_published'), value: s.listings.published, icon: '✅', variant: 'success' as const },
+    { title: t('admin.stat_pending_moderation'), value: s.listings.pending_moderation, icon: '⏳', variant: 'warning' as const },
+    { title: t('admin.stat_rejected'), value: s.listings.rejected, icon: '❌', variant: 'danger' as const },
+    { title: t('admin.stat_expired'), value: s.listings.expired, icon: '⏰', variant: 'info' as const },
+    { title: t('admin.stat_matched'), value: s.listings.matched, icon: '🤝', variant: 'default' as const },
+    { title: t('admin.stat_total_users'), value: s.users.total, icon: '👥', variant: 'default' as const },
+    { title: t('admin.stat_kyc_pending'), value: s.users.kyc_pending, icon: '🔍', variant: 'warning' as const },
+  ]
+})
 
 const listingColumns = [
   { key: 'title', label: 'عنوان آگهی' },
@@ -114,9 +129,6 @@ const listingColumns = [
   { key: 'risk', label: 'ریسک' },
   { key: 'status', label: 'وضعیت' },
 ]
-
-const isLoading = ref(false)
-const error = ref<string | null>(null)
 
 const pendingListings = computed(() =>
   listingStore.listings
@@ -133,48 +145,24 @@ const pendingListings = computed(() =>
     }))
 )
 
-const pendingCount = computed(() =>
-  listingStore.listings.filter((l) => l.status === 'pending_moderation').length
-)
-
-const publishedCount = computed(() =>
-  listingStore.listings.filter((l) => l.status === 'published').length
-)
-
-const rejectedCount = computed(() =>
-  listingStore.listings.filter((l) => l.status === 'rejected').length
-)
-
-const stats = computed(() => [
-  { label: 'در انتظار بررسی', value: pendingCount.value.toString(), iconBg: 'var(--orange-light)', icon: '⏳' },
-  { label: 'تأیید شده', value: publishedCount.value.toString(), iconBg: 'var(--teal-light)', icon: '✅' },
-  { label: 'رد شده', value: rejectedCount.value.toString(), iconBg: 'var(--red-light)', icon: '❌' },
-  { label: 'کل آگهی‌ها', value: listingStore.listings.length.toString(), iconBg: 'var(--gold-pale)', icon: '�' },
-])
-
-async function loadData(): Promise<void> {
-  isLoading.value = true
-  error.value = null
-  try {
-    await listingStore.fetchAllListings()
-  } catch (err: unknown) {
-    const anyErr = err as { response?: { data?: { error?: { message?: string } } } }
-    error.value = anyErr?.response?.data?.error?.message || 'error.unknown'
-  } finally {
-    isLoading.value = false
-  }
-}
-
 function viewListing(id: number): void {
   console.log('View listing:', id)
 }
 
-function getRisk(row: Listing): 'low' | 'mid' | 'high' {
-  return row.risk
+function getRisk(row: { risk: string }): 'low' | 'mid' | 'high' {
+  return row.risk as 'low' | 'mid' | 'high'
+}
+
+async function retry(): Promise<void> {
+  await Promise.all([
+    adminStore.fetchStats(),
+    listingStore.fetchAllListings(),
+  ])
 }
 
 onMounted(() => {
-  loadData()
+  adminStore.fetchStats()
+  listingStore.fetchAllListings()
 })
 </script>
 
@@ -226,46 +214,6 @@ onMounted(() => {
   gap: 1rem;
 }
 
-.stat-card {
-  background: rgba(255, 255, 255, 0.04);
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  border-radius: var(--radius);
-  padding: 1rem 1.25rem;
-  display: flex;
-  align-items: center;
-  gap: 0.85rem;
-}
-
-.stat-icon {
-  width: 40px;
-  height: 40px;
-  border-radius: var(--radius-sm);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex-shrink: 0;
-  font-size: 1.2rem;
-}
-
-.stat-icon-emoji {
-  font-size: 1.2rem;
-  line-height: 1;
-}
-
-.stat-value {
-  font-size: 1.5rem;
-  font-weight: var(--font-weight-bold);
-  color: var(--gold-light);
-  line-height: 1.1;
-}
-
-.stat-label {
-  font-size: var(--font-size-xs);
-  color: rgba(255, 255, 255, 0.6);
-  margin-top: 0.15rem;
-}
-
-/* Admin Content */
 .admin-content {
   max-width: 1100px;
   margin: 0 auto;

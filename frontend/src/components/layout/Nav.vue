@@ -77,7 +77,7 @@ const props = withDefaults(defineProps<Props>(), {
   showLanguageSwitcher: true,
 })
 
-const { locale } = useI18n()
+const { locale, t } = useI18n()
 const notificationStore = useNotificationStore()
 
 const appName = 'چک‌بازار'
@@ -92,8 +92,9 @@ const logoLink = computed(() => {
 const navLinks = computed<NavLink[]>(() => {
   if (props.variant === 'admin') {
     return [
-      { path: ROUTES.ADMIN_DASHBOARD, label: 'داشبورد' },
-      { path: ROUTES.ADMIN_MODERATION_QUEUE, label: 'مدیریت' },
+      { path: ROUTES.ADMIN_DASHBOARD, label: $t('layout.nav.dashboard') },
+      { path: ROUTES.ADMIN_MODERATION_QUEUE, label: $t('admin.moderation_title') },
+      { path: ROUTES.ADMIN_FEATURE_FLAGS, label: $t('admin.feature_flags_title') },
     ]
   }
   if (props.variant === 'user') {

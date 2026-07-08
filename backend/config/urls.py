@@ -30,7 +30,7 @@ urlpatterns = [
 # API URLS
 urlpatterns += [
     # API v1 base url
-    path("api/v1/", include("config.api_router")),
+    path("api/v1/", include(("config.api_router", "api_v1"))),
     # Schema and docs under v1
     path("api/v1/schema/", SpectacularAPIView.as_view(), name="api-schema"),
     path(
@@ -39,7 +39,7 @@ urlpatterns += [
         name="api-docs",
     ),
     # Legacy API base url (backward compatibility)
-    path("api/", include("config.api_router")),
+    path("api/", include(("config.api_router", "api_legacy"))),
     # DRF auth token (legacy)
     path("api/auth-token/", obtain_auth_token, name="obtain_auth_token"),
     path("api/schema/", SpectacularAPIView.as_view(), name="api-schema-legacy"),

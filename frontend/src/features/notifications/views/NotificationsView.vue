@@ -10,7 +10,10 @@
         >
           <template #icon>
             <div class="empty-icon">
-              <Icon name="notifications-off" :size="48" />
+              <Icon
+                name="notifications-off"
+                :size="48"
+              />
             </div>
           </template>
         </NEmpty>
@@ -55,9 +58,14 @@
       class="empty-list"
     >
       <div class="empty-content">
-        <Icon name="notifications-off" :size="64" />
+        <Icon
+          name="notifications-off"
+          :size="64"
+        />
         <p>{{ emptyTitle }}</p>
-        <p class="empty-description">{{ emptyDescription }}</p>
+        <p class="empty-description">
+          {{ emptyDescription }}
+        </p>
       </div>
     </div>
 

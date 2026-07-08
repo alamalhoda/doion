@@ -5,7 +5,10 @@
     @click="handleClick"
   >
     <div class="notification-icon">
-      <Icon :name="iconName" :size="20" />
+      <Icon
+        :name="iconName"
+        :size="20"
+      />
     </div>
 
     <div class="notification-content">

@@ -32,8 +32,8 @@ class Notification(TimeStampedModel):
         verbose_name = _("Notification")
         verbose_name_plural = _("Notifications")
         indexes = [
-            models.Index(fields=["user", "-created_at"]),
-            models.Index(fields=["user", "status", "-created_at"]),
+            models.Index(fields=["user", "-created_at"], name="notification_user_created_idx"),
+            models.Index(fields=["user", "status", "-created_at"], name="notification_user_status_idx"),
         ]
 
     def __str__(self):
