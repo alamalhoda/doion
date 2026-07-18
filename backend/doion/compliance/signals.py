@@ -7,6 +7,7 @@ from doion.checks.models import ChequeListing
 from doion.compliance.audit import audit_event
 from doion.compliance.models import AuditEvent
 from doion.compliance.models import FeatureFlag
+from doion.identity.models import Profile
 from doion.identity.signals import verification_approved
 from doion.identity.signals import verification_rejected
 from doion.moderation.signals import ChequeListingPublished
@@ -42,6 +43,7 @@ def on_listing_rejected(
 
 @receiver(verification_approved)
 def on_verification_approved(sender, verification, **kwargs):
+    Profile.objects.filter(user=verification.user).update(is_verified=True)
     audit_event(
         AuditEvent.EventType.KYC_APPROVED,
         actor=None,
@@ -54,6 +56,7 @@ def on_verification_approved(sender, verification, **kwargs):
 def on_verification_rejected(
     sender, verification, rejection_code, rejection_note, **kwargs
 ):
+    Profile.objects.filter(user=verification.user).update(is_verified=False)
     audit_event(
         AuditEvent.EventType.KYC_REJECTED,
         actor=None,

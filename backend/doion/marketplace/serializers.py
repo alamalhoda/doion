@@ -6,6 +6,36 @@ from doion.checks.models import ChequeListing
 from doion.checks.serializers import IssuerProfileSerializer
 
 
+class MarketplaceLatestSerializer(serializers.ModelSerializer):
+    issuer_profile = IssuerProfileSerializer(read_only=True)
+    days_to_due = serializers.SerializerMethodField()
+
+    class Meta:
+        model = ChequeListing
+        fields = [
+            "id",
+            "issuer_profile",
+            "bank_name",
+            "face_amount",
+            "due_date",
+            "issuer_type",
+            "suggested_discount_rate",
+            "risk_tier",
+            "status",
+            "days_to_due",
+            "created_at",
+        ]
+        read_only_fields = [
+            "id",
+            "status",
+            "created_at",
+            "days_to_due",
+        ]
+
+    def get_days_to_due(self, obj):
+        return (obj.due_date - date.today()).days
+
+
 class MarketplaceListingSerializer(serializers.ModelSerializer):
     issuer_profile = IssuerProfileSerializer(read_only=True)
     owner_id = serializers.IntegerField(source="owner.id", read_only=True)
