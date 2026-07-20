@@ -368,9 +368,63 @@ npm run preview
 
 ---
 
-**Status:** ✅ COMPLETE (Phase 0 + Phase 1 + Phase 2 KYC + Phase 3 Listings + Phase 4 Moderation + Phase 5 Marketplace API + Phase 7 Notifications)
+**Status:** ✅ COMPLETE (Phase 0 + Phase 1 + Phase 2 KYC + Phase 3 Listings + Phase 4 Moderation + Phase 5 Marketplace Frontend + Phase 6 Matching Frontend + Phase 7 Notifications + Phase 8 Compliance/Hardening)
 
-Phase 0 scaffold, Phase 1 Identity/Registration, Phase 2 KYC, Phase 3 Listings, Phase 4 Moderation, Phase 5 Marketplace API, and Phase 7 Notifications are **production-ready**. Next: Phase 8 Compliance/Hardening.
+Phase 0 scaffold, Phase 1 Identity/Registration, Phase 2 KYC, Phase 3 Listings, Phase 4 Moderation, Phase 5 Marketplace Frontend, Phase 6 Matching Frontend, Phase 7 Notifications, and Phase 8 Compliance/Hardening are **production-ready**.
+
+---
+
+## ✅ Phase 5 Marketplace Frontend
+
+### Backend
+- [x] `doion.marketplace` app created with `MarketplaceViewSet`
+- [x] `MarketplaceSerializer` + `MarketplaceFilter` (django-filter) implemented
+- [x] Endpoint exposes only `status=published` listings for investor browse
+- [x] Filtering by `risk_tier`, `issuer_type`, `min_amount`, `max_amount`, `max_days_to_due`, `bank_name`
+- [x] Ordering by `created_at`, `face_amount`, `suggested_discount_rate`, `due_date`
+- [x] Emulated pagination via override params (`page`, `page_size`, max 50)
+- [x] Cache headers (60s TTL) on list responses
+- [x] `interest_count` annotated as 0 (placeholder for future interest feature)
+- [x] Route registered under `/api/v1/marketplace/listings/`
+- [x] `MarketplaceLatestSerializer` + `latest_listings` action for public landing page
+- [x] Tests written (36 marketplace + moderation + identity tests pass)
+- [x] Docs: API Contract Registry updated with Phase 5 endpoint
+
+### Frontend
+- [x] `MarketplaceView.vue` — browse listings with filters, pagination, sorting
+- [x] `MarketplaceListingCard.vue` — listing card with Persian date formatting
+- [x] `FilterSidebar.vue` — filter by risk tier, amount range, days to due, issuer type, bank name
+- [x] `ListingDetailModal.vue` — detail modal with express interest button wired to real API
+- [x] KYC gate: investors without `is_verified` see CTA banner instead of listings
+- [x] Check holders see "marketplace for investors only" banner
+- [x] `marketplaceStore.ts` — Pinia store with filters, sorting, pagination, error handling
+- [x] `ListingService.getMarketplaceListings()` — wired to real API
+- [x] `useToast` integration for express interest feedback
+- [x] Persian date formatting via `dayjs` + `fa` locale
+- [x] Landing page latest listings section with auth-aware CTA
+
+---
+
+## ✅ Phase 6 Matching Frontend
+
+### Backend
+- [x] `doion.matching` app created with `Match` model + state machine
+- [x] `SettlementPort` + `OffPlatformSettlement` models
+- [x] `MatchViewSet` with create/list/accept/decline/cancel/confirm-off-platform actions
+- [x] `UserSerializer` exposes `is_verified` for frontend KYC checks
+- [x] Signal handlers wire `Profile.is_verified` on verification approved/rejected
+
+### Frontend
+- [x] `MatchStatus` type aligned with backend constants
+- [x] `MatchesListView.vue` — pending/accepted/completed tabs, removed ComingSoonView wrapper
+- [x] `MatchDetailView.vue` — full detail view with role-based action buttons
+- [x] `MatchCard.vue` — listing title (bank + amount), status badges, Persian dates, counterparty name
+- [x] `matchService.ts` — aligned with backend serializer fields, fixed indentation
+- [x] `matchStore.ts` — createMatch, fetchMyMatches, updateMatchStatus, fetchMatch
+- [x] `match.ts` types — ListingSummary aligned with `ChequeListingMinimalSerializer`
+- [x] i18n: `matches.*` keys added to fa.json + en.json
+- [x] Express interest flow: investor → createMatch → toast → navigate to matches
+- [x] Match actions: accept/decline/confirm/cancel with loading states and toast feedback
 
 ---
 

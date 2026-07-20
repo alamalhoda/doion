@@ -22,16 +22,13 @@ todos:
     status: completed
   - id: phase-6-matching-settlement
     content: "فاز ۶: Match model + SettlementPort؛ express interest + dashboard match organisms"
-    status: pending
+    status: completed
   - id: phase-7-notifications-center
     content: "فاز ۷: Notification model + Celery SMS stub؛ notification organisms + activity feed"
-status: completed
-   - id: phase-6-matching-settlement
-     content: "فاز ۶: Match model + SettlementPort؛ express interest + dashboard match organisms"
-     status: pending
-   - id: phase-7-notifications-center
-     content: "فاز ۷: Notification model + Celery SMS stub؛ notification organisms + activity feed"
-     status: completed
+    status: completed
+  - id: phase-8-compliance-hardening
+    content: "فاز ۸: Compliance, Jobs & Hardening"
+    status: completed
 isProject: false
 ---
 
@@ -269,23 +266,25 @@ flowchart LR
 
 ![آماده]
 
-## فاز ۵ — Marketplace و مرور سرمایه‌گذار (Backend API ✅)
+## فاز ۵ — Marketplace و مرور سرمایه‌گذار (تکمیل)
 
 **پروتوتایپ:** فیلتر sidebar، grid کارت‌ها، modal جزئیات — [`cheque-marketplace-prototype.html`](ai-preview/cheque-marketplace-prototype.html) (page-marketplace)
 
-**جریان:** Investor (KYC_APPROVED) → browse → filter/sort → detail modal
+**جریان:** Investor (KYC_APPROVED) → browse → filter/sort → detail modal → ابراز تمایل
 
 ### Backend
 | App | کار |
 |-----|-----|
 | `doion.marketplace` | `MarketplaceViewSet` فیلتر فقط `status=published` + `django-filter` |
+| `doion.marketplace` | `latest_listings` action با `AllowAny` برای landing page |
 
 **API:**
 - `GET /api/v1/marketplace/listings/?risk_tier=&min_amount=&max_amount=&max_days_to_due=&issuer_type=&bank_name=&ordering=`
+- `GET /api/v1/marketplace/listings/latest/` — ۴ listing آخر (public، بدون auth)
 
 **فیلترها:** risk tier (`low/medium/high`), issuer type (`legal/natural`), amount range (`min_amount`, `max_amount`), days to due (`max_days_to_due`), bank name (`icontains`), ordering.
 
-**Serializerها:** `MarketplaceSerializer` با `days_to_due`, `interest_count` (=0 placeholder).
+**Serializerها:** `MarketplaceSerializer` با `days_to_due`, `interest_count` (=0 placeholder). `MarketplaceLatestSerializer` برای داده‌های عمومی.
 
 **Pagination:** Emulated via override params (`page`, `page_size`, max=50).
 
@@ -296,20 +295,23 @@ flowchart LR
 ### Frontend
 | Feature | کار |
 |---------|-----|
-| `marketplace` | Wire [`MarketplaceView.vue`](frontend/src/features/marketplace/views/MarketplaceView.vue) + [`MarketplaceListingCard.vue`](frontend/src/features/marketplace/components/MarketplaceListingCard.vue) |
-| | FilterSidebar organism (risk tier, days to due, min amount, issuer type, bank name) |
-| | DetailModal organism (ListingDetail, RiskBar, DiscountRate) |
-| | `useModal.ts` composable برای modal state management |
-| `landing` | بخش «آخرین آگهی‌ها» — fetch ۴ listing منتشرشده (RealTimeCard atoms) |
+| `marketplace` | [`MarketplaceView.vue`](frontend/src/features/marketplace/views/MarketplaceView.vue) — browse + filters + pagination |
+| | [`MarketplaceListingCard.vue`](frontend/src/features/marketplace/components/MarketplaceListingCard.vue) — کارت listing با تاریخ فارسی |
+| | [`FilterSidebar.vue`](frontend/src/features/marketplace/components/FilterSidebar.vue) — فیلترهای risk tier، مبلغ، روز سررسید، نوع صادرکننده، بانک |
+| | [`ListingDetailModal.vue`](frontend/src/features/marketplace/components/ListingDetailModal.vue) — modal جزئیات + دکمه «ابراز تمایل» متصل به API |
+| | KYC gate: investor بدون `is_verified` بنر CTA می‌بیند، چک‌هاورد بنر «فقط برای سرمایه‌گذاران» |
+| `landing` | بخش «آخرین آگهی‌ها» — fetch ۴ listing منتشرشده از endpoint عمومی + CTA برای کاربران غیراحرازشده |
 
 ### تست فاز ۵
 - فقط `published` listings نمایش داده شوند
 - فیلتر risk + sort کار کند
 - Investor بدون KYC → CTA «تکمیل احراز هویت»
+- Landing page عمومی بدون auth ۴ listing آخر را نشان می‌دهد
+- Express interest → match created → navigate to matches
 
 ---
 
-## فاز ۶ — Matching و Settlement (لایه ۱)
+## فاز ۶ — Matching و Settlement (لایه ۱) (تکمیل)
 
 **پروتوتایپ:** دکمه «ابراز تمایل»، تب‌های investor/holder در dashboard، match rows — [`cheque-marketplace-prototype.html`](ai-preview/cheque-marketplace-prototype.html) (dashboard tabs)
 
@@ -323,7 +325,10 @@ flowchart LR
 
 **APIها:**
 - `POST /api/v1/matches/` — investor creates match
-- `PATCH /api/v1/matches/{id}/status/` — transitions: accept, decline, confirm, cancel
+- `PATCH /api/v1/matches/{id}/accept/` — holder accepts
+- `PATCH /api/v1/matches/{id}/decline/` — holder declines
+- `PATCH /api/v1/matches/{id}/cancel/` — investor cancels
+- `PATCH /api/v1/matches/{id}/confirm-off-platform/` — holder confirms settlement
 - `GET /api/v1/matches/` — filtered by role
 
 **Events:** `MatchCreated`, `MatchAccepted`, `MatchDeclined`, `SettlementConfirmed`
@@ -333,17 +338,19 @@ flowchart LR
 ### Frontend
 | Feature | کار |
 |---------|-----|
-| `marketplace` | دکمه «ابراز تمایل» → API + ConfirmationDialog organism |
-| `matches` | wire [`MatchesListView.vue`](frontend/src/features/matches/views/MatchesListView.vue) + MatchDetail organism |
-| `components/ui/MatchCard.vue` (molecule) برای match rows |
-| `components/ui/ConfirmationDialog.vue` (molecule) برای action confirm |
-| `dashboard` | تب‌های holder/investor با stats واقعی |
-| | Holder: accept/decline incoming matches (MatchAction organism) |
+| `marketplace` | دکمه «ابراز تمایل» در [`ListingDetailModal.vue`](frontend/src/features/marketplace/components/ListingDetailModal.vue) → API + toast + navigate to matches |
+| `matches` | [`MatchesListView.vue`](frontend/src/features/matches/views/MatchesListView.vue) — تب‌های pending/accepted/completed |
+| | [`MatchDetailView.vue`](frontend/src/features/matches/views/MatchDetailView.vue) — جزئیات + action buttons (accept/decline/confirm/cancel) |
+| | [`MatchCard.vue`](frontend/src/features/matches/components/MatchCard.vue) — کارت تطابق با عنوان bank + مبلغ، status badge، تاریخ فارسی |
+| `services` | [`matchService.ts`](frontend/src/features/matches/services/matchService.ts) — متصل به API واقعی با mapping درست serializer fields |
+| `types` | [`match.ts`](frontend/src/features/matches/types/match.ts) — `MatchStatus` هماهنگ با backend constants |
+| `i18n` | کلیدهای `matches.*` در fa.json + en.json اضافه شد |
 
 ### تست فاز ۶
-- Investor express interest → holder notification (in-app)
+- Investor express interest → match created → notification (in-app)
 - Holder accept → listing status `matched`
 - Both confirm off-platform → audit record, disclaimer نمایش داده شود
+- Match detail view: action buttons فقط برای نقش کاربر صحیح نمایش داده می‌شوند
 
 ---
 
@@ -389,7 +396,7 @@ flowchart LR
 
 ---
 
-## فاز ۸ — Compliance، Jobs و Hardening
+## فاز ۸ — Compliance، Jobs و Hardening (تکمیل)
 
 **پروتوتایپ:** stats admin، state machine viz (فقط dev/internal)
 
@@ -397,17 +404,22 @@ flowchart LR
 | App | کار |
 |-----|-----|
 | `doion.compliance` | `AuditEvent`, `FeatureFlag` |
+| `doion.compliance` | `is_verified` روی `Profile` توسط signal handlers به‌روز می‌شود |
 | Celery Beat | job انقضای listing (`due_date_passed` → `EXPIRED`) |
 | Infrastructure | rate limiting (LLD §10), structlog + correlation_id |
 
 **APIها:**
 - `GET/PATCH /api/v1/feature-flags/{key}/` — Admin
+- `GET /api/v1/compliance/stats/` — aggregate admin stats
+- `GET /api/v1/compliance/audit/` — paginated audit events
 - Audit خودکار روی transitions حساس
+- `UserSerializer` حالا `is_verified` را از `profile` برمی‌گرداند
 
 ### Frontend
 | Feature | کار |
 |---------|-----|
 | `admin` | [`AdminDashboardView.vue`](frontend/src/features/admin/views/AdminDashboardView.vue) — stats واقعی از API (StatCard organisms) |
+| | [`FeatureFlagsView.vue`](frontend/src/features/admin/views/FeatureFlagsView.vue) — UI مدیریت feature flags |
 | Error UX | کاتالوگ خطاهای [`mvp-spec.md`](ai-preview/mvp-spec.md) §2 — AUTH_*, LISTING_*, MATCH_* همراه error boundary components |
 | Polish | responsive (768px breakpoints پروتوتایپ)، loading/empty states (Skeleton organisms) |
 | `components/ui/ErrorBoundary.vue` (organism) برای error states |
@@ -417,6 +429,7 @@ flowchart LR
 - Listing گذشته از due_date → auto EXPIRED
 - Feature flag `matching_enabled=false` → دکمه express interest غیرفعال
 - E2E smoke: register → KYC → create listing → moderate → browse → match → notify
+- Backend tests: 105 tests سبز (identity, compliance, marketplace, matching)
 
 ---
 
