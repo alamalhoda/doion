@@ -81,21 +81,18 @@
 - [x] Change `Document.related_object_id` from `UUIDField` to `CharField(max_length=255)` for integer PK compatibility
 - [x] Migrations created and applied
 
-## Phase 6 — Matching — ACTUALLY NOT IMPLEMENTED
+## Phase 6 — Matching — Completed (backend), frontend wiring in progress
 
-> The items below are claimed complete in the original TODO but are **false**: the
-> `doion.matching` app source files (`models.py`, `views.py`, `urls.py`, `serializers.py`,
-> etc.) are absent from the working tree and were never committed to git; the app is not in
-> `INSTALLED_APPS`. Phase 8 was implemented independently of matching. Phase 6 must be
-> re-implemented (per LLD / mvp-spec §1.3) on a dedicated `feature/phase-6-*` branch before
-> the `matching_enabled` flag can be consumed by a live matching service.
+> Backend was implemented and merged via PR #6. The matching app exists, is in
+> `INSTALLED_APPS`, and has models/views/serializers/services/urls/tests. Remaining
+> work: frontend wiring to consume the API (`features/matches/`).
 
-- [ ] Match model + state machine
-- [ ] Settlement Port implementation
-- [ ] Express interest endpoint (`POST /api/v1/matches/`)
-- [ ] Match status transitions + listing `MATCHED` side-effect
-- [ ] Wire notification match-event handlers (currently orphaned functions in `notifications/signals.py`)
-- [ ] Frontend `matchService.ts` still uses mock data
+- [x] Match model + state machine
+- [x] Settlement Port implementation
+- [x] Express interest endpoint (`POST /api/v1/matches/`)
+- [x] Match status transitions + listing `MATCHED` side-effect
+- [x] Notification match-event handlers wired
+- [ ] Frontend `matchService.ts` / `matchStore.ts` / views fully validated end-to-end
 
 ## Phase 8 — Compliance, Jobs & Hardening — Completed
 

@@ -131,6 +131,45 @@
     "flag_enabled": "Feature enabled",
     "flag_disabled": "Feature disabled"
   },
+  "listings": {
+    "untitled_listing": "Untitled listing",
+    "face_amount": "Cheque amount"
+  },
+  "matches": {
+    "title": "Matches",
+    "subtitle": "Manage match requests",
+    "pending": "Pending",
+    "accepted": "Accepted",
+    "completed": "Completed",
+    "no_pending_matches": "No pending match requests.",
+    "no_accepted_matches": "No accepted matches.",
+    "no_completed_matches": "No completed matches.",
+    "status_pending": "Pending",
+    "status_accepted": "Accepted",
+    "status_declined": "Declined",
+    "status_cancelled": "Cancelled",
+    "status_off_platform_confirmed": "Off-Platform Confirmed",
+    "status_settled": "Settled",
+    "discount_rate": "Discount rate",
+    "counterparty": "Counterparty",
+    "settlement_type": "Settlement type",
+    "off_platform": "Off-Platform",
+    "escrow": "Escrow",
+    "principal_ledger": "Principal Ledger",
+    "last_message": "Last message",
+    "detail_title": "Match Details",
+    "actions_accept": "Accept",
+    "actions_decline": "Decline",
+    "actions_confirm": "Confirm Settlement",
+    "actions_cancel": "Cancel Request",
+    "message_label": "Message",
+    "counterparty_label": "Counterparty",
+    "listing_info_label": "Listing Info"
+  },
+  "common": {
+    "created": "Created",
+    "unknown": "Unknown"
+  },
   "language": {
     "fa": "فارسی",
     "en": "English"

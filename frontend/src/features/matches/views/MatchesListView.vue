@@ -1,91 +1,85 @@
 <template>
-  <ComingSoonView
-    title="تطابق‌ها"
-    description="مدیریت درخواست‌های تطابق"
-    phase="فاز ۶"
-  >
-    <div class="matches-view">
-      <div class="view-header">
-        <h1>{{ $t('matches.title') }}</h1>
-        <p class="subtitle">
-          {{ $t('matches.subtitle') }}
-        </p>
-      </div>
-
-      <div
-        v-if="isLoading"
-        class="loading-state"
-      >
-        {{ $t('common.loading') }}
-      </div>
-
-      <div
-        v-else-if="error"
-        class="error-state"
-      >
-        {{ error }}
-      </div>
-
-      <div
-        v-else
-        class="matches-container"
-      >
-        <NTabs
-          v-model:value="activeTab"
-          type="line"
-          animated
-        >
-          <NTabPane
-            name="pending"
-            :tab="$t('matches.pending')"
-          >
-            <MatchCard
-              v-for="match in pendingMatches"
-              :key="match.id"
-              :match="match"
-              @click="viewMatch(match.id)"
-            />
-            <NEmpty
-              v-if="pendingMatches.length === 0"
-              :description="$t('matches.no_pending_matches')"
-            />
-          </NTabPane>
-
-          <NTabPane
-            name="accepted"
-            :tab="$t('matches.accepted')"
-          >
-            <MatchCard
-              v-for="match in acceptedMatches"
-              :key="match.id"
-              :match="match"
-              @click="viewMatch(match.id)"
-            />
-            <NEmpty
-              v-if="acceptedMatches.length === 0"
-              :description="$t('matches.no_accepted_matches')"
-            />
-          </NTabPane>
-
-          <NTabPane
-            name="completed"
-            :tab="$t('matches.completed')"
-          >
-            <MatchCard
-              v-for="match in completedMatches"
-              :key="match.id"
-              :match="match"
-              @click="viewMatch(match.id)"
-            />
-            <NEmpty
-              v-if="completedMatches.length === 0"
-              :description="$t('matches.no_completed_matches')"
-            />
-          </NTabPane>
-        </NTabs>
-      </div>
+  <div class="matches-view">
+    <div class="view-header">
+      <h1>{{ $t('matches.title') }}</h1>
+      <p class="subtitle">
+        {{ $t('matches.subtitle') }}
+      </p>
     </div>
-  </ComingSoonView>
+
+    <div
+      v-if="isLoading"
+      class="loading-state"
+    >
+      {{ $t('common.loading') }}
+    </div>
+
+    <div
+      v-else-if="error"
+      class="error-state"
+    >
+      {{ error }}
+    </div>
+
+    <div
+      v-else
+      class="matches-container"
+    >
+      <NTabs
+        v-model:value="activeTab"
+        type="line"
+        animated
+      >
+        <NTabPane
+          name="pending"
+          :tab="$t('matches.pending')"
+        >
+          <MatchCard
+            v-for="match in pendingMatches"
+            :key="match.id"
+            :match="match"
+            @click="viewMatch(match.id)"
+          />
+          <NEmpty
+            v-if="pendingMatches.length === 0"
+            :description="$t('matches.no_pending_matches')"
+          />
+        </NTabPane>
+
+        <NTabPane
+          name="accepted"
+          :tab="$t('matches.accepted')"
+        >
+          <MatchCard
+            v-for="match in acceptedMatches"
+            :key="match.id"
+            :match="match"
+            @click="viewMatch(match.id)"
+          />
+          <NEmpty
+            v-if="acceptedMatches.length === 0"
+            :description="$t('matches.no_accepted_matches')"
+          />
+        </NTabPane>
+
+        <NTabPane
+          name="completed"
+          :tab="$t('matches.completed')"
+        >
+          <MatchCard
+            v-for="match in completedMatches"
+            :key="match.id"
+            :match="match"
+            @click="viewMatch(match.id)"
+          />
+          <NEmpty
+            v-if="completedMatches.length === 0"
+            :description="$t('matches.no_completed_matches')"
+          />
+        </NTabPane>
+      </NTabs>
+    </div>
+  </div>
 </template>
 
 <script setup lang="ts">
@@ -94,7 +88,6 @@ import { useRouter } from 'vue-router'
 import { NTabs, NTabPane, NEmpty } from 'naive-ui'
 import { useMatchStore } from '../stores/matchStore'
 import MatchCard from '../components/MatchCard.vue'
-import ComingSoonView from '@/components/ComingSoonView.vue'
 
 const router = useRouter()
 const matchStore = useMatchStore()
@@ -105,7 +98,7 @@ const isLoading = computed(() => matchStore.isLoading)
 const error = computed(() => matchStore.error)
 const pendingMatches = computed(() => matchStore.pendingMatches)
 const acceptedMatches = computed(() => matchStore.acceptedMatches)
-const completedMatches = computed(() => [...matchStore.rejectedMatches])
+const completedMatches = computed(() => matchStore.completedMatches)
 
 function viewMatch(id: string): void {
   router.push(`/app/matches/${id}`)

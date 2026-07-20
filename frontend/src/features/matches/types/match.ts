@@ -4,11 +4,12 @@ export type MatchStatus = 'pending' | 'accepted' | 'declined' | 'cancelled' | 'o
 
 export interface ListingSummary {
   id: string
+  bank_name: string
   face_amount: number
   due_date: string
   status: string
-  title?: string
-  suggested_discount_rate?: number | null
+  created_at: string
+  updated_at: string
 }
 
 export interface UserSummary {

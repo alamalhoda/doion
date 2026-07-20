@@ -1,6 +1,8 @@
 <template>
   <div class="rejection-form">
-    <p class="rejection-form__prompt">{{ $t('admin.reject_reason_prompt') }}</p>
+    <p class="rejection-form__prompt">
+      {{ $t('admin.reject_reason_prompt') }}
+    </p>
     <FormField
       v-model="selectedCode"
       type="select"
@@ -31,7 +33,7 @@ const emit = defineEmits<{
   (e: 'update:modelValue', val: { code: RejectionCode; note: string }): void
 }>()
 
-const selectedRejectionCode | ''>(props.modelValue?.code || '')
+const selectedRejectionCode = ref<RejectionCode>(props.modelValue?.code || '')
 const note = ref(props.modelValue?.note || '')
 
 const codeOptions = Object.entries(REJECTION_CODE_LABELS).map(
@@ -39,7 +41,7 @@ const codeOptions = Object.entries(REJECTION_CODE_LABELS).map(
 )
 
 const emitValue = computed(() => ({
-  code: selectedCode.value as RejectionCode,
+  code: selectedRejectionCode.value as RejectionCode,
   note: note.value,
 }))
 

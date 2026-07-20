@@ -79,6 +79,8 @@
 
 <script setup lang="ts">
 import { computed } from 'vue'
+import dayjs from 'dayjs'
+import 'dayjs/locale/fa'
 import RiskBadge from '@/components/RiskBadge.vue'
 import type { ChequeListing } from '@/features/listings/types/listing'
 import { useFormat } from '@/composables'
@@ -112,7 +114,10 @@ const riskTier = computed(() => {
 
 const formattedAmount = computed(() => formatCurrency(props.listing.face_amount))
 
-const formattedDueDate = computed(() => props.listing.due_date)
+const formattedDueDate = computed(() => {
+  if (!props.listing.due_date) return '-'
+  return dayjs(props.listing.due_date).locale('fa').format('YYYY/MM/DD')
+})
 
 const issuerTypeLabel = computed(() => {
   return props.listing.issuer_type === 'legal' ? 'حقوقی' : 'حقیقی'

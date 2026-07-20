@@ -129,6 +129,27 @@
       </div>
     </div>
 
+    <div
+      v-if="!showMarketplace"
+      class="kyc-gate"
+    >
+      <div class="kyc-gate-card">
+        <h3>بازارچه آگهی‌های چک</h3>
+        <p v-if="!isInvestor(authStore.user)">
+          بازارچه فقط برای سرمایه‌گذاران فعال است.
+        </p>
+        <p v-else>
+          برای مشاهده آگهی‌ها، ابتدا احراز هویت خود را تکمیل کنید.
+        </p>
+        <RouterLink
+          to="/app/verification/kyc"
+          class="btn btn--primary"
+        >
+          تکمیل احراز هویت
+        </RouterLink>
+      </div>
+    </div>
+
     <ListingDetailModal
       v-model="showDetail"
       :listing="selectedListing"
@@ -143,8 +164,12 @@ import type { ChequeListing } from '@/features/listings/types/listing'
 import MarketplaceListingCard from '../components/MarketplaceListingCard.vue'
 import FilterSidebar from '../components/FilterSidebar.vue'
 import ListingDetailModal from '../components/ListingDetailModal.vue'
+import { useAuthStore } from '@/features/auth/stores/authStore'
+import { isInvestor } from '@/utils/permissions'
+import { RouterLink } from 'vue-router'
 
 const store = useMarketplaceStore()
+const authStore = useAuthStore()
 
 const localFilters = ref<MarketplaceFilters>({ ...store.filters })
 const showDetail = ref(false)
@@ -156,8 +181,13 @@ const totalPages = computed(() => Math.max(1, Math.ceil(store.totalCount / store
 const startIndex = computed(() => (store.page - 1) * store.pageSize + 1)
 const endIndex = computed(() => Math.min(store.page * store.pageSize, store.totalCount))
 
+const isKycApproved = computed(() => authStore.user?.is_verified === true)
+const showMarketplace = computed(() => isInvestor(authStore.user) && isKycApproved.value)
+
 onMounted(() => {
-  store.fetchListings()
+  if (showMarketplace.value) {
+    store.fetchListings()
+  }
 })
 
 watch(() => ({ ...store.filters }), (newVal) => {
@@ -337,5 +367,36 @@ function openDetail(item: ChequeListing) {
 @keyframes shimmer {
   0% { background-position: 200% 0; }
   100% { background-position: -200% 0; }
+}
+
+.kyc-gate {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 2rem;
+}
+
+.kyc-gate-card {
+  text-align: center;
+  padding: 3rem 2rem;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+}
+
+.kyc-gate-card h3 {
+  color: var(--navy);
+  font-size: var(--font-size-xl);
+  margin-bottom: 1rem;
+}
+
+.kyc-gate-card p {
+  color: var(--text2);
+  margin-bottom: 1.5rem;
+  font-size: var(--font-size-base);
+}
+
+.kyc-gate-card .btn {
+  text-decoration: none;
+  display: inline-block;
 }
 </style>
