@@ -81,10 +81,10 @@
       <div class="detail-footer">
         <button
           class="btn btn--primary"
-          disabled
+          :disabled="isSubmitting"
           @click="handleInterest"
         >
-          ابراز تمایل
+          {{ isSubmitting ? 'در حال ثبت...' : 'ابراز تمایل' }}
         </button>
       </div>
     </div>
@@ -92,12 +92,17 @@
 </template>
 
 <script setup lang="ts">
-import { computed } from 'vue'
+import { computed, ref } from 'vue'
+import { useRouter } from 'vue-router'
+import dayjs from 'dayjs'
+import 'dayjs/locale/fa'
 import Modal from '@/components/Modal.vue'
 import RiskBadge from '@/components/RiskBadge.vue'
 import { useFormat } from '@/composables'
 import { useToast } from '@/composables'
-import type { ChequeListing } from '../listings/types/listing'
+import { useMatchStore } from '@/features/matches/stores/matchStore'
+import { useAuthStore } from '@/features/auth/stores/authStore'
+import type { ChequeListing } from '@/features/listings/types/listing'
 
 const props = defineProps<{
   modelValue: boolean
@@ -110,6 +115,9 @@ const emit = defineEmits<{
 
 const { formatCurrency, formatNumber } = useFormat()
 const { showToast } = useToast()
+const matchStore = useMatchStore()
+const authStore = useAuthStore()
+const router = useRouter()
 
 const isOpen = computed({
   get: () => props.modelValue,
@@ -136,7 +144,7 @@ const formattedAmount = computed(() => {
 
 const formattedDueDate = computed(() => {
   if (!props.listing) return '-'
-  return props.listing.due_date
+  return dayjs(props.listing.due_date).locale('fa').format('YYYY/MM/DD')
 })
 
 const issuerTypeLabel = computed(() => {
@@ -152,11 +160,37 @@ const formattedRate = computed(() => {
 const formattedPublishedAt = computed(() => {
   if (!props.listing) return '-'
   const val = props.listing.published_at || props.listing.updated_at || props.listing.created_at
-  return val
+  return dayjs(val).locale('fa').format('YYYY/MM/DD HH:mm')
 })
 
-function handleInterest() {
-  showToast('برای فاز بعدی فعال می‌شود.', 'info')
+const isSubmitting = ref(false)
+
+async function handleInterest() {
+  if (!props.listing) return
+
+  if (authStore.user?.role !== 'investor') {
+    showToast('فقط سرمایه‌گذاران می‌توانند ابراز تمایل کنند.', 'error')
+    return
+  }
+
+  if (!authStore.user?.is_verified) {
+    showToast('برای ابراز تمایل، ابتدا احراز هویت خود را تکمیل کنید.', 'warning')
+    router.push('/app/verification/kyc')
+    return
+  }
+
+  isSubmitting.value = true
+  try {
+    await matchStore.createMatch({ listing_id: String(props.listing.id), message: '' })
+    showToast('ابراز تمایل شما ثبت شد.', 'success')
+    isOpen.value = false
+    router.push('/app/matches')
+  } catch (err: unknown) {
+    const message = (err as { message?: string }).message || 'خطایی رخ داده است.'
+    showToast(message, 'error')
+  } finally {
+    isSubmitting.value = false
+  }
 }
 
 </script>

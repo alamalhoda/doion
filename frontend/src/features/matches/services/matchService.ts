@@ -11,8 +11,6 @@ interface RawListing {
   status?: string
   created_at?: string
   updated_at?: string
-  title?: string
-  suggested_discount_rate?: number | null
 }
 
 interface RawUser {
@@ -44,11 +42,12 @@ function mapListing(raw: RawListing | null): ListingSummary | undefined {
   if (!raw) return undefined
   return {
     id: String(raw.id),
+    bank_name: raw.bank_name ?? '',
     face_amount: raw.face_amount ?? 0,
     due_date: raw.due_date ?? '',
     status: raw.status ?? '',
-    title: raw.title,
-    suggested_discount_rate: raw.suggested_discount_rate,
+    created_at: raw.created_at ?? '',
+    updated_at: raw.updated_at ?? '',
   }
 }
 
@@ -74,10 +73,10 @@ function mapMatch(raw: RawMatch): Match {
 export const MatchService = {
   async createMatch(data: CreateMatchRequest): Promise<Match> {
     try {
-const response = await apiClient.post<RawMatch>('/api/v1/matches/', {
-      listing_id: Number(data.listing_id as string),
-      message: data.message ?? '',
-    })
+      const response = await apiClient.post<RawMatch>('/api/v1/matches/', {
+        listing_id: Number(data.listing_id as string),
+        message: data.message ?? '',
+      })
       return mapMatch(response.data)
     } catch (error) {
       throw normalizeApiError(error)

@@ -139,6 +139,45 @@
     "network_error": "خطای شبکه رخ داده است",
     "mod_306": "حداکثر تعداد ارسال مجدد رسیده ا�ت. لطفاً با پشتیبانی تماس بگیریд"
   },
+  "listings": {
+    "untitled_listing": "آگهی بدون عنوان",
+    "face_amount": "مبلغ چک"
+  },
+  "matches": {
+    "title": "تطابق‌ها",
+    "subtitle": "مدیریت درخواست‌های تطابق",
+    "pending": "در انتظار",
+    "accepted": "پذیرفته شده",
+    "completed": "تکمیل شده",
+    "no_pending_matches": "درخواست تطابق در انتظاری وجود ندارد.",
+    "no_accepted_matches": "تطابق پذیرفته شده‌ای وجود ندارد.",
+    "no_completed_matches": "تطابق تکمیل شده‌ای وجود ندارد.",
+    "status_pending": "در انتظار",
+    "status_accepted": "پذیرفته شده",
+    "status_declined": "رد شده",
+    "status_cancelled": "لغو شده",
+    "status_off_platform_confirmed": "تأیید شده (خارج از پلتفرم)",
+    "status_settled": "تسویه شده",
+    "discount_rate": "نرخ تنزیل",
+    "counterparty": "طرف مقابل",
+    "settlement_type": "نوع تسویه",
+    "off_platform": "خارج از پلتفرم",
+    "escrow": "امانی",
+    "principal_ledger": "دفتر اصلی",
+    "last_message": "آخرین پیام",
+    "detail_title": "جزئیات تطابق",
+    "actions_accept": "پذیرش",
+    "actions_decline": "رد",
+    "actions_confirm": "تأیید تسویه",
+    "actions_cancel": "لغو درخواست",
+    "message_label": "پیام",
+    "counterparty_label": "طرف مقابل",
+    "listing_info_label": "اطلاعات آگهی"
+  },
+  "common": {
+    "created": "تاریخ ایجاد",
+    "unknown": "نامشخص"
+  },
   "language": {
     "fa": "فارسی",
     "en": "English"

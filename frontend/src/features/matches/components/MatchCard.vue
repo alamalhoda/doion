@@ -5,7 +5,7 @@
   >
     <div class="card-header">
       <h3 class="listing-title">
-        {{ match.listing?.title || $t('listings.untitled_listing') }}
+        {{ displayTitle }}
       </h3>
       <NTag
         :type="statusTagType"
@@ -23,7 +23,7 @@
         </div>
         <div class="info-item">
           <span class="label">{{ $t('matches.discount_rate') }}</span>
-          <span class="value">{{ match.final_discount_rate || match.listing?.suggested_discount_rate || '-' }}%</span>
+          <span class="value">{{ match.final_discount_rate ? formatNumber(match.final_discount_rate) : '-' }}٪</span>
         </div>
         <div class="info-item">
           <span class="label">{{ $t('matches.counterparty') }}</span>
@@ -54,8 +54,11 @@
 
 <script setup lang="ts">
 import { computed } from 'vue'
+import dayjs from 'dayjs'
+import 'dayjs/locale/fa'
 import { useI18n } from 'vue-i18n'
 import { NTag } from 'naive-ui'
+import { useFormat } from '@/composables'
 import type { Match } from '../types/match'
 
 interface Props {
@@ -68,13 +71,21 @@ const emit = defineEmits<{
 }>()
 
 const { t } = useI18n()
+const { formatCurrency, formatNumber } = useFormat()
+
+const displayTitle = computed(() => {
+  if (!props.match.listing) return t('listings.untitled_listing')
+  return `${props.match.listing.bank_name} — ${formatCurrency(props.match.listing.face_amount)}`
+})
 
 const statusTagType = computed(() => {
-  const statusMap: Record<string, 'info' | 'success' | 'warning' | 'error'> = {
+  const statusMap: Record<string, 'info' | 'success' | 'warning' | 'error' | 'default'> = {
     pending: 'info',
     accepted: 'warning',
-    rejected: 'error',
-    settled_off_platform: 'success',
+    declined: 'error',
+    cancelled: 'default',
+    off_platform_confirmed: 'success',
+    settled: 'success',
   }
   return statusMap[props.match.status] || 'default'
 })
@@ -83,15 +94,16 @@ const statusText = computed(() => {
   const statusMap: Record<string, string> = {
     pending: t('matches.status_pending'),
     accepted: t('matches.status_accepted'),
-    rejected: t('matches.status_rejected'),
-    settled_off_platform: t('matches.status_settled'),
+    declined: t('matches.status_declined'),
+    cancelled: t('matches.status_cancelled'),
+    off_platform_confirmed: t('matches.status_off_platform_confirmed'),
+    settled: t('matches.status_settled'),
   }
   return statusMap[props.match.status] || props.match.status
 })
 
 const counterpartyName = computed(() => {
-  // For check holders, show investor; for investors, show check holder
-  return props.match.investor?.full_name || props.match.check_holder?.full_name || t('common.unknown')
+  return props.match.investor?.name || props.match.check_holder?.name || t('common.unknown')
 })
 
 const settlementTypeText = computed(() => {
@@ -107,16 +119,8 @@ function handleClick(): void {
   emit('click')
 }
 
-function formatCurrency(amount: number): string {
-  return new Intl.NumberFormat('fa-IR', {
-    style: 'currency',
-    currency: 'IRR',
-    minimumFractionDigits: 0,
-  }).format(amount)
-}
-
 function formatDateTime(dateStr: string): string {
-  return new Date(dateStr).toLocaleDateString('fa-IR')
+  return dayjs(dateStr).locale('fa').format('YYYY/MM/DD')
 }
 
 function truncateMessage(message: string): string {

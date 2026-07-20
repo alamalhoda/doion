@@ -15,7 +15,7 @@ export const REJECTION_CODE_LABELS: Record<RejectionCode, string> = {
   MOD_106: 'Other',
 }
 
-export type MatchStatus = 'pending' | 'accepted' | 'rejected' | 'settled_off_platform'
+export type MatchStatus = 'pending' | 'accepted' | 'declined' | 'cancelled' | 'off_platform_confirmed' | 'settled'
 
 export type VerificationStatus = 'pending' | 'approved' | 'rejected'
 
