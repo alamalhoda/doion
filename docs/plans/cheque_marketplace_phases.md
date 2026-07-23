@@ -191,7 +191,7 @@ flowchart LR
 
 **پروتوتایپ:** فرم ۳ مرحله‌ای create listing — [`cheque-marketplace-prototype.html`](ai-preview/cheque-marketplace-prototype.html) (page-create)
 
-**جریان:** `DRAFT` → submit → `PENDING_MODERATION`
+**جریان:** ایجاد → `pending_moderation` → (moderation) → `published` / `rejected`
 
 ### Backend
 | App | کار |
@@ -233,7 +233,7 @@ flowchart LR
 
 **پروتوتایپ:** صف moderation + modal تأیید/رد — [`extended-prototype.html`](ai-preview/extended-prototype.html) (page-admin)
 
-**جریان:** `PENDING_MODERATION` → approve → `PUBLISHED` / reject → `REJECTED` → resubmit (max 3)
+**جریان:** `pending_moderation` → approve → `published` / reject → `rejected` → resubmit (max 3)
 
 ### Backend
 | App | کار |
@@ -243,7 +243,7 @@ flowchart LR
 
 **APIها:**
 - `GET /api/v1/moderation/queue/` — فیلتر، sort، pagination
-- `POST /api/v1/moderation/listings/{id}/decision/` — `{decision, rejection_reason?}`
+- `POST /api/v1/moderation/{id}/decision/` — `{decision, rejection_code?, rejection_note?}`
 
 **Events:** `ChequeListingPublished`, `ListingRejected` → notification stub
 
@@ -315,7 +315,7 @@ flowchart LR
 
 **پروتوتایپ:** دکمه «ابراز تمایل»، تب‌های investor/holder در dashboard، match rows — [`cheque-marketplace-prototype.html`](ai-preview/cheque-marketplace-prototype.html) (dashboard tabs)
 
-**جریان:** Investor express interest → `Match(PENDING)` → Holder accept/decline → `ACCEPTED` → both confirm off-platform → `SETTLED`
+**جریان:** Investor express interest → `Match(pending)` → Holder accept/decline → `accepted` → both confirm off-platform → `settled`
 
 ### Backend
 | App | کار |

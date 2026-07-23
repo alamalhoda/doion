@@ -162,7 +162,7 @@ Register a new user with role selection.
 - `username`: required, unique, max 150 chars
 - `email`: optional
 - `phone`: optional, unique, max 20 chars
-- `role`: required, one of `check_holder` | `investor`
+- `role`: required, one of `check_holder` | `investor` | `moderator` | `admin`
 - `password`: required, min 8 chars
 - `password_confirm`: must match `password`
 
@@ -288,13 +288,13 @@ With files: `national_id_front`, `national_id_back` (required), `selfie` (option
 **Response 201:**
 ```json
 {
-  "id": "uuid",
+  "id": 1,
   "full_name": "رضا کریمی",
   "national_id": "0012345678",
   "company_name": "شرکتExample",
   "status": "pending",
   "documents": [
-    { "id": "uuid", "document_type": "national_id_front", "file": "/media/documents/...", "file_size": 102400 }
+    { "id": 1, "document_type": "national_id_front", "file": "/media/documents/...", "file_size": 102400 }
   ]
 }
 ```
@@ -307,7 +307,7 @@ Get current user's latest verification.
 **Response 200:**
 ```json
 {
-  "id": "uuid",
+  "id": 1,
   "full_name": "رضا کریمی",
   "national_id": "0012345678",
   "company_name": "شرکتExample",
@@ -330,7 +330,7 @@ List pending KYC verifications (Moderator/Admin only).
 {
   "results": [
     {
-      "id": "uuid",
+      "id": 1,
       "full_name": "رضا کریمی",
       "national_id": "0012345678",
       "company_name": "شرکتExample",
@@ -494,7 +494,7 @@ Upload a document for a listing. Only the owner can upload.
 **Response (201):**
 ```json
 {
-  "id": "uuid",
+  "id": 1,
   "document_type": "cheque_image",
   "file": "/media/documents/2026/06/28/cheque.jpg",
   "file_size": 102400
@@ -706,14 +706,14 @@ List user's notifications with pagination and filtering.
   "unread_count": 3,
   "results": [
     {
-      "id": "uuid",
+      "id": 1,
       "type": "match_created",
       "channel": "in_app",
       "status": "pending",
       "title": "درخواست خرید جدید",
       "message": "یک سرمایه‌گذار به آگهی چک شما علاقه‌مند شده است",
       "related_object_type": "cheque_listing",
-      "related_object_id": "uuid",
+      "related_object_id": "1",
       "read_at": null,
       "sent_at": "2025-04-25T14:00:00Z",
       "created_at": "2025-04-25T14:00:00Z"
@@ -742,14 +742,14 @@ Mark a notification as read.
 **Response 200:**
 ```json
 {
-  "id": "uuid",
+  "id": 1,
   "type": "match_created",
   "channel": "in_app",
   "status": "read",
   "title": "...",
   "message": "...",
   "related_object_type": "cheque_listing",
-  "related_object_id": "uuid",
+  "related_object_id": "1",
   "read_at": "2025-04-25T15:00:00Z",
   "sent_at": "2025-04-25T14:00:00Z",
   "created_at": "2025-04-25T14:00:00Z"
@@ -903,21 +903,19 @@ DRF throttling is enabled globally:
 | `AUTH_003` | 429 | Auth | Too many attempts |
 | `AUTH_004` | 401 | Auth | Token expired |
 | `AUTH_005` | 403 | Auth | Account suspended |
-| `KYC_101` | 400 | KYC | Document image unreadable |
-| `KYC_102` | 400 | KYC | Information mismatch |
-| `KYC_103` | 400 | KYC | Incomplete documents |
-| `KYC_104` | 400 | KYC | Identity already registered |
 | `LST_201` | 400 | Listing | Face amount must be greater than zero |
 | `LST_202` | 400 | Listing | Due date must be in the future |
 | `LST_203` | 400 | Listing | Sayad number must be 16 digits |
 | `LST_204` | 400 | Listing | Cheque already registered (duplicate) |
 | `LST_205` | 400 | Listing | Daily listing limit (10) reached |
 | `LST_206` | 400 | Listing | At least one cheque image required |
-| `MOD_301` | 400 | Moderation | Incomplete cheque information |
-| `MOD_302` | 400 | Moderation | Unreadable cheque image |
-| `MOD_303` | 400 | Moderation | Information mismatch |
-| `MOD_304` | 400 | Moderation | Unauthorized content |
-| `MOD_305` | 400 | Moderation | Incomplete issuer documents |
+| `MOD_101` | 400 | Moderation | Incomplete information |
+| `MOD_102` | 400 | Moderation | Poor quality image |
+| `MOD_103` | 400 | Moderation | Invalid cheque |
+| `MOD_104` | 400 | Moderation | Duplicate listing |
+| `MOD_105` | 400 | Moderation | Risk too high |
+| `MOD_106` | 400 | Moderation | Other |
+| `MOD_306` | 400 | Moderation | Maximum resubmission limit exceeded (3 rejects) |
 
 > Note: The spec defines listing errors as `LST_*` (not `LISTING_*`); there are no `MATCH_*`
 > codes defined in the spec yet (the matching flow is implemented per Phase 6).

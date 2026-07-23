@@ -265,11 +265,14 @@ export const ROUTES = {
 
 | عملیات | Endpoint | Header |
 |--------|----------|--------|
-| دریافت token | `POST /api/auth-token/` | — |
-| کاربر جاری | `GET /api/users/me/` | `Authorization: Token <token>` |
+| دریافت token | `POST /api/v1/auth/login/` | — |
+| تمدید token | `POST /api/v1/auth/refresh/` | — |
+| کاربر جاری | `GET /api/v1/users/me/` | `Authorization: Bearer <access_token>` |
+| ثبت‌نام | `POST /api/v1/identity/register/` | — |
 
-- **JWT نیست** — DRF Token Authentication.
+- **JWT است** — `djangorestframework-simplejwt` با access token ۱ ساعت و refresh token ۷ روز.
 - نگهداری token: `sessionStorage` (مبادله XSS در README).
+- legacy endpoint `/api/auth-token/` برای backward compatibility موجود است ولی استفاده نشده.
 
 ### 10.2 لایه API
 

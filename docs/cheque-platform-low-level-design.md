@@ -58,79 +58,152 @@ backend/
 ```mermaid
 erDiagram
     USER {
-        uuid id PK
-        string phone_number
+        int id PK
+        string username
+        string email
+        string password
+        string name
+        string phone
         string role
-        bool is_verified
+        bool is_active
+        bool is_staff
         datetime date_joined
     }
     PROFILE {
-        uuid id PK
-        uuid user_id FK
-        string full_name
-        string company_name
-        string kyc_level
+        int id PK
+        int user_id FK
+        string role
+        string bio
+        bool is_verified
+        datetime created_at
+        datetime updated_at
     }
     VERIFICATION {
-        uuid id PK
-        uuid user_id FK
-        string verification_type
+        int id PK
+        int user_id FK
+        string full_name
+        string national_id
+        string company_name
         string status
-        datetime reviewed_at
+        string rejection_reason
+        string rejection_code
+        datetime created_at
+        datetime updated_at
     }
     ISSUER_PROFILE {
-        uuid id PK
+        int id PK
         string national_or_company_id
         string name
         int credit_score
+        datetime created_at
+        datetime updated_at
     }
     CHEQUE_LISTING {
-        uuid id PK
-        uuid owner_id FK
-        uuid issuer_id FK
+        int id PK
+        int owner_id FK
+        int issuer_id FK
+        string bank_name
+        string cheque_serial_number
         decimal face_amount
         date due_date
-        string status
+        string issuer_type
+        string issuer_name
+        string issuer_national_id
+        string description
         decimal suggested_discount_rate
         string risk_tier
+        string status
+        string rejection_reason
+        string rejection_code
+        int resubmit_count
+        datetime created_at
+        datetime updated_at
     }
     DOCUMENT {
-        uuid id PK
-        uuid owner_id FK
+        int id PK
+        int owner_id FK
         string related_object_type
-        uuid related_object_id
+        string related_object_id
         string document_type
+        string file
+        int file_size
+        datetime created_at
+        datetime updated_at
     }
     MATCH {
-        uuid id PK
-        uuid listing_id FK
-        uuid investor_id FK
+        int id PK
+        int listing_id FK
+        int investor_id FK
+        int check_holder_id FK
         string status
         string settlement_type
+        decimal final_discount_rate
+        string terms
+        string message
+        datetime created_at
+        datetime updated_at
+    }
+    SETTLEMENT_PORT {
+        int id PK
+        int match_id FK
+        string port_number
+        string bank_name
+        string account_holder
+        bool is_verified
+        datetime created_at
+        datetime updated_at
+    }
+    OFF_PLATFORM_SETTLEMENT {
+        int id PK
+        int match_id FK
+        string confirmation_code
+        int confirmed_by FK
+        datetime confirmed_at
+        string settlement_notes
+        datetime created_at
+        datetime updated_at
     }
     NOTIFICATION {
-        uuid id PK
-        uuid user_id FK
+        int id PK
+        int user_id FK
         string type
         string channel
         string status
+        string title
+        string message
+        string related_object_type
+        string related_object_id
+        datetime read_at
+        datetime sent_at
+        datetime created_at
     }
     AUDIT_EVENT {
-        uuid id PK
-        string event_name
-        uuid actor_user_id FK
-        datetime occurred_at
+        int id PK
+        int actor_id FK
+        string event_type
+        string object_type
+        string object_id
+        json metadata
+        string ip_address
+        datetime created_at
     }
     FEATURE_FLAG {
-        uuid id PK
+        int id PK
         string key
+        string description
         bool is_enabled
+        bool is_system
+        datetime created_at
+        datetime updated_at
     }
     MODERATION_DECISION {
-        uuid id PK
-        uuid listing_id FK
-        uuid moderator_id FK
+        int id PK
+        int listing_id FK
+        int moderator_id FK
         string decision
+        string rejection_code
+        string rejection_note
+        datetime created_at
     }
 
     USER ||--o| PROFILE : has
@@ -139,9 +212,13 @@ erDiagram
     ISSUER_PROFILE ||--o{ CHEQUE_LISTING : "is issuer of"
     CHEQUE_LISTING ||--o{ DOCUMENT : "has attachments"
     USER ||--o{ DOCUMENT : uploads
-    CHEQUE_LISTING ||--o{ MATCH : "matched in"
+    CHEQUE_LISTING ||--o| MATCH : "matched in"
     USER ||--o{ MATCH : "as investor"
+    USER ||--o{ MATCH : "as check_holder"
+    MATCH ||--o| SETTLEMENT_PORT : "has port"
+    MATCH ||--o| OFF_PLATFORM_SETTLEMENT : "has off-platform"
     USER ||--o{ NOTIFICATION : receives
+    USER ||--o{ AUDIT_EVENT : acts
     CHEQUE_LISTING ||--o{ MODERATION_DECISION : "reviewed via"
     USER ||--o{ MODERATION_DECISION : "moderator decides"
 ```
@@ -157,20 +234,40 @@ erDiagram
 
 | متد | مسیر | نقش مجاز | توضیح |
 |---|---|---|---|
-| POST | `/api/v1/auth/register/` | عمومی | ثبت‌نام دارنده چک یا سرمایه‌گذار |
 | POST | `/api/v1/auth/login/` | عمومی | دریافت JWT (SimpleJWT) |
 | POST | `/api/v1/auth/refresh/` | عمومی | تمدید access token |
-| GET/PATCH | `/api/v1/users/me/` | کاربر احرازشده | مشاهده/ویرایش پروفایل |
+| POST | `/api/v1/identity/register/` | عمومی | ثبت‌نام + ایجاد User + Profile |
+| GET/PATCH | `/api/v1/users/me/` | کاربر احرازشده | مشاهده/ویرایش اطلاعات کاربر |
+| GET/PATCH | `/api/v1/identity/profile/` | کاربر احرازشده | مشاهده/ویرایش پروفایل |
 | POST | `/api/v1/verifications/` | کاربر احرازشده | شروع فرایند KYC |
+| GET | `/api/v1/verifications/me/` | کاربر احرازشده | آخرین درخواست KYC کاربر |
+| GET | `/api/v1/verifications/` | کاربر احرازشده | لیست درخواست‌های KYC |
 | POST | `/api/v1/listings/` | CheckHolder | ثبت آگهی چک (status=pending_moderation) |
-| PATCH | `/api/v1/listings/{id}/` | CheckHolder (مالک) | ویرایش پیش از انتشار |
+| GET/PATCH | `/api/v1/listings/{id}/` | CheckHolder (مالک) | مشاهده/ویرایش آگهی |
 | POST | `/api/v1/listings/{id}/documents/` | CheckHolder (مالک) | بارگذاری مدارک |
-| GET | `/api/v1/marketplace/listings/` | Investor | جست‌وجو/فیلتر آگهی‌های `published` |
+| POST | `/api/v1/listings/{id}/withdraw/` | CheckHolder (مالک) | پس‌گرفتن آگهی |
+| GET | `/api/v1/listings/my/` | CheckHolder | آگهی‌های من |
+| GET | `/api/v1/marketplace/listings/` | همه | جست‌وجو/فیلتر آگهی‌های `published` |
+| GET | `/api/v1/issuer-profiles/` | همه | لیست پروفایل‌های صادرکننده |
+| GET/PATCH | `/api/v1/issuer-profiles/{id}/` | CheckHolder (مالک) | مشاهده/ویرایش پروفایل |
 | POST | `/api/v1/matches/` | Investor | ابراز تمایل (ایجاد Match) |
-| PATCH | `/api/v1/matches/{id}/status/` | طرفین Match | بروزرسانی وضعیت (مثلاً تایید توافق بیرون از پلتفرم) |
+| GET | `/api/v1/matches/` | کاربر احرازشده | لیست Matchهای کاربر |
+| PATCH | `/api/v1/matches/{id}/status/` | طرفین Match | بروزرسانی وضعیت |
+| POST | `/api/v1/matches/{id}/confirm-off-platform/` | طرفین Match | تأیید تسویه بیرون از پلتفرم |
 | GET | `/api/v1/moderation/queue/` | Moderator | صف آگهی‌های در انتظار بررسی |
-| POST | `/api/v1/moderation/listings/{id}/decision/` | Moderator | تایید/رد آگهی |
-| GET/PATCH | `/api/v1/feature-flags/{key}/` | Admin | مشاهده/تغییر Feature Flag |
+| POST | `/api/v1/moderation/{id}/decision/` | Moderator | تأیید/رد آگهی |
+| POST | `/api/v1/moderation/{id}/resubmit/` | CheckHolder | ارسال مجدد آگهی رد شده |
+| GET | `/api/v1/moderation/kyc/` | Moderator | صف درخواست‌های KYC |
+| POST | `/api/v1/moderation/kyc/{id}/decision/` | Moderator | تأیید/رد KYC |
+| GET | `/api/v1/notifications/` | کاربر احرازشده | لیست اعلان‌ها |
+| PATCH | `/api/v1/notifications/{id}/` | کاربر احرازشده | علامت‌گذاری خوانده‌شده |
+| POST | `/api/v1/notifications/mark-all-read/` | کاربر احرازشده | علامت‌گذاری همه خوانده‌شده |
+| GET | `/api/v1/notifications/preferences/` | کاربر احرازشده | تنظیمات اعلان |
+| PATCH | `/api/v1/notifications/preferences/` | کاربر احرازشده | بروزرسانی تنظیمات |
+| GET | `/api/v1/compliance/feature-flags/` | Admin/Moderator | لیست Feature Flags |
+| GET/PATCH | `/api/v1/compliance/feature-flags/{key}/` | Admin | مشاهده/تغییر Feature Flag |
+| GET | `/api/v1/compliance/stats/` | Admin/Moderator | آمار داشبورد |
+| GET | `/api/v1/compliance/audit/` | Admin/Moderator | لیست رویدادهای审计 |
 
 ---
 
