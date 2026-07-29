@@ -40,6 +40,32 @@ class MatchViewSet(GenericViewSet):
         serializer = self.get_serializer(queryset, many=True)
         return Response(serializer.data)
 
+    @action(detail=False, methods=["get"], url_path="my")
+    def my(self, request):
+        queryset = self.get_queryset()
+        page = self.paginate_queryset(queryset)
+        if page is not None:
+            serializer = self.get_serializer(page, many=True)
+            return self.get_paginated_response(serializer.data)
+        serializer = self.get_serializer(queryset, many=True)
+        return Response(serializer.data)
+
+    @action(detail=True, methods=["patch"], url_path="status")
+    def status(self, request, pk=None):
+        match = self.get_object()
+        serializer = MatchStatusUpdateSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+
+        validated = serializer.validated_data
+        match.status = validated["status"]
+        if validated.get("final_discount_rate") is not None:
+            match.final_discount_rate = validated["final_discount_rate"]
+        if validated.get("terms") is not None:
+            match.terms = validated["terms"]
+        match.save(update_fields=["status", "final_discount_rate", "terms", "updated_at"])
+
+        return Response(MatchSerializer(match).data)
+
     def create(self, request):
         serializer = MatchCreateSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)

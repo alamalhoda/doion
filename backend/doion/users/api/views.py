@@ -75,6 +75,8 @@ class LoginViewSet(GenericViewSet):
                 "username": user.username,
                 "email": user.email,
                 "name": user.name,
+                "role": user.role,
+                "phone": user.phone or "",
             },
         }
 
@@ -123,6 +125,8 @@ class RefreshViewSet(GenericViewSet):
                 "username": user.username,
                 "email": user.email,
                 "name": user.name,
+                "role": user.role,
+                "phone": user.phone or "",
             },
         }
 

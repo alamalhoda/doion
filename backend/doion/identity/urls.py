@@ -15,4 +15,14 @@ router.register("profile", ProfileViewSet, basename="profile")
 
 urlpatterns = [
     path("identity/", include(router.urls)),
+    path(
+        "identity/profile/",
+        ProfileViewSet.as_view({"get": "retrieve", "patch": "partial_update", "put": "update"}),
+        name="profile-current",
+    ),
+    path(
+        "identity/me/",
+        UserMeViewSet.as_view({"get": "retrieve", "patch": "partial_update", "put": "update"}),
+        name="me-current",
+    ),
 ]

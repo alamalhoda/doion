@@ -47,6 +47,23 @@ class FeatureFlagViewSet(ModelViewSet):
             )
         return super().partial_update(request, *args, **kwargs)
 
+    @action(detail=True, methods=["post"], url_path="toggle")
+    def toggle(self, request, key=None):
+        instance = self.get_object()
+        if instance.is_system:
+            return Response(
+                {
+                    "error": {
+                        "code": "PERMISSION_ERROR",
+                        "message": "System flags cannot be toggled via API.",
+                    }
+                },
+                status=status.HTTP_403_FORBIDDEN,
+            )
+        instance.is_enabled = not instance.is_enabled
+        instance.save(update_fields=["is_enabled"])
+        return Response(FeatureFlagSerializer(instance).data)
+
 
 class ComplianceStatsView(GenericViewSet):
     permission_classes = [IsModeratorOrAdmin]

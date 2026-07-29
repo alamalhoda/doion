@@ -75,7 +75,12 @@ class ProfileSerializer(serializers.ModelSerializer):
         read_only_fields = ["id", "role", "is_verified", "created_at", "updated_at"]
 
     def update(self, instance, validated_data):
-        user_data = validated_data.pop("user", {})
+        user_fields = {"email", "name", "phone"}
+        user_data = {}
+        for attr, value in list(validated_data.items()):
+            if attr in user_fields:
+                user_data[attr] = value
+                validated_data.pop(attr)
         user = instance.user
         for attr, value in user_data.items():
             setattr(user, attr, value)

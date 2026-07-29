@@ -129,7 +129,9 @@ All API errors follow this envelope format (implemented in `backend/config/excep
     "id": 1,
     "username": "09121234567",
     "email": "user@example.com",
-    "name": "رضا کریمی"
+    "name": "رضا کریمی",
+    "role": "check_holder",
+    "phone": "+989123456789"
   }
 }
 ```
@@ -162,7 +164,9 @@ All API errors follow this envelope format (implemented in `backend/config/excep
     "id": 1,
     "username": "09121234567",
     "email": "user@example.com",
-    "name": "رضا کریمی"
+    "name": "رضا کریمی",
+    "role": "check_holder",
+    "phone": "+989123456789"
   }
 }
 ```
@@ -978,7 +982,47 @@ Documents are created as part of Verification creation or Listing document uploa
 
 ---
 
-### 9.7 Match Status Values
+### 9.7 List My Matches
+
+**Endpoint:** `GET /api/v1/matches/my/`
+
+**Permission:** IsAuthenticated
+
+**Behavior:**
+- Investors: see matches where they are the investor
+- Check holders: see matches where they are the check holder
+
+**Response 200:** Paginated array of `Match` objects (same shape as create response).
+
+---
+
+### 9.8 Update Match Status
+
+**Endpoint:** `PATCH /api/v1/matches/{id}/status/`
+
+**Permission:** IsAuthenticated
+
+**Request Body:**
+
+```json
+{
+  "status": "accepted",
+  "final_discount_rate": "2.7",
+  "terms": "Updated terms"
+}
+```
+
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| `status` | `MatchStatus` | Yes | New match status |
+| `final_discount_rate` | `string \| null` | No | Final discount rate |
+| `terms` | `string` | No | Updated terms |
+
+**Response 200:** Updated `Match` object.
+
+---
+
+### 9.9 Match Status Values
 
 | Value | Description |
 |-------|-------------|
@@ -991,7 +1035,7 @@ Documents are created as part of Verification creation or Listing document uploa
 
 ---
 
-### 9.8 Settlement Type Values
+### 9.9 Match Status Values
 
 | Value | Description |
 |-------|-------------|
@@ -1311,7 +1355,21 @@ Documents are created as part of Verification creation or Listing document uploa
 
 ---
 
-### 12.4 Admin Stats
+### 12.4 Toggle Feature Flag
+
+**Endpoint:** `POST /api/v1/compliance/feature-flags/{key}/toggle/`
+
+**Permission:** IsAuthenticated (moderator/admin only)
+
+**Behavior:** Toggles `is_enabled` on the feature flag identified by `key`.
+
+**Response 200:** Updated `FeatureFlag` object.
+
+**Errors:** `PERMISSION_ERROR` (403) — system flags cannot be toggled.
+
+---
+
+### 12.5 Admin Stats
 
 **Endpoint:** `GET /api/v1/compliance/stats/`
 
@@ -1345,7 +1403,7 @@ Documents are created as part of Verification creation or Listing document uploa
 
 ---
 
-### 12.5 Audit Events
+### 12.6 Audit Events
 
 **Endpoint:** `GET /api/v1/compliance/audit/`
 
@@ -1410,6 +1468,7 @@ All list endpoints support DRF standard pagination:
 
 | Date | Change |
 |------|--------|
+| 2026-07-29 | Phase 1 backend connectivity: added role/phone to login/refresh responses; exposed identity/profile/ and identity/me/ without pk; fixed ProfileSerializer.update field separation; added matches/my/ and matches/{id}/status/ endpoints; added feature flag toggle endpoint |
 | 2026-07-23 | Initial contract derived from actual backend code (Phases 0-8) |
 
 ---
