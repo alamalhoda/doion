@@ -97,7 +97,16 @@ Refresh access token using refresh token.
 **Response (200):**
 ```json
 {
-  "access": "new_jwt_access_token"
+  "access": "new_jwt_access_token",
+  "refresh": "new_jwt_refresh_token",
+  "user": {
+    "id": 1,
+    "username": "johndoe",
+    "email": "john@example.com",
+    "name": "John Doe",
+    "phone": "09123456789",
+    "role": "check_holder"
+  }
 }
 ```
 
@@ -681,6 +690,132 @@ List all `published` cheque listings for investor browsing. Supports pagination 
 
 ---
 
+## Phase-6 Endpoints
+
+### Matches
+
+#### POST /api/v1/matches/
+
+Create a new match (express interest). Investor-only.
+
+**Request Body:**
+```json
+{
+  "listing_id": 1,
+  "message": "I am interested in this cheque"
+}
+```
+
+**Response (201):**
+```json
+{
+  "id": 1,
+  "listing": {
+    "id": 1,
+    "bank_name": "بانک ملت",
+    "face_amount": "500000000",
+    "due_date": "2025-06-10",
+    "status": "published",
+    "created_at": "2025-04-25T09:00:00Z",
+    "updated_at": "2025-04-25T09:00:00Z"
+  },
+  "investor": {
+    "id": 2,
+    "username": "investor_user",
+    "name": "علی محمدی"
+  },
+  "check_holder": {
+    "id": 1,
+    "username": "holder_user",
+    "name": "رضا کریمی"
+  },
+  "status": "pending",
+  "settlement_type": "off_platform",
+  "final_discount_rate": null,
+  "terms": "",
+  "message": "I am interested in this cheque",
+  "created_at": "2025-04-25T10:00:00Z",
+  "updated_at": "2025-04-25T10:00:00Z"
+}
+```
+
+#### GET /api/v1/matches/
+
+List matches filtered by current user role.
+
+**Response (200):** Paginated array of `Match` objects.
+
+#### GET /api/v1/matches/my/
+
+List matches for the current user (alias of `/matches/` with role-based filtering).
+
+**Response (200):** Paginated array of `Match` objects.
+
+#### POST /api/v1/matches/{id}/accept/
+
+Accept a match. Check holder only.
+
+**Response (200):** Updated `Match` object with `status: "accepted"`.
+
+#### POST /api/v1/matches/{id}/decline/
+
+Decline a match. Check holder only.
+
+**Request Body:**
+```json
+{
+  "note": "The terms are not acceptable"
+}
+```
+
+**Response (200):** Updated `Match` object with `status: "declined"`.
+
+#### POST /api/v1/matches/{id}/cancel/
+
+Cancel a match. Either party can cancel.
+
+**Response (200):** Updated `Match` object with `status: "cancelled"`.
+
+#### POST /api/v1/matches/{id}/confirm-off-platform/
+
+Confirm off-platform settlement. Check holder only.
+
+**Response (200):** Updated `Match` object with `status: "off_platform_confirmed"`.
+
+#### PATCH /api/v1/matches/{id}/status/
+
+Update match status directly.
+
+**Request Body:**
+```json
+{
+  "status": "accepted",
+  "final_discount_rate": "2.7",
+  "terms": "Updated terms"
+}
+```
+
+**Response (200):** Updated `Match` object.
+
+**Match Status Values:**
+| Value | Description |
+|-------|-------------|
+| `pending` | Interest expressed, awaiting holder response |
+| `accepted` | Holder accepted the match |
+| `declined` | Holder declined the match |
+| `cancelled` | Match cancelled by either party |
+| `off_platform_confirmed` | Settlement confirmed outside platform |
+| `settled` | Match fully settled |
+
+**Settlement Type Values:**
+| Value | Description |
+|-------|-------------|
+| `off_platform` | Default — settlement occurs outside the platform |
+| `escrow` | Future: escrow-based settlement (Layer 2) |
+| `principal_ledger` | Future: internal ledger settlement (Layer 3) |
+
+---
+
 ## Phase-7 Endpoints
 
 ### Notifications
@@ -855,6 +990,14 @@ All compliance endpoints require `Moderator` or `Admin` role (permission `IsMode
 **Errors:**
 - `PERMISSION_ERROR` (403) — Normal users cannot read/modify flags.
 - `PERMISSION_ERROR` (403) — System flags (`is_system: true`) cannot be modified via API.
+
+**Toggle a flag**
+`POST /api/v1/compliance/feature-flags/{key}/toggle/`
+
+**Response 200:** Updated `FeatureFlag` object.
+
+**Errors:**
+- `PERMISSION_ERROR` (403) — System flags cannot be toggled via API.
 
 ### Admin Stats
 

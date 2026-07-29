@@ -17,6 +17,7 @@ Doion Project
 - **Timezone**: Asia/Tehran
 - **احراز هویت**: django-allauth
 - **API**: Django REST Framework + drf-spectacular
+- **CORS**: django-cors-headers (development allows all origins; specific origins listed in `config/settings/local.py`)
 
 ---
 
@@ -176,7 +177,22 @@ backend/                            ← ریشه بک‌اند (Django)
 | `/api/` | نقطه ورود API |
 | `/api/users/` | API کاربران (لیست، جزئیات، ویرایش) |
 | `/api/users/me/` | اطلاعات کاربر جاری |
-| `/api/auth-token/` | دریافت توکن احراز هویت |
+| `/api/v1/auth/login/` | ورود با JWT |
+| `/api/v1/auth/refresh/` | تمدید توکن |
+| `/api/v1/identity/register/` | ثبت‌نام |
+| `/api/v1/identity/me/` | اطلاعات کاربر جاری (UserMe) |
+| `/api/v1/identity/profile/` | پروفایل کاربر جاری (Profile) |
+| `/api/v1/verifications/` | احراز هویت (KYC) |
+| `/api/v1/listings/` | آگهی‌های چک |
+| `/api/v1/listings/my/` | آگهی‌های من |
+| `/api/v1/marketplace/listings/` | مارکت‌پلیس |
+| `/api/v1/marketplace/listings/latest/` | ۴ آگهی آخر |
+| `/api/v1/matches/` | تطابق‌ها |
+| `/api/v1/matches/my/` | تطابق‌های من |
+| `/api/v1/notifications/` | اعلان‌ها |
+| `/api/v1/moderation/queue/` | صف نظارت |
+| `/api/v1/compliance/stats/` | آمار ادمین |
+| `/api/v1/compliance/feature-flags/` | فلگ‌های قابلیت |
 | `/api/schema/` | اسکیمای API |
 | `/api/docs/` | مستندات Swagger |
 

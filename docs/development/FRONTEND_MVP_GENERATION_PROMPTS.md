@@ -220,7 +220,7 @@ You are continuing the Cheque Yar Vue 3 frontend project. The infrastructure fro
 2. `src/features/auth/RegisterView.vue`
    - Form: username, email, password, password_confirm, name, phone, role (select: check_holder / investor).
    - Validate password match client-side before submit.
-   - On success, store tokens, redirect to `/marketplace`.
+   - On success, store tokens (response includes `user.id`, `user.username`, `user.email`, `user.name`, `user.role`, `user.phone`), redirect to `/marketplace`.
 
 ### Identity
 3. `src/features/profile/ProfileView.vue`
@@ -299,7 +299,7 @@ You are continuing the Cheque Yar Vue 3 frontend project. The infrastructure fro
 
 ### Matches
 13. `src/features/matches/MyMatchesView.vue`
-    - GET `/api/v1/matches/`.
+    - GET `/api/v1/matches/my/`.
     - Investors see matches where they are investor; check holders see matches where they are check holder.
     - Two tabs: Received (check_holder) / Sent (investor).
     - Status chips with MATCH_STATUS_LABELS.
@@ -314,6 +314,7 @@ You are continuing the Cheque Yar Vue 3 frontend project. The infrastructure fro
     - POST `/api/v1/matches/{id}/decline/` — check_holder only, body { note }.
     - POST `/api/v1/matches/{id}/cancel/` — either party.
     - POST `/api/v1/matches/{id}/confirm-off-platform/` — check_holder only.
+    - PATCH `/api/v1/matches/{id}/status/` — body { status, final_discount_rate?, terms? }.
     - All actions via n-message feedback + optimistic UI refresh of match list.
     - In accepted matches, show unmasked check_holder/investor contact information.
     - Settlement must show banner: "تسویه با تأیید خارج از پلتفرم"
@@ -388,6 +389,7 @@ api.d.ts
 21. `src/features/admin/FeatureFlagsView.vue`
     - GET `/api/v1/compliance/feature-flags/`.
     - PATCH `/api/v1/compliance/feature-flags/{key}/` { is_enabled: true/false }.
+    - POST `/api/v1/compliance/feature-flags/{key}/toggle/` to toggle flag.
     - Admin-only toggles; disable n-switch if `is_system === true`.
 
 22. `src/features/admin/AuditEventsView.vue`

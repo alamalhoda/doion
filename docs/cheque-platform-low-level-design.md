@@ -251,11 +251,15 @@ erDiagram
 | GET | `/api/v1/issuer-profiles/` | همه | لیست پروفایل‌های صادرکننده |
 | GET/PATCH | `/api/v1/issuer-profiles/{id}/` | CheckHolder (مالک) | مشاهده/ویرایش پروفایل |
 | POST | `/api/v1/matches/` | Investor | ابراز تمایل (ایجاد Match) |
-| GET | `/api/v1/matches/` | کاربر احرازشده | لیست Matchهای کاربر |
-| PATCH | `/api/v1/matches/{id}/status/` | طرفین Match | بروزرسانی وضعیت |
-| POST | `/api/v1/matches/{id}/confirm-off-platform/` | طرفین Match | تأیید تسویه بیرون از پلتفرم |
+| GET | `/api/v1/matches/` | کاربر احرازشده | لیست Matchهای کاربر (فیلتر بر اساس نقش) |
+| GET | `/api/v1/matches/my/` | کاربر احرازشده | تطابق‌های من (همانند `/matches/` با فیلتر نقش) |
+| PATCH | `/api/v1/matches/{id}/status/` | طرفین Match | بروزرسانی وضعیت (`status`, `final_discount_rate?`, `terms?`) |
+| POST | `/api/v1/matches/{id}/accept/` | check_holder | پذیرش تطابق |
+| POST | `/api/v1/matches/{id}/decline/` | check_holder | رد تطابق |
+| POST | `/api/v1/matches/{id}/cancel/` | طرفین Match | لغو تطابق |
+| POST | `/api/v1/matches/{id}/confirm-off-platform/` | check_holder | تأیید تسویه بیرون از پلتفرم |
+| GET | `/api/v1/marketplace/listings/latest/` | عمومی | ۴ آگهی آخر منتشر شده |
 | GET | `/api/v1/moderation/queue/` | Moderator | صف آگهی‌های در انتظار بررسی |
-| POST | `/api/v1/moderation/{id}/decision/` | Moderator | تأیید/رد آگهی |
 | POST | `/api/v1/moderation/{id}/resubmit/` | CheckHolder | ارسال مجدد آگهی رد شده |
 | GET | `/api/v1/moderation/kyc/` | Moderator | صف درخواست‌های KYC |
 | POST | `/api/v1/moderation/kyc/{id}/decision/` | Moderator | تأیید/رد KYC |
@@ -266,6 +270,7 @@ erDiagram
 | PATCH | `/api/v1/notifications/preferences/` | کاربر احرازشده | بروزرسانی تنظیمات |
 | GET | `/api/v1/compliance/feature-flags/` | Admin/Moderator | لیست Feature Flags |
 | GET/PATCH | `/api/v1/compliance/feature-flags/{key}/` | Admin | مشاهده/تغییر Feature Flag |
+| POST | `/api/v1/compliance/feature-flags/{key}/toggle/` | Admin | تغییر وضعیت Feature Flag |
 | GET | `/api/v1/compliance/stats/` | Admin/Moderator | آمار داشبورد |
 | GET | `/api/v1/compliance/audit/` | Admin/Moderator | لیست رویدادهای审计 |
 
