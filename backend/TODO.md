@@ -110,7 +110,7 @@
 - [x] `CorrelationIDMiddleware` (`X-Correlation-ID`) + structlog JSON logging config (guarded imports so app boots without the packages)
 - [x] Resolved `urls.W005` namespace warning in `config/urls.py`
 - [x] Tests: `test_models.py`, `test_views.py`, `test_celery.py` (expire_listings → EXPIRED), `test_audit.py`
-- [x] `docs/development/API_CONTRACT_REGISTRY.md` updated with Phase 8 endpoints + error-code catalog
+- [x] API contract consolidated into `docs/development/MASTER_API_CONTRACT.md` (SSOT); `API_CONTRACT_REGISTRY.md` deprecated stub
 
 ### Phase 8 — Remaining (requires shell, blocked in this environment)
 - [ ] `python manage.py makemigrations` + `migrate` (generates compliance 0001 and the pending integrations/moderation/notifications migrations)
