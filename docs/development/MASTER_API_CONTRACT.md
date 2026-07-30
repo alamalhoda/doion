@@ -6,11 +6,13 @@
 
 **Base URL:** `/api/v1/`
 
-**Auth:** Bearer JWT (`djangorestframework-simplejwt`). Access token lifetime: 1 hour. Refresh token lifetime: 7 days.
+**Auth:** Bearer JWT (`djangorestframework-simplejwt`). Access token lifetime: 1 hour. Refresh token lifetime: **1 day** (SimpleJWT default; `REFRESH_TOKEN_LIFETIME` is not overridden in settings).
 
 **Date Format:** ISO 8601 (`"2025-04-25T09:00:00Z"`)
 
 **IDs:** All primary keys are `number` (`BigAutoField`). There are no UUIDs in the current implementation.
+
+**Legacy mount:** The same router is also mounted under `/api/` (alias of `/api/v1/`). Prefer `/api/v1/` for new clients.
 
 ---
 
@@ -28,6 +30,13 @@
 10. [Moderation](#10-moderation)
 11. [Notifications](#11-notifications)
 12. [Compliance & Admin](#12-compliance--admin)
+13. [Pagination](#13-pagination)
+14. [Rate Limiting](#14-rate-limiting)
+15. [Operational Notes](#15-operational-notes)
+16. [Legacy Endpoints](#16-legacy-endpoints)
+17. [Role Values](#17-role-values)
+18. [Changelog](#18-changelog)
+19. [Sync Policy](#19-sync-policy)
 
 ---
 
@@ -55,45 +64,55 @@ All API errors follow this envelope format (implemented in `backend/config/excep
 | `message` | `string` | Human-readable error message |
 | `details` | `object \| undefined` | Optional field-level errors (only present for `VALIDATION_ERROR`) |
 
-### 1.2 General Error Codes
+### 1.2 Envelope Error Codes (emitted by `exception_handler`)
 
-| Code | HTTP | Description |
-|------|------|-------------|
-| `VALIDATION_ERROR` | 400 | Field validation failed |
-| `AUTHENTICATION_ERROR` | 401 | Invalid or missing credentials |
-| `PERMISSION_ERROR` | 403 | User lacks required permissions |
-| `NOT_FOUND_ERROR` | 404 | Resource not found |
-| `SERVER_ERROR` | 500 | Unexpected server error |
+| Code | HTTP | When |
+|------|------|------|
+| `VALIDATION_ERROR` | 400 | DRF `ValidationError` (includes listing field validation) |
+| `AUTHENTICATION_ERROR` | 401 | DRF `AuthenticationFailed` |
+| `PERMISSION_ERROR` | 403 | DRF `PermissionDenied` (also returned manually by some views) |
+| `NOT_FOUND_ERROR` | 404 | DRF `NotFound` |
+| `SERVER_ERROR` | * | Fallback for other DRF `APIException` subclasses **including** match-domain exceptions |
+| `MOD_306` | 400 | `ModerationResubmitLimitExceeded` |
+| `MOD_500` | * | Base `ModerationError.default_code` (if raised without subclass) |
 
-### 1.3 Listing Error Codes (`LST_*`)
+### 1.3 Listing validation (maps to `VALIDATION_ERROR`, not `LST_*`)
 
-| Code | Field | Description |
-|------|-------|-------------|
-| `LST_201` | `face_amount` | Must be greater than 0 |
-| `LST_202` | `due_date` | Must be in the future |
-| `LST_203` | `cheque_serial_number` | Must be exactly 16 digits |
-| `LST_204` | `cheque_serial_number` | Duplicate cheque for this issuer/bank (unique constraint) |
-| `LST_205` | — | Daily listing limit (10) reached |
-| `LST_206` | — | At least one cheque image required (enforced at submission, not serializer) |
+Listing create/update validators raise standard `ValidationError`. The API **does not** emit `LST_*` codes in the envelope `error.code`. Messages/fields in practice:
 
-### 1.4 Moderation Error Codes (`MOD_*`)
+| Spec label (not emitted) | Field / detail | Actual message (approx.) |
+|--------------------------|----------------|--------------------------|
+| `LST_201` | `face_amount` | `face_amount must be greater than 0` |
+| `LST_202` | `due_date` | `due_date must be in the future` |
+| `LST_203` | `cheque_serial_number` | `sayad_number must be 16 digits` |
+| `LST_204` | `cheque_serial_number` | Duplicate cheque for issuer/bank (IntegrityError → ValidationError) |
+| `LST_205` | `non_field_errors` | `Daily limit of 10 listings reached` |
+| `LST_206` | — | **spec-only / not implemented** — no cheque-image requirement enforced in serializer/views |
 
-| Code | Description |
-|------|-------------|
+### 1.4 Moderation rejection codes (`MOD_101`–`MOD_106`)
+
+These are **payload enum values** for `rejection_code` on listing moderation decisions — **not** envelope `error.code` values (except `MOD_306` above).
+
+| Code | Meaning |
+|------|---------|
 | `MOD_101` | Incomplete information |
 | `MOD_102` | Poor quality image |
 | `MOD_103` | Invalid cheque |
 | `MOD_104` | Duplicate listing |
 | `MOD_105` | Risk too high |
 | `MOD_106` | Other |
-| `MOD_306` | Maximum resubmission limit exceeded (3 rejects) |
 
-### 1.5 Notification Error Codes (`NOTIF_*`)
+### 1.5 Match exception codes (declared but not emitted)
 
-| Code | HTTP | Description |
-|------|------|-------------|
-| `NOTIF_401` | 401 | Authentication required |
-| `NOTIF_403` | 403 | Permission denied |
+`MatchNotAllowed` (`MATCH_NOT_ALLOWED`) and `InvalidMatchStatus` (`INVALID_MATCH_STATUS`) exist on exceptions, but `custom_exception_handler` maps non-`ModerationError` `APIException`s to `SERVER_ERROR` with message `"An unexpected error occurred"`. Clients must treat match failures as `SERVER_ERROR` until the handler is fixed.
+
+### 1.6 Spec-only codes (not in backend)
+
+| Code family | Status |
+|-------------|--------|
+| `AUTH_001`–`AUTH_005` | **spec-only / not implemented** |
+| `NOTIF_401`, `NOTIF_403` | **spec-only / not implemented** — notifications use standard envelope codes |
+| `LST_*` as envelope codes | **spec-only / not implemented** — see §1.3 |
 
 ---
 
@@ -227,7 +246,7 @@ All API errors follow this envelope format (implemented in `backend/config/excep
 
 ## 3. Users & Identity
 
-### 3.1 Get / Update Current User
+### 3.1 Get Current User
 
 **Endpoint:** `GET /api/v1/users/me/`
 
@@ -243,41 +262,22 @@ All API errors follow this envelope format (implemented in `backend/config/excep
   "name": "رضا کریمی",
   "phone": "+989123456789",
   "role": "check_holder",
-  "is_verified": false
+  "is_verified": false,
+  "url": "http://example.com/api/v1/users/09121234567/"
 }
 ```
 
-**Endpoint:** `PATCH /api/v1/users/me/`
+Note: The `me` action is **GET-only**. Partial updates for the cookiecutter user route use `PATCH /api/v1/users/{username}/` (queryset is limited to the authenticated user). Prefer `PATCH /api/v1/identity/me/` for profile-style self-updates.
 
-**Request Body (partial):**
-
-```json
-{
-  "name": "NAME_UPDATED",
-  "email": "new@example.com",
-  "phone": "+989198765432"
-}
-```
-
-**Response 200:**
-
-```json
-{
-  "id": 1,
-  "username": "09121234567",
-  "email": "new@example.com",
-  "name": "NAME_UPDATED",
-  "phone": "+989198765432",
-  "role": "check_holder",
-  "is_verified": false
-}
-```
+Also available: `GET /api/v1/users/` (list of self only), `GET|PUT|PATCH /api/v1/users/{username}/`.
 
 ---
 
 ### 3.2 Get / Update Profile
 
 **Endpoint:** `GET /api/v1/identity/profile/`
+
+**Endpoint:** `PUT|PATCH /api/v1/identity/profile/`
 
 **Permission:** IsAuthenticated
 
@@ -305,40 +305,31 @@ All API errors follow this envelope format (implemented in `backend/config/excep
 | `email` | `string` | No | Mapped to `user.email` |
 | `name` | `string` | No | Mapped to `user.name` |
 | `phone` | `string` | No | Mapped to `user.phone` |
-| `role` | `string` | Yes | From `user.role` |
+| `role` | `string` | Yes | Profile role (`read_only_fields`) |
 | `bio` | `string` | No | Profile bio |
 | `is_verified` | `boolean` | Yes | KYC verification status |
 | `created_at` | `string` (ISO 8601) | Yes | |
 | `updated_at` | `string` (ISO 8601) | Yes | |
 
-**Endpoint:** `PATCH /api/v1/identity/profile/`
+**Request Body (partial):** `email`, `name`, `phone`, `bio` — **not** `role` / `is_verified`.
 
-**Request Body (partial):**
+**Known runtime gap:** `ProfileViewSet.get_object` references `Profile` without importing it in `identity/api/views.py`, which can raise `NameError` on these routes until fixed.
 
-```json
-{
-  "bio": "Experienced investor",
-  "role": "investor"
-}
-```
-
-Note: `role` is writeable via ProfileSerializer (not read-only), but `is_verified` is read-only.
-
-**Response 200:** Same shape as GET.
+Router also exposes detail stubs `GET|PUT|PATCH /api/v1/identity/profile/{pk}/` (same viewset).
 
 ---
 
-### 3.3 Get / Update Current User (Alt Endpoint)
+### 3.3 Get / Update Current User (Identity)
 
 **Endpoint:** `GET /api/v1/identity/me/`
 
+**Endpoint:** `PUT|PATCH /api/v1/identity/me/`
+
 **Permission:** IsAuthenticated
 
-**Response 200:** Same shape as `GET /api/v1/users/me/` (returns `UserMeSerializer` data).
+**Response 200:** `UserMeSerializer` — `{id, username, email, name, phone, role, is_verified}` (`role` / `is_verified` read-only). Writable: `email`, `name`, `phone`, `username` (model fields not marked read-only).
 
-**Endpoint:** `PATCH /api/v1/identity/me/`
-
-Updates `User` fields directly (not Profile fields). Response 200: same shape as GET.
+Router also exposes `GET|PUT|PATCH /api/v1/identity/me/{pk}/`.
 
 ---
 
@@ -465,9 +456,9 @@ Note: Only `full_name`, `national_id`, and `company_name` are writable. `status`
 
 **Endpoint:** `GET /api/v1/moderation/kyc/`
 
-**Permission:** IsModerator
+**Permission:** `identity.IsModerator` — requires authenticated user whose **profile.role** is `moderator` or `admin`.
 
-**Query Parameters:** `ordering=-created_at`, `page`, `page_size`
+**Query Parameters:** Default list behavior (no custom pagination class on this view).
 
 **Response 200:**
 
@@ -498,7 +489,7 @@ Note: Only `full_name`, `national_id`, and `company_name` are writable. `status`
 
 ```json
 {
-  "decision": "approve",
+  "decision": "reject",
   "rejection_code": "KYC_101",
   "rejection_note": "تصویر کارت ملی ناخوانا است"
 }
@@ -507,7 +498,7 @@ Note: Only `full_name`, `national_id`, and `company_name` are writable. `status`
 | Field | Type | Required | Description |
 |-------|------|----------|-------------|
 | `decision` | `"approve" \| "reject"` | Yes | Decision |
-| `rejection_code` | `string` | Conditional | Required if `decision === "reject"` |
+| `rejection_code` | `string` | Conditional | Required if `decision === "reject"` (free-form string in current KYC view; not the listing `MOD_*` enum) |
 | `rejection_note` | `string` | No | Explanation note |
 
 **Response 200 (approve):**
@@ -560,7 +551,7 @@ Documents are created as part of Verification creation or Listing document uploa
 
 **Endpoint:** `POST /api/v1/listings/`
 
-**Permission:** IsAuthenticated (check_holder with approved KYC)
+**Permission:** IsAuthenticated (default). Scoped throttle `listing_create` = 10/day. Daily serializer cap of 10 listings/user/day also applies. `IsCheckHolder` is imported but **not** applied on this ViewSet; KYC-approved is **not** enforced in the view layer.
 
 **Request Body:**
 
@@ -621,7 +612,9 @@ Documents are created as part of Verification creation or Listing document uploa
 }
 ```
 
-**Errors:** `LST_201`, `LST_202`, `LST_203`, `LST_204`, `LST_205`, `PERMISSION_ERROR`
+**Errors:** `VALIDATION_ERROR` (400) for face_amount / due_date / serial / daily limit / duplicate; `PERMISSION_ERROR` on illegal updates.
+
+**Note:** Response create serializer returns create fields; list/retrieve use `ChequeListingSerializer` with nested field named `issuer_profile`. Model FK is `issuer` and the nested serializer currently has no `source="issuer"` — treat nested issuer as a known serialization gap until fixed.
 
 ---
 
@@ -717,36 +710,45 @@ Documents are created as part of Verification creation or Listing document uploa
 
 ## 7. Issuer Profiles
 
-### 7.1 List Issuer Profiles
+Full CRUD via `IssuerProfileViewSet`. Permission: **IsAuthenticated** for all methods. There is **no ownership filter** — any authenticated user can list/create/update/delete any issuer profile.
+
+### 7.1 List / Create Issuer Profiles
 
 **Endpoint:** `GET /api/v1/issuer-profiles/`
 
-**Permission:** IsAuthenticated
+**Endpoint:** `POST /api/v1/issuer-profiles/`
 
-**Response 200:** Array of `IssuerProfile` objects.
+**Request Body (create):**
 
----
+```json
+{
+  "national_or_company_id": "10100345678",
+  "name": "شرکت آسان‌پرداخت"
+}
+```
 
-### 7.2 Retrieve / Update Issuer Profile
-
-**Endpoint:** `GET /api/v1/issuer-profiles/{id}/`
-
-**Endpoint:** `PATCH /api/v1/issuer-profiles/{id}/`
-
-**Permission:** IsAuthenticated (owner only for PATCH)
-
-**Response 200:**
+**Response 200/201:**
 
 ```json
 {
   "id": 1,
   "national_or_company_id": "10100345678",
   "name": "شرکت آسان‌پرداخت",
-  "credit_score": 78,
+  "credit_score": null,
   "created_at": "2025-04-25T08:00:00Z",
   "updated_at": "2025-04-25T08:00:00Z"
 }
 ```
+
+---
+
+### 7.2 Retrieve / Update / Delete Issuer Profile
+
+**Endpoint:** `GET /api/v1/issuer-profiles/{id}/`
+
+**Endpoint:** `PUT|PATCH /api/v1/issuer-profiles/{id}/`
+
+**Endpoint:** `DELETE /api/v1/issuer-profiles/{id}/`
 
 | Field | Type | Read-Only | Description |
 |-------|------|-----------|-------------|
@@ -779,7 +781,8 @@ Documents are created as part of Verification creation or Listing document uploa
 | `bank_name` | `string` | Partial match on bank name (icontains) |
 | `ordering` | `string` | Sort field: `created_at`, `-created_at`, `face_amount`, `-face_amount`, `suggested_discount_rate`, `-suggested_discount_rate`, `due_date`, `-due_date` |
 | `page` | `number` | Page number (default: 1) |
-| `page_size` | `number` | Results per page (default: 20, max: 50) |
+
+Note: Default DRF `PageNumberPagination` is used (page size fixed at **20**). Client `page_size` override is **not** enabled for marketplace. Cache key is `marketplace:listings:{page}` only (filter variance is not part of the cache key).
 
 **Response 200:**
 
@@ -914,7 +917,7 @@ Documents are created as part of Verification creation or Listing document uploa
 }
 ```
 
-**Errors:** `MatchNotAllowed` (400) — if listing not found, user is not investor, or investor already expressed interest.
+**Errors:** Match domain exceptions currently surface as envelope `SERVER_ERROR` (see §1.5), HTTP 400 from the exception `status_code` but with generic message.
 
 ---
 
@@ -1035,7 +1038,7 @@ Documents are created as part of Verification creation or Listing document uploa
 
 ---
 
-### 9.9 Match Status Values
+### 9.10 Settlement Type Values
 
 | Value | Description |
 |-------|-------------|
@@ -1051,9 +1054,9 @@ Documents are created as part of Verification creation or Listing document uploa
 
 **Endpoint:** `GET /api/v1/moderation/queue/`
 
-**Permission:** IsAuthenticated (moderator/admin only)
+**Permission:** IsAuthenticated + `core.IsModerator` (`user.role == "moderator"` — note: does **not** treat `admin` the same way as compliance permissions).
 
-**Query Parameters:** `ordering=-created_at`, `page`, `page_size`
+**Query Parameters:** `page` (fixed page size 20; `page_size` query not enabled by default)
 
 **Response 200:**
 
@@ -1177,8 +1180,8 @@ Documents are created as part of Verification creation or Listing document uploa
 |-----------|------|-------------|
 | `type` | `string` | Filter by notification type |
 | `status` | `string` | Filter by status (`pending`, `sent`, `read`, `failed`) |
-| `page` | `number` | Page number |
-| `page_size` | `number` | Results per page |
+| `is_read` | `boolean` | Filter by read state (`true` / `false`) when supported by the view |
+| `page` | `number` | Page number (fixed page size 20) |
 
 **Response 200:**
 
@@ -1339,7 +1342,7 @@ Documents are created as part of Verification creation or Listing document uploa
 
 **Endpoint:** `PATCH /api/v1/compliance/feature-flags/{key}/`
 
-**Permission:** IsAuthenticated (admin only)
+**Permission:** IsModeratorOrAdmin (`user.role` in `moderator` \| `admin`)
 
 **Request Body:**
 
@@ -1438,7 +1441,7 @@ Documents are created as part of Verification creation or Listing document uploa
 
 ## 13. Pagination
 
-All list endpoints support DRF standard pagination:
+Default list pagination uses DRF `PageNumberPagination` with fixed `PAGE_SIZE = 20`:
 
 ```json
 {
@@ -1449,38 +1452,109 @@ All list endpoints support DRF standard pagination:
 }
 ```
 
-**Default page size:** 20
-**Max page size:** 50 (for marketplace), 100 (for compliance)
+| Endpoint group | `page_size` query | Max |
+|----------------|-------------------|-----|
+| Most list endpoints | **Not supported** (fixed 20) | 20 |
+| `GET /compliance/audit/` | Yes (`StandardResultPagination`) | 100 |
+
+Exceptions (unpaginated array responses):
+- `GET /listings/my/` — raw array
+- `GET /marketplace/listings/latest/` — array of up to 4
+- Some verification list views may return non-paginated arrays depending on queryset size / view config
+
+Notifications list adds top-level `unread_count` alongside the pagination envelope.
 
 ---
 
 ## 14. Rate Limiting
 
+Configured in `REST_FRAMEWORK["DEFAULT_THROTTLE_*"]`:
+
 | Scope | Limit |
 |-------|-------|
-| Anonymous | 100 requests/minute |
-| Authenticated | 1000 requests/minute |
-| Listing creation | 10 requests/day per user |
+| Anonymous (`AnonRateThrottle`) | 100 requests/minute |
+| Authenticated (`UserRateThrottle`) | 1000 requests/minute |
+| Listing creation (`listing_create` scoped) | 10 requests/day per user |
+
+Listing create also enforces a serializer-level daily cap of 10 listings per user (same calendar day).
 
 ---
 
-## 15. Changelog
+## 15. Operational Notes
+
+Behaviors that affect API responses or observed data without being separate endpoints:
+
+| Behavior | Effect |
+|----------|--------|
+| **Marketplace list cache** | `GET /marketplace/listings/` cached 60s under key `marketplace:listings:{page}`. Invalidated when listing status changes to published/rejected/expired/withdrawn. |
+| **Celery `expire_listings`** | Beat every 3600s. Sets `published` listings with `due_date < today` to `expired`. Clients may see status change without an API call. |
+| **Correlation ID** | `CorrelationIDMiddleware` reads/sets `X-Correlation-ID` on every request/response (for logging). |
+| **Feature flags (seeded)** | `matching_enabled`, `notifications_sms_enabled` (among others as seeded). |
+| **Moderator permission inconsistency** | Listing moderation (`core.IsModerator`) checks `user.role == moderator`. KYC moderation (`identity.IsModerator`) checks profile role in `moderator` \| `admin`. Compliance uses `user.role` in `moderator` \| `admin`. |
+
+---
+
+## 16. Legacy Endpoints
+
+| Path | Notes |
+|------|-------|
+| `/api/...` | Full alias of `/api/v1/...` (same `api_router`) |
+| `POST /api/auth-token/` | DRF `obtain_auth_token` (non-JWT legacy token) |
+| `/api/schema/`, `/api/docs/` | Legacy Spectacular schema/Swagger (also under `/api/v1/`) |
+| Django template user pages (`/users/~redirect/`, etc.) | Not part of the REST JSON contract |
+
+Prefer `/api/v1/` for all new client work.
+
+---
+
+## 17. Role Values
+
+| Value | Description | Registerable via API? |
+|-------|-------------|------------------------|
+| `check_holder` | Can create and manage listings | Yes |
+| `investor` | Can browse marketplace and create matches | Yes |
+| `moderator` | Moderation queues | No — assign out-of-band |
+| `admin` | Full platform access | No — assign out-of-band |
+
+Model/profile store all four roles; `POST /identity/register/` only accepts `check_holder` \| `investor`.
+
+---
+
+## 18. Changelog
 
 | Date | Change |
 |------|--------|
-| 2026-07-29 | Phase 1 backend connectivity: added role/phone to login/refresh responses; exposed identity/profile/ and identity/me/ without pk; fixed ProfileSerializer.update field separation; added matches/my/ and matches/{id}/status/ endpoints; added feature flag toggle endpoint |
-| 2026-07-23 | Initial contract derived from actual backend code (Phases 0-8) |
+| 2026-07-31 | Consolidated as sole API SSOT; aligned with live backend (error catalog, refresh TTL, pagination, issuer CRUD, permissions, operational notes, legacy mount); marked spec-only codes; deprecated `API_CONTRACT_REGISTRY.md` |
+| 2026-07-29 | Phase 1 backend connectivity: role/phone on login/refresh; identity profile/me without pk; matches/my + status; feature-flag toggle |
+| 2026-07-23 | Initial contract derived from backend code (Phases 0–8) |
 
 ---
 
-## 16. Sync Policy
+## 19. Sync Policy
 
-**This file must be updated whenever any of the following change:**
+**This file (`docs/development/MASTER_API_CONTRACT.md`) is the only API contract SSOT.**
+
+Any change to API-facing backend code **must** update this file in the **same PR**. Without documenting sync, the API change is incomplete.
+
+Update when any of the following change:
 - `backend/doion/*/serializers.py` — fields, read-only fields, response shapes
 - `backend/doion/*/views.py` — endpoints, permissions, actions
 - `backend/doion/*/urls.py` — URL patterns
 - `backend/config/api_router.py` — router registrations
-- `backend/config/exception_handler.py` — error envelope format
-- `backend/doion/*/models.py` — model fields, choices, constraints
+- `backend/config/exception_handler.py` — error envelope / code mapping
+- `backend/doion/*/models.py` — model fields, choices, constraints that appear in the API
+- JWT / pagination / throttling settings that affect clients
 
-**Do not update this file from memory or from design docs alone. Always sync from the actual backend code.**
+**Rules:**
+1. Derive shapes and codes from code — never from memory, MVP specs, or the deprecated registry alone.
+2. If a behavior is planned but not implemented, mark it **`spec-only / not implemented`** — do not document fictional runtime behavior.
+3. Keep `frontend/src/types/api.d.ts` and clients aligned after contract edits.
+4. Do not resurrect a parallel contract document; `API_CONTRACT_REGISTRY.md` is a deprecated stub only.
+
+**PR checklist (API changes):**
+- [ ] Endpoints / methods / permissions listed here match `show_urls` / router
+- [ ] Request/response fields match serializers
+- [ ] Error codes match `exception_handler` + raised exceptions
+- [ ] Enums/choices match models
+- [ ] Changelog row added with today's date
+- [ ] Spec-only items explicitly labeled

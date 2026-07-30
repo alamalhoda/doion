@@ -40,7 +40,7 @@ isProject: false
 |------|--------|------|
 | Backend | `doion.users` + JWT login + `doion.core` + `doion.identity` + role field + register API + `doion.checks` + `doion.pricing` + `doion.moderation` + `doion.marketplace` | [`backend/doion/`](backend/doion/) |
 | Frontend | Vue 3 + design tokens + UI shells + landing + register + role badge | [`frontend/src/features/`](frontend/src/features/) |
-| مستندات | LLD، معماری، state machines، design system، API contract | [`docs/cheque-platform-low-level-design.md`](docs/cheque-platform-low-level-design.md)، [`ai-preview/mvp-spec.md`](ai-preview/mvp-spec.md)، [`docs/development/API_CONTRACT_REGISTRY.md`](docs/development/API_CONTRACT_REGISTRY.md) |
+| مستندات | LLD، معماری، state machines، design system، API contract | [`docs/cheque-platform-low-level-design.md`](docs/cheque-platform-low-level-design.md)، [`ai-preview/mvp-spec.md`](ai-preview/mvp-spec.md)، [`docs/development/MASTER_API_CONTRACT.md`](docs/development/MASTER_API_CONTRACT.md) |
 
 **نقشه پروتوتایپ → محصول:**
 
@@ -86,7 +86,7 @@ flowchart LR
 - JWT login با phone/username/email (موجود)
 - افزودن `POST /api/v1/auth/refresh/` و versioning زیر `/api/v1/`
 - Exception handler یکنواخت خطا (فرمت LLD بخش ۹)
-- ثبت قرارداد API در [`docs/development/API_CONTRACT_REGISTRY.md`](docs/development/API_CONTRACT_REGISTRY.md)
+- ثبت قرارداد API در [`docs/development/MASTER_API_CONTRACT.md`](docs/development/MASTER_API_CONTRACT.md)
 
 ### Frontend (تکمیل)
 - اتصال `authStore` به API واقعی (موجود جدئی)
@@ -473,7 +473,7 @@ flowchart TD
 - ✅ چک‌لیست قبل از PR رعایت شود (build، تست، conflict رفع شده)
 
 ### مستندسازی هر PR
-- به‌روز [`docs/development/API_CONTRACT_REGISTRY.md`](docs/development/API_CONTRACT_REGISTRY.md)
+- به‌روز [`docs/development/MASTER_API_CONTRACT.md`](docs/development/MASTER_API_CONTRACT.md)
 - به‌روز [`docs/development/PAGE_REVIEW_LOG.md`](docs/development/PAGE_REVIEW_LOG.md)
 - [`backend/TODO.md`](backend/TODO.md) / [`frontend/TODO.md`](frontend/TODO.md)
 

@@ -87,7 +87,7 @@ flowchart LR
 - افزودن `POST /api/v1/auth/refresh/` و versioning زیر `/api/v1/`
 - Exception handler یکنواخت خطا (فرمت LLD بخش ۹)
 - PostgreSQL در dev (جایگزینی SQLite برای migration واقعی)
-- ثبت قرارداد API در [`docs/development/API_CONTRACT_REGISTRY.md`](docs/development/API_CONTRACT_REGISTRY.md)
+- ثبت قرارداد API در [`docs/development/MASTER_API_CONTRACT.md`](docs/development/MASTER_API_CONTRACT.md)
 
 ### Frontend (تکمیل)
 - اتصال `authStore` به API واقعی (موجود جزئی)
@@ -407,7 +407,7 @@ flowchart TD
 - PR به `develop` با checklist docs (طبق [`documentation-sync-policy.mdc`](.cursor/rules/share/documentation-sync-policy.mdc))
 
 ### مستندسازی هر PR
-- به‌روز [`docs/development/API_CONTRACT_REGISTRY.md`](docs/development/API_CONTRACT_REGISTRY.md)
+- به‌روز [`docs/development/MASTER_API_CONTRACT.md`](docs/development/MASTER_API_CONTRACT.md)
 - به‌روز [`docs/development/PAGE_REVIEW_LOG.md`](docs/development/PAGE_REVIEW_LOG.md)
 - [`backend/TODO.md`](backend/TODO.md) / [`frontend/TODO.md`](frontend/TODO.md)
 

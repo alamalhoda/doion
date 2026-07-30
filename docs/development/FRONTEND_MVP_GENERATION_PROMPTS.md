@@ -5,7 +5,7 @@ This file contains two LLM prompts in order:
 1. First build the **Infrastructure Prompt** (Vite, router, axios client, simulator, auth, shared layout).
 2. Then build each **Feature Prompt** for individual pages.
 
-All prompts keep the error envelope and field names aligned with the actual backend contract.
+All prompts keep the error envelope and field names aligned with the actual backend contract (`docs/development/MASTER_API_CONTRACT.md` — sole API SSOT).
 
 ---
 

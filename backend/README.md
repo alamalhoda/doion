@@ -196,6 +196,8 @@ backend/                            ← ریشه بک‌اند (Django)
 | `/api/schema/` | اسکیمای API |
 | `/api/docs/` | مستندات Swagger |
 
+مرجع قرارداد کامل API (SSOT): [`docs/development/MASTER_API_CONTRACT.md`](../docs/development/MASTER_API_CONTRACT.md)
+
 ---
 
 ## ابزارهای توسعه
