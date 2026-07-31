@@ -1,8 +1,9 @@
-# معماری Frontend — doion
+# معماری Frontend — doion (legacy archive)
 
-> **وضعیت:** این سند مرجع معماری **بالادستی** برای پوشه `frontend/` است.  
+> **آرشیو:** این درخت قبلاً `frontend/` بود و از ۲۰۲۶-۰۷-۳۱ به `frontend-legacy/` منتقل شده است. UI فعال در [checkyar-googleai](https://github.com/alamalhoda/checkyar-googleai) است — جزئیات: [`docs/development/FRONTEND_DEVELOPMENT_STATUS.md`](../docs/development/FRONTEND_DEVELOPMENT_STATUS.md).  
+> **وضعیت:** این سند مرجع معماری **بالادستی** برای پوشه **آرشیو** `frontend-legacy/` است.  
 > **پیاده‌سازی اولیه:** طبق [`phase 0 prompt.md`](./phase%200%20prompt.md) (فاز ۰ — platform scaffold).  
-> **قوانین Cursor:** `.cursor/rules/frontend/**` و `.cursor/rules/share/**` — در صورت تعارض با این سند، این سند برای ساختار `frontend/` ارجح است تا globهای قدیمی `frontend` به‌روز شوند.
+> **قوانین Cursor:** `.cursor/rules/frontend/**` و `.cursor/rules/share/**` — در صورت تعارض با این سند، این سند برای ساختار `frontend-legacy/` ارجح است تا globها به‌روز شوند.
 
 ---
 
