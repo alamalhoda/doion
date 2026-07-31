@@ -20,18 +20,18 @@ describe('useErrorHandler', () => {
     document.documentElement.lang = 'en'
   })
 
-  it('maps a domain code to its english message in the en locale', () => {
+  it('maps AUTHENTICATION_ERROR to its english message in the en locale', () => {
     const { getErrorMessage } = useErrorHandler()
-    expect(getErrorMessage({ code: 'AUTH_001', message: '' })).toBe(
-      DOMAIN_ERROR_CODES.AUTH_001.englishMessage,
+    expect(getErrorMessage({ code: 'AUTHENTICATION_ERROR', message: '' })).toBe(
+      DOMAIN_ERROR_CODES.AUTHENTICATION_ERROR.englishMessage,
     )
   })
 
-  it('maps a domain code to its persian message in the fa locale', () => {
+  it('maps VALIDATION_ERROR to its persian message in the fa locale', () => {
     document.documentElement.lang = 'fa'
     const { getErrorMessage } = useErrorHandler()
-    expect(getErrorMessage({ code: 'LST_201', message: '' })).toBe(
-      DOMAIN_ERROR_CODES.LST_201.persianMessage,
+    expect(getErrorMessage({ code: 'VALIDATION_ERROR', message: '' })).toBe(
+      DOMAIN_ERROR_CODES.VALIDATION_ERROR.persianMessage,
     )
   })
 
@@ -52,9 +52,9 @@ describe('useErrorHandler', () => {
   it('handleError surfaces an error toast with the mapped message', () => {
     document.documentElement.lang = 'fa'
     const { handleError } = useErrorHandler()
-    handleError({ code: 'KYC_101', message: '' })
+    handleError({ code: 'MOD_306', message: '' })
     expect(showToast).toHaveBeenCalledWith(
-      DOMAIN_ERROR_CODES.KYC_101.persianMessage,
+      DOMAIN_ERROR_CODES.MOD_306.persianMessage,
       'error',
       expect.any(Number),
     )

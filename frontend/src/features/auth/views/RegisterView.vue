@@ -1,7 +1,6 @@
 <template>
   <div class="register-view">
     <form
-      v-if="!otpSent"
       class="register-form"
       @submit.prevent="handleRegister"
     >
@@ -81,46 +80,6 @@
         </RouterLink>
       </div>
     </form>
-
-    <form
-      v-else
-      class="register-form"
-      @submit.prevent="handleOtpVerify"
-    >
-      <h2>{{ $t('otp_title') }}</h2>
-      <p class="otp-description">
-        {{ $t('otp_description') }}
-      </p>
-
-      <FormField
-        v-model="otpCode"
-        type="text"
-        :label="$t('otp_code')"
-        :error="otpError"
-        required
-      />
-
-      <div
-        v-if="otpSuccess"
-        class="form-success"
-      >
-        {{ $t('otp_success') }}
-      </div>
-
-      <AppButton
-        :label="$t('otp_submit')"
-        type="submit"
-        :loading="isLoading"
-        :disabled="isLoading"
-      />
-
-      <div class="login-link">
-        <a
-          href="#"
-          @click.prevent="resendOtp"
-        >{{ $t('otp_resend') }}</a>
-      </div>
-    </form>
   </div>
 </template>
 
@@ -132,11 +91,12 @@ import { NSelect } from 'naive-ui'
 import FormField from '@/components/ui/FormField.vue'
 import AppButton from '@/components/ui/AppButton.vue'
 import { ROUTES } from '@/constants/routes'
-import { apiClient } from '@/api/client'
+import { useAuthStore } from '@/features/auth/stores/authStore'
 import { normalizeApiError } from '@/api/errors'
 
 const router = useRouter()
 const { t } = useI18n()
+const authStore = useAuthStore()
 
 const formData = reactive({
   username: '',
@@ -151,10 +111,6 @@ const formData = reactive({
 const fieldErrors = ref<Record<string, string[]>>({})
 const isLoading = ref(false)
 const error = ref<string | null>(null)
-const otpSent = ref(false)
-const otpCode = ref('')
-const otpError = ref<string | undefined>(undefined)
-const otpSuccess = ref(false)
 
 const hasFieldErrors = computed(() => Object.keys(fieldErrors.value).length > 0)
 
@@ -174,7 +130,7 @@ async function handleRegister() {
   isLoading.value = true
 
   try {
-    await apiClient.post('/api/v1/identity/register/', {
+    await authStore.register({
       username: formData.username,
       email: formData.email,
       name: formData.name,
@@ -183,41 +139,17 @@ async function handleRegister() {
       password: formData.password,
       password_confirm: formData.password_confirm,
     })
-
-    otpSent.value = true
+    router.push(ROUTES.MARKETPLACE)
   } catch (err: unknown) {
     const normalized = normalizeApiError(err)
     if (normalized.fieldErrors) {
       fieldErrors.value = normalized.fieldErrors
     } else {
-      error.value = t(normalized.message || 'error.unknown')
+      error.value = normalized.message || t('error.unknown')
     }
   } finally {
     isLoading.value = false
   }
-}
-
-async function handleOtpVerify() {
-  otpError.value = undefined
-  otpSuccess.value = false
-  isLoading.value = true
-
-  try {
-    await new Promise((resolve) => setTimeout(resolve, 500))
-    if (otpCode.value.length === 6) {
-      otpSuccess.value = true
-      setTimeout(() => router.push(ROUTES.LOGIN), 1000)
-    } else {
-      otpError.value = t('error.validation_error')
-    }
-  } finally {
-    isLoading.value = false
-  }
-}
-
-function resendOtp() {
-  otpCode.value = ''
-  otpError.value = undefined
 }
 </script>
 
@@ -246,13 +178,6 @@ function resendOtp() {
   font-size: var(--font-size-lg);
 }
 
-.otp-description {
-  text-align: center;
-  color: var(--color-text-secondary);
-  margin-bottom: var(--spacing-lg);
-  font-size: var(--font-size-sm);
-}
-
 .role-selector {
   margin-bottom: var(--spacing-lg);
 }
@@ -264,16 +189,6 @@ function resendOtp() {
   border: 1px solid var(--red);
   border-radius: var(--radius-sm);
   color: var(--red);
-  font-size: var(--font-size-sm);
-}
-
-.form-success {
-  padding: var(--spacing-md);
-  margin-bottom: var(--spacing-lg);
-  background: var(--green-light, #e8f5e9);
-  border: 1px solid var(--green, #4caf50);
-  border-radius: var(--radius-sm);
-  color: var(--green, #2e7d32);
   font-size: var(--font-size-sm);
 }
 

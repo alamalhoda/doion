@@ -1,6 +1,7 @@
 import { defineStore } from 'pinia'
 import { apiClient } from '@/api/client'
-import { VerificationStatus } from '@/features/verification/types/verification'
+import { normalizeApiError } from '@/api/errors'
+import { VerificationStatus, type Verification } from '@/features/verification/types/verification'
 
 export const useVerificationStore = defineStore('verification', {
   state: () => ({
@@ -9,7 +10,7 @@ export const useVerificationStore = defineStore('verification', {
       national_id: '',
       company_name: null as string | null,
     },
-    verification: null as any,
+    verification: null as Verification | null,
     loading: false,
   }),
   getters: {
@@ -18,11 +19,18 @@ export const useVerificationStore = defineStore('verification', {
     isRejected: (state) => state.verification?.status === VerificationStatus.REJECTED,
   },
   actions: {
-    async startVerification(data: { full_name: string; national_id: string; company_name?: string }) {
+    async startVerification(formData: FormData) {
       this.loading = true
       try {
-        const response = await apiClient.post('/verifications/', data)
+        const response = await apiClient.post<Verification>(
+          '/api/v1/verifications/',
+          formData,
+          { headers: { 'Content-Type': 'multipart/form-data' } },
+        )
         this.verification = response.data
+        return this.verification
+      } catch (error) {
+        throw normalizeApiError(error)
       } finally {
         this.loading = false
       }
@@ -30,9 +38,16 @@ export const useVerificationStore = defineStore('verification', {
     async getMyVerification() {
       this.loading = true
       try {
-        const response = await apiClient.get('/verifications/me/')
+        const response = await apiClient.get<Verification>('/api/v1/verifications/me/')
         this.verification = response.data
         return this.verification
+      } catch (error) {
+        const normalized = normalizeApiError(error)
+        if (normalized.code === 'NOT_FOUND_ERROR' || normalized.status === 404) {
+          this.verification = null
+          return null
+        }
+        throw normalized
       } finally {
         this.loading = false
       }

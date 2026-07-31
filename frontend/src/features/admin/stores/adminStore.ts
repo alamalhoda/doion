@@ -4,7 +4,6 @@ import { ref, computed } from 'vue'
 import { AdminService } from '../services/adminService'
 import type { AdminStats, FeatureFlag } from '../types/admin'
 import { useErrorHandler } from '@/composables/useErrorHandler'
-import { useToast } from '@/composables/useToast'
 
 export const useAdminStore = defineStore('admin', () => {
   const stats = ref<AdminStats | null>(null)
@@ -13,7 +12,6 @@ export const useAdminStore = defineStore('admin', () => {
   const error = ref<string | null>(null)
 
   const errorHandler = useErrorHandler()
-  const toast = useToast()
 
   async function fetchStats(): Promise<void> {
     isLoading.value = true
@@ -58,6 +56,19 @@ export const useAdminStore = defineStore('admin', () => {
     }
   }
 
+  async function toggleFlag(key: string): Promise<void> {
+    try {
+      const updated = await AdminService.toggleFeatureFlag(key)
+      const index = flags.value.findIndex(f => f.key === key)
+      if (index !== -1) {
+        flags.value[index] = updated
+      }
+    } catch (err: unknown) {
+      error.value = errorHandler.getErrorMessage(err)
+      errorHandler.handleError(err)
+    }
+  }
+
   return {
     stats,
     flags,
@@ -66,5 +77,6 @@ export const useAdminStore = defineStore('admin', () => {
     fetchStats,
     fetchFlags,
     updateFlag,
+    toggleFlag,
   }
 })

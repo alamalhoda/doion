@@ -1,4 +1,4 @@
-// Verification/KYC types
+// Verification/KYC types — MASTER_API_CONTRACT.md §4
 
 export const VerificationStatus = {
   PENDING: 'pending',
@@ -6,50 +6,41 @@ export const VerificationStatus = {
   REJECTED: 'rejected',
 } as const
 
-export type VerificationStatus = typeof VerificationStatus[keyof typeof VerificationStatus]
+export type VerificationStatus = (typeof VerificationStatus)[keyof typeof VerificationStatus]
 
-export type VerificationType = 'individual' | 'corporate'
-
-export type KycLevel = 'basic' | 'advanced' | 'full'
-
-export interface Verification {
-  id: string
-  user_id: string
-  verification_type: VerificationType
-  status: VerificationStatus
-  kyc_level?: KycLevel
-  reviewed_at?: string | null
-  rejection_reason?: string | null
-  created_at: string
+export interface VerificationDocument {
+  id: number
+  document_type: string
+  file: string
+  file_size: number
 }
 
-export interface CreateVerificationRequest {
-  verification_type: VerificationType
+export interface Verification {
+  id: number
+  full_name: string
+  national_id: string
+  company_name: string
+  status: VerificationStatus
+  rejection_reason: string
+  rejection_code: string
+  documents: VerificationDocument[]
+}
+
+export interface CreateVerificationFields {
   full_name: string
   national_id?: string
   company_name?: string
-  company_registration_id?: string
-  phone_number: string
+  national_id_front: File
+  national_id_back: File
+  selfie?: File
 }
 
-export interface IndividualVerification extends CreateVerificationRequest {
-  verification_type: 'individual'
-  national_id: string
-  birth_date?: string
+export interface KycDecisionRequest {
+  decision: 'approve' | 'reject'
+  rejection_code?: string
+  rejection_note?: string
 }
 
-export interface CorporateVerification extends CreateVerificationRequest {
-  verification_type: 'corporate'
-  company_registration_id: string
-  company_representative_name?: string
-}
-
-export interface VerificationDocument {
-  id: string
-  user_id: string
-  related_object_type: 'verification' | 'listing'
-  related_object_id: string
-  document_type: string
-  file_url: string
-  uploaded_at: string
+export interface KycDecisionResponse {
+  status: 'approved' | 'rejected'
 }

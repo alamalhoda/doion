@@ -2,37 +2,40 @@
   <div
     class="upload-area"
     @dragover.prevent
-    @drop.prevent
-    @drop="onDrop"
+    @drop.prevent="onDrop"
   >
-    <n-upload
-      :action="uploadUrl"
-      :headers="headers"
-      :multiple="false"
-      :show-file-list="false"
+    <input
+      ref="inputRef"
+      type="file"
+      class="upload-input"
       :accept="accept"
-      :max="1"
-      :on-exceed="handleExceed"
-      :on-success="handleSuccess"
-      :on-error="handleError"
+      @change="onChange"
     >
-      <div class="upload-zone">
-        <n-icon :size="40">
-          <svg
-            viewBox="0 0 24 24"
-            fill="currentColor"
-          ><path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z" /></svg>
-        </n-icon>
-        <n-p>{{ dragLabel }}</n-p>
-      </div>
-    </n-upload>
+    <button
+      type="button"
+      class="upload-zone"
+      @click="inputRef?.click()"
+    >
+      <n-icon :size="40">
+        <svg
+          viewBox="0 0 24 24"
+          fill="currentColor"
+        ><path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z" /></svg>
+      </n-icon>
+      <n-p>{{ dragLabel }}</n-p>
+      <n-p
+        v-if="selectedName"
+        depth="3"
+      >
+        {{ selectedName }}
+      </n-p>
+    </button>
   </div>
 </template>
 
 <script setup lang="ts">
 import { computed, ref } from 'vue'
 import { useUploadStore } from '@/stores/uploadStore'
-import { useFileUpload } from '@/composables/useFileUpload'
 
 const emit = defineEmits<{
   (e: 'uploaded', payload: { type: string; file: File }): void
@@ -45,50 +48,45 @@ const props = defineProps<{
 }>()
 
 const uploadStore = useUploadStore()
-const uploadApiBase = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000'
+const inputRef = ref<HTMLInputElement | null>(null)
+const selectedName = ref('')
 
-const { files, error: uploadError, addFiles, clear } = useFileUpload({
-  accept: props.accept,
-  maxSize: props.maxSize,
-  multiple: false,
-})
+const dragLabel = computed(() => `${props.documentType} را انتخاب کنید یا اینجا رها کنید`)
 
-const uploadUrl = `${uploadApiBase}/api/v1/documents/upload/`
-const headers = computed(() => ({
-  Authorization: `Bearer ${localStorage.getItem('access_token')}`,
-}))
+function takeFile(file: File | undefined) {
+  if (!file) return
+  if (file.size > props.maxSize) {
+    uploadStore.setError('حجم فایل بیش از حد مجاز است')
+    return
+  }
+  selectedName.value = file.name
+  emit('uploaded', { type: props.documentType, file })
+}
 
-const dragLabel = computed(() => `${props.documentType} در اینجا رها کنید یا کلیک کنید`)
+function onChange(e: Event) {
+  const input = e.target as HTMLInputElement
+  takeFile(input.files?.[0])
+}
 
 function onDrop(e: DragEvent) {
-  if (e.dataTransfer?.files.length) {
-    addFiles(e.dataTransfer.files)
-  }
-}
-
-function handleExceed(files: File[]) {
-  uploadStore.setError('حداکثر یک فایل مجاز است')
-}
-
-function handleSuccess(_file: File, response: any) {
-  emit('uploaded', { type: props.documentType, file: _file })
-}
-
-function handleError(_error: Error) {
-  uploadStore.setError(_error.message)
+  takeFile(e.dataTransfer?.files?.[0])
 }
 </script>
 
 <style scoped>
 .upload-area {
-  border: 2px dashed #d9d9d9;
-  border-radius: 8px;
-  padding: 24px;
-  text-align: center;
-  cursor: pointer;
-  transition: border-color 0.2s;
+  width: 100%;
 }
-.upload-area:hover {
-  border-color: #18a058;
+.upload-input {
+  display: none;
+}
+.upload-zone {
+  width: 100%;
+  border: 2px dashed var(--border, #d1d5db);
+  border-radius: 8px;
+  padding: 1.5rem;
+  text-align: center;
+  background: transparent;
+  cursor: pointer;
 }
 </style>

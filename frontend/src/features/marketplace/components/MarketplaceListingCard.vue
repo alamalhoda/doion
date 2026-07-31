@@ -82,12 +82,12 @@ import { computed } from 'vue'
 import dayjs from 'dayjs'
 import 'dayjs/locale/fa'
 import RiskBadge from '@/components/RiskBadge.vue'
-import type { ChequeListing } from '@/features/listings/types/listing'
+import type { ChequeListing, MarketplaceLatestListing } from '@/features/listings/types/listing'
 import { useFormat } from '@/composables'
 
 const props = withDefaults(
   defineProps<{
-    listing: ChequeListing
+    listing: ChequeListing | MarketplaceLatestListing
     hoverable?: boolean
   }>(),
   {
@@ -103,7 +103,7 @@ const emit = defineEmits<{
 const { formatCurrency, formatNumber } = useFormat()
 
 const issuerName = computed(() => {
-  return props.listing.issuer_profile?.name || props.listing.issuer_name || '-'
+  return props.listing.issuer_profile?.name || ('issuer_name' in props.listing ? props.listing.issuer_name : '') || '-'
 })
 
 const riskTier = computed(() => {

@@ -2,14 +2,15 @@ import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { AdminService } from '../services/adminService'
 import type { AdminStats, FeatureFlag } from '../types/admin'
 
-// Mock apiClient
 const mockGet = vi.fn()
 const mockPatch = vi.fn()
+const mockPost = vi.fn()
 
 vi.mock('@/api/client', () => ({
   apiClient: {
     get: (...args: unknown[]) => mockGet(...args),
     patch: (...args: unknown[]) => mockPatch(...args),
+    post: (...args: unknown[]) => mockPost(...args),
   },
 }))
 
@@ -72,18 +73,22 @@ describe('AdminService', () => {
   })
 
   describe('getFeatureFlags', () => {
-    it('should fetch feature flags list', async () => {
-      mockGet.mockResolvedValue({ data: [mockFlag] })
+    it('should unwrap paginated feature flags list', async () => {
+      mockGet.mockResolvedValue({
+        data: { count: 1, next: null, previous: null, results: [mockFlag] },
+      })
 
       const result = await AdminService.getFeatureFlags()
 
-      expect(mockGet).toHaveBeenCalledWith(basePath + '/feature-flags/')
+      expect(mockGet).toHaveBeenCalledWith(basePath + '/feature-flags/', { params: undefined })
       expect(result).toHaveLength(1)
       expect(result[0].key).toBe('new_feature')
     })
 
     it('should return empty array when no flags', async () => {
-      mockGet.mockResolvedValue({ data: [] })
+      mockGet.mockResolvedValue({
+        data: { count: 0, next: null, previous: null, results: [] },
+      })
 
       const result = await AdminService.getFeatureFlags()
 
@@ -109,7 +114,21 @@ describe('AdminService', () => {
 
       const result = await AdminService.updateFeatureFlag('new_feature', false)
 
-      expect(mockPatch).toHaveBeenCalledWith(basePath + '/feature-flags/new_feature/', { is_enabled: false })
+      expect(mockPatch).toHaveBeenCalledWith(basePath + '/feature-flags/new_feature/', {
+        is_enabled: false,
+      })
+      expect(result.is_enabled).toBe(false)
+    })
+  })
+
+  describe('toggleFeatureFlag', () => {
+    it('should post toggle action', async () => {
+      const updated = { ...mockFlag, is_enabled: false }
+      mockPost.mockResolvedValue({ data: updated })
+
+      const result = await AdminService.toggleFeatureFlag('new_feature')
+
+      expect(mockPost).toHaveBeenCalledWith(basePath + '/feature-flags/new_feature/toggle/')
       expect(result.is_enabled).toBe(false)
     })
   })

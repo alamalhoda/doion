@@ -1,19 +1,23 @@
-import type { UserRole } from '@/features/listings/types/listing'
+export type UserRole = 'check_holder' | 'investor' | 'moderator' | 'admin'
 
+/** Current user shape from GET /api/v1/users/me/ and identity serializers */
 export interface User {
   id: number
   username: string
   email: string
   name?: string
   phone?: string | null
-  is_staff: boolean
-  is_superuser: boolean
   role: UserRole
   is_verified: boolean
+  url?: string
 }
 
 export function canAccessAdmin(user: User | null): boolean {
-  return user?.is_staff === true || user?.role === 'admin' || user?.role === 'moderator'
+  return user?.role === 'admin' || user?.role === 'moderator'
+}
+
+export function canAccessModeration(user: User | null): boolean {
+  return user?.role === 'moderator' || user?.role === 'admin'
 }
 
 export function canAccessUser(user: User | null): boolean {
@@ -25,5 +29,5 @@ export function isCheckHolder(user: User | null): boolean {
 }
 
 export function isInvestor(user: User | null): boolean {
-  return user?.role === 'investor' || user?.role === 'institutional_investor'
+  return user?.role === 'investor'
 }

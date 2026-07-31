@@ -100,7 +100,7 @@ const pendingMatches = computed(() => matchStore.pendingMatches)
 const acceptedMatches = computed(() => matchStore.acceptedMatches)
 const completedMatches = computed(() => matchStore.completedMatches)
 
-function viewMatch(id: string): void {
+function viewMatch(id: number | string): void {
   router.push(`/app/matches/${id}`)
 }
 

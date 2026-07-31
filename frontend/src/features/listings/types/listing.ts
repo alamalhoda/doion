@@ -1,8 +1,15 @@
-// Cheque Listing types for the marketplace
+// Cheque Listing types aligned with MASTER_API_CONTRACT.md
 
-export type UserRole = 'check_holder' | 'investor' | 'institutional_investor' | 'moderator' | 'admin'
+export type UserRole = 'check_holder' | 'investor' | 'moderator' | 'admin'
 
-export type ListingStatus = 'pending_moderation' | 'published' | 'rejected' | 'matched' | 'expired' | 'withdrawn' | 'settled_off_platform'
+export type ListingStatus =
+  | 'pending_moderation'
+  | 'published'
+  | 'rejected'
+  | 'matched'
+  | 'expired'
+  | 'withdrawn'
+  | 'settled_off_platform'
 
 export type RejectionCode = 'MOD_101' | 'MOD_102' | 'MOD_103' | 'MOD_104' | 'MOD_105' | 'MOD_106'
 
@@ -15,39 +22,46 @@ export const REJECTION_CODE_LABELS: Record<RejectionCode, string> = {
   MOD_106: 'Other',
 }
 
-export type MatchStatus = 'pending' | 'accepted' | 'declined' | 'cancelled' | 'off_platform_confirmed' | 'settled'
+export type MatchStatus =
+  | 'pending'
+  | 'accepted'
+  | 'declined'
+  | 'cancelled'
+  | 'off_platform_confirmed'
+  | 'settled'
 
 export type VerificationStatus = 'pending' | 'approved' | 'rejected'
 
 export interface IssuerProfile {
-  id: string
+  id: number
   national_or_company_id: string
   name: string
-  credit_score?: number
+  credit_score: number | null
+  created_at?: string
+  updated_at?: string
 }
 
 export interface ChequeListing {
-  id: string
+  id: number
   owner_id: number
-  issuer_id: number
-  issuer_profile?: IssuerProfile
+  issuer_profile?: IssuerProfile | null
   bank_name: string
   cheque_serial_number: string
-  face_amount: number
+  face_amount: string
   due_date: string
   issuer_type: 'legal' | 'natural'
   issuer_name: string
   issuer_national_id: string
   description: string
-  suggested_discount_rate?: number | null
-  risk_tier?: 'low' | 'medium' | 'high' | null
+  suggested_discount_rate: string | null
+  risk_tier: 'low' | 'medium' | 'high' | null
   status: ListingStatus
   rejection_reason?: string
-  rejection_code?: RejectionCode | null
+  rejection_code?: RejectionCode | string | null
   resubmit_count?: number
   days_to_due?: number
   interest_count?: number
-  published_at?: string
+  published_at?: string | null
   created_at: string
   updated_at: string
 }
@@ -65,6 +79,7 @@ export interface CreateListingRequest {
 }
 
 export interface UpdateListingRequest {
+  issuer?: number
   bank_name?: string
   cheque_serial_number?: string
   face_amount?: number
@@ -76,18 +91,33 @@ export interface UpdateListingRequest {
 }
 
 export interface DocumentUpload {
-  document_type: string
+  document_type: 'cheque_image' | 'id_document' | 'supplementary' | string
   file: File
 }
 
 export interface ListingFilters {
+  risk_tier?: 'low' | 'medium' | 'high'
   min_amount?: number
   max_amount?: number
-  min_due_date?: string
-  max_due_date?: string
-  risk_tier?: 'low' | 'medium' | 'high'
-  status?: ListingStatus
-  search?: string
+  max_days_to_due?: number
+  issuer_type?: 'legal' | 'natural'
+  bank_name?: string
+  ordering?: string
+  page?: number
+}
+
+export interface MarketplaceLatestListing {
+  id: number
+  issuer_profile?: IssuerProfile | null
+  bank_name: string
+  face_amount: string
+  due_date: string
+  issuer_type: 'legal' | 'natural'
+  suggested_discount_rate: string | null
+  risk_tier: 'low' | 'medium' | 'high' | null
+  status: ListingStatus
+  days_to_due: number
+  created_at: string
 }
 
 export interface ModerateDecisionRequest {
@@ -97,10 +127,10 @@ export interface ModerateDecisionRequest {
 }
 
 export interface ModerationDecisionResponse {
-  id: string
+  id: number
   listing: number
   moderator: number | null
-  decision: 'approve' | 'reject'
+  decision: 'approved' | 'rejected'
   rejection_code: RejectionCode | null
   rejection_code_display: string | null
   rejection_note: string
