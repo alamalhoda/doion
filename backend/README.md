@@ -8,6 +8,16 @@ Doion Project
 
 پروژه doion با استفاده از **Cookiecutter Django** ساخته شده و از بهترین شیوه‌های توسعه Django پیروی می‌کند.
 
+### Frontend (وضعیت فعلی)
+
+| نقش | مکان |
+|-----|------|
+| Backend + قرارداد API (SSOT) | این repo (`backend/`, `docs/development/MASTER_API_CONTRACT.md`) |
+| UI فعال | [alamalhoda/checkyar-googleai](https://github.com/alamalhoda/checkyar-googleai) — توسعه در [AI Studio](https://aistudio.google.com/) |
+| UI آرشیو | `frontend-legacy/` در همین مونورپو (فقط مستندات/مرجع) |
+
+**قانون یک‌طرفه UI:** AI Studio → GitHub → لوکال (`git pull`). از لوکال روی repo فرانت فعال push نکنید. جزئیات کامل: [`docs/development/FRONTEND_DEVELOPMENT_STATUS.md`](../docs/development/FRONTEND_DEVELOPMENT_STATUS.md).
+
 ### مشخصات فنی
 - **Python**: 3.12
 - **Django**: 5.2.14 (LTS)

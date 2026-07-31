@@ -1,6 +1,8 @@
 # Cursor Rules — OilChenger Monorepo
 
-قوانین توسعه در ریشه مونورپو اعمال می‌شوند. هر قانون با **globs** به مسیر مشخص (مثلاً `frontend/**` یا `backend/**`) محدود می‌شود.
+قوانین توسعه در ریشه مونورپو اعمال می‌شوند. هر قانون با **globs** به مسیر مشخص (مثلاً `frontend/**` / `frontend-legacy/**` یا `backend/**`) محدود می‌شود.
+
+> **UI فعال:** فعلاً خارج از این مونورپو است ([checkyar-googleai](https://github.com/alamalhoda/checkyar-googleai)). درخت اپلیکیشن آرشیو: `frontend-legacy/`. جزئیات: `docs/development/FRONTEND_DEVELOPMENT_STATUS.md`. پوشه `.cursor/rules/frontend/` همچنان قوانین *مهندسی* UI است (نه مسیر اپ فعال).
 
 ## تفکیک فیزیکی
 

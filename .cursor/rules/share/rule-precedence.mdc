@@ -33,5 +33,7 @@ alwaysApply: true
 ## Scope Mapping
 
 - فایل‌های `backend/**` → rules در `backend/` + `share/`
-- فایل‌های `frontend/**` → rules در `frontend/` + `share/`
+- فایل‌های `frontend/**` یا `frontend-legacy/**` → rules در `frontend/` + `share/`
 - سایر فایل‌ها → فقط `share/` و ruleهای مرتبط با همان مسیر
+
+> UI فعال فعلاً در repo خارجی `checkyar-googleai` است؛ درخت اپ در این مونورپو `frontend-legacy/` آرشیو است. جزئیات: `docs/development/FRONTEND_DEVELOPMENT_STATUS.md`.

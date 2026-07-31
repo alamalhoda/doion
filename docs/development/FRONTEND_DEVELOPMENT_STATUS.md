@@ -1,0 +1,59 @@
+# Frontend Development Status
+
+**As of:** 2026-07-31
+
+This document is the SSOT for *where* active UI work happens and how it relates to this monorepo.
+
+## Roles
+
+| Component | Location | Role |
+|-----------|----------|------|
+| **Backend + API contract** | This repo (`doion`) — `backend/`, `docs/development/MASTER_API_CONTRACT.md` | Source of truth for API; developed with GitFlow (`feature/*` → PR → `develop`) |
+| **Active frontend** | External: [alamalhoda/checkyar-googleai](https://github.com/alamalhoda/checkyar-googleai) | Product UI under active development |
+| **Legacy frontend** | `frontend-legacy/` in this repo | Archived; documentation and historical reference only — **not maintained** |
+| **Cursor frontend rules** | `.cursor/rules/frontend/` | Still apply to future `frontend/` code and to edits under `frontend-legacy/` when touched |
+
+## One-way sync rule (mandatory while AI Studio is the UI source)
+
+Active UI is authored in [Google AI Studio](https://aistudio.google.com/), which can **push** to GitHub but does **not** pull remote changes.
+
+```text
+[Google AI Studio]  --push-->  github.com/alamalhoda/checkyar-googleai
+                                        |
+                                        v  (git pull only)
+                                 local machine / integration with doion backend
+```
+
+### Do
+
+- Develop UI **only** in AI Studio until a stable release is accepted.
+- On a local clone of `checkyar-googleai`: `git pull` to receive Studio pushes; use local `.env` to point at `doion` backend (`VITE_USE_MOCK=false`, `VITE_API_BASE_URL=http://localhost:8000/api/v1`).
+- Keep API contract changes in `doion` (`MASTER_API_CONTRACT.md` + backend) via normal GitFlow.
+- Mirror contract changes into the UI **inside AI Studio** (do not rely on local commits to the UI repo).
+
+### Do not
+
+- Commit or push UI source changes from local/Cursor to `checkyar-googleai` (AI Studio will not see them → divergence).
+- Treat `frontend-legacy/` as the active app or wire CI/deploy to it.
+- Copy the active UI into this monorepo until leaving AI Studio (planned exit: adopt into `frontend/` via a feature PR, then archive the external repo).
+
+## Integration testing (local)
+
+1. Run `doion` backend (typically `http://localhost:8000`).
+2. Pull latest `checkyar-googleai` and run `npm run dev` (typically `http://localhost:3000`).
+3. Fix API/backend issues in `doion`; fix UI issues only via AI Studio → GitHub → local pull.
+
+## Exit criteria (later)
+
+When the active UI is acceptable:
+
+1. Final `git pull` on `checkyar-googleai`.
+2. Feature branch on `doion`: place code in `frontend/`, keep `frontend-legacy/` as archive.
+3. PR → `develop`; then archive the `checkyar-googleai` GitHub repository.
+4. From then on, UI GitFlow is two-way inside this monorepo only.
+
+## Related docs
+
+- Legacy UI: [`../../frontend-legacy/README.md`](../../frontend-legacy/README.md)
+- Active UI repo README: https://github.com/alamalhoda/checkyar-googleai
+- API SSOT: [`MASTER_API_CONTRACT.md`](./MASTER_API_CONTRACT.md)
