@@ -21,6 +21,7 @@
 | `code-quality-baseline.mdc` | baseline کیفیت کد (خوانایی، naming، magic values، secrets، test expectation) | کل پروژه | ✅ true |
 | `rule-precedence.mdc` | سیاست رسمی اولویت و حل تعارض Ruleها | کل پروژه | ✅ true |
 | `python-venv-policy.mdc` | قبل از اجرای دستور پایتون، محیط مجازی باید فعال شود (`source backend/.venv/bin/activate`) | کل پروژه | ✅ true |
+| `active-frontend-toolchain.mdc` | UI فعال (`checkyar-googleai`): Bun SSOT، `bun.lock`، بدون `package-lock.json`، یادآوری one-way AI Studio | docs وضعیت فرانت + `frontend-legacy/**` | false |
 | `documentation-sync-policy.mdc` | الزام همگام‌سازی TODO/README/PLAN و اسناد توسعه بعد از تغییرات مهم و قبل از PR | کد + مستندات پروژه | false |
 | `rule-authoring-standard.mdc` | استاندارد نگارش/جایگذاری Ruleها | فقط تغییرات قوانین (`.cursor/rules/**`) | false |
 | `rules-audit-checklist.mdc` | چک‌لیست قابل اجرا برای PRهای مربوط به Ruleها | فقط تغییرات قوانین (`.cursor/rules/**`) | false |

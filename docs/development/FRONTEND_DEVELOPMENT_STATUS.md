@@ -28,19 +28,39 @@ Active UI is authored in [Google AI Studio](https://aistudio.google.com/), which
 
 - Develop UI **only** in AI Studio until a stable release is accepted.
 - On a local clone of `checkyar-googleai`: `git pull` to receive Studio pushes; use local `.env` to point at `doion` backend (`VITE_USE_MOCK=false`, `VITE_API_BASE_URL=http://localhost:8000/api/v1`).
+- Install and run the active UI with **Bun** (see [Package manager](#package-manager-active-ui)).
 - Keep API contract changes in `doion` (`MASTER_API_CONTRACT.md` + backend) via normal GitFlow.
 - Mirror contract changes into the UI **inside AI Studio** (do not rely on local commits to the UI repo).
 
 ### Do not
 
 - Commit or push UI source changes from local/Cursor to `checkyar-googleai` (AI Studio will not see them → divergence).
+- Use `npm install` / commit `package-lock.json` for the active UI (creates drift vs AI Studio’s `bun.lock`).
 - Treat `frontend-legacy/` as the active app or wire CI/deploy to it.
 - Copy the active UI into this monorepo until leaving AI Studio (planned exit: adopt into `frontend/` via a feature PR, then archive the external repo).
+
+## Package manager (active UI)
+
+| Item | Value |
+|------|--------|
+| Package manager | **Bun** (SSOT; matches Google AI Studio) |
+| Lockfile in git | `bun.lock` |
+| Ignored | `package-lock.json` (must stay out of git) |
+| Install | `bun install` |
+| Dev server | `bun run dev` (port `3000`) |
+| Lint / build | `bun run lint` / `bun run build` |
+
+On macOS, ensure Bun is on `PATH` for login shells (Cursor terminals often load `~/.zprofile`):
+
+```bash
+export BUN_INSTALL="$HOME/.bun"
+export PATH="$BUN_INSTALL/bin:$PATH"
+```
 
 ## Integration testing (local)
 
 1. Run `doion` backend (typically `http://localhost:8000`).
-2. Pull latest `checkyar-googleai` and run `npm run dev` (typically `http://localhost:3000`).
+2. Pull latest `checkyar-googleai`, then `bun install` and `bun run dev` (typically `http://localhost:3000`).
 3. Fix API/backend issues in `doion`; fix UI issues only via AI Studio → GitHub → local pull.
 
 ## Exit criteria (later)

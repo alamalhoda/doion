@@ -13,10 +13,10 @@ Doion Project
 | نقش | مکان |
 |-----|------|
 | Backend + قرارداد API (SSOT) | این repo (`backend/`, `docs/development/MASTER_API_CONTRACT.md`) |
-| UI فعال | [alamalhoda/checkyar-googleai](https://github.com/alamalhoda/checkyar-googleai) — توسعه در [AI Studio](https://aistudio.google.com/) |
+| UI فعال | [alamalhoda/checkyar-googleai](https://github.com/alamalhoda/checkyar-googleai) — توسعه در [AI Studio](https://aistudio.google.com/)؛ لوکال با **Bun** (`bun install` / `bun run dev`) |
 | UI آرشیو | `frontend-legacy/` در همین مونورپو (فقط مستندات/مرجع) |
 
-**قانون یک‌طرفه UI:** AI Studio → GitHub → لوکال (`git pull`). از لوکال روی repo فرانت فعال push نکنید. جزئیات کامل: [`docs/development/FRONTEND_DEVELOPMENT_STATUS.md`](../docs/development/FRONTEND_DEVELOPMENT_STATUS.md).
+**قانون یک‌طرفه UI:** AI Studio → GitHub → لوکال (`git pull`). از لوکال روی repo فرانت فعال push نکنید. Package manager UI فعال: **Bun** (`bun.lock`؛ نه `package-lock.json`). جزئیات: [`docs/development/FRONTEND_DEVELOPMENT_STATUS.md`](../docs/development/FRONTEND_DEVELOPMENT_STATUS.md).
 
 ### مشخصات فنی
 - **Python**: 3.12
