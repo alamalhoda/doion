@@ -1,10 +1,11 @@
 /**
- * Domain-specific API error codes with i18n-ready message keys.
+ * Domain-specific API error codes aligned with MASTER_API_CONTRACT.md.
  *
- * Each entry provides:
- * - `message`        : i18n key used by the backend/API contract
- * - `persianMessage` : fallback Persian text (used when i18n key is missing or for direct reference)
- * - `englishMessage` : fallback English text
+ * Envelope codes emitted by custom_exception_handler:
+ * VALIDATION_ERROR | AUTHENTICATION_ERROR | PERMISSION_ERROR | NOT_FOUND_ERROR | SERVER_ERROR | MOD_306
+ *
+ * Spec-only labels (AUTH_*, LST_* as envelope codes) are not listed here.
+ * KYC_101–104 may appear as free-form rejection_code payloads, not envelope codes.
  */
 export interface DomainErrorInfo {
   message: string
@@ -13,31 +14,37 @@ export interface DomainErrorInfo {
 }
 
 export const DOMAIN_ERROR_CODES: Record<string, DomainErrorInfo> = {
-  AUTH_001: {
-    message: 'error.auth_001_invalid_code',
-    persianMessage: 'کد تأیید نامعتبر',
-    englishMessage: 'Invalid verification code',
+  VALIDATION_ERROR: {
+    message: 'error.validation_error',
+    persianMessage: 'خطای اعتبارسنجی',
+    englishMessage: 'Validation failed',
   },
-  AUTH_002: {
-    message: 'error.auth_002_expired_code',
-    persianMessage: 'کد تأیید منقضی شده',
-    englishMessage: 'Verification code expired',
+  AUTHENTICATION_ERROR: {
+    message: 'error.authentication_error',
+    persianMessage: 'احراز هویت ناموفق',
+    englishMessage: 'Authentication failed',
   },
-  AUTH_003: {
-    message: 'error.auth_003_rate_limit',
-    persianMessage: 'تعداد تلاش بیش از حد',
-    englishMessage: 'Too many attempts',
+  PERMISSION_ERROR: {
+    message: 'error.permission_error',
+    persianMessage: 'دسترسی مجاز نیست',
+    englishMessage: 'Permission denied',
   },
-  AUTH_004: {
-    message: 'error.auth_004_token_expired',
-    persianMessage: 'توکن منقضی شده',
-    englishMessage: 'Token expired',
+  NOT_FOUND_ERROR: {
+    message: 'error.not_found_error',
+    persianMessage: 'یافت نشد',
+    englishMessage: 'Not found',
   },
-  AUTH_005: {
-    message: 'error.auth_005_account_suspended',
-    persianMessage: 'حساب معلق است',
-    englishMessage: 'Account suspended',
+  SERVER_ERROR: {
+    message: 'error.server_error',
+    persianMessage: 'خطای سرور',
+    englishMessage: 'An unexpected error occurred',
   },
+  MOD_306: {
+    message: 'error.mod_306_resubmit_limit',
+    persianMessage: 'سقف ارسال مجدد آگهی پر شده است',
+    englishMessage: 'Maximum resubmission limit exceeded',
+  },
+  // Free-form KYC rejection payload codes (not envelope codes)
   KYC_101: {
     message: 'error.kyc_101_unreadable_document',
     persianMessage: 'تصویر مدرک ناخوانا',
@@ -57,61 +64,6 @@ export const DOMAIN_ERROR_CODES: Record<string, DomainErrorInfo> = {
     message: 'error.kyc_104_already_registered',
     persianMessage: 'هویت قبلاً ثبت شده',
     englishMessage: 'Identity already registered',
-  },
-  LST_201: {
-    message: 'error.lst_201_amount_must_be_positive',
-    persianMessage: 'مبلغ باید بیشتر از صفر باشد',
-    englishMessage: 'Amount must be greater than zero',
-  },
-  LST_202: {
-    message: 'error.lst_202_due_date_in_future',
-    persianMessage: 'سررسید باید در آینده باشد',
-    englishMessage: 'Due date must be in the future',
-  },
-  LST_203: {
-    message: 'error.lst_203_sayad_code_length',
-    persianMessage: 'کد صیاد باید ۱۶ رقم باشد',
-    englishMessage: 'Sayad code must be 16 digits',
-  },
-  LST_204: {
-    message: 'error.lst_204_duplicate_listing',
-    persianMessage: 'این چک قبلاً ثبت شده',
-    englishMessage: 'This cheque has already been registered',
-  },
-  LST_205: {
-    message: 'error.lst_205_daily_limit',
-    persianMessage: 'سقف ثبت آگهی روزانه',
-    englishMessage: 'Daily listing limit reached',
-  },
-  LST_206: {
-    message: 'error.lst_206_cheque_image_required',
-    persianMessage: 'حداقل یک تصویر از چک الزامی است',
-    englishMessage: 'At least one cheque image is required',
-  },
-  MOD_301: {
-    message: 'error.mod_301_incomplete_info',
-    persianMessage: 'اطلاعات چک ناقص',
-    englishMessage: 'Incomplete cheque information',
-  },
-  MOD_302: {
-    message: 'error.mod_302_unreadable_image',
-    persianMessage: 'تصویر چک ناخوانا',
-    englishMessage: 'Unreadable cheque image',
-  },
-  MOD_303: {
-    message: 'error.mod_303_mismatch',
-    persianMessage: 'عدم تطابق اطلاعات',
-    englishMessage: 'Information mismatch',
-  },
-  MOD_304: {
-    message: 'error.mod_304_invalid_content',
-    persianMessage: 'محتوای غیرمجاز',
-    englishMessage: 'Invalid content',
-  },
-  MOD_305: {
-    message: 'error.mod_305_incomplete_issuer_docs',
-    persianMessage: 'مدارک صادرکننده ناقص',
-    englishMessage: 'Incomplete issuer documents',
   },
 }
 

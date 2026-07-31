@@ -55,7 +55,7 @@ const columns = ref([
           h(
             'span',
             {},
-            row.user?.full_name || row.user?.username || '-'
+            row.full_name || row.user?.username || '-'
           ),
         ]
       )

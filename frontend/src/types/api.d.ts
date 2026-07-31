@@ -93,14 +93,17 @@ export type GeneralErrorCode =
   | 'NOT_FOUND_ERROR'
   | 'SERVER_ERROR';
 
-/** Listing error codes */
-export type ListingErrorCode = 'LST_201' | 'LST_202' | 'LST_203' | 'LST_204' | 'LST_205' | 'LST_206';
+/**
+ * Listing validation historically labeled LST_* in specs.
+ * Live backend emits VALIDATION_ERROR with field details — LST_* are not envelope codes.
+ */
+export type ListingSpecLabel = 'LST_201' | 'LST_202' | 'LST_203' | 'LST_204' | 'LST_205' | 'LST_206';
 
-/** Moderation error codes */
-export type ModerationErrorCode = 'MOD_101' | 'MOD_102' | 'MOD_103' | 'MOD_104' | 'MOD_105' | 'MOD_106' | 'MOD_306';
+/** Envelope moderation code (resubmit limit). MOD_101–106 are rejection_code payload values. */
+export type ModerationEnvelopeErrorCode = 'MOD_306';
 
-/** All error codes union */
-export type ErrorCode = GeneralErrorCode | ListingErrorCode | ModerationErrorCode;
+/** All envelope error codes union (emitted by custom_exception_handler) */
+export type ErrorCode = GeneralErrorCode | ModerationEnvelopeErrorCode;
 
 /** Field-level validation error detail */
 export interface ApiErrorDetail {
@@ -137,6 +140,8 @@ export interface LoginResponse {
     username: string;
     email: string;
     name: string;
+    role: UserRole;
+    phone?: string | null;
   };
 }
 
@@ -161,6 +166,7 @@ export interface RegisterResponse {
     email: string;
     name: string;
     role: 'check_holder' | 'investor';
+    phone?: string | null;
   };
 }
 
@@ -178,6 +184,8 @@ export interface RefreshTokenResponse {
     username: string;
     email: string;
     name: string;
+    role: UserRole;
+    phone?: string | null;
   };
 }
 
@@ -185,7 +193,7 @@ export interface RefreshTokenResponse {
 // 4. USER & IDENTITY TYPES
 // ============================================================================
 
-/** User object */
+/** User object (GET /users/me/, identity/me) */
 export interface User {
   id: number;
   username: string;
@@ -194,6 +202,7 @@ export interface User {
   phone?: string | null;
   role: UserRole;
   is_verified: boolean;
+  url?: string;
 }
 
 /** Profile object */
@@ -297,7 +306,7 @@ export interface CreateListingRequest {
 /** Update listing request (same fields as create, all optional) */
 export type UpdateListingRequest = Partial<CreateListingRequest>;
 
-/** Listing filters for marketplace */
+/** Listing filters for marketplace (page_size is not supported; fixed PAGE_SIZE=20) */
 export interface ListingFilters {
   risk_tier?: 'low' | 'medium' | 'high';
   min_amount?: number;
@@ -307,7 +316,6 @@ export interface ListingFilters {
   bank_name?: string;
   ordering?: string;
   page?: number;
-  page_size?: number;
 }
 
 // ============================================================================
@@ -566,10 +574,10 @@ export const NOTIFICATION_TYPE_LABELS: Record<NotificationType, string> = {
 
 export const REJECTION_CODE_LABELS: Record<RejectionCode, string> = {
   MOD_101: 'اطلاعات ناقص',
-  MOD_102: 'تصویر ناخوانا',
-  MOD_103: 'عدم تطابق',
-  MOD_104: 'محتوای غیرمجاز',
-  MOD_105: 'مدارک صادرکننده ناقص',
+  MOD_102: 'تصویر با کیفیت پایین',
+  MOD_103: 'چک نامعتبر',
+  MOD_104: 'آگهی تکراری',
+  MOD_105: 'ریسک بیش از حد',
   MOD_106: 'سایر',
 };
 

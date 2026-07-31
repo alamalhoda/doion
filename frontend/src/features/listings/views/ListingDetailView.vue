@@ -265,9 +265,19 @@ function expressInterest() {
   showToast('درخوا�ت شما ثبت شد', 'success')
 }
 
-function handleResubmit() {
-  showToast('آگهی برای بررسی مجدد ارسال شد', 'info')
-  router.push('/app/listings')
+async function handleResubmit() {
+  if (!listing.value) return
+  try {
+    await store.resubmitListing(listing.value.id)
+    showToast('آگهی برای بررسی مجدد ارسال شد', 'success')
+  } catch (err: unknown) {
+    const code = (err as { code?: string }).code
+    if (code === 'MOD_306') {
+      showToast('سقف ارسال مجدد آگهی پر شده است', 'error')
+    } else {
+      showToast((err as { message?: string }).message || 'خطا در ارسال مجدد', 'error')
+    }
+  }
 }
 
 </script>

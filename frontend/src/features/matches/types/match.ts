@@ -1,11 +1,19 @@
-// Match and Notification types for the marketplace
+// Match types aligned with MASTER_API_CONTRACT.md §9
 
-export type MatchStatus = 'pending' | 'accepted' | 'declined' | 'cancelled' | 'off_platform_confirmed' | 'settled'
+export type MatchStatus =
+  | 'pending'
+  | 'accepted'
+  | 'declined'
+  | 'cancelled'
+  | 'off_platform_confirmed'
+  | 'settled'
+
+export type SettlementType = 'off_platform' | 'escrow' | 'principal_ledger'
 
 export interface ListingSummary {
-  id: string
+  id: number
   bank_name: string
-  face_amount: number
+  face_amount: string
   due_date: string
   status: string
   created_at: string
@@ -13,48 +21,33 @@ export interface ListingSummary {
 }
 
 export interface UserSummary {
-  id: string
+  id: number
   username: string
-  full_name?: string
+  name: string
 }
 
 export interface Match {
-  id: string
-  listing_id: string
-  investor_id: string
-  check_holder_id: string
+  id: number
+  listing: ListingSummary
+  investor: UserSummary
+  check_holder: UserSummary
   status: MatchStatus
-  settlement_type: 'off_platform' | 'escrow' | 'principal_ledger'
-  final_discount_rate?: number | null
-  terms?: string | null
-  message?: string | null
+  settlement_type: SettlementType
+  final_discount_rate: string | null
+  terms: string
+  message: string
   created_at: string
   updated_at: string
-  listing?: ListingSummary
-  investor?: UserSummary
-  check_holder?: UserSummary
 }
 
 export interface CreateMatchRequest {
-  listing_id: string
+  listing_id: number
   message?: string
-  proposed_discount_rate?: number
 }
 
 export interface UpdateMatchStatusRequest {
   status: MatchStatus
-  final_discount_rate?: number
+  final_discount_rate?: string | null
   terms?: string
-}
-
-export interface Notification {
-  id: string
-  user_id: string
-  type: 'match_created' | 'listing_approved' | 'listing_rejected' | 'match_accepted' | 'match_rejected'
-  channel: 'in_app' | 'sms' | 'email'
-  status: 'pending' | 'sent' | 'read'
-  title: string
-  message: string
-  reference_id?: string
-  created_at: string
+  note?: string
 }

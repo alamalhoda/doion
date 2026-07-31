@@ -283,6 +283,8 @@ import UploadArea from '../components/UploadArea.vue'
 import ReviewSummary from '../components/ReviewSummary.vue'
 import type { ChequeListing } from '../types/listing'
 import { ListingService } from '../services/listingService'
+import { IssuerProfileService } from '../services/issuerProfileService'
+import { normalizeApiError } from '@/api/errors'
 
 const router = useRouter()
 const { showToast } = useToast()
@@ -332,10 +334,9 @@ const hasChequeImage = computed(() => chequeImageFile.value !== null)
 const reviewListing = computed<ChequeListing>(() => ({
   id: 0,
   owner_id: 0,
-  issuer_id: 0,
   bank_name: form.value.bank,
   cheque_serial_number: form.value.sayad,
-  face_amount: form.value.amount || 0,
+  face_amount: String(form.value.amount || 0),
   due_date: form.value.dueDate,
   issuer_type: form.value.issuerType,
   issuer_name: form.value.issuer,
@@ -377,8 +378,13 @@ async function submit() {
   listingStore.error = null
 
   try {
+    const issuerProfile = await IssuerProfileService.findOrCreate({
+      national_or_company_id: form.value.nationalId,
+      name: form.value.issuer,
+    })
+
     const listing = await listingStore.createListing({
-      issuer: 1,
+      issuer: issuerProfile.id,
       bank_name: form.value.bank,
       cheque_serial_number: form.value.sayad,
       face_amount: form.value.amount || 0,
@@ -392,7 +398,7 @@ async function submit() {
     if (chequeImageFile.value) {
       try {
         await ListingService.uploadDocument(listing.id, chequeImageFile.value, 'cheque_image')
-      } catch (docErr) {
+      } catch {
         showToast('آگهی ثبت شد اما در آپلود تصویر چک خطا رخ داد', 'warning')
       }
     }
@@ -401,14 +407,15 @@ async function submit() {
       try {
         await ListingService.uploadDocument(listing.id, idDocFile.value, 'id_document')
       } catch {
-        showToast('در آپلود مدارک صادرکننده خطا رخ داد', 'warning')
+        showToast('آگهی ثبت شد اما در آپلود مدرک خطا رخ داد', 'warning')
       }
     }
 
     currentStep.value = 'success'
     showToast('آگهی شما با موفقیت ثبت شد', 'success')
-  } catch {
-    showToast('خطا در ثبت آگهی. لطفاً دوباره تلاش کنید.', 'error')
+  } catch (err: unknown) {
+    const normalized = normalizeApiError(err)
+    showToast(normalized.message || 'خطا در ثبت آگهی. لطفاً دوباره تلاش کنید.', 'error')
   } finally {
     isSubmitting.value = false
   }

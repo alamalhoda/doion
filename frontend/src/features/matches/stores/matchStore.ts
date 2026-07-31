@@ -52,17 +52,18 @@ export const useMatchStore = defineStore('match', () => {
     }
   }
 
-  async function updateMatchStatus(id: string, data: UpdateMatchStatusRequest): Promise<void> {
+  async function updateMatchStatus(id: number | string, data: UpdateMatchStatusRequest): Promise<void> {
     isLoading.value = true
     error.value = null
 
     try {
       const updated = await MatchService.updateMatchStatus(id, data)
-      const index = matches.value.findIndex(m => m.id === id)
+      const numericId = Number(id)
+      const index = matches.value.findIndex(m => m.id === numericId)
       if (index !== -1) {
         matches.value[index] = updated
       }
-      if (currentMatch.value?.id === id) {
+      if (currentMatch.value?.id === numericId) {
         currentMatch.value = updated
       }
     } catch (err: unknown) {
@@ -73,7 +74,7 @@ export const useMatchStore = defineStore('match', () => {
     }
   }
 
-  async function fetchMatch(id: string): Promise<Match> {
+  async function fetchMatch(id: number | string): Promise<Match> {
     isLoading.value = true
     error.value = null
 

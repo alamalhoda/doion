@@ -26,3 +26,15 @@ export interface FeatureFlag {
   is_enabled: boolean
   is_system: boolean
 }
+
+export interface AuditEvent {
+  id: number
+  actor: number
+  actor_username: string
+  event_type: string
+  object_type: string
+  object_id: string
+  metadata: Record<string, unknown>
+  ip_address: string
+  created_at: string
+}

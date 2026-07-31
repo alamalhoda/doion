@@ -1,10 +1,16 @@
 import { apiClient } from '@/api/client'
 import { normalizeApiError } from '@/api/errors'
-import type { LoginRequest, LoginResponse, RefreshTokenResponse } from '../types/auth'
+import type {
+  LoginRequest,
+  LoginResponse,
+  RefreshTokenResponse,
+  RegisterRequest,
+  RegisterResponse,
+} from '../types/auth'
 import type { User } from '@/utils/permissions'
 
 export class AuthService {
-  static async login(credentials: LoginRequest): Promise<{ access: string; refresh: string }> {
+  static async login(credentials: LoginRequest): Promise<LoginResponse> {
     try {
       const response = await apiClient.post<LoginResponse>('/api/v1/auth/login/', credentials)
       return response.data
@@ -13,12 +19,21 @@ export class AuthService {
     }
   }
 
-  static async refreshToken(refreshToken: string): Promise<string> {
+  static async register(data: RegisterRequest): Promise<RegisterResponse> {
+    try {
+      const response = await apiClient.post<RegisterResponse>('/api/v1/identity/register/', data)
+      return response.data
+    } catch (error) {
+      throw normalizeApiError(error)
+    }
+  }
+
+  static async refreshToken(refreshToken: string): Promise<RefreshTokenResponse> {
     try {
       const response = await apiClient.post<RefreshTokenResponse>('/api/v1/auth/refresh/', {
         refresh: refreshToken,
       })
-      return response.data.access
+      return response.data
     } catch (error) {
       throw normalizeApiError(error)
     }

@@ -25,19 +25,6 @@
         </div>
       </div>
       <div
-        v-else-if="!isAuthenticated"
-        class="empty-state"
-      >
-        <p>برای مشاهده آگهی‌ها، وارد شوید.</p>
-        <RouterLink
-          to="/login"
-          class="btn btn--primary"
-        >
-          ورود به حساب کاربری
-        </RouterLink>
-      </div>
-
-      <div
         v-else-if="listings.length === 0"
         class="empty-state"
       >
@@ -84,27 +71,22 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, computed } from 'vue'
-import { RouterLink } from 'vue-router'
+import { ref, onMounted } from 'vue'
 import HeroSection from '../components/HeroSection.vue'
 import StatsBar from '../components/StatsBar.vue'
 import StepCard from '../components/StepCard.vue'
 import FooterDisclaimer from '../components/FooterDisclaimer.vue'
 import MarketplaceListingCard from '@/features/marketplace/components/MarketplaceListingCard.vue'
 import { ListingService } from '@/features/listings/services/listingService'
-import { useAuthStore } from '@/features/auth/stores/authStore'
-import type { ChequeListing } from '@/features/listings/types/listing'
+import type { MarketplaceLatestListing } from '@/features/listings/types/listing'
 
 const isLoading = ref(false)
-const listings = ref<ChequeListing[]>([])
-const authStore = useAuthStore()
-const isAuthenticated = computed(() => authStore.isAuthenticated)
+const listings = ref<MarketplaceLatestListing[]>([])
 
 onMounted(async () => {
   isLoading.value = true
   try {
-    const data = await ListingService.getMarketplaceListings({ page_size: 4 })
-    listings.value = data.results
+    listings.value = await ListingService.getLatestMarketplaceListings()
   } catch {
     listings.value = []
   } finally {

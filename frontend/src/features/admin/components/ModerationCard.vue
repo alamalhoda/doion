@@ -79,9 +79,11 @@ interface ModerationItem {
   id: string | number
   issuer?: string
   bank?: string
-  amount?: number
+  amount?: number | string
   dueDate?: string
   risk?: string
+  rejection_code?: string
+  rejection_note?: string
 }
 
 const props = withDefaults(
@@ -100,7 +102,7 @@ const emit = defineEmits<{
   (e: 'view-detail', id: string | number): void
 }>()
 
-const formatCurrency = (value: number) => value.toLocaleString('fa-IR')
+const formatCurrency = (value: number | string) => Number(value || 0).toLocaleString('fa-IR')
 
 const approve = () => {
   if (!props.readonly) emit('approve', props.item.id)

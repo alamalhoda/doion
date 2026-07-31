@@ -168,7 +168,7 @@ const showRejectModal = ref(false)
 const rejectionCode = ref<RejectionCode | ''>('')
 const rejectionNote = ref('')
 const isProcessing = ref(false)
-const listingToReject = ref<string | null>(null)
+const listingToReject = ref<number | null>(null)
 
 const rejectionCodeOptions = Object.entries(REJECTION_CODE_LABELS).map(
   ([value, label]) => ({ value, label })
@@ -182,15 +182,15 @@ const rejectedListings = computed(() =>
   listingStore.listings.filter(l => l.status === 'rejected')
 )
 
-function viewListing(id: string): void {
+function viewListing(id: number): void {
   router.push(`/admin/moderation/${id}`)
 }
 
-async function handleApprove(id: string): Promise<void> {
+async function handleApprove(id: number): Promise<void> {
   isProcessing.value = true
   try {
     await ListingService.moderateListing(id, { decision: 'approve' })
-    await listingStore.fetchAllListings()
+    await listingStore.fetchModerationQueue()
   } catch (err) {
     console.error('Failed to approve listing:', err)
   } finally {
@@ -198,7 +198,7 @@ async function handleApprove(id: string): Promise<void> {
   }
 }
 
-function handleReject(id: string): void {
+function handleReject(id: number): void {
   listingToReject.value = id
   rejectionCode.value = ''
   rejectionNote.value = ''
@@ -216,7 +216,7 @@ async function confirmReject(): Promise<void> {
       rejection_note: rejectionNote.value,
     })
     showRejectModal.value = false
-    await listingStore.fetchAllListings()
+    await listingStore.fetchModerationQueue()
   } catch (err) {
     console.error('Failed to reject listing:', err)
   } finally {
@@ -225,7 +225,7 @@ async function confirmReject(): Promise<void> {
 }
 
 onMounted(() => {
-  listingStore.fetchAllListings()
+  listingStore.fetchModerationQueue()
 })
 </script>
 

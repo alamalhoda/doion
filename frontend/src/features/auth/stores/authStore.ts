@@ -1,10 +1,29 @@
 import { defineStore } from 'pinia'
 import { ref, computed } from 'vue'
-import { canAccessAdmin, canAccessUser, type User } from '@/utils/permissions'
+import { canAccessAdmin, canAccessUser, type User, type UserRole } from '@/utils/permissions'
 import { AuthService } from '../services/authService'
-import type { LoginRequest } from '../types/auth'
+import type { AuthUserPayload, LoginRequest, RegisterRequest } from '../types/auth'
 import { apiClient } from '@/api/client'
 import { normalizeApiError } from '@/api/errors'
+
+function mapAuthUserToUser(payload: AuthUserPayload, previous?: User | null): User {
+  return {
+    id: payload.id,
+    username: payload.username,
+    email: payload.email,
+    name: payload.name,
+    phone: payload.phone ?? null,
+    role: payload.role as UserRole,
+    is_verified: previous?.is_verified ?? false,
+    url: previous?.url,
+  }
+}
+
+function persistTokens(access: string, refresh: string) {
+  sessionStorage.setItem('auth_token', access)
+  sessionStorage.setItem('refresh_token', refresh)
+  apiClient.defaults.headers.common['Authorization'] = `Bearer ${access}`
+}
 
 export const useAuthStore = defineStore('auth', () => {
   const token = ref<string | null>(sessionStorage.getItem('auth_token'))
@@ -22,14 +41,18 @@ export const useAuthStore = defineStore('auth', () => {
     error.value = null
 
     try {
-      const { access, refresh } = await AuthService.login(credentials)
-      token.value = access
-      refreshToken.value = refresh
-      sessionStorage.setItem('auth_token', access)
-      sessionStorage.setItem('refresh_token', refresh)
+      const response = await AuthService.login(credentials)
+      token.value = response.access
+      refreshToken.value = response.refresh
+      persistTokens(response.access, response.refresh)
+      user.value = mapAuthUserToUser(response.user)
 
-      const currentUser = await AuthService.getCurrentUser()
-      user.value = currentUser
+      try {
+        const currentUser = await AuthService.getCurrentUser()
+        user.value = currentUser
+      } catch {
+        // Keep role/phone from login payload if /me is temporarily unavailable
+      }
     } catch (err: unknown) {
       error.value = (err as { code?: string }).code || 'UNKNOWN'
       throw err
@@ -38,20 +61,26 @@ export const useAuthStore = defineStore('auth', () => {
     }
   }
 
-  async function register(data: {
-    username: string
-    email: string
-    name: string
-    phone: string
-    role: 'check_holder' | 'investor'
-    password: string
-    password_confirm: string
-  }) {
+  async function register(data: RegisterRequest) {
     isLoading.value = true
     error.value = null
 
     try {
-      await apiClient.post('/api/v1/identity/register/', data)
+      const response = await AuthService.register(data)
+      token.value = response.access
+      refreshToken.value = response.refresh
+      persistTokens(response.access, response.refresh)
+      user.value = mapAuthUserToUser({
+        ...response.user,
+        phone: data.phone ?? null,
+      })
+
+      try {
+        const currentUser = await AuthService.getCurrentUser()
+        user.value = currentUser
+      } catch {
+        // Keep register payload mapping if /me fails
+      }
     } catch (err: unknown) {
       error.value = (err as { code?: string }).code || 'UNKNOWN'
       throw normalizeApiError(err)
@@ -62,6 +91,7 @@ export const useAuthStore = defineStore('auth', () => {
 
   function logout() {
     AuthService.logout()
+    delete apiClient.defaults.headers.common['Authorization']
     token.value = null
     refreshToken.value = null
     user.value = null
@@ -78,6 +108,7 @@ export const useAuthStore = defineStore('auth', () => {
     if (storedToken) {
       token.value = storedToken
       refreshToken.value = storedRefreshToken
+      apiClient.defaults.headers.common['Authorization'] = `Bearer ${storedToken}`
     }
     try {
       const currentUser = await AuthService.getCurrentUser()
@@ -86,8 +117,6 @@ export const useAuthStore = defineStore('auth', () => {
         token.value = 'session-based'
       }
     } catch {
-      // If we have a stored token but /me/ fails, clear auth
-      // If no stored token, user simply isn't logged in — that's fine
       if (token.value) {
         logout()
       }

@@ -8,6 +8,7 @@ vi.mock('../services/adminService', () => ({
     getStats: vi.fn(),
     getFeatureFlags: vi.fn(),
     updateFeatureFlag: vi.fn(),
+    toggleFeatureFlag: vi.fn(),
   },
 }))
 
