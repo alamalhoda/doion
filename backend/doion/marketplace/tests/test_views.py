@@ -225,3 +225,24 @@ class TestMarketplaceListingsEndpoint:
         results = response2.data["results"] if "results" in response2.data else response2.data
         ids = [item["id"] for item in results]
         assert published_listing_low_risk.id not in ids
+
+
+@pytest.mark.django_db
+class TestMarketplaceLatestListingsEndpoint:
+    def test_latest_is_public_and_returns_only_published(
+        self,
+        published_listing_low_risk,
+        published_listing_high_risk,
+        pending_listing,
+    ):
+        client = APIClient()
+
+        response = client.get("/api/v1/marketplace/listings/latest/")
+
+        assert response.status_code == 200
+        assert isinstance(response.data, list)
+        assert len(response.data) <= 4
+        ids = [item["id"] for item in response.data]
+        assert published_listing_low_risk.id in ids
+        assert published_listing_high_risk.id in ids
+        assert pending_listing.id not in ids

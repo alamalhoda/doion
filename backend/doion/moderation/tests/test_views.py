@@ -212,3 +212,71 @@ class TestModerationDecisionEndpoint:
         )
 
         assert response.status_code == 400
+
+
+@pytest.fixture
+def rejected_listing(db, check_holder, issuer):
+    return ChequeListingFactory.create(
+        rejected=True,
+        owner=check_holder,
+        issuer=issuer,
+        bank_name="بانک ملت",
+        cheque_serial_number="7777666655554444",
+        face_amount=250000000,
+        due_date="2026-12-31",
+        issuer_type="legal",
+        issuer_name="شرکت نمونه",
+        issuer_national_id="1234567890",
+        resubmit_count=1,
+    )
+
+
+@pytest.mark.django_db
+class TestModerationResubmitEndpoint:
+    def test_resubmit_rejected_listing_moves_to_pending(self, check_holder, rejected_listing):
+        client = APIClient()
+        client.force_authenticate(user=check_holder)
+
+        response = client.post(f"/api/v1/moderation/{rejected_listing.id}/resubmit/")
+
+        assert response.status_code == 200
+        rejected_listing.refresh_from_db()
+        assert rejected_listing.status == ChequeListing.Status.PENDING_MODERATION
+
+    def test_resubmit_non_rejected_listing_returns_400(self, check_holder, pending_listing):
+        client = APIClient()
+        client.force_authenticate(user=check_holder)
+
+        response = client.post(f"/api/v1/moderation/{pending_listing.id}/resubmit/")
+
+        assert response.status_code == 400
+        assert response.data["error"]["code"] == "VALIDATION_ERROR"
+
+    def test_resubmit_at_limit_returns_mod_306(self, check_holder, rejected_listing):
+        rejected_listing.resubmit_count = 3
+        rejected_listing.save(update_fields=["resubmit_count"])
+
+        client = APIClient()
+        client.force_authenticate(user=check_holder)
+
+        response = client.post(f"/api/v1/moderation/{rejected_listing.id}/resubmit/")
+
+        assert response.status_code == 400
+        assert response.data["error"]["code"] == "MOD_306"
+
+    def test_resubmit_requires_authentication(self, rejected_listing):
+        client = APIClient()
+
+        response = client.post(f"/api/v1/moderation/{rejected_listing.id}/resubmit/")
+
+        assert response.status_code == 401
+
+    def test_resubmit_by_non_owner_returns_403(self, rejected_listing):
+        other_user = UserFactory.create()
+        client = APIClient()
+        client.force_authenticate(user=other_user)
+
+        response = client.post(f"/api/v1/moderation/{rejected_listing.id}/resubmit/")
+
+        assert response.status_code == 403
+        assert response.data["error"]["code"] == "PERMISSION_ERROR"

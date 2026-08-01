@@ -79,6 +79,12 @@ python manage.py runserver
 uv run pytest
 ```
 
+### اجرای تست‌ها با coverage
+```bash
+uv run pytest --cov=doion --cov-report=term-missing --cov-report=html
+```
+خروجی HTML در `htmlcov/index.html` ساخته می‌شود.
+
 ### چک کردن نوع‌ها (Type Checking)
 ```bash
 uv run mypy doion
