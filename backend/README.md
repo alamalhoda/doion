@@ -46,14 +46,23 @@ source .venv/bin/activate
 uv sync
 ```
 
-### ۳. اعمال Migrationها و ایجاد کاربر ادمین
+### ۳. متغیرهای محیطی (لوکال)
+
+```bash
+cp .env.example .env
+# در صورت نیاز مقادیر را ویرایش کنید
+```
+
+`config/settings/base.py` در صورت وجود، `backend/.env` را بارگذاری می‌کند. متغیرهای سیستم / پنل چابکان همیشه اولویت دارند. روی چابکان فایل `.env` آپلود نکنید؛ همان کلیدها را در پنل سرویس تنظیم کنید.
+
+### ۴. اعمال Migrationها و ایجاد کاربر ادمین
 
 ```bash
 python manage.py migrate
 python manage.py createsuperuser
 ```
 
-### ۴. اجرای سرور
+### ۵. اجرای سرور
 
 ```bash
 python manage.py runserver
@@ -163,13 +172,15 @@ backend/                            ← ریشه بک‌اند (Django)
 │           ├── user_detail.html
 │           └── user_form.html
 │
-├── .env                            ← متغیرهای محیطی
+├── .env                            ← متغیرهای لوکال (gitignored؛ از .env.example کپی شود)
+├── .env.example                    ← نمونه کلیدهای محیطی (لوکال + مثال چابکان)
 ├── .editorconfig                   ← تنظیمات ویرایشگر
 ├── .gitignore                      ← فایل‌های نادیده‌گرفته‌شده توسط Git
 ├── .gitattributes                  ← ویژگی‌های Git
 ├── manage.py                       ← اسکریپت مدیریت Django
 ├── pyproject.toml                  ← مدیریت وابستگی‌ها و تنظیمات ابزارها
 ├── uv.lock                         ← قفل وابستگی‌های uv
+├── requirements.txt                ← وابستگی‌های pip برای استقرار (مثلاً چابکان)
 └── README.md                       ← همین فایل 📄
 ```
 

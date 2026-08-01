@@ -12,6 +12,19 @@ from .base import env
 SECRET_KEY = env("DJANGO_SECRET_KEY")
 # https://docs.djangoproject.com/en/dev/ref/settings/#allowed-hosts
 ALLOWED_HOSTS = env.list("DJANGO_ALLOWED_HOSTS", default=["doion.ir"])
+# https://docs.djangoproject.com/en/dev/ref/settings/#csrf-trusted-origins
+CSRF_TRUSTED_ORIGINS = env.list(
+    "DJANGO_CSRF_TRUSTED_ORIGINS",
+    default=["https://doion.ir"],
+)
+
+# CORS (frontend SPA origins; override via env for Chabokan / staging)
+# ------------------------------------------------------------------------------
+CORS_ALLOWED_ORIGINS = env.list(
+    "CORS_ALLOWED_ORIGINS",
+    default=["https://chequeyar-front.chbkn.dev"],
+)
+CORS_ALLOW_CREDENTIALS = True
 
 # DATABASES
 # ------------------------------------------------------------------------------

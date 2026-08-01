@@ -11,10 +11,11 @@ BASE_DIR = Path(__file__).resolve(strict=True).parent.parent.parent
 APPS_DIR = BASE_DIR / "doion"
 env = environ.Env()
 
-READ_DOT_ENV_FILE = env.bool("DJANGO_READ_DOT_ENV_FILE", default=False)
-if READ_DOT_ENV_FILE:
-    # OS environment variables take precedence over variables from .env
-    env.read_env(str(BASE_DIR / ".env"))
+# Load backend/.env when present (local development).
+# Process/OS env always wins (e.g. Chabokan panel) — do not deploy .env to servers.
+_ENV_FILE = BASE_DIR / ".env"
+if _ENV_FILE.is_file():
+    env.read_env(str(_ENV_FILE))
 
 # GENERAL
 # ------------------------------------------------------------------------------

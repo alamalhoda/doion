@@ -13,7 +13,10 @@ alwaysApply: false
 * settings: `base.py`، `local.py`، `production.py`
 * استفاده از `django-environ` یا `os.environ`
 * هیچ secret در git commit نشود
-* `.env.example` برای نمونه متغیرهای محیطی
+* `.env.example` برای نمونه متغیرهای محیطی (commit شود)
+* لوکال: `backend/.env` از روی `.env.example` (gitignored)؛ `base.py` در صورت وجود فایل آن را می‌خواند
+* چابکان/production: همان کلیدها در پنل سرویس؛ فایل `.env` روی سرور آپلود نشود
+* اولویت: متغیرهای OS/پنل همیشه بر مقادیر `.env` می‌چربند
 
 ## نمونه
 
