@@ -1,58 +1,54 @@
-from datetime import timedelta
-
 import pytest
-from django.utils import timezone
 
-from doion.checks.models import ChequeListing, IssuerProfile
+from doion.checks.factories import ChequeListingFactory
+from doion.checks.factories import IssuerProfileFactory
+from doion.checks.models import ChequeListing
 from doion.matching.constants import Status
 from doion.matching.exceptions import InvalidMatchStatus, MatchNotAllowed
 from doion.matching.models import OffPlatformSettlement
 from doion.matching.services import MatchingService
-from doion.users.tests.factories import UserFactory
+from doion.users.factories import UserFactory
 
 
 @pytest.fixture
 def investor(db):
-    return UserFactory.create(role="investor")
+    return UserFactory.create(as_investor=True)
 
 
 @pytest.fixture
 def check_holder(db):
-    return UserFactory.create(role="check_holder")
+    return UserFactory.create()
 
 
 @pytest.fixture
 def other_check_holder(db):
-    return UserFactory.create(role="check_holder")
+    return UserFactory.create()
 
 
 @pytest.fixture
 def issuer(db):
-    return IssuerProfile.objects.create(
+    return IssuerProfileFactory.create(
         national_or_company_id="1234567890",
         name="Test Issuer",
     )
 
 
 def create_listing(owner, **kwargs):
-    issuer = IssuerProfile.objects.create(
-        national_or_company_id="1234567890",
-        name="Test Issuer",
-    )
     defaults = {
         "owner": owner,
-        "issuer": issuer,
         "bank_name": "Bank Melli",
-        "cheque_serial_number": "1234567890123456",
-        "face_amount": 100000000,
-        "due_date": timezone.now().date() + timedelta(days=30),
         "issuer_type": "legal",
         "issuer_name": "Test Corp",
         "issuer_national_id": "987654321",
         "status": ChequeListing.Status.PUBLISHED,
     }
+    if "issuer" not in kwargs:
+        defaults["issuer"] = IssuerProfileFactory.create(
+            national_or_company_id="1234567890",
+            name="Test Issuer",
+        )
     defaults.update(kwargs)
-    return ChequeListing.objects.create(**defaults)
+    return ChequeListingFactory.create(**defaults)
 
 
 @pytest.mark.django_db
@@ -79,14 +75,14 @@ class TestMatchingServiceCreateMatch:
             MatchingService.create_match(listing.id, investor)
 
     def test_create_match_own_listing(self, issuer):
-        investor_owner = UserFactory.create(role="investor")
+        investor_owner = UserFactory.create(as_investor=True)
         listing = create_listing(owner=investor_owner, issuer=issuer)
 
         with pytest.raises(MatchNotAllowed, match="You cannot match your own listing"):
             MatchingService.create_match(listing.id, investor_owner)
 
     def test_create_match_non_investor(self, check_holder, issuer):
-        not_investor = UserFactory.create(role="check_holder")
+        not_investor = UserFactory.create()
         listing = create_listing(owner=check_holder, issuer=issuer)
 
         with pytest.raises(MatchNotAllowed, match="Only investors can create matches"):
@@ -119,7 +115,7 @@ class TestMatchingServiceAcceptMatch:
         listing = create_listing(owner=check_holder, issuer=issuer)
         match = MatchingService.create_match(listing.id, investor)
 
-        wrong_user = UserFactory.create(role="check_holder")
+        wrong_user = UserFactory.create()
         with pytest.raises(MatchNotAllowed, match="not authorized to accept"):
             MatchingService.accept_match(match.id, wrong_user)
 
@@ -148,7 +144,7 @@ class TestMatchingServiceDeclineMatch:
         listing = create_listing(owner=check_holder, issuer=issuer)
         match = MatchingService.create_match(listing.id, investor)
 
-        wrong_user = UserFactory.create(role="check_holder")
+        wrong_user = UserFactory.create()
         with pytest.raises(MatchNotAllowed, match="not authorized to decline"):
             MatchingService.decline_match(match.id, wrong_user)
 
@@ -175,7 +171,7 @@ class TestMatchingServiceCancelMatch:
         listing = create_listing(owner=check_holder, issuer=issuer)
         match = MatchingService.create_match(listing.id, investor)
 
-        third_party = UserFactory.create(role="check_holder")
+        third_party = UserFactory.create()
         with pytest.raises(MatchNotAllowed, match="not a party"):
             MatchingService.cancel_match(match.id, third_party)
 
@@ -226,6 +222,6 @@ class TestMatchingServiceConfirmOffPlatform:
         match = MatchingService.create_match(listing.id, investor)
         accepted = MatchingService.accept_match(match.id, check_holder)
 
-        wrong_user = UserFactory.create(role="check_holder")
+        wrong_user = UserFactory.create()
         with pytest.raises(MatchNotAllowed, match="Only the check holder"):
             MatchingService.confirm_off_platform(accepted.id, wrong_user)

@@ -112,6 +112,13 @@
 - [x] Tests: `test_models.py`, `test_views.py`, `test_celery.py` (expire_listings → EXPIRED), `test_audit.py`
 - [x] API contract consolidated into `docs/development/MASTER_API_CONTRACT.md` (SSOT); `API_CONTRACT_REGISTRY.md` deprecated stub
 
+## Domain factories (prep for demo seed + broader tests)
+
+- [x] App-level factories (outside `tests/`) for User, IssuerProfile, ChequeListing, Profile, Verification, Notification, Match, ModerationDecision
+- [x] Refactor existing tests to use shared factories (DRY/SSOT)
+- [ ] `seed_demo` management command using the same factories
+- [ ] Optional separate demo SQLite DB (`db.demo.sqlite3`)
+
 ### Phase 8 — Remaining (requires shell, blocked in this environment)
 - [ ] `python manage.py makemigrations` + `migrate` (generates compliance 0001 and the pending integrations/moderation/notifications migrations)
 - [ ] `pip install celery structlog` (deps already declared in pyproject.toml)

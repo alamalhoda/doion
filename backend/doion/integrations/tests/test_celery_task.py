@@ -1,20 +1,20 @@
 import pytest
-from datetime import date
 
+from doion.checks.factories import ChequeListingFactory
+from doion.checks.factories import IssuerProfileFactory
 from doion.checks.models import ChequeListing
-from doion.checks.models import IssuerProfile
 from doion.integrations.tasks import expire_listings
-from doion.users.tests.factories import UserFactory
+from doion.users.factories import UserFactory
 
 
 @pytest.fixture
 def check_holder(db):
-    return UserFactory.create(role="check_holder")
+    return UserFactory.create()
 
 
 @pytest.fixture
 def issuer(db):
-    return IssuerProfile.objects.create(
+    return IssuerProfileFactory.create(
         national_or_company_id="1234567890",
         name="Test Issuer",
         credit_score=750,
@@ -24,32 +24,30 @@ def issuer(db):
 @pytest.mark.django_db
 class TestExpireListingsTask:
     def test_expire_listings_changes_status(self, check_holder, issuer):
-        # Create expired listing
-        expired_listing = ChequeListing.objects.create(
+        expired_listing = ChequeListingFactory.create(
+            published=True,
             owner=check_holder,
             issuer=issuer,
             bank_name="بانک ملت",
             cheque_serial_number="1111111111111111",
             face_amount=500000000,
-            due_date="2020-01-01",  # Past date
+            due_date="2020-01-01",
             issuer_type="legal",
             issuer_name="Test Issuer",
             issuer_national_id="1234567890",
-            status=ChequeListing.Status.PUBLISHED,
         )
 
-        # Create non-expired listing
-        ChequeListing.objects.create(
+        ChequeListingFactory.create(
+            published=True,
             owner=check_holder,
             issuer=issuer,
             bank_name="بانک ملت",
             cheque_serial_number="2222222222222222",
             face_amount=300000000,
-            due_date="2026-12-31",  # Future date
+            due_date="2026-12-31",
             issuer_type="natural",
             issuer_name="Natural Issuer",
             issuer_national_id="0987654321",
-            status=ChequeListing.Status.PUBLISHED,
         )
 
         result = expire_listings()
@@ -59,18 +57,17 @@ class TestExpireListingsTask:
         assert expired_listing.status == ChequeListing.Status.EXPIRED
 
     def test_expire_listings_only_published(self, check_holder, issuer):
-        # Create matched listing (should not be expired by this task)
-        ChequeListing.objects.create(
+        ChequeListingFactory.create(
+            matched=True,
             owner=check_holder,
             issuer=issuer,
             bank_name="بانک ملت",
             cheque_serial_number="3333333333333333",
             face_amount=200000000,
-            due_date="2020-01-01",  # Past date
+            due_date="2020-01-01",
             issuer_type="legal",
             issuer_name="Test Issuer",
             issuer_national_id="1234567890",
-            status=ChequeListing.Status.MATCHED,
         )
 
         result = expire_listings()

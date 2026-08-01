@@ -3,9 +3,9 @@ from rest_framework.test import APIClient
 
 from doion.notifications.constants import NotificationStatus
 from doion.notifications.constants import NotificationType
+from doion.notifications.factories import NotificationFactory
 from doion.notifications.models import Notification
-from doion.notifications.models import NotificationPreference
-from doion.users.tests.factories import UserFactory
+from doion.users.factories import UserFactory
 
 
 @pytest.fixture
@@ -15,7 +15,7 @@ def user(db):
 
 @pytest.fixture
 def notification(user):
-    return Notification.objects.create(
+    return NotificationFactory.create(
         user=user,
         type=NotificationType.MATCH_CREATED,
         channel="in_app",
@@ -40,7 +40,7 @@ class TestNotificationListEndpoint:
         assert len(results) >= 1
 
     def test_list_filter_by_type(self, user):
-        Notification.objects.create(
+        NotificationFactory.create(
             user=user,
             type=NotificationType.MATCH_CREATED,
             channel="in_app",
@@ -48,7 +48,7 @@ class TestNotificationListEndpoint:
             title="Match Created",
             message="Message 1",
         )
-        Notification.objects.create(
+        NotificationFactory.create(
             user=user,
             type=NotificationType.LISTING_PUBLISHED,
             channel="in_app",
@@ -67,7 +67,7 @@ class TestNotificationListEndpoint:
         assert all(r["type"] == "match_created" for r in results)
 
     def test_list_filter_by_is_read(self, user):
-        Notification.objects.create(
+        NotificationFactory.create(
             user=user,
             type=NotificationType.MATCH_CREATED,
             channel="in_app",
@@ -75,7 +75,7 @@ class TestNotificationListEndpoint:
             title="Read Notif",
             message="Read message",
         )
-        Notification.objects.create(
+        NotificationFactory.create(
             user=user,
             type=NotificationType.MATCH_CREATED,
             channel="in_app",
@@ -118,7 +118,7 @@ class TestNotificationMarkReadEndpoint:
 
     def test_mark_read_other_user_notification_forbidden(self, user):
         other_user = UserFactory.create()
-        notification = Notification.objects.create(
+        notification = NotificationFactory.create(
             user=other_user,
             type=NotificationType.MATCH_CREATED,
             channel="in_app",
@@ -141,7 +141,7 @@ class TestNotificationMarkReadEndpoint:
 @pytest.mark.django_db
 class TestNotificationMarkAllReadEndpoint:
     def test_mark_all_read(self, user):
-        Notification.objects.create(
+        NotificationFactory.create(
             user=user,
             type=NotificationType.MATCH_CREATED,
             channel="in_app",
@@ -149,7 +149,7 @@ class TestNotificationMarkAllReadEndpoint:
             title="Notif 1",
             message="Message 1",
         )
-        Notification.objects.create(
+        NotificationFactory.create(
             user=user,
             type=NotificationType.LISTING_PUBLISHED,
             channel="in_app",
@@ -157,7 +157,7 @@ class TestNotificationMarkAllReadEndpoint:
             title="Notif 2",
             message="Message 2",
         )
-        Notification.objects.create(
+        NotificationFactory.create(
             user=user,
             type=NotificationType.MATCH_ACCEPTED,
             channel="in_app",

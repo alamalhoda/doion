@@ -1,13 +1,12 @@
-from datetime import timedelta
-
 import pytest
-from django.utils import timezone
 from rest_framework.test import APIClient
 
-from doion.checks.models import ChequeListing, IssuerProfile
+from doion.checks.factories import ChequeListingFactory
+from doion.checks.factories import IssuerProfileFactory
+from doion.checks.models import ChequeListing
 from doion.matching.constants import Status
 from doion.matching.services import MatchingService
-from doion.users.tests.factories import UserFactory
+from doion.users.factories import UserFactory
 
 
 @pytest.fixture
@@ -17,41 +16,38 @@ def api_client():
 
 @pytest.fixture
 def investor(db):
-    return UserFactory.create(role="investor")
+    return UserFactory.create(as_investor=True)
 
 
 @pytest.fixture
 def check_holder(db):
-    return UserFactory.create(role="check_holder")
+    return UserFactory.create()
 
 
 @pytest.fixture
 def issuer(db):
-    return IssuerProfile.objects.create(
+    return IssuerProfileFactory.create(
         national_or_company_id="1234567890",
         name="Test Issuer",
     )
 
 
 def create_listing(owner, **kwargs):
-    issuer = IssuerProfile.objects.create(
-        national_or_company_id="1234567890",
-        name="Test Issuer",
-    )
     defaults = {
         "owner": owner,
-        "issuer": issuer,
         "bank_name": "Bank Melli",
-        "cheque_serial_number": "1234567890123456",
-        "face_amount": 100000000,
-        "due_date": timezone.now().date() + timedelta(days=30),
         "issuer_type": "legal",
         "issuer_name": "Test Corp",
         "issuer_national_id": "987654321",
         "status": ChequeListing.Status.PUBLISHED,
     }
+    if "issuer" not in kwargs:
+        defaults["issuer"] = IssuerProfileFactory.create(
+            national_or_company_id="1234567890",
+            name="Test Issuer",
+        )
     defaults.update(kwargs)
-    return ChequeListing.objects.create(**defaults)
+    return ChequeListingFactory.create(**defaults)
 
 
 @pytest.mark.django_db
@@ -106,7 +102,7 @@ class TestMatchViewSet:
         assert match.id in ids
 
         # third party should not see the match
-        third_party = UserFactory.create(role="check_holder")
+        third_party = UserFactory.create()
         api_client.force_authenticate(user=third_party)
         response = api_client.get("/api/v1/matches/")
         assert response.status_code == 200
@@ -159,7 +155,7 @@ class TestMatchViewSet:
         match = MatchingService.create_match(listing.id, investor)
 
         # third party tries to cancel -> 404 (filtered out by get_queryset)
-        third_party = UserFactory.create(role="check_holder")
+        third_party = UserFactory.create()
         api_client.force_authenticate(user=third_party)
         response = api_client.post(f"/api/v1/matches/{match.id}/cancel/")
         assert response.status_code == 404

@@ -2,20 +2,22 @@ from datetime import date, timedelta
 
 import pytest
 
+from doion.checks.factories import ChequeListingFactory
+from doion.checks.factories import IssuerProfileFactory
 from doion.checks.models import ChequeListing
-from doion.checks.models import IssuerProfile
 from doion.compliance.models import AuditEvent
 from doion.moderation.signals import ChequeListingPublished
-from doion.users.tests.factories import UserFactory
+from doion.users.factories import UserFactory
 
 
 @pytest.mark.django_db
 def test_listing_published_signal_creates_audit_event():
     owner = UserFactory.create()
-    issuer = IssuerProfile.objects.create(
+    issuer = IssuerProfileFactory.create(
         national_or_company_id="1234567890", name="Test Issuer"
     )
-    listing = ChequeListing.objects.create(
+    listing = ChequeListingFactory.create(
+        published=True,
         owner=owner,
         issuer=issuer,
         bank_name="Test Bank",
@@ -25,9 +27,8 @@ def test_listing_published_signal_creates_audit_event():
         issuer_type="legal",
         issuer_name="Test Issuer",
         issuer_national_id="1234567890",
-        status=ChequeListing.Status.PUBLISHED,
     )
-    moderator = UserFactory.create(role="moderator")
+    moderator = UserFactory.create(as_moderator=True)
 
     ChequeListingPublished.send(sender=None, listing=listing, moderator=moderator)
 

@@ -2,24 +2,24 @@ import pytest
 from rest_framework.test import APIClient
 
 from doion.compliance.models import FeatureFlag
-from doion.users.tests.factories import UserFactory
+from doion.users.factories import UserFactory
 
 BASE = "/api/v1/compliance"
 
 
 @pytest.fixture
 def moderator(db):
-    return UserFactory.create(role="moderator")
+    return UserFactory.create(as_moderator=True)
 
 
 @pytest.fixture
 def admin(db):
-    return UserFactory.create(role="admin")
+    return UserFactory.create(as_admin=True)
 
 
 @pytest.fixture
 def normal_user(db):
-    return UserFactory.create(role="investor")
+    return UserFactory.create(as_investor=True)
 
 
 @pytest.mark.django_db

@@ -1,24 +1,25 @@
 import pytest
 from rest_framework.test import APIClient
 
+from doion.checks.factories import ChequeListingFactory
+from doion.checks.factories import IssuerProfileFactory
 from doion.checks.models import ChequeListing
-from doion.checks.models import IssuerProfile
-from doion.users.tests.factories import UserFactory
+from doion.users.factories import UserFactory
 
 
 @pytest.fixture
 def moderator(db):
-    return UserFactory.create(role="moderator")
+    return UserFactory.create(as_moderator=True)
 
 
 @pytest.fixture
 def check_holder(db):
-    return UserFactory.create(role="check_holder")
+    return UserFactory.create()
 
 
 @pytest.fixture
 def issuer(db):
-    return IssuerProfile.objects.create(
+    return IssuerProfileFactory.create(
         national_or_company_id="1234567890",
         name="Test Issuer",
     )
@@ -26,7 +27,8 @@ def issuer(db):
 
 @pytest.fixture
 def pending_listing(db, check_holder, issuer):
-    return ChequeListing.objects.create(
+    return ChequeListingFactory.create(
+        pending=True,
         owner=check_holder,
         issuer=issuer,
         bank_name="بانک ملت",
@@ -36,13 +38,13 @@ def pending_listing(db, check_holder, issuer):
         issuer_type="legal",
         issuer_name="شرکت فناوری نوین",
         issuer_national_id="1234567890",
-        status=ChequeListing.Status.PENDING_MODERATION,
     )
 
 
 @pytest.fixture
 def published_listing(db, check_holder, issuer):
-    return ChequeListing.objects.create(
+    return ChequeListingFactory.create(
+        published=True,
         owner=check_holder,
         issuer=issuer,
         bank_name="بانک ملت",
@@ -52,7 +54,6 @@ def published_listing(db, check_holder, issuer):
         issuer_type="natural",
         issuer_name="رضا کریمی",
         issuer_national_id="0012345678",
-        status=ChequeListing.Status.PUBLISHED,
     )
 
 

@@ -4,7 +4,7 @@ from typing import TYPE_CHECKING
 
 import pytest
 
-from doion.users.tests.factories import UserFactory
+from doion.users.factories import UserFactory
 
 if TYPE_CHECKING:
     from doion.users.models import User
