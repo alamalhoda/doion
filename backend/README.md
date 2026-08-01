@@ -94,6 +94,29 @@ uv run python manage.py runserver
 python manage.py createsuperuser
 ```
 
+### Factories (تست و دمو)
+
+Factoryهای دامنه در ماژول‌های اپ (خارج از `tests/`) هستند تا هم تست و هم دستورات management مثل seed دمو بتوانند از همان SSOT استفاده کنند:
+
+| ماژول | Factoryها |
+|-------|-----------|
+| `doion.users.factories` | `UserFactory` (+ traits: `as_investor`, `as_moderator`, `as_admin`) |
+| `doion.checks.factories` | `IssuerProfileFactory`, `ChequeListingFactory` |
+| `doion.identity.factories` | `ProfileFactory`, `VerificationFactory` |
+| `doion.notifications.factories` | `NotificationFactory`, `NotificationPreferenceFactory` |
+| `doion.matching.factories` | `MatchFactory` |
+| `doion.moderation.factories` | `ModerationDecisionFactory` |
+
+نمونه:
+```python
+from doion.checks.factories import ChequeListingFactory
+from doion.users.factories import UserFactory
+
+holder = UserFactory.create()
+investor = UserFactory.create(as_investor=True)
+listing = ChequeListingFactory.create(published=True, owner=holder)
+```
+
 ---
 
 ## ساختار پروژه

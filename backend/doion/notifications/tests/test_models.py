@@ -1,15 +1,15 @@
 import pytest
 
 from doion.notifications.constants import NotificationChannel, NotificationStatus, NotificationType
-from doion.notifications.models import Notification
-from doion.users.tests.factories import UserFactory
+from doion.notifications.factories import NotificationFactory
+from doion.users.factories import UserFactory
 
 
 @pytest.mark.django_db
 class TestNotificationModel:
     def test_create_notification(self):
         user = UserFactory.create()
-        notification = Notification.objects.create(
+        notification = NotificationFactory.create(
             user=user,
             type=NotificationType.MATCH_CREATED,
             channel=NotificationChannel.IN_APP,
@@ -28,7 +28,7 @@ class TestNotificationModel:
 
     def test_notification_default_status(self):
         user = UserFactory.create()
-        notification = Notification.objects.create(
+        notification = NotificationFactory.create(
             user=user,
             type=NotificationType.LISTING_PUBLISHED,
             channel=NotificationChannel.IN_APP,
@@ -40,15 +40,14 @@ class TestNotificationModel:
 
     def test_notification_indexes(self):
         user = UserFactory.create()
-        # Create multiple notifications for same user to test indexes
-        Notification.objects.create(
+        NotificationFactory.create(
             user=user,
             type=NotificationType.MATCH_CREATED,
             channel=NotificationChannel.IN_APP,
             title="Notification 1",
             message="Message 1",
         )
-        Notification.objects.create(
+        NotificationFactory.create(
             user=user,
             type=NotificationType.MATCH_ACCEPTED,
             channel=NotificationChannel.IN_APP,
@@ -56,16 +55,17 @@ class TestNotificationModel:
             message="Message 2",
         )
 
-        # Verify notifications are created and queryable
+        from doion.notifications.models import Notification
+
         assert Notification.objects.filter(user=user).count() == 2
 
     def test_notification_with_read_at(self):
         user = UserFactory.create()
-        notification = Notification.objects.create(
+        notification = NotificationFactory.create(
             user=user,
             type=NotificationType.MATCH_ACCEPTED,
             channel=NotificationChannel.IN_APP,
-            status=NotificationStatus.READ,
+            as_read=True,
             title="Read Notification",
             message="This is read",
         )

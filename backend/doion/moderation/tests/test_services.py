@@ -1,10 +1,11 @@
 import pytest
 
+from doion.checks.factories import ChequeListingFactory
 from doion.checks.models import ChequeListing
 from doion.moderation.exceptions import ModerationResubmitLimitExceeded
 from doion.moderation.models import ModerationDecision
 from doion.moderation.services import ModerationService
-from doion.users.tests.factories import UserFactory
+from doion.users.factories import UserFactory
 
 
 @pytest.fixture
@@ -15,25 +16,15 @@ def user(db):
 @pytest.mark.django_db
 class TestModerationServiceApprove:
     def _create_listing(self, user, status=ChequeListing.Status.PENDING_MODERATION):
-        from doion.checks.models import IssuerProfile
-
-        issuer = IssuerProfile.objects.create(
-            national_or_company_id="1234567890",
-            name="Test Issuer",
-        )
-        listing = ChequeListing.objects.create(
+        return ChequeListingFactory.create(
             owner=user,
-            issuer=issuer,
+            status=status,
             bank_name="بانک ملت",
-            cheque_serial_number="1234567890123456",
             face_amount=500000000,
             due_date="2026-12-31",
             issuer_type="legal",
             issuer_name="شرکت فناوری نوین",
-            issuer_national_id="1234567890",
-            status=status,
         )
-        return listing
 
     def test_approve_pending_listing(self, user):
         listing = self._create_listing(user)
@@ -56,26 +47,16 @@ class TestModerationServiceApprove:
 @pytest.mark.django_db
 class TestModerationServiceReject:
     def _create_listing(self, user, status=ChequeListing.Status.PENDING_MODERATION, resubmit_count=0):
-        from doion.checks.models import IssuerProfile
-
-        issuer = IssuerProfile.objects.create(
-            national_or_company_id="1234567890",
-            name="Test Issuer",
-        )
-        listing = ChequeListing.objects.create(
+        return ChequeListingFactory.create(
             owner=user,
-            issuer=issuer,
+            status=status,
+            resubmit_count=resubmit_count,
             bank_name="بانک ملت",
-            cheque_serial_number="1234567890123456",
             face_amount=500000000,
             due_date="2026-12-31",
             issuer_type="legal",
             issuer_name="شرکت فناوری نوین",
-            issuer_national_id="1234567890",
-            status=status,
-            resubmit_count=resubmit_count,
         )
-        return listing
 
     def test_reject_first_time(self, user):
         listing = self._create_listing(user)

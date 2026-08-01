@@ -3,9 +3,10 @@ from django.core.files.uploadedfile import SimpleUploadedFile
 from rest_framework import status
 from rest_framework.test import APIClient
 
-from doion.identity.models import Profile
+from doion.identity.factories import ProfileFactory
+from doion.identity.factories import VerificationFactory
 from doion.identity.models import Verification
-from doion.users.models import User
+from doion.users.factories import UserFactory
 
 
 @pytest.fixture
@@ -15,12 +16,12 @@ def api_client():
 
 @pytest.fixture
 def test_user(db):
-    return User.objects.create_user(username="testuser", password="testpass123", role="check_holder")
+    return UserFactory.create(username="testuser")
 
 
 @pytest.fixture
 def test_user_with_profile(test_user):
-    Profile.objects.get_or_create(user=test_user, defaults={"role": test_user.role})
+    ProfileFactory.create(user=test_user, role=test_user.role)
     return test_user
 
 
@@ -32,13 +33,8 @@ def authenticated_client(api_client, test_user_with_profile):
 
 @pytest.fixture
 def moderator_user(db):
-    user = User.objects.create_user(
-        username="moduser",
-        password="testpass123",
-        role="moderator",
-        is_staff=True,
-    )
-    Profile.objects.get_or_create(user=user, defaults={"role": user.role})
+    user = UserFactory.create(username="moduser", as_moderator=True)
+    ProfileFactory.create(user=user, role=user.role)
     return user
 
 
@@ -66,7 +62,7 @@ class TestVerificationAPI:
         assert Verification.objects.filter(user=test_user_with_profile).exists()
 
     def test_get_my_verification(self, authenticated_client, test_user_with_profile):
-        Verification.objects.create(
+        VerificationFactory.create(
             user=test_user_with_profile,
             full_name="Test",
             national_id="1234567890",
@@ -77,11 +73,10 @@ class TestVerificationAPI:
         assert response.data["status"] == "pending"
 
     def test_moderator_can_see_all_verifications(self, api_client, moderator_user):
-        Profile.objects.get_or_create(user=moderator_user, defaults={"role": moderator_user.role})
-        user1 = User.objects.create_user(username="user1", password="pass", role="check_holder")
-        user2 = User.objects.create_user(username="user2", password="pass", role="investor")
-        Verification.objects.create(user=user1, full_name="User1", national_id="1111111111")
-        Verification.objects.create(user=user2, full_name="User2", national_id="2222222222")
+        user1 = UserFactory.create(username="user1")
+        user2 = UserFactory.create(username="user2", as_investor=True)
+        VerificationFactory.create(user=user1, full_name="User1", national_id="1111111111")
+        VerificationFactory.create(user=user2, full_name="User2", national_id="2222222222")
         api_client.force_authenticate(user=moderator_user)
         url = "/api/v1/verifications/"
         response = api_client.get(url)
@@ -91,17 +86,18 @@ class TestVerificationAPI:
     def test_regular_user_cannot_see_other_verifications(
         self, authenticated_client, test_user_with_profile,
     ):
-        user2 = User.objects.create_user(username="user2", password="pass", role="check_holder")
-        Verification.objects.create(user=user2, full_name="User2", national_id="2222222222")
+        user2 = UserFactory.create(username="user2")
+        VerificationFactory.create(user=user2, full_name="User2", national_id="2222222222")
         url = "/api/v1/verifications/"
         response = authenticated_client.get(url)
         assert response.status_code == status.HTTP_200_OK
         assert len(response.data["results"]) == 0
 
     def test_moderator_can_approve_verification(self, api_client, moderator_user):
-        Profile.objects.get_or_create(user=moderator_user, defaults={"role": moderator_user.role})
-        verification = Verification.objects.create(
-            user=moderator_user,
+        holder = UserFactory.create()
+        ProfileFactory.create(user=holder, role=holder.role)
+        verification = VerificationFactory.create(
+            user=holder,
             full_name="User1",
             national_id="1111111111",
         )
@@ -113,9 +109,10 @@ class TestVerificationAPI:
         assert verification.status == Verification.Status.APPROVED
 
     def test_moderator_can_reject_verification(self, api_client, moderator_user):
-        Profile.objects.get_or_create(user=moderator_user, defaults={"role": moderator_user.role})
-        verification = Verification.objects.create(
-            user=moderator_user,
+        holder = UserFactory.create()
+        ProfileFactory.create(user=holder, role=holder.role)
+        verification = VerificationFactory.create(
+            user=holder,
             full_name="User1",
             national_id="1111111111",
         )

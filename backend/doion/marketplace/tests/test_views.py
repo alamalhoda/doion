@@ -4,19 +4,20 @@ from datetime import timedelta
 import pytest
 from rest_framework.test import APIClient
 
+from doion.checks.factories import ChequeListingFactory
+from doion.checks.factories import IssuerProfileFactory
 from doion.checks.models import ChequeListing
-from doion.checks.models import IssuerProfile
-from doion.users.tests.factories import UserFactory
+from doion.users.factories import UserFactory
 
 
 @pytest.fixture
 def investor(db):
-    return UserFactory.create(role="investor")
+    return UserFactory.create(as_investor=True)
 
 
 @pytest.fixture
 def issuer(db):
-    return IssuerProfile.objects.create(
+    return IssuerProfileFactory.create(
         national_or_company_id="1234567890",
         name="Test Issuer",
     )
@@ -24,7 +25,8 @@ def issuer(db):
 
 @pytest.fixture
 def published_listing_low_risk(db, investor, issuer):
-    return ChequeListing.objects.create(
+    return ChequeListingFactory.create(
+        published=True,
         owner=investor,
         issuer=issuer,
         bank_name="بانک ملت",
@@ -34,7 +36,6 @@ def published_listing_low_risk(db, investor, issuer):
         issuer_type="legal",
         issuer_name="شرکت فناوری نوین",
         issuer_national_id="1234567890",
-        status=ChequeListing.Status.PUBLISHED,
         risk_tier="low",
         suggested_discount_rate=3.5,
     )
@@ -42,7 +43,8 @@ def published_listing_low_risk(db, investor, issuer):
 
 @pytest.fixture
 def published_listing_high_risk(db, investor, issuer):
-    return ChequeListing.objects.create(
+    return ChequeListingFactory.create(
+        published=True,
         owner=investor,
         issuer=issuer,
         bank_name="بانک صادرات",
@@ -52,15 +54,14 @@ def published_listing_high_risk(db, investor, issuer):
         issuer_type="natural",
         issuer_name="رضا کریمی",
         issuer_national_id="0012345678",
-        status=ChequeListing.Status.PUBLISHED,
-        risk_tier="high",
-        suggested_discount_rate=10.0,
+        high_risk=True,
     )
 
 
 @pytest.fixture
 def pending_listing(db, investor, issuer):
-    return ChequeListing.objects.create(
+    return ChequeListingFactory.create(
+        pending=True,
         owner=investor,
         issuer=issuer,
         bank_name="بانک تجارت",
@@ -70,7 +71,6 @@ def pending_listing(db, investor, issuer):
         issuer_type="legal",
         issuer_name="شرکت تجارت گستر",
         issuer_national_id="9876543210",
-        status=ChequeListing.Status.PENDING_MODERATION,
     )
 
 

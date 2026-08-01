@@ -2,26 +2,20 @@ from datetime import date, timedelta
 
 import pytest
 
+from doion.checks.factories import ChequeListingFactory
 from doion.checks.models import ChequeListing
-from doion.checks.models import IssuerProfile
 from doion.integrations.tasks import expire_listings
-from doion.users.tests.factories import UserFactory
+from doion.users.factories import UserFactory
 
 
 def _make_listing(owner, status, due_date):
-    issuer = IssuerProfile.objects.create(
-        national_or_company_id="1234567890", name="Test Issuer"
-    )
-    return ChequeListing.objects.create(
+    return ChequeListingFactory.create(
         owner=owner,
-        issuer=issuer,
         bank_name="Test Bank",
-        cheque_serial_number="SN-0001",
         face_amount=1000000,
         due_date=due_date,
         issuer_type="legal",
         issuer_name="Test Issuer",
-        issuer_national_id="1234567890",
         status=status,
     )
 
