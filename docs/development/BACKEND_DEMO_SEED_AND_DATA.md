@@ -91,9 +91,20 @@ VITE_USE_MOCK=false
 VITE_API_BASE_URL=http://localhost:8000/api/v1
 ```
 
-علاوه بر کاربران دمو، seed معمولاً این‌ها را هم می‌سازد: issuer، آگهی‌های `pending_moderation` / `published` / `rejected`، و یک match در وضعیت `pending`.
+علاوه بر کاربران دمو، `seed_demo` این fixtureهای پایدار را هم می‌سازد (برای دمو دستی و E2E critical-path):
 
-جزئیات فلگ‌ها: [`backend/README.md`](../../backend/README.md) (بخش Seed دمو).
+| نوع | تعداد / شناسه پایدار | کاربرد |
+|-----|----------------------|--------|
+| آگهی `published` | ۲۲ عدد با سریال `2000…0001` … `2000…0022` | pagination مارکت‌پلیس (`PAGE_SIZE=20` → صفحه ۲) |
+| آگهی `pending_moderation` | ۱۲ عدد با سریال `3000…0001` … `3000…0012` | صف نظارت + pagination جدول UI (`pageSize=10`) |
+| آگهی `rejected` | ۱ عدد سریال `4000…0001` | وضعیت ردشده |
+| Match `pending` | روی سریال `2000…0001` (`investor1` → `holder1`) | E2E accept-match |
+| Express target | سریال `2000…0022` بدون match از `investor1` | E2E express-interest |
+| Notification (holder1) | ۱۲ ردیف unread (`status=sent`) | E2E mark-read + pagination نوتیف |
+
+نکته: `created_at` آگهی‌های seed به ۲ روز قبل backdate می‌شود تا سقف ۱۰ آگهی/روز برای تست create باقی بماند.
+
+جزئیات فلگ‌ها: [`backend/README.md`](../../backend/README.md) (بخش Seed دمو). E2E: [`E2E_LOCAL_RUNBOOK.md`](./E2E_LOCAL_RUNBOOK.md).
 
 ---
 

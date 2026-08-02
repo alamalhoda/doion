@@ -135,7 +135,8 @@
 
 ### Cross-cutting (خارج از این مونورپو یا موج جدا)
 - [x] E2E smoke harness در `e2e/` (Playwright) با `VITE_USE_MOCK=false` + `seed_demo` / demo DB — see [`docs/development/E2E_LOCAL_RUNBOOK.md`](../docs/development/E2E_LOCAL_RUNBOOK.md)
-- [ ] E2E critical path (express interest / accept / moderation decision) + CI Playwright
+- [x] E2E critical-path specs + rich `seed_demo` (express interest / accept / moderation approve / create listing / notifications mark-read) — runbook + [`AI_STUDIO_E2E_CRITICAL_PATH_PROMPT.md`](../docs/development/AI_STUDIO_E2E_CRITICAL_PATH_PROMPT.md); needs Studio testids then `npm run test:critical`
+- [ ] CI Playwright (smoke + critical)
 - [ ] ادامه تست‌های UI در `checkyar-googleai` (store/API-client با mock کنترل‌شده) فقط از طریق AI Studio — selector prep: [`docs/development/AI_STUDIO_E2E_PREP_PROMPT.md`](../docs/development/AI_STUDIO_E2E_PREP_PROMPT.md)
 
 ### Phase 8 — Remaining (requires shell, blocked in this environment)

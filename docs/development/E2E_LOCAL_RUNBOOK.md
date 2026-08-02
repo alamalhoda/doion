@@ -1,16 +1,16 @@
 # E2E Local Runbook
 
 **As of:** 2026-08-02  
-**Scope:** Playwright smoke harness in this monorepo (`e2e/`) against the active UI (`checkyar-googleai`) and `doion` backend.
+**Scope:** Playwright harness in this monorepo (`e2e/`) against the active UI (`checkyar-googleai`) and `doion` backend — smoke + critical-path.
 
 ## Ownership
 
 | Piece | Location | Who changes it |
 |-------|----------|----------------|
-| E2E harness (Playwright, scripts, smoke specs) | `doion/e2e/` | This monorepo (GitFlow) |
+| E2E harness (Playwright, scripts, smoke/critical specs) | `doion/e2e/` | This monorepo (GitFlow) |
 | Backend + `seed_demo` | `doion/backend/` | This monorepo |
 | Active UI source | External `checkyar-googleai` | **Only via Google AI Studio → GitHub**; local = `git pull` only |
-| Stable selectors (`data-testid`) | UI | Paste prompt from [`AI_STUDIO_E2E_PREP_PROMPT.md`](./AI_STUDIO_E2E_PREP_PROMPT.md) into AI Studio |
+| Stable selectors (`data-testid`) | UI | Smoke: [`AI_STUDIO_E2E_PREP_PROMPT.md`](./AI_STUDIO_E2E_PREP_PROMPT.md); critical: [`AI_STUDIO_E2E_CRITICAL_PATH_PROMPT.md`](./AI_STUDIO_E2E_CRITICAL_PATH_PROMPT.md) |
 
 Do **not** commit UI source from the local `checkyar-googleai` clone.
 
@@ -41,7 +41,7 @@ From repo root:
 ./e2e/scripts/prepare-backend.sh
 ```
 
-This sets `DJANGO_DEMO_DATABASE=1`, migrates `backend/db.demo.sqlite3`, and runs `seed_demo --reset`.
+This sets `DJANGO_DEMO_DATABASE=1`, migrates `backend/db.demo.sqlite3`, and runs `seed_demo --reset` (rich fixtures: 22 published, 12 pending, 12 holder notifications — see [`BACKEND_DEMO_SEED_AND_DATA.md`](./BACKEND_DEMO_SEED_AND_DATA.md)).
 
 ### 2) Start backend (demo DB)
 
@@ -79,7 +79,21 @@ npm install
 npm run test:smoke
 ```
 
+### 5) Run critical-path
+
+Prefer after AI Studio applies [`AI_STUDIO_E2E_CRITICAL_PATH_PROMPT.md`](./AI_STUDIO_E2E_CRITICAL_PATH_PROMPT.md) (testid-first; Persian fallbacks still present):
+
+```bash
+cd e2e
+export DEMO_SEED_PASSWORD='password123'
+./scripts/run-critical.sh
+# or: npm run test:critical
+```
+
+Critical specs mutate demo data. Re-run `./e2e/scripts/prepare-backend.sh` (and restart backend if needed) between full critical suite runs.
+
 On newer CI hosts you may set `PLAYWRIGHT_CHANNEL=chromium` after `npx playwright install chromium`.
+
 ## Smoke coverage (current)
 
 | Spec | User | Assert |
@@ -93,6 +107,18 @@ On newer CI hosts you may set `PLAYWRIGHT_CHANNEL=chromium` after `npx playwrigh
 | `listings-my-holder.spec.ts` | `holder1` | `/listings/my` table without crash |
 | `login-failed.spec.ts` | `holder1` + bad password | stays on `/login` + error message |
 
+## Critical-path coverage
+
+| Spec | User | Assert |
+|------|------|--------|
+| `express-interest.spec.ts` | `investor1` | marketplace pagination active; express interest on serial `2000…0022` → sent match card |
+| `accept-match.spec.ts` | `holder1` | accept seeded pending match on `2000…0001` → accepted |
+| `moderation-approve.spec.ts` | `moderator1` | approve pending `3000…0001` via review page → holder sees published |
+| `create-listing.spec.ts` | `holder1` | fill sample in flat mode; Live create via API with `issuer` (UI gap noted in Studio prompt) → my listings pending |
+| `notifications-mark-read.spec.ts` | `holder1` | pagination + mark one unread as read |
+
+Stable serials / counts: `e2e/support/constants.ts` (`SEED`) and `seed_demo`.
+
 Selectors prefer `data-testid` when present; fallbacks use Persian labels/placeholders.
 
 `e2e/support/auth.ts` still seeds a guest localStorage user without tokens before login so `/login` is reachable even if older UI builds re-seed mock auth.
@@ -103,7 +129,7 @@ Same as `seed_demo`: `holder1`, `investor1`, `moderator1`, `admin1` — password
 
 ## Out of scope (follow-ups)
 
-- Critical-path flows (express interest, accept/reject, moderation decision)
+- Decline match / moderation reject / full KYC submit→approve
 - admin feature-flags smoke
 - CI job for Playwright
 - Visual regression
@@ -112,4 +138,5 @@ Same as `seed_demo`: `holder1`, `investor1`, `moderator1`, `admin1` — password
 
 - Demo / seed SSOT: [`BACKEND_DEMO_SEED_AND_DATA.md`](./BACKEND_DEMO_SEED_AND_DATA.md)
 - UI policy: [`FRONTEND_DEVELOPMENT_STATUS.md`](./FRONTEND_DEVELOPMENT_STATUS.md)
-- AI Studio prep prompt: [`AI_STUDIO_E2E_PREP_PROMPT.md`](./AI_STUDIO_E2E_PREP_PROMPT.md)
+- AI Studio smoke prep: [`AI_STUDIO_E2E_PREP_PROMPT.md`](./AI_STUDIO_E2E_PREP_PROMPT.md)
+- AI Studio critical-path prep: [`AI_STUDIO_E2E_CRITICAL_PATH_PROMPT.md`](./AI_STUDIO_E2E_CRITICAL_PATH_PROMPT.md)
