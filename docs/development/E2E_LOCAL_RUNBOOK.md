@@ -87,20 +87,24 @@ On newer CI hosts you may set `PLAYWRIGHT_CHANNEL=chromium` after `npx playwrigh
 | `login-holder.spec.ts` | `holder1` | lands on `/marketplace` |
 | `login-investor-marketplace.spec.ts` | `investor1` | marketplace + at least one listing |
 | `login-moderator.spec.ts` | `moderator1` | lands on `/moderation` |
+| `matches-holder.spec.ts` | `holder1` | `/matches` + at least one `match-card` |
+| `matches-investor.spec.ts` | `investor1` | `/matches` sent tab + at least one `match-card` |
+| `moderation-queue.spec.ts` | `moderator1` | `/moderation` without pagination/filter errors |
+| `listings-my-holder.spec.ts` | `holder1` | `/listings/my` table without crash |
+| `login-failed.spec.ts` | `holder1` + bad password | stays on `/login` + error message |
 
-Selectors prefer `data-testid` (after Studio prompt); fallbacks use current Persian labels/placeholders.
+Selectors prefer `data-testid` when present; fallbacks use Persian labels/placeholders.
 
-Until AI Studio applies prompt item **0** (`loadSavedUser` must not invent mock tokens when Live API is on), the harness uses a temporary guest localStorage seed in `e2e/support/auth.ts` so `/login` stays reachable.
+`e2e/support/auth.ts` still seeds a guest localStorage user without tokens before login so `/login` is reachable even if older UI builds re-seed mock auth.
 
 ## Demo users
 
 Same as `seed_demo`: `holder1`, `investor1`, `moderator1`, `admin1` — password = `$DEMO_SEED_PASSWORD`.
 
-Note: until AI Studio renames the mock persona, UI quick-login may still show `mod1`; E2E uses the form with `moderator1`.
-
 ## Out of scope (follow-ups)
 
 - Critical-path flows (express interest, accept/reject, moderation decision)
+- admin feature-flags smoke
 - CI job for Playwright
 - Visual regression
 

@@ -89,9 +89,9 @@ async function clickLoginSubmit(page: Page): Promise<void> {
 }
 
 /**
- * Log in via the standard form (not mock persona cards).
+ * Submit the login form (does not assert success).
  */
-export async function loginAs(
+export async function submitLoginForm(
   page: Page,
   username: string,
   password: string = DEMO_PASSWORD,
@@ -104,6 +104,75 @@ export async function loginAs(
   await fillIdentifier(page, username);
   await fillPassword(page, password);
   await clickLoginSubmit(page);
+}
+
+/**
+ * Log in via the standard form (not mock persona cards).
+ */
+export async function loginAs(
+  page: Page,
+  username: string,
+  password: string = DEMO_PASSWORD,
+): Promise<void> {
+  await submitLoginForm(page, username, password);
+  // Wait until Live login finishes (token stored / leave /login).
+  await expect
+    .poll(async () => page.evaluate((key) => localStorage.getItem(key), TOKEN_KEY), {
+      timeout: 20_000,
+    })
+    .not.toBeNull();
+  await expect(page).not.toHaveURL(/\/login(?:\?|$)/, { timeout: 20_000 });
+}
+
+export async function expectStillOnLogin(page: Page): Promise<void> {
+  await expect(page).toHaveURL(/\/login/, { timeout: 10_000 });
+  await expect(page.getByText(/ورود به سامانه چک‌یار/)).toBeVisible();
+}
+
+export async function expectLoginErrorVisible(page: Page): Promise<void> {
+  // Live API: "Invalid credentials"; UI may also show Persian fallback.
+  await expect(
+    page.getByText(/Invalid credentials|خطا در ورود|نامعتبر|credentials/i),
+  ).toBeVisible({ timeout: 15_000 });
+}
+
+export async function expectMyListingsPage(page: Page): Promise<void> {
+  await expect(page).toHaveURL(new RegExp(`${ROUTES.myListings}`), {
+    timeout: 20_000,
+  });
+  await expect(page.getByRole("heading", { name: /آگهی‌های من/ })).toBeVisible({
+    timeout: 20_000,
+  });
+  await expect(
+    page.getByText(/هنوز هیچ آگهی چکی ثبت نکرده‌اید/),
+  ).toHaveCount(0);
+  // Seeded holder has listings; table rows render bank / id cells.
+  await expect(page.locator(".n-data-table, table").first()).toBeVisible({
+    timeout: 20_000,
+  });
+}
+
+export async function expectMatchesSentWithCard(page: Page): Promise<void> {
+  await expect(page).toHaveURL(new RegExp(`${ROUTES.matches}`), {
+    timeout: 20_000,
+  });
+  await expect(page.getByTestId(TEST_IDS.matchesPage)).toBeVisible();
+
+  // Investor defaults to "sent"; still click tab for explicit coverage.
+  const sentTab = page.getByTestId(TEST_IDS.matchesTabSent);
+  if (await sentTab.count()) {
+    await sentTab.click();
+  } else {
+    await page.getByText(/پیشنهادهای ارسالی/).first().click();
+  }
+
+  const sentPanel = page.getByTestId(TEST_IDS.matchesPanelSent);
+  if (await sentPanel.count()) {
+    await expect(sentPanel).toBeVisible({ timeout: 15_000 });
+  }
+  await expect(page.getByTestId(TEST_IDS.matchCard).first()).toBeVisible({
+    timeout: 20_000,
+  });
 }
 
 export async function expectMarketplace(page: Page): Promise<void> {

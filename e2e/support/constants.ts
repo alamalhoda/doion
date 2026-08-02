@@ -13,6 +13,8 @@ export const ROUTES = {
   login: "/login",
   marketplace: "/marketplace",
   moderation: "/moderation",
+  matches: "/matches",
+  myListings: "/listings/my",
 } as const;
 
 /**
