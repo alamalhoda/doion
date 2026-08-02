@@ -123,6 +123,16 @@ investor = UserFactory.create(as_investor=True)
 listing = ChequeListingFactory.create(published=True, owner=holder)
 ```
 
+### Seed دمو (محلی / دستی / آماده‌سازی E2E)
+```bash
+uv run python manage.py seed_demo
+# یا با پسورد ثابت برای سناریوهای تکراری:
+uv run python manage.py seed_demo --password "$DEMO_SEED_PASSWORD"
+# بازنشانی کاربران دمو و seed دوباره:
+uv run python manage.py seed_demo --reset --password "$DEMO_SEED_PASSWORD"
+```
+کاربران: `holder1`, `investor1`, `moderator1`, `admin1` — پسورد در خروجی دستور چاپ می‌شود.
+
 ---
 
 ## ساختار پروژه

@@ -116,7 +116,7 @@
 
 - [x] App-level factories (outside `tests/`) for User, IssuerProfile, ChequeListing, Profile, Verification, Notification, Match, ModerationDecision
 - [x] Refactor existing tests to use shared factories (DRY/SSOT)
-- [ ] `seed_demo` management command using the same factories
+- [x] `seed_demo` management command using the same factories
 - [ ] Optional separate demo SQLite DB (`db.demo.sqlite3`)
 
 ### Phase 8 — Remaining (requires shell, blocked in this environment)
