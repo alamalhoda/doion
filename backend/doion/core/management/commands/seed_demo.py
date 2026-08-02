@@ -17,6 +17,11 @@ from doion.identity.models import Profile
 from doion.matching.constants import SettlementType
 from doion.matching.constants import Status as MatchStatus
 from doion.matching.models import Match
+from doion.notifications.constants import NotificationChannel
+from doion.notifications.constants import NotificationStatus
+from doion.notifications.constants import NotificationType
+from doion.notifications.models import Notification
+from doion.notifications.models import NotificationPreference
 from doion.users.models import User
 
 DEMO_USERS = (
@@ -26,11 +31,27 @@ DEMO_USERS = (
     ("admin1", User.Role.ADMIN, "Admin"),
 )
 
+# Stable serials for E2E critical-path fixtures (16-digit sayad-style).
+PUBLISHED_COUNT = 22
+PENDING_COUNT = 12
+NOTIFICATION_COUNT = 12
+ACCEPT_MATCH_SERIAL = "2000000000000001"
+EXPRESS_INTEREST_SERIAL = "2000000000000022"
+REJECTED_SERIAL = "4000000000000001"
+
+BANKS = (
+    "بانک ملت",
+    "بانک ملی",
+    "بانک صادرات",
+    "بانک پاسارگاد",
+    "بانک تجارت",
+)
+
 
 class Command(BaseCommand):
     help = (
-        "Seed demo users/listings/match using domain factories. "
-        "Intended for local/manual and future E2E scenarios. Idempotent by username/serial."
+        "Seed demo users/listings/match/notifications using domain models. "
+        "Intended for local/manual and E2E. Idempotent by username/serial."
     )
 
     def add_arguments(self, parser):
@@ -89,54 +110,135 @@ class Command(BaseCommand):
         )
 
         due = timezone.now().date() + timedelta(days=60)
-        listing_specs = (
-            ("1000000000000001", "بانک ملت", ChequeListing.Status.PENDING_MODERATION),
-            ("1000000000000002", "بانک ملی", ChequeListing.Status.PUBLISHED),
-            ("1000000000000003", "بانک صادرات", ChequeListing.Status.REJECTED),
-        )
-        listings: dict[str, ChequeListing] = {}
-        for serial, bank_name, status in listing_specs:
-            listing, _ = ChequeListing.objects.update_or_create(
-                issuer=issuer,
-                bank_name=bank_name,
-                cheque_serial_number=serial,
-                defaults={
-                    "owner": holder,
-                    "face_amount": Decimal("500000000"),
-                    "due_date": due,
-                    "issuer_type": ChequeListing.IssuerType.LEGAL,
-                    "issuer_name": issuer.name,
-                    "issuer_national_id": issuer.national_or_company_id,
-                    "description": "Demo listing",
-                    "suggested_discount_rate": Decimal("5.00"),
-                    "risk_tier": "medium",
-                    "status": status,
-                    "rejection_code": "MOD_101" if status == ChequeListing.Status.REJECTED else None,
-                    "rejection_reason": (
-                        "Demo rejection" if status == ChequeListing.Status.REJECTED else ""
-                    ),
-                },
-            )
-            listings[serial] = listing
+        published: dict[str, ChequeListing] = {}
+        pending: dict[str, ChequeListing] = {}
 
-        published = listings["1000000000000002"]
+        for index in range(1, PUBLISHED_COUNT + 1):
+            serial = f"2000000000000{index:03d}"
+            listing = self._upsert_listing(
+                issuer=issuer,
+                owner=holder,
+                serial=serial,
+                bank_name=BANKS[(index - 1) % len(BANKS)],
+                status=ChequeListing.Status.PUBLISHED,
+                due=due,
+                description=f"Demo published listing {index}",
+            )
+            published[serial] = listing
+
+        for index in range(1, PENDING_COUNT + 1):
+            serial = f"3000000000000{index:03d}"
+            listing = self._upsert_listing(
+                issuer=issuer,
+                owner=holder,
+                serial=serial,
+                bank_name=BANKS[(index - 1) % len(BANKS)],
+                status=ChequeListing.Status.PENDING_MODERATION,
+                due=due,
+                description=f"Demo pending listing {index}",
+            )
+            pending[serial] = listing
+
+        rejected = self._upsert_listing(
+            issuer=issuer,
+            owner=holder,
+            serial=REJECTED_SERIAL,
+            bank_name="بانک صادرات",
+            status=ChequeListing.Status.REJECTED,
+            due=due,
+            description="Demo rejected listing",
+            rejection_code="MOD_101",
+            rejection_reason="Demo rejection",
+        )
+
+        accept_listing = published[ACCEPT_MATCH_SERIAL]
         match, _ = Match.objects.update_or_create(
-            listing=published,
+            listing=accept_listing,
             investor=investor,
             defaults={
                 "check_holder": holder,
                 "status": MatchStatus.PENDING,
                 "settlement_type": SettlementType.OFF_PLATFORM,
-                "message": "Demo interest",
+                "message": "Demo interest for accept-match E2E",
                 "terms": "",
             },
+        )
+
+        NotificationPreference.objects.get_or_create(user=holder)
+        for index in range(1, NOTIFICATION_COUNT + 1):
+            notif_type = (
+                NotificationType.LISTING_PUBLISHED
+                if index % 2 == 1
+                else NotificationType.MATCH_CREATED
+            )
+            title = f"Demo notification {index}"
+            Notification.objects.update_or_create(
+                user=holder,
+                title=title,
+                channel=NotificationChannel.IN_APP,
+                defaults={
+                    "type": notif_type,
+                    "status": NotificationStatus.SENT,
+                    "message": f"Seeded unread notification #{index} for E2E",
+                    "related_object_type": "cheque_listing",
+                    "related_object_id": str(accept_listing.id),
+                    "read_at": None,
+                    "sent_at": timezone.now(),
+                },
+            )
+
+        # Backdate seeded listings so the 10/day create cap remains usable for E2E.
+        seeded_ids = (
+            list(published.values())
+            + list(pending.values())
+            + [rejected]
+        )
+        ChequeListing.objects.filter(id__in=[listing.id for listing in seeded_ids]).update(
+            created_at=timezone.now() - timedelta(days=2),
         )
 
         self.stdout.write(self.style.SUCCESS("Demo seed complete."))
         self.stdout.write(f"Password for all demo users: {password}")
         self.stdout.write(
             "Users: holder1, investor1, moderator1, admin1 "
-            f"| listings: pending={listings['1000000000000001'].id}, "
-            f"published={published.id}, rejected={listings['1000000000000003'].id} "
-            f"| match={match.id}"
+            f"| published={PUBLISHED_COUNT} (express={EXPRESS_INTEREST_SERIAL}, "
+            f"accept_match={ACCEPT_MATCH_SERIAL}) "
+            f"| pending={PENDING_COUNT} "
+            f"| rejected={rejected.id} "
+            f"| match={match.id} "
+            f"| notifications={NOTIFICATION_COUNT}"
         )
+
+    def _upsert_listing(
+        self,
+        *,
+        issuer: IssuerProfile,
+        owner: User,
+        serial: str,
+        bank_name: str,
+        status: str,
+        due,
+        description: str,
+        rejection_code: str | None = None,
+        rejection_reason: str = "",
+    ) -> ChequeListing:
+        listing, _ = ChequeListing.objects.update_or_create(
+            issuer=issuer,
+            bank_name=bank_name,
+            cheque_serial_number=serial,
+            defaults={
+                "owner": owner,
+                "face_amount": Decimal("500000000"),
+                "due_date": due,
+                "issuer_type": ChequeListing.IssuerType.LEGAL,
+                "issuer_name": issuer.name,
+                "issuer_national_id": issuer.national_or_company_id,
+                "description": description,
+                "suggested_discount_rate": Decimal("5.00"),
+                "risk_tier": "medium",
+                "status": status,
+                "rejection_code": rejection_code,
+                "rejection_reason": rejection_reason,
+            },
+        )
+        return listing

@@ -9,16 +9,32 @@ export const USERS = {
   admin: "admin1",
 } as const;
 
+/** Stable cheque serials from enriched `seed_demo`. */
+export const SEED = {
+  acceptMatchSerial: "2000000000000001",
+  expressInterestSerial: "2000000000000022",
+  approvePendingSerial: "3000000000000001",
+  publishedCount: 22,
+  pendingCount: 12,
+  notificationCount: 12,
+  marketplacePageSize: 20,
+  notificationsPageSize: 10,
+} as const;
+
 export const ROUTES = {
   login: "/login",
   marketplace: "/marketplace",
   moderation: "/moderation",
   matches: "/matches",
   myListings: "/listings/my",
+  listingCreate: "/listings/create",
+  notifications: "/notifications",
+  expressInterest: (listingId: number | string) =>
+    `/matches/express-interest/${listingId}`,
 } as const;
 
 /**
- * Prefer data-testid after AI Studio applies AI_STUDIO_E2E_PREP_PROMPT.md.
+ * Prefer data-testid after AI Studio applies prep / critical-path prompts.
  * Fallbacks match current LoginView / Marketplace / ModerationQueue copy.
  */
 export const TEST_IDS = {
@@ -28,11 +44,29 @@ export const TEST_IDS = {
   mockModeSwitch: "mock-mode-switch",
   marketplacePage: "marketplace-page",
   marketplaceListingCard: "marketplace-listing-card",
+  marketplacePagination: "marketplace-pagination",
   moderationQueuePage: "moderation-queue-page",
+  moderationItem: "moderation-item",
+  moderationApproveBtn: "moderation-approve-btn",
+  moderationApproveConfirm: "moderation-approve-confirm",
   matchesPage: "matches-page",
   matchCard: "match-card",
   matchesTabReceived: "matches-tab-received",
   matchesTabSent: "matches-tab-sent",
   matchesPanelReceived: "matches-panel-received",
   matchesPanelSent: "matches-panel-sent",
+  matchAcceptBtn: "match-accept-btn",
+  matchAcceptConfirm: "match-accept-confirm",
+  matchStatusAccepted: "match-status-accepted",
+  expressInterestPage: "express-interest-page",
+  expressInterestMessage: "express-interest-message",
+  expressInterestSubmit: "express-interest-submit",
+  expressInterestConfirm: "express-interest-confirm",
+  listingCreatePage: "listing-create-page",
+  listingFillSample: "listing-fill-sample",
+  listingCreateSubmit: "listing-create-submit",
+  notificationsPage: "notifications-page",
+  notificationItem: "notification-item",
+  notificationMarkRead: "notification-mark-read",
+  notificationsPagination: "notifications-pagination",
 } as const;
