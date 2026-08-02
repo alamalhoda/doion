@@ -134,8 +134,9 @@
 - [ ] راهنمای کوتاه در پنل/runbook: رمز دمو فقط از `DEMO_SEED_PASSWORD` / خروجی seed؛ هرگز در production واقعی seed با `--reset` بدون آگاهی
 
 ### Cross-cutting (خارج از این مونورپو یا موج جدا)
-- [ ] E2E یکپارچه (مثلاً Playwright) با `VITE_USE_MOCK=false` + backend seeded
-- [ ] ادامه تست‌های UI در `checkyar-googleai` (store/API-client با mock کنترل‌شده) فقط از طریق AI Studio
+- [x] E2E smoke harness در `e2e/` (Playwright) با `VITE_USE_MOCK=false` + `seed_demo` / demo DB — see [`docs/development/E2E_LOCAL_RUNBOOK.md`](../docs/development/E2E_LOCAL_RUNBOOK.md)
+- [ ] E2E critical path (express interest / accept / moderation decision) + CI Playwright
+- [ ] ادامه تست‌های UI در `checkyar-googleai` (store/API-client با mock کنترل‌شده) فقط از طریق AI Studio — selector prep: [`docs/development/AI_STUDIO_E2E_PREP_PROMPT.md`](../docs/development/AI_STUDIO_E2E_PREP_PROMPT.md)
 
 ### Phase 8 — Remaining (requires shell, blocked in this environment)
 - [ ] `python manage.py makemigrations` + `migrate` (generates compliance 0001 and the pending integrations/moderation/notifications migrations)
