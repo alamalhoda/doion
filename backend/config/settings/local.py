@@ -18,11 +18,15 @@ ALLOWED_HOSTS = ["localhost", "0.0.0.0", "127.0.0.1"]  # noqa: S104
 
 # DATABASES - SQLite for local development (PostgreSQL not available)
 # ------------------------------------------------------------------------------
+# DJANGO_DEMO_DATABASE=1 → isolated demo file (safe to seed_demo --reset)
+# DJANGO_DEMO_DATABASE=0 / unset → day-to-day local DB
 BASE_DIR = Path(__file__).resolve(strict=True).parent.parent.parent
+_USE_DEMO_DATABASE = env.bool("DJANGO_DEMO_DATABASE", default=False)
+_SQLITE_NAME = "db.demo.sqlite3" if _USE_DEMO_DATABASE else "db.sqlite3"
 DATABASES = {
     "default": {
         "ENGINE": "django.db.backends.sqlite3",
-        "NAME": str(BASE_DIR / "db.sqlite3"),
+        "NAME": str(BASE_DIR / _SQLITE_NAME),
         "ATOMIC_REQUESTS": True,
     }
 }
