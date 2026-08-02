@@ -18,7 +18,7 @@ from doion.identity.api.serializers import (
     VerificationSerializer,
 )
 from doion.identity.api.permissions import IsModerator, IsOwnerOrModerator
-from doion.identity.models import Verification
+from doion.identity.models import Profile, Verification
 from doion.users.models import User
 
 

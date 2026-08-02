@@ -60,8 +60,9 @@ export PATH="$BUN_INSTALL/bin:$PATH"
 ## Integration testing (local)
 
 1. Run `doion` backend (typically `http://localhost:8000`).
-2. Pull latest `checkyar-googleai`, then `bun install` and `bun run dev` (typically `http://localhost:3000`).
-3. Fix API/backend issues in `doion`; fix UI issues only via AI Studio → GitHub → local pull.
+2. Prefer seeded demo data for realistic roles/listings: `python manage.py seed_demo` (see [`BACKEND_DEMO_SEED_AND_DATA.md`](./BACKEND_DEMO_SEED_AND_DATA.md)). Backend has **no** in-process API mock flag comparable to `VITE_USE_MOCK`.
+3. Pull latest `checkyar-googleai`, then `bun install` and `bun run dev` (typically `http://localhost:3000`) with `VITE_USE_MOCK=false`.
+4. Fix API/backend issues in `doion`; fix UI issues only via AI Studio → GitHub → local pull.
 
 ## Exit criteria (later)
 
@@ -77,3 +78,4 @@ When the active UI is acceptable:
 - Legacy UI: [`../../frontend-legacy/README.md`](../../frontend-legacy/README.md)
 - Active UI repo README: https://github.com/alamalhoda/checkyar-googleai
 - API SSOT: [`MASTER_API_CONTRACT.md`](./MASTER_API_CONTRACT.md)
+- Backend demo / seed / (no) mock: [`BACKEND_DEMO_SEED_AND_DATA.md`](./BACKEND_DEMO_SEED_AND_DATA.md)

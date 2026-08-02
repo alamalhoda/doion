@@ -79,6 +79,12 @@ python manage.py runserver
 uv run pytest
 ```
 
+### اجرای تست‌ها با coverage
+```bash
+uv run pytest --cov=doion --cov-report=term-missing --cov-report=html
+```
+خروجی HTML در `htmlcov/index.html` ساخته می‌شود.
+
 ### چک کردن نوع‌ها (Type Checking)
 ```bash
 uv run mypy doion
@@ -116,6 +122,31 @@ holder = UserFactory.create()
 investor = UserFactory.create(as_investor=True)
 listing = ChequeListingFactory.create(published=True, owner=holder)
 ```
+
+### Seed دمو (محلی / دستی / آماده‌سازی E2E)
+
+توسعه روزمره روی `db.sqlite3` است. برای دمو قابل‌پاک‌سازی بدون دست زدن به DB شخصی:
+
+```bash
+export DJANGO_DEMO_DATABASE=1
+uv run python manage.py migrate
+uv run python manage.py seed_demo --reset --password "$DEMO_SEED_PASSWORD"
+uv run python manage.py runserver
+```
+
+بدون فلگ دمو (همان DB عادی):
+
+```bash
+uv run python manage.py seed_demo
+# یا با پسورد ثابت برای سناریوهای تکراری:
+uv run python manage.py seed_demo --password "$DEMO_SEED_PASSWORD"
+# بازنشانی کاربران دمو و seed دوباره (روی DB فعلی — مراقب دادهٔ شخصی باشید):
+uv run python manage.py seed_demo --reset --password "$DEMO_SEED_PASSWORD"
+```
+کاربران: `holder1`, `investor1`, `moderator1`, `admin1` — پسورد در خروجی دستور چاپ می‌شود.
+
+توضیح کامل (mock فرانت، seed، `DJANGO_DEMO_DATABASE`، چابکان):  
+[`docs/development/BACKEND_DEMO_SEED_AND_DATA.md`](../docs/development/BACKEND_DEMO_SEED_AND_DATA.md)
 
 ---
 

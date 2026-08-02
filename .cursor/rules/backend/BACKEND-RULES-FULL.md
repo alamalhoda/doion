@@ -1211,7 +1211,7 @@ class OrderAPITest(APITestCase):
 هدف ≥ ۸۰٪ برای مسیرهای حیاتی:
 
 ```bash
-pytest --cov=khodroban --cov-report=html
+pytest --cov=doion --cov-report=html
 ```
 ````
 

@@ -181,3 +181,50 @@ class TestMatchViewSet:
         response = api_client.post(f"/api/v1/matches/{accepted.id}/confirm-off-platform/")
         assert response.status_code == 200
         assert response.data["status"] == Status.OFF_PLATFORM_CONFIRMED
+
+    def test_list_requires_authentication(self, api_client):
+        response = api_client.get("/api/v1/matches/")
+        assert response.status_code == 401
+
+    def test_my_matches_returns_role_filtered_results(
+        self, api_client, investor, check_holder, issuer
+    ):
+        listing = create_listing(owner=check_holder, issuer=issuer)
+        match = MatchingService.create_match(listing.id, investor)
+
+        api_client.force_authenticate(user=investor)
+        response = api_client.get("/api/v1/matches/my/")
+        assert response.status_code == 200
+        ids = [
+            m["id"]
+            for m in (
+                response.data["results"] if "results" in response.data else response.data
+            )
+        ]
+        assert match.id in ids
+
+        api_client.force_authenticate(user=check_holder)
+        response = api_client.get("/api/v1/matches/my/")
+        assert response.status_code == 200
+        ids = [
+            m["id"]
+            for m in (
+                response.data["results"] if "results" in response.data else response.data
+            )
+        ]
+        assert match.id in ids
+
+    def test_patch_status_updates_match(self, api_client, investor, check_holder, issuer):
+        listing = create_listing(owner=check_holder, issuer=issuer)
+        match = MatchingService.create_match(listing.id, investor)
+
+        api_client.force_authenticate(user=investor)
+        response = api_client.patch(
+            f"/api/v1/matches/{match.id}/status/",
+            {"status": Status.CANCELLED, "terms": "updated terms"},
+            format="json",
+        )
+
+        assert response.status_code == 200
+        assert response.data["status"] == Status.CANCELLED
+        assert response.data["terms"] == "updated terms"

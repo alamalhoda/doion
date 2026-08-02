@@ -116,8 +116,26 @@
 
 - [x] App-level factories (outside `tests/`) for User, IssuerProfile, ChequeListing, Profile, Verification, Notification, Match, ModerationDecision
 - [x] Refactor existing tests to use shared factories (DRY/SSOT)
-- [ ] `seed_demo` management command using the same factories
-- [ ] Optional separate demo SQLite DB (`db.demo.sqlite3`)
+- [x] `seed_demo` management command using the same factories
+- [x] Local demo SQLite switch: `DJANGO_DEMO_DATABASE=1` → `db.demo.sqlite3` (see `docs/development/BACKEND_DEMO_SEED_AND_DATA.md`)
+
+## Follow-ups (after `feature/backend-critical-path-test-hardening`)
+
+کارهای توصیه‌شده برای بعد از merge این branch — عمداً اینجا انجام نشد تا PR کوچک و قابل‌بازبینی بماند.
+جزئیات دمو/چابکان: [`docs/development/BACKEND_DEMO_SEED_AND_DATA.md`](../docs/development/BACKEND_DEMO_SEED_AND_DATA.md) (بخش Follow-ups).
+
+### Wave 2 — Automation & quality
+- [ ] GitHub Actions (یا CI معادل): `pytest` (+ در صورت تمایل `--cov=doion`) روی PR به `develop`
+- [ ] رفع `UnorderedObjectListWarning` با `ordering` / `order_by` روی querysetهای FeatureFlag / Verification / Match / ChequeListing / IssuerProfile
+- [ ] پوشش بیشتر matching API (شاخه‌های باقی‌مانده در `matching/views.py`) و edgeهای upload سند
+
+### Demo / staging (ops)
+- [ ] محیط staging یا demo جدا روی چابکان با **Postgres** + `migrate` + `seed_demo` (نه SQLite روی production)
+- [ ] راهنمای کوتاه در پنل/runbook: رمز دمو فقط از `DEMO_SEED_PASSWORD` / خروجی seed؛ هرگز در production واقعی seed با `--reset` بدون آگاهی
+
+### Cross-cutting (خارج از این مونورپو یا موج جدا)
+- [ ] E2E یکپارچه (مثلاً Playwright) با `VITE_USE_MOCK=false` + backend seeded
+- [ ] ادامه تست‌های UI در `checkyar-googleai` (store/API-client با mock کنترل‌شده) فقط از طریق AI Studio
 
 ### Phase 8 — Remaining (requires shell, blocked in this environment)
 - [ ] `python manage.py makemigrations` + `migrate` (generates compliance 0001 and the pending integrations/moderation/notifications migrations)

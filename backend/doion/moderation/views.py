@@ -20,6 +20,11 @@ class ModerationViewSet(GenericViewSet):
     permission_classes = [IsAuthenticated, IsModerator]
     queryset = ChequeListing.objects.all()
 
+    def get_permissions(self):
+        if self.action == "resubmit":
+            return [IsAuthenticated()]
+        return super().get_permissions()
+
     @action(detail=False, methods=["get"], url_path="queue")
     def queue(self, request):
         queryset = ChequeListing.objects.filter(
@@ -83,6 +88,17 @@ class ModerationViewSet(GenericViewSet):
     @action(detail=True, methods=["post"], url_path="resubmit")
     def resubmit(self, request, pk=None):
         listing = self.get_object()
+
+        if listing.owner_id != request.user.id:
+            return Response(
+                {
+                    "error": {
+                        "code": "PERMISSION_ERROR",
+                        "message": "Only the listing owner can resubmit",
+                    }
+                },
+                status=status.HTTP_403_FORBIDDEN,
+            )
 
         if listing.status != ChequeListing.Status.REJECTED:
             return Response(
