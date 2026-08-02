@@ -117,7 +117,7 @@
 - [x] App-level factories (outside `tests/`) for User, IssuerProfile, ChequeListing, Profile, Verification, Notification, Match, ModerationDecision
 - [x] Refactor existing tests to use shared factories (DRY/SSOT)
 - [x] `seed_demo` management command using the same factories
-- [ ] Optional separate demo SQLite DB (`db.demo.sqlite3`)
+- [ ] Optional separate demo SQLite DB (`db.demo.sqlite3`) — deferred; rationale and sketch in `docs/development/BACKEND_DEMO_SEED_AND_DATA.md`
 
 ### Phase 8 — Remaining (requires shell, blocked in this environment)
 - [ ] `python manage.py makemigrations` + `migrate` (generates compliance 0001 and the pending integrations/moderation/notifications migrations)

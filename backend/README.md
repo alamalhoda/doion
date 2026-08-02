@@ -133,6 +133,9 @@ uv run python manage.py seed_demo --reset --password "$DEMO_SEED_PASSWORD"
 ```
 کاربران: `holder1`, `investor1`, `moderator1`, `admin1` — پسورد در خروجی دستور چاپ می‌شود.
 
+توضیح تفاوت mock فرانت، seed بک‌اند، و وضعیت اختیاری `db.demo.sqlite3`:  
+[`docs/development/BACKEND_DEMO_SEED_AND_DATA.md`](../docs/development/BACKEND_DEMO_SEED_AND_DATA.md)
+
 ---
 
 ## ساختار پروژه
