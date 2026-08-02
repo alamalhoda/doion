@@ -64,6 +64,13 @@ export PATH="$BUN_INSTALL/bin:$PATH"
 3. Pull latest `checkyar-googleai`, then `bun install` and `bun run dev` (typically `http://localhost:3000`) with `VITE_USE_MOCK=false`.
 4. Fix API/backend issues in `doion`; fix UI issues only via AI Studio → GitHub → local pull.
 
+### E2E smoke (Playwright harness in doion)
+
+Browser smoke tests live in this monorepo under `e2e/` (not in `checkyar-googleai`). They hit the Live UI against a seeded demo backend.
+
+- Runbook: [`E2E_LOCAL_RUNBOOK.md`](./E2E_LOCAL_RUNBOOK.md)
+- AI Studio selector/username prep (paste into Studio only): [`AI_STUDIO_E2E_PREP_PROMPT.md`](./AI_STUDIO_E2E_PREP_PROMPT.md)
+
 ## Exit criteria (later)
 
 When the active UI is acceptable:
@@ -79,3 +86,5 @@ When the active UI is acceptable:
 - Active UI repo README: https://github.com/alamalhoda/checkyar-googleai
 - API SSOT: [`MASTER_API_CONTRACT.md`](./MASTER_API_CONTRACT.md)
 - Backend demo / seed / (no) mock: [`BACKEND_DEMO_SEED_AND_DATA.md`](./BACKEND_DEMO_SEED_AND_DATA.md)
+- E2E local runbook: [`E2E_LOCAL_RUNBOOK.md`](./E2E_LOCAL_RUNBOOK.md)
+- AI Studio E2E prep prompt: [`AI_STUDIO_E2E_PREP_PROMPT.md`](./AI_STUDIO_E2E_PREP_PROMPT.md)

@@ -148,6 +148,18 @@ uv run python manage.py seed_demo --reset --password "$DEMO_SEED_PASSWORD"
 توضیح کامل (mock فرانت، seed، `DJANGO_DEMO_DATABASE`، چابکان):  
 [`docs/development/BACKEND_DEMO_SEED_AND_DATA.md`](../docs/development/BACKEND_DEMO_SEED_AND_DATA.md)
 
+### آماده‌سازی E2E (smoke)
+
+Harness Playwright در ریشهٔ مونورپو (`e2e/`) است، نه در ریپوی UI. برای seed ایزولهٔ دمو قبل از تست:
+
+```bash
+./e2e/scripts/prepare-backend.sh
+# سپس runserver با DJANGO_DEMO_DATABASE=1 و UI با VITE_USE_MOCK=false
+./e2e/scripts/run-smoke.sh
+```
+
+جزئیات: [`docs/development/E2E_LOCAL_RUNBOOK.md`](../docs/development/E2E_LOCAL_RUNBOOK.md).
+
 ---
 
 ## ساختار پروژه

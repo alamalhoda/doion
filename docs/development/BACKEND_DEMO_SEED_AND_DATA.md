@@ -134,6 +134,7 @@ VITE_API_BASE_URL=http://localhost:8000/api/v1
 - `DJANGO_SETTINGS_MODULE` همان `config.settings.local` می‌ماند.
 - `db.demo.sqlite3` در `backend/.gitignore` است.
 - بدون `--reset`، `seed_demo` تقریباً **idempotent** است (بر اساس username و شماره صیاد).
+- Migration `sites.0003` فقط روی PostgreSQL sequence را sync می‌کند؛ روی SQLite دیگر با خطای `django_site_id_seq` fail نمی‌شود (لازم برای `db.demo.sqlite3` تازه).
 
 ```bash
 # توسعه عادی
@@ -146,6 +147,8 @@ python manage.py migrate
 python manage.py seed_demo --reset --password "$DEMO_SEED_PASSWORD"
 python manage.py runserver
 ```
+
+برای آماده‌سازی خودکار همان DB دمو قبل از smoke E2E: [`../../e2e/scripts/prepare-backend.sh`](../../e2e/scripts/prepare-backend.sh) (جزئیات: [`E2E_LOCAL_RUNBOOK.md`](./E2E_LOCAL_RUNBOOK.md)).
 
 نمونه در `.env` لوکال (اختیاری):
 
@@ -222,8 +225,8 @@ DEMO_SEED_PASSWORD=MyLocalDemoPass1
 | متوسط | Staging/demo چابکان با Postgres + `seed_demo` | ops |
 | متوسط | `order_by` برای رفع warningهای pagination در تست/API | quality |
 | پایین‌تر | پوشش بیشتر matching views / document edge cases | tests |
-| جدا | E2E Playwright (UI واقعی ↔ API seeded) | cross |
-| جدا | تست‌های بیشتر UI در AI Studio (نه mock به‌جای قرارداد) | frontend |
+| جدا | E2E smoke harness در `e2e/` (شروع‌شده؛ runbook: [`E2E_LOCAL_RUNBOOK.md`](./E2E_LOCAL_RUNBOOK.md)) — critical path + CI هنوز باز | cross |
+| جدا | تست‌های بیشتر UI در AI Studio (نه mock به‌جای قرارداد)؛ پرامپت selector: [`AI_STUDIO_E2E_PREP_PROMPT.md`](./AI_STUDIO_E2E_PREP_PROMPT.md) | frontend |
 
 ---
 
@@ -233,3 +236,5 @@ DEMO_SEED_PASSWORD=MyLocalDemoPass1
 - Active UI + when to disable mock: [`FRONTEND_DEVELOPMENT_STATUS.md`](./FRONTEND_DEVELOPMENT_STATUS.md)
 - Backend commands / factories: [`backend/README.md`](../../backend/README.md)
 - Backend TODO / follow-ups checklist: [`backend/TODO.md`](../../backend/TODO.md)
+- E2E runbook: [`E2E_LOCAL_RUNBOOK.md`](./E2E_LOCAL_RUNBOOK.md)
+- AI Studio E2E prep prompt: [`AI_STUDIO_E2E_PREP_PROMPT.md`](./AI_STUDIO_E2E_PREP_PROMPT.md)
