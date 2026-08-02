@@ -212,8 +212,24 @@ DEMO_SEED_PASSWORD=MyLocalDemoPass1
 
 ---
 
+## Follow-ups (بعداً — خارج از PR فعلی)
+
+این فهرست عمداً برای بعد از merge branch تست/دمو نگه داشته شده تا فراموش نشود. چک‌لیست عملیاتی در [`backend/TODO.md`](../../backend/TODO.md) هم هست.
+
+| اولویت | کار | دامنه |
+|--------|-----|--------|
+| بالا | CI: اجرای `pytest` روی PR | automation |
+| متوسط | Staging/demo چابکان با Postgres + `seed_demo` | ops |
+| متوسط | `order_by` برای رفع warningهای pagination در تست/API | quality |
+| پایین‌تر | پوشش بیشتر matching views / document edge cases | tests |
+| جدا | E2E Playwright (UI واقعی ↔ API seeded) | cross |
+| جدا | تست‌های بیشتر UI در AI Studio (نه mock به‌جای قرارداد) | frontend |
+
+---
+
 ## Related docs
 
 - API contract SSOT: [`MASTER_API_CONTRACT.md`](./MASTER_API_CONTRACT.md)
 - Active UI + when to disable mock: [`FRONTEND_DEVELOPMENT_STATUS.md`](./FRONTEND_DEVELOPMENT_STATUS.md)
 - Backend commands / factories: [`backend/README.md`](../../backend/README.md)
+- Backend TODO / follow-ups checklist: [`backend/TODO.md`](../../backend/TODO.md)
