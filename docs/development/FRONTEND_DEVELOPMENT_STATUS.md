@@ -87,4 +87,6 @@ When the active UI is acceptable:
 - API SSOT: [`MASTER_API_CONTRACT.md`](./MASTER_API_CONTRACT.md)
 - Backend demo / seed / (no) mock: [`BACKEND_DEMO_SEED_AND_DATA.md`](./BACKEND_DEMO_SEED_AND_DATA.md)
 - E2E local runbook: [`E2E_LOCAL_RUNBOOK.md`](./E2E_LOCAL_RUNBOOK.md)
+- AI Studio UI docs bootstrap prompt: [`AI_STUDIO_DOCS_BOOTSTRAP_PROMPT.md`](./AI_STUDIO_DOCS_BOOTSTRAP_PROMPT.md)
 - AI Studio E2E prep prompt: [`AI_STUDIO_E2E_PREP_PROMPT.md`](./AI_STUDIO_E2E_PREP_PROMPT.md)
+- AI Studio E2E critical-path prompt: [`AI_STUDIO_E2E_CRITICAL_PATH_PROMPT.md`](./AI_STUDIO_E2E_CRITICAL_PATH_PROMPT.md)

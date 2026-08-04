@@ -15,13 +15,20 @@ Skill پروژه: `.cursor/skills/ai-studio-ui-fix-loop/`
 ## چه کار می‌کند
 
 1. خطای Live را تشخیص می‌دهد (UI vs backend vs استفاده اشتباه).
-2. پرامپت آماده برای Google AI Studio می‌نویسد.
-3. بعد از اینکه شما commit را از Studio آوردید: `git pull`، بررسی diff، و در صورت نیاز smoke/تست.
+2. پرامپت آماده برای Google AI Studio می‌نویسد (کد + در صورت نیاز vitest و docs دوزبانه).
+3. بعد از commit از Studio: `git pull`، بررسی diff (کد/تست UI/docs)، و در صورت نیاز E2E در `doion/e2e`.
 
 ## چه کار نمی‌کند
 
 - به AI Studio مستقیم وصل نمی‌شود؛ شما پرامپت را کپی می‌کنید.
-- سورس UI را از لوکال به GitHub پوش نمی‌کند (قانون one-way).
+- سورس UI، vitest، یا docs UI را از لوکال به GitHub پوش نمی‌کند (قانون one-way).
+- تست Playwright را داخل repo UI اضافه نمی‌کند؛ آن‌ها در `doion/e2e` می‌مانند.
+
+## Docs اول‌بار
+
+اگر هنوز `docs/ARCHITECTURE*.md` / `docs/TESTING*.md` در UI نیست، یک‌بار پرامپت bootstrap را به Studio بدهید:
+
+`docs/development/AI_STUDIO_DOCS_BOOTSTRAP_PROMPT.md`
 
 ## پیش‌نیاز لوکال
 
