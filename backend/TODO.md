@@ -125,7 +125,7 @@
 جزئیات دمو/چابکان: [`docs/development/BACKEND_DEMO_SEED_AND_DATA.md`](../docs/development/BACKEND_DEMO_SEED_AND_DATA.md) (بخش Follow-ups).
 
 ### Wave 2 — Automation & quality
-- [ ] GitHub Actions (یا CI معادل): `pytest` (+ در صورت تمایل `--cov=doion`) روی PR به `develop`
+- [x] GitHub Actions: `pytest` روی PR/push به `develop` (`.github/workflows/ci-backend.yml`); `ruff` فعلاً فقط لوکال — gate اجباری بعد از پاک‌سازی lint
 - [ ] رفع `UnorderedObjectListWarning` با `ordering` / `order_by` روی querysetهای FeatureFlag / Verification / Match / ChequeListing / IssuerProfile
 - [ ] پوشش بیشتر matching API (شاخه‌های باقی‌مانده در `matching/views.py`) و edgeهای upload سند
 

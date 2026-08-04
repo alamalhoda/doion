@@ -232,7 +232,7 @@ DEMO_SEED_PASSWORD=MyLocalDemoPass1
 
 | اولویت | کار | دامنه |
 |--------|-----|--------|
-| بالا | CI: اجرای `pytest` روی PR | automation |
+| انجام‌شده | CI: `pytest` روی PR/push به `develop` (`.github/workflows/ci-backend.yml`) | automation |
 | متوسط | Staging/demo چابکان با Postgres + `seed_demo` | ops |
 | متوسط | `order_by` برای رفع warningهای pagination در تست/API | quality |
 | پایین‌تر | پوشش بیشتر matching views / document edge cases | tests |

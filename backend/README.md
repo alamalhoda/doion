@@ -72,6 +72,24 @@ python manage.py runserver
 
 ---
 
+## CI (GitHub Actions)
+
+روی هر `pull_request` و `push` به شاخه `develop`، workflowی [`.github/workflows/ci-backend.yml`](../.github/workflows/ci-backend.yml) در پوشه `backend/` اجرا می‌شود:
+
+1. `uv sync --frozen`
+2. `uv run pytest` (با `config.settings.test` از `pyproject.toml`)
+
+معادل لوکال (از داخل `backend/`):
+
+```bash
+uv sync --frozen
+uv run pytest
+```
+
+`ruff` فعلاً gate اجباری CI نیست (بدهی lint موجود در codebase)؛ لوکال می‌توانید `uv run ruff check .` را اجرا کنید. E2E (Playwright) و deploy هنوز در CI نیستند.
+
+---
+
 ## دستورات مفید
 
 ### اجرای تست‌ها

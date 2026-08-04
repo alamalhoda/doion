@@ -1,0 +1,31 @@
+name: CI Backend
+
+on:
+  pull_request:
+    branches: [develop]
+  push:
+    branches: [develop]
+
+defaults:
+  run:
+    working-directory: backend
+
+jobs:
+  backend:
+    name: pytest
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v6
+        with:
+          enable-cache: true
+          python-version: "3.12"
+
+      - name: Install dependencies
+        run: uv sync --frozen
+
+      - name: Pytest
+        run: uv run pytest
