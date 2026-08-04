@@ -5,6 +5,7 @@ from django.core.management import call_command
 from django.utils.crypto import get_random_string
 
 from doion.checks.models import ChequeListing
+from doion.core.management.commands.seed_demo import ACCEPT_MATCH_SERIAL
 from doion.matching.models import Match
 from doion.users.models import User
 
@@ -42,5 +43,5 @@ class TestSeedDemoCommand:
         call_command("seed_demo", password=password)
 
         assert User.objects.filter(username="holder1").count() == 1
-        assert ChequeListing.objects.filter(cheque_serial_number="1000000000000002").count() == 1
+        assert ChequeListing.objects.filter(cheque_serial_number=ACCEPT_MATCH_SERIAL).count() == 1
         assert Match.objects.filter(investor__username="investor1").count() == 1
