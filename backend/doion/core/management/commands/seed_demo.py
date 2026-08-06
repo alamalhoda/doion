@@ -30,6 +30,7 @@ DEMO_USERS = (
     ("investor1", User.Role.INVESTOR, "Investor"),
     ("moderator1", User.Role.MODERATOR, "Moderator"),
     ("admin1", User.Role.ADMIN, "Admin"),
+    ("holderkyc1", User.Role.CHECK_HOLDER, "CheckHolder"),
 )
 
 # Stable serials for E2E critical-path fixtures (16-digit sayad-style).
@@ -37,7 +38,9 @@ PUBLISHED_COUNT = 22
 PENDING_COUNT = 12
 NOTIFICATION_COUNT = 12
 ACCEPT_MATCH_SERIAL = "2000000000000001"
+DECLINE_MATCH_SERIAL = "2000000000000002"
 EXPRESS_INTEREST_SERIAL = "2000000000000022"
+REJECT_PENDING_SERIAL = "3000000000000012"
 REJECTED_SERIAL = "4000000000000001"
 
 BANKS = (
@@ -102,7 +105,23 @@ class Command(BaseCommand):
             action = "created" if created else "updated"
             self.stdout.write(f"  {action}: {username} ({role})")
 
-            if role in {User.Role.CHECK_HOLDER, User.Role.INVESTOR}:
+            if username == "holderkyc1":
+                Verification.objects.filter(
+                    user=user,
+                    status=Verification.Status.APPROVED,
+                ).delete()
+                Verification.objects.get_or_create(
+                    user=user,
+                    status=Verification.Status.PENDING,
+                    defaults={
+                        "full_name": "KYC Pending Holder",
+                        "national_id": "0012345678",
+                        "company_name": "",
+                        "rejection_reason": "",
+                        "rejection_code": "",
+                    },
+                )
+            elif role in {User.Role.CHECK_HOLDER, User.Role.INVESTOR}:
                 Verification.objects.get_or_create(
                     user=user,
                     status=Verification.Status.APPROVED,
@@ -185,6 +204,19 @@ class Command(BaseCommand):
             },
         )
 
+        decline_listing = published[DECLINE_MATCH_SERIAL]
+        decline_match, _ = Match.objects.update_or_create(
+            listing=decline_listing,
+            investor=investor,
+            defaults={
+                "check_holder": holder,
+                "status": MatchStatus.PENDING,
+                "settlement_type": SettlementType.OFF_PLATFORM,
+                "message": "Demo interest for decline-match E2E",
+                "terms": "",
+            },
+        )
+
         NotificationPreference.objects.get_or_create(user=holder)
         for index in range(1, NOTIFICATION_COUNT + 1):
             notif_type = (
@@ -221,12 +253,12 @@ class Command(BaseCommand):
         self.stdout.write(self.style.SUCCESS("Demo seed complete."))
         self.stdout.write(f"Password for all demo users: {password}")
         self.stdout.write(
-            "Users: holder1, investor1, moderator1, admin1 "
+            "Users: holder1, investor1, moderator1, admin1, holderkyc1 "
             f"| published={PUBLISHED_COUNT} (express={EXPRESS_INTEREST_SERIAL}, "
-            f"accept_match={ACCEPT_MATCH_SERIAL}) "
-            f"| pending={PENDING_COUNT} "
+            f"accept_match={ACCEPT_MATCH_SERIAL}, decline_match={DECLINE_MATCH_SERIAL}) "
+            f"| pending={PENDING_COUNT} (reject={REJECT_PENDING_SERIAL}) "
             f"| rejected={rejected.id} "
-            f"| match={match.id} "
+            f"| match={match.id}/{decline_match.id} "
             f"| notifications={NOTIFICATION_COUNT}"
         )
 

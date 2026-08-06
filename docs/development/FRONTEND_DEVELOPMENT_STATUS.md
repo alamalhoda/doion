@@ -104,6 +104,18 @@ When the active UI is acceptable:
 3. PR → `develop`; then archive the `checkyar-googleai` GitHub repository.
 4. From then on, UI GitFlow is two-way inside this monorepo only.
 
+## MVP v1 execution status (2026-08-06)
+
+| Track | Status |
+|-------|--------|
+| Backend gates (KYC, issuer ownership, register throttle, ordering) | In progress on `feature/v1-backend-mvp-gates` |
+| UI Live blockers (KYC submit/review, moderation details, doc upload bytes) | Awaiting AI Studio — prompt: [`V1_PHASE_A_STUDIO_PROMPT.md`](./V1_PHASE_A_STUDIO_PROMPT.md) |
+| E2E expansion + CI Playwright | Specs + `.github/workflows/ci-e2e.yml` |
+| Chabokan production | Runbook: [`PRODUCTION_CHABOKAN_DEPLOY.md`](./PRODUCTION_CHABOKAN_DEPLOY.md) |
+| Codespaces | `.devcontainer/` in doion (dev only; not production host) |
+
+UI remains external + one-way until after MVP acceptance. Do **not** migrate into `doion/frontend` for v1.
+
 ## Related docs
 
 - Legacy UI: [`../../frontend-legacy/README.md`](../../frontend-legacy/README.md)
@@ -115,3 +127,5 @@ When the active UI is acceptable:
 - AI Studio CI (GitHub Actions) prompt: [`AI_STUDIO_CI_GITHUB_ACTIONS_PROMPT.md`](./AI_STUDIO_CI_GITHUB_ACTIONS_PROMPT.md)
 - AI Studio E2E prep prompt: [`AI_STUDIO_E2E_PREP_PROMPT.md`](./AI_STUDIO_E2E_PREP_PROMPT.md)
 - AI Studio E2E critical-path prompt: [`AI_STUDIO_E2E_CRITICAL_PATH_PROMPT.md`](./AI_STUDIO_E2E_CRITICAL_PATH_PROMPT.md)
+- V1 Phase A Studio prompt (KYC / upload / moderation Live): [`V1_PHASE_A_STUDIO_PROMPT.md`](./V1_PHASE_A_STUDIO_PROMPT.md)
+- Production Chabokan: [`PRODUCTION_CHABOKAN_DEPLOY.md`](./PRODUCTION_CHABOKAN_DEPLOY.md)

@@ -1,0 +1,104 @@
+name: CI E2E Playwright
+
+on:
+  pull_request:
+    branches: [develop]
+  push:
+    branches: [develop]
+  workflow_dispatch:
+
+jobs:
+  e2e:
+    name: smoke + critical
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+
+    steps:
+      - name: Checkout doion
+        uses: actions/checkout@v4
+
+      - name: Checkout active UI
+        uses: actions/checkout@v4
+        with:
+          repository: alamalhoda/checkyar-googleai
+          path: checkyar-googleai
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v6
+        with:
+          enable-cache: true
+          python-version: "3.12"
+
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@v2
+
+      - name: Setup Node (Playwright)
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: npm
+          cache-dependency-path: e2e/package-lock.json
+
+      - name: Install backend deps
+        working-directory: backend
+        run: uv sync --frozen
+
+      - name: Prepare demo backend
+        working-directory: backend
+        env:
+          DJANGO_DEMO_DATABASE: "1"
+          DEMO_SEED_PASSWORD: password123
+        run: |
+          source .venv/bin/activate 2>/dev/null || true
+          uv run python manage.py migrate --noinput
+          uv run python manage.py seed_demo --password "$DEMO_SEED_PASSWORD" --reset
+
+      - name: Start backend
+        working-directory: backend
+        env:
+          DJANGO_DEMO_DATABASE: "1"
+          DJANGO_SETTINGS_MODULE: config.settings.local
+        run: |
+          nohup uv run python manage.py runserver 127.0.0.1:8000 > /tmp/doion-backend.log 2>&1 &
+          for i in $(seq 1 30); do
+            curl -sf -o /dev/null http://127.0.0.1:8000/api/v1/ || { sleep 2; continue; }
+            exit 0
+          done
+          echo "backend failed to start"; cat /tmp/doion-backend.log; exit 1
+
+      - name: Install and start UI
+        working-directory: checkyar-googleai
+        run: |
+          printf 'VITE_USE_MOCK=false\nVITE_API_BASE_URL=http://127.0.0.1:8000/api/v1\n' > .env
+          bun install
+          nohup bun run dev -- --host 127.0.0.1 --port 3000 > /tmp/ui-dev.log 2>&1 &
+          for i in $(seq 1 40); do
+            curl -sf -o /dev/null http://127.0.0.1:3000/ && exit 0
+            sleep 2
+          done
+          echo "UI failed to start"; cat /tmp/ui-dev.log; exit 1
+
+      - name: Install Playwright
+        working-directory: e2e
+        run: |
+          npm install
+          npx playwright install --with-deps chromium
+
+      - name: Run smoke
+        working-directory: e2e
+        env:
+          FRONTEND_URL: http://127.0.0.1:3000
+          API_URL: http://127.0.0.1:8000/api/v1
+          DEMO_SEED_PASSWORD: password123
+          PLAYWRIGHT_CHANNEL: chromium
+        run: npm run test:smoke
+
+      - name: Run critical
+        working-directory: e2e
+        env:
+          FRONTEND_URL: http://127.0.0.1:3000
+          API_URL: http://127.0.0.1:8000/api/v1
+          DEMO_SEED_PASSWORD: password123
+          PLAYWRIGHT_CHANNEL: chromium
+        run: npm run test:critical
