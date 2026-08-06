@@ -138,6 +138,15 @@ Same as `seed_demo`: `holder1`, `investor1`, `moderator1`, `admin1`, `holderkyc1
 
 GitHub Actions: [`.github/workflows/ci-e2e.yml`](../../.github/workflows/ci-e2e.yml) — seeds demo backend, starts UI from `alamalhoda/checkyar-googleai`, runs smoke + critical with Chromium.
 
+The UI checkout is **pinned to a full commit SHA** (`ref:` in the workflow), not a floating branch tip. That keeps the CI trust boundary explicit: compromise of the external repo’s default branch cannot silently change what this job runs.
+
+To bump the pin after reviewing a new UI commit:
+
+```bash
+cd /path/to/checkyar-googleai && git pull && git rev-parse HEAD
+# then set that SHA as `ref:` under "Checkout active UI" in ci-e2e.yml
+```
+
 ## Out of scope (follow-ups)
 
 - Full KYC submit→approve UI path until Phase A Studio lands

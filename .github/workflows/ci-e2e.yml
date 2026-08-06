@@ -17,10 +17,15 @@ jobs:
       - name: Checkout doion
         uses: actions/checkout@v4
 
+      # Pin to an immutable commit (not a branch) so CI cannot run attacker-controlled
+      # UI code if checkyar-googleai's default branch is compromised. Bump deliberately
+      # after reviewing the UI commit (see E2E_LOCAL_RUNBOOK.md).
       - name: Checkout active UI
         uses: actions/checkout@v4
         with:
           repository: alamalhoda/checkyar-googleai
+          # UI Live blockers + tsc/docs follow-up (2026-08-06)
+          ref: 46dbdb850f55af2ca963bed30564870a5476979d
           path: checkyar-googleai
           token: ${{ secrets.GITHUB_TOKEN }}
 
