@@ -1,6 +1,6 @@
 # Frontend Development Status
 
-**As of:** 2026-07-31
+**As of:** 2026-08-06
 
 This document is the SSOT for *where* active UI work happens and how it relates to this monorepo.
 
@@ -47,7 +47,7 @@ Active UI is authored in [Google AI Studio](https://aistudio.google.com/), which
 | Lockfile in git | `bun.lock` |
 | Ignored | `package-lock.json` (must stay out of git) |
 | Install | `bun install` |
-| Dev server | `bun run dev` (port `3000`) |
+| Dev server | Prefer `bun run dev -- --host 127.0.0.1 --port 3000` (see [Local Vite host](#local-vite-host-recommended)) |
 | Lint / build | `bun run lint` / `bun run build` |
 
 On macOS, ensure Bun is on `PATH` for login shells (Cursor terminals often load `~/.zprofile`):
@@ -57,11 +57,35 @@ export BUN_INSTALL="$HOME/.bun"
 export PATH="$BUN_INSTALL/bin:$PATH"
 ```
 
+### Local Vite host (recommended)
+
+Default `bun run dev` in this UI often binds Vite to `0.0.0.0` (all interfaces). On machines with a VPN / TUN client (e.g. v2box, Clash — interfaces like `utun*` / `198.18.0.1`), that binding commonly breaks browser access: Vite prints “ready”, but `http://localhost:3000/` fails with `ERR_CONNECTION_TIMED_OUT` while TCP stays in `SYN_SENT` / `SYN_RCVD`.
+
+**Use this local command instead:**
+
+```bash
+cd /path/to/checkyar-googleai
+bun run dev -- --host 127.0.0.1 --port 3000
+```
+
+Then open **`http://127.0.0.1:3000/`** (or `http://localhost:3000/` once loopback works).
+
+| Part | Meaning |
+|------|---------|
+| `bun run dev` | Runs the `dev` script from `package.json` (Vite). |
+| `--` | Ends Bun/npm args; everything after is passed to Vite. |
+| `--host 127.0.0.1` | Bind only to loopback so VPN TUN does not hijack the listener. |
+| `--port 3000` | Keep the usual UI port (matches E2E / CORS expectations). |
+
+Do **not** commit this host change into `checkyar-googleai` from local/Cursor (one-way AI Studio rule). Keep it as a local run flag.
+
+If it still times out with VPN on: bypass `localhost` / `127.0.0.1` in the VPN app, or temporarily disable TUN / Enhanced Mode.
+
 ## Integration testing (local)
 
 1. Run `doion` backend (typically `http://localhost:8000`).
 2. Prefer seeded demo data for realistic roles/listings: `python manage.py seed_demo` (see [`BACKEND_DEMO_SEED_AND_DATA.md`](./BACKEND_DEMO_SEED_AND_DATA.md)). Backend has **no** in-process API mock flag comparable to `VITE_USE_MOCK`.
-3. Pull latest `checkyar-googleai`, then `bun install` and `bun run dev` (typically `http://localhost:3000`) with `VITE_USE_MOCK=false`.
+3. Pull latest `checkyar-googleai`, then `bun install` and `bun run dev -- --host 127.0.0.1 --port 3000` (open `http://127.0.0.1:3000`) with `VITE_USE_MOCK=false`.
 4. Fix API/backend issues in `doion`; fix UI issues only via AI Studio → GitHub → local pull.
 
 ### E2E smoke (Playwright harness in doion)
