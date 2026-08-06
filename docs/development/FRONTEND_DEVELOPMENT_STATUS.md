@@ -108,8 +108,8 @@ When the active UI is acceptable:
 
 | Track | Status |
 |-------|--------|
-| Backend gates (KYC, issuer ownership, register throttle, ordering) | In progress on `feature/v1-backend-mvp-gates` |
-| UI Live blockers (KYC submit/review, moderation details, doc upload bytes) | Awaiting AI Studio — prompt: [`V1_PHASE_A_STUDIO_PROMPT.md`](./V1_PHASE_A_STUDIO_PROMPT.md) |
+| Backend gates (KYC, issuer ownership, register throttle, ordering) | Landed on `feature/v1-backend-mvp-gates` (PR #23) |
+| UI Live blockers (KYC submit/review, moderation details, doc upload bytes) | Landed in UI `70c80e74` — follow-up tsc: [`V1_PHASE_A_FOLLOWUP_TSC_PROMPT.md`](./V1_PHASE_A_FOLLOWUP_TSC_PROMPT.md) |
 | E2E expansion + CI Playwright | Specs + `.github/workflows/ci-e2e.yml` |
 | Chabokan production | Runbook: [`PRODUCTION_CHABOKAN_DEPLOY.md`](./PRODUCTION_CHABOKAN_DEPLOY.md) |
 | Codespaces | `.devcontainer/` in doion (dev only; not production host) |
