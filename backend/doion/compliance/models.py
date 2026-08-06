@@ -54,6 +54,7 @@ class FeatureFlag(TimeStampedModel):
     class Meta:
         verbose_name = _("Feature Flag")
         verbose_name_plural = _("Feature Flags")
+        ordering = ["key"]
 
     def __str__(self) -> str:
         return self.key

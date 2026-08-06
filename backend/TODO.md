@@ -15,7 +15,10 @@
 ## Phase 1 — Remaining
 
 - [ ] Add tests for identity endpoints (serializer + permission)
-- [ ] Add rate limiting to register endpoint
+- [x] Add rate limiting to register endpoint
+- [x] Enforce KYC_APPROVED before listing create / express interest
+- [x] Scope IssuerProfile update/delete to creator or staff (`created_by`)
+- [x] Default `ordering` on FeatureFlag / Verification / Match / ChequeListing / IssuerProfile
 - [ ] Add OpenAPI schema annotations (drf-spectacular)
 
 ## Phase 2 — KYC — Completed

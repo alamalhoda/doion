@@ -340,6 +340,7 @@ REST_FRAMEWORK = {
         "anon": "100/minute",
         "user": "1000/minute",
         "listing_create": "10/day",
+        "register": "10/hour",
     },
 }
 

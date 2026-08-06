@@ -14,6 +14,7 @@ from django.utils.crypto import get_random_string
 from doion.checks.models import ChequeListing
 from doion.checks.models import IssuerProfile
 from doion.identity.models import Profile
+from doion.identity.models import Verification
 from doion.matching.constants import SettlementType
 from doion.matching.constants import Status as MatchStatus
 from doion.matching.models import Match
@@ -101,13 +102,33 @@ class Command(BaseCommand):
             action = "created" if created else "updated"
             self.stdout.write(f"  {action}: {username} ({role})")
 
+            if role in {User.Role.CHECK_HOLDER, User.Role.INVESTOR}:
+                Verification.objects.get_or_create(
+                    user=user,
+                    status=Verification.Status.APPROVED,
+                    defaults={
+                        "full_name": user.name or username,
+                        "national_id": f"{1000000000 + user.id}"[:10],
+                        "company_name": "",
+                        "rejection_reason": "",
+                        "rejection_code": "",
+                    },
+                )
+
         holder = users["holder1"]
         investor = users["investor1"]
 
         issuer, _ = IssuerProfile.objects.get_or_create(
             national_or_company_id="1000000001",
-            defaults={"name": "Demo Issuer Co", "credit_score": 720},
+            defaults={
+                "name": "Demo Issuer Co",
+                "credit_score": 720,
+                "created_by": holder,
+            },
         )
+        if issuer.created_by_id is None:
+            issuer.created_by = holder
+            issuer.save(update_fields=["created_by", "updated_at"])
 
         due = timezone.now().date() + timedelta(days=60)
         published: dict[str, ChequeListing] = {}

@@ -5,6 +5,7 @@ from rest_framework.decorators import action
 from rest_framework.mixins import RetrieveModelMixin, UpdateModelMixin
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
+from rest_framework.throttling import ScopedRateThrottle
 from rest_framework.views import APIView
 from rest_framework.viewsets import GenericViewSet, ModelViewSet, ViewSet
 from rest_framework_simplejwt.tokens import RefreshToken
@@ -25,6 +26,8 @@ from doion.users.models import User
 class RegisterViewSet(GenericViewSet):
     serializer_class = RegisterSerializer
     permission_classes = [AllowAny]
+    throttle_classes = [ScopedRateThrottle]
+    throttle_scope = "register"
 
     def create(self, request):
         serializer = self.get_serializer(data=request.data)

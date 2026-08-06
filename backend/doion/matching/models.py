@@ -42,6 +42,7 @@ class Match(TimeStampedModel):
     message = models.TextField(blank=True, default="")
 
     class Meta:
+        ordering = ["-created_at"]
         indexes = [
             models.Index(fields=["status"]),
             models.Index(fields=["check_holder", "status"]),
