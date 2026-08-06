@@ -61,10 +61,28 @@ test.describe("critical: create listing", () => {
       .catch(() => false);
 
     if (leftCreate) {
-      await page.goto(ROUTES.myListings);
-      await expect(page.locator("tr").filter({ hasText: sampleSerial })).toBeVisible({
-        timeout: 20_000,
+      const tokenAfter = await page.evaluate(
+        (key) => localStorage.getItem(key),
+        "chequeyar_access_token",
+      );
+      const apiBaseAfter = process.env.API_URL || "http://127.0.0.1:8000/api/v1";
+      const myResAfter = await page.request.get(`${apiBaseAfter}/listings/my/`, {
+        headers: { Authorization: `Bearer ${tokenAfter}` },
       });
+      expect(myResAfter.ok()).toBeTruthy();
+      const myBodyAfter = await myResAfter.json();
+      const myListAfter = Array.isArray(myBodyAfter)
+        ? myBodyAfter
+        : myBodyAfter.results || [];
+      const createdViaUi = myListAfter.find(
+        (row: { cheque_serial_number?: string }) =>
+          row.cheque_serial_number === sampleSerial,
+      );
+      expect(createdViaUi?.id).toBeTruthy();
+      await page.goto(ROUTES.myListings);
+      await expect(
+        page.locator("tr").filter({ hasText: `#${createdViaUi.id}` }),
+      ).toBeVisible({ timeout: 20_000 });
       return;
     }
 
