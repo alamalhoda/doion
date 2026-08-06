@@ -20,14 +20,16 @@ Full policy SSOT: `docs/development/FRONTEND_DEVELOPMENT_STATUS.md`.
 - Use **Bun**, not npm/yarn/pnpm, for install and scripts.
 - Lockfile SSOT: `bun.lock` (committed by AI Studio).
 - `package-lock.json` is gitignored in the UI repo — do not create, commit, or push it.
-- Local commands:
+- Local commands (prefer loopback host — VPN/TUN often breaks `0.0.0.0`):
 
 ```bash
 cd /path/to/checkyar-googleai
 git pull
 bun install
-bun run dev
+bun run dev -- --host 127.0.0.1 --port 3000
 ```
+
+Open `http://127.0.0.1:3000/`. Full rationale: `docs/development/FRONTEND_DEVELOPMENT_STATUS.md` § Local Vite host.
 
 ## One-way sync reminder
 

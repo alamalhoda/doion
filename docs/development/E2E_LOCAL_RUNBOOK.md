@@ -1,6 +1,6 @@
 # E2E Local Runbook
 
-**As of:** 2026-08-02  
+**As of:** 2026-08-06  
 **Scope:** Playwright harness in this monorepo (`e2e/`) against the active UI (`checkyar-googleai`) and `doion` backend — smoke + critical-path.
 
 ## Ownership
@@ -54,14 +54,16 @@ python manage.py runserver 8000
 
 ### 3) Start UI (separate terminal)
 
+Bind Vite to loopback (avoids VPN/TUN `ERR_CONNECTION_TIMED_OUT` on `0.0.0.0` — details: [`FRONTEND_DEVELOPMENT_STATUS.md`](./FRONTEND_DEVELOPMENT_STATUS.md#local-vite-host-recommended)):
+
 ```bash
 cd /path/to/checkyar-googleai
 git pull
 bun install
-bun run dev
+bun run dev -- --host 127.0.0.1 --port 3000
 ```
 
-UI: `http://localhost:3000`
+UI: `http://127.0.0.1:3000` (set `FRONTEND_URL=http://127.0.0.1:3000` for Playwright if needed)
 
 ### 4) Run smoke
 
