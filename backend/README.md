@@ -90,6 +90,28 @@ uv run pytest
 
 ---
 
+## Staging روی چابکان (PaaS)
+
+Staging فعلی از شاخهٔ `develop` با CLI چابکان deploy می‌شود. از داخل `backend/`:
+
+```bash
+chabok login
+chabok deploy
+```
+
+فایل‌های مرتبط:
+
+| فایل | نقش |
+|------|-----|
+| `chabok.json` | نام سرویس Django (`chequeyar-back`) |
+| `.chabokignore` | حذف `.venv` / `.env` / SQLite / `staticfiles` از آپلود |
+| `nginx.conf` | سرو `/static/` از `staticfiles/` (نه `/app/static/`) |
+| `chabok-pre-start.sh` | `migrate` + `collectstatic` قبل از Gunicorn |
+
+Secrets و `DATABASE_URL` فقط در پنل سرویس تنظیم شوند؛ فایل `.env` آپلود نشود. Production جدا بعداً از `master`/`main` پیشنهاد می‌شود.
+
+---
+
 ## دستورات مفید
 
 ### اجرای تست‌ها
