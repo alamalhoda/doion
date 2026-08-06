@@ -9,10 +9,18 @@ class IssuerProfile(TimeStampedModel):
     national_or_company_id = models.CharField(max_length=20)
     name = models.CharField(max_length=255)
     credit_score = models.PositiveIntegerField(null=True, blank=True)
+    created_by = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="created_issuer_profiles",
+    )
 
     class Meta:
         verbose_name = _("Issuer Profile")
         verbose_name_plural = _("Issuer Profiles")
+        ordering = ["-created_at"]
 
     def __str__(self):
         return self.name
@@ -82,6 +90,7 @@ class ChequeListing(TimeStampedModel):
     class Meta:
         verbose_name = _("Cheque Listing")
         verbose_name_plural = _("Cheque Listings")
+        ordering = ["-created_at"]
         constraints = [
             models.UniqueConstraint(
                 fields=["issuer", "bank_name", "cheque_serial_number"],

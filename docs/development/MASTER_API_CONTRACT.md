@@ -198,7 +198,7 @@ These are **payload enum values** for `rejection_code` on listing moderation dec
 
 **Endpoint:** `POST /api/v1/identity/register/`
 
-**Permission:** AllowAny
+**Permission:** AllowAny. Scoped throttle `register` = 10/hour.
 
 **Request Body:**
 
@@ -551,7 +551,7 @@ Documents are created as part of Verification creation or Listing document uploa
 
 **Endpoint:** `POST /api/v1/listings/`
 
-**Permission:** IsAuthenticated (default). Scoped throttle `listing_create` = 10/day. Daily serializer cap of 10 listings/user/day also applies. `IsCheckHolder` is imported but **not** applied on this ViewSet; KYC-approved is **not** enforced in the view layer.
+**Permission:** IsAuthenticated (default). Requires an **approved KYC** verification (`403 PERMISSION_ERROR` otherwise). Scoped throttle `listing_create` = 10/day. Daily serializer cap of 10 listings/user/day also applies.
 
 **Request Body:**
 
@@ -710,7 +710,7 @@ Documents are created as part of Verification creation or Listing document uploa
 
 ## 7. Issuer Profiles
 
-Full CRUD via `IssuerProfileViewSet`. Permission: **IsAuthenticated** for all methods. There is **no ownership filter** — any authenticated user can list/create/update/delete any issuer profile.
+Full CRUD via `IssuerProfileViewSet`. **List/retrieve/create:** any authenticated user. **Update/delete:** only the `created_by` user, or moderator/admin. List supports query filter `national_or_company_id`. Response includes read-only `created_by` (user id or null).
 
 ### 7.1 List / Create Issuer Profiles
 
@@ -735,6 +735,7 @@ Full CRUD via `IssuerProfileViewSet`. Permission: **IsAuthenticated** for all me
   "national_or_company_id": "10100345678",
   "name": "شرکت آسان‌پرداخت",
   "credit_score": null,
+  "created_by": 1,
   "created_at": "2025-04-25T08:00:00Z",
   "updated_at": "2025-04-25T08:00:00Z"
 }
@@ -867,7 +868,7 @@ Note: Default DRF `PageNumberPagination` is used (page size fixed at **20**). Cl
 
 **Endpoint:** `POST /api/v1/matches/`
 
-**Permission:** IsAuthenticated (investor only)
+**Permission:** IsAuthenticated (investor only). Requires an **approved KYC** verification (`403 PERMISSION_ERROR` otherwise).
 
 **Request Body:**
 
@@ -1475,6 +1476,7 @@ Configured in `REST_FRAMEWORK["DEFAULT_THROTTLE_*"]`:
 | Anonymous (`AnonRateThrottle`) | 100 requests/minute |
 | Authenticated (`UserRateThrottle`) | 1000 requests/minute |
 | Listing creation (`listing_create` scoped) | 10 requests/day per user |
+| Registration (`register` scoped) | 10 requests/hour per IP/client |
 
 Listing create also enforces a serializer-level daily cap of 10 listings per user (same calendar day).
 

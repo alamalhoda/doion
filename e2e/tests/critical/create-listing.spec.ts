@@ -44,9 +44,49 @@ test.describe("critical: create listing", () => {
     });
     await expect(publishBtn.first()).toBeVisible({ timeout: 10_000 });
 
-    // Live UI create currently omits required `issuer` FK (API contract).
-    // Drive the mutating assert via API using demo IssuerProfile; Studio prompt
-    // should fix UI to get-or-create issuer before POST /listings/.
+    // Live createListing client already get-or-creates issuer when national_id is set.
+    // Prefer UI submit; fall back to API only if publish does not leave the form.
+    const publishTestId = page.getByTestId(TEST_IDS.listingCreateSubmit);
+    if (await publishTestId.count()) {
+      await publishTestId.click();
+    } else {
+      await publishBtn.first().click();
+    }
+
+    const leftCreate = await page
+      .waitForURL((url) => !url.pathname.includes("/listings/create"), {
+        timeout: 12_000,
+      })
+      .then(() => true)
+      .catch(() => false);
+
+    if (leftCreate) {
+      const tokenAfter = await page.evaluate(
+        (key) => localStorage.getItem(key),
+        "chequeyar_access_token",
+      );
+      const apiBaseAfter = process.env.API_URL || "http://127.0.0.1:8000/api/v1";
+      const myResAfter = await page.request.get(`${apiBaseAfter}/listings/my/`, {
+        headers: { Authorization: `Bearer ${tokenAfter}` },
+      });
+      expect(myResAfter.ok()).toBeTruthy();
+      const myBodyAfter = await myResAfter.json();
+      const myListAfter = Array.isArray(myBodyAfter)
+        ? myBodyAfter
+        : myBodyAfter.results || [];
+      const createdViaUi = myListAfter.find(
+        (row: { cheque_serial_number?: string }) =>
+          row.cheque_serial_number === sampleSerial,
+      );
+      expect(createdViaUi?.id).toBeTruthy();
+      await page.goto(ROUTES.myListings);
+      await expect(
+        page.locator("tr").filter({ hasText: `#${createdViaUi.id}` }),
+      ).toBeVisible({ timeout: 20_000 });
+      return;
+    }
+
+    // Fallback until Phase A upload/issuer UX is fully verified via Studio.
     const token = await page.evaluate(
       (key) => localStorage.getItem(key),
       "chequeyar_access_token",

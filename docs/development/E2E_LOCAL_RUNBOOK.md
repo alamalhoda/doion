@@ -115,9 +115,14 @@ On newer CI hosts you may set `PLAYWRIGHT_CHANNEL=chromium` after `npx playwrigh
 |------|------|--------|
 | `express-interest.spec.ts` | `investor1` | marketplace pagination active; express interest on serial `2000…0022` → sent match card |
 | `accept-match.spec.ts` | `holder1` | accept seeded pending match on `2000…0001` → accepted |
-| `moderation-approve.spec.ts` | `moderator1` | approve pending `3000…0001` via review page → holder sees published |
-| `create-listing.spec.ts` | `holder1` | fill sample in flat mode; Live create via API with `issuer` (UI gap noted in Studio prompt) → my listings pending |
+| `decline-match.spec.ts` | `holder1` | decline seeded pending match on `2000…0002` |
+| `moderation-approve.spec.ts` | `moderator1` | approve pending via review page → holder sees published |
+| `moderation-reject.spec.ts` | `moderator1` | reject pending serial `3000…0012` → status rejected |
+| `create-listing.spec.ts` | `holder1` | UI submit preferred; API fallback if create form does not navigate |
 | `notifications-mark-read.spec.ts` | `holder1` | pagination + mark one unread as read |
+| `kyc-approve.spec.ts` | `moderator1` | approve pending KYC for `holderkyc1` (needs Live KYC review UI) |
+
+Also smoke: `admin-surfaces.spec.ts` for `admin1` stats / feature-flags / audit.
 
 Stable serials / counts: `e2e/support/constants.ts` (`SEED`) and `seed_demo`.
 
@@ -127,14 +132,26 @@ Selectors prefer `data-testid` when present; fallbacks use Persian labels/placeh
 
 ## Demo users
 
-Same as `seed_demo`: `holder1`, `investor1`, `moderator1`, `admin1` — password = `$DEMO_SEED_PASSWORD`.
+Same as `seed_demo`: `holder1`, `investor1`, `moderator1`, `admin1`, `holderkyc1` (pending KYC) — password = `$DEMO_SEED_PASSWORD`.
+
+## CI
+
+GitHub Actions: [`.github/workflows/ci-e2e.yml`](../../.github/workflows/ci-e2e.yml) — seeds demo backend, starts UI from `alamalhoda/checkyar-googleai`, runs smoke + critical with Chromium.
+
+The UI checkout is **pinned to a full commit SHA** (`ref:` in the workflow), not a floating branch tip. That keeps the CI trust boundary explicit: compromise of the external repo’s default branch cannot silently change what this job runs.
+
+To bump the pin after reviewing a new UI commit:
+
+```bash
+cd /path/to/checkyar-googleai && git pull && git rev-parse HEAD
+# then set that SHA as `ref:` under "Checkout active UI" in ci-e2e.yml
+```
 
 ## Out of scope (follow-ups)
 
-- Decline match / moderation reject / full KYC submit→approve
-- admin feature-flags smoke
-- CI job for Playwright
+- Full KYC submit→approve UI path until Phase A Studio lands
 - Visual regression
+- Settlement / SMS real providers
 
 ## Related
 

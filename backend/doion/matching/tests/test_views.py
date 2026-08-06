@@ -4,6 +4,8 @@ from rest_framework.test import APIClient
 from doion.checks.factories import ChequeListingFactory
 from doion.checks.factories import IssuerProfileFactory
 from doion.checks.models import ChequeListing
+from doion.identity.factories import ProfileFactory
+from doion.identity.factories import VerificationFactory
 from doion.matching.constants import Status
 from doion.matching.services import MatchingService
 from doion.users.factories import UserFactory
@@ -16,12 +18,18 @@ def api_client():
 
 @pytest.fixture
 def investor(db):
-    return UserFactory.create(as_investor=True)
+    user = UserFactory.create(as_investor=True)
+    ProfileFactory.create(user=user, role=user.role)
+    VerificationFactory.create(user=user, approved=True)
+    return user
 
 
 @pytest.fixture
 def check_holder(db):
-    return UserFactory.create()
+    user = UserFactory.create()
+    ProfileFactory.create(user=user, role=user.role)
+    VerificationFactory.create(user=user, approved=True)
+    return user
 
 
 @pytest.fixture

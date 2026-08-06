@@ -22,6 +22,13 @@ def user(db):
     return user
 
 
+@pytest.fixture
+def other_user(db):
+    user = UserFactory.create(password=get_random_string(12))
+    ProfileFactory.create(user=user, role=user.role)
+    return user
+
+
 @pytest.mark.django_db
 class TestIssuerProfileAPI:
     def test_create_issuer_profile(self, api_client, user):
@@ -37,7 +44,8 @@ class TestIssuerProfileAPI:
         )
 
         assert response.status_code == 201
-        assert IssuerProfile.objects.filter(national_or_company_id="5555666677").exists()
+        issuer = IssuerProfile.objects.get(national_or_company_id="5555666677")
+        assert issuer.created_by_id == user.id
 
     def test_list_issuer_profiles_requires_auth(self, api_client):
         response = api_client.get("/api/v1/issuer-profiles/")
@@ -53,8 +61,23 @@ class TestIssuerProfileAPI:
         results = response.data["results"] if "results" in response.data else response.data
         assert len(results) >= 1
 
-    def test_patch_issuer_profile(self, api_client, user):
-        issuer = IssuerProfileFactory.create(name="Old Name")
+    def test_filter_by_national_or_company_id(self, api_client, user):
+        IssuerProfileFactory.create(national_or_company_id="1111222233", name="A")
+        IssuerProfileFactory.create(national_or_company_id="9999888877", name="B")
+        api_client.force_authenticate(user=user)
+
+        response = api_client.get(
+            "/api/v1/issuer-profiles/",
+            {"national_or_company_id": "1111222233"},
+        )
+
+        assert response.status_code == 200
+        results = response.data["results"] if "results" in response.data else response.data
+        assert len(results) == 1
+        assert results[0]["national_or_company_id"] == "1111222233"
+
+    def test_patch_own_issuer_profile(self, api_client, user):
+        issuer = IssuerProfileFactory.create(name="Old Name", created_by=user)
         api_client.force_authenticate(user=user)
 
         response = api_client.patch(
@@ -67,8 +90,20 @@ class TestIssuerProfileAPI:
         issuer.refresh_from_db()
         assert issuer.name == "Updated Name"
 
-    def test_delete_issuer_profile(self, api_client, user):
-        issuer = IssuerProfileFactory.create()
+    def test_patch_other_users_issuer_forbidden(self, api_client, user, other_user):
+        issuer = IssuerProfileFactory.create(name="Owned", created_by=other_user)
+        api_client.force_authenticate(user=user)
+
+        response = api_client.patch(
+            f"/api/v1/issuer-profiles/{issuer.id}/",
+            {"name": "Hijacked"},
+            format="json",
+        )
+
+        assert response.status_code == 403
+
+    def test_delete_own_issuer_profile(self, api_client, user):
+        issuer = IssuerProfileFactory.create(created_by=user)
         api_client.force_authenticate(user=user)
 
         response = api_client.delete(f"/api/v1/issuer-profiles/{issuer.id}/")

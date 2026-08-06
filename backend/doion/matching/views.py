@@ -6,6 +6,7 @@ from rest_framework.viewsets import GenericViewSet
 
 from doion.checks.models import ChequeListing
 from doion.core.permissions import IsCheckHolder, IsInvestor
+from doion.identity.services import require_approved_kyc
 from doion.matching.constants import Status
 from doion.matching.exceptions import InvalidMatchStatus, MatchNotAllowed
 from doion.matching.models import Match
@@ -72,6 +73,8 @@ class MatchViewSet(GenericViewSet):
 
         listing_id = serializer.validated_data["listing_id"]
         message = serializer.validated_data.get("message", "")
+
+        require_approved_kyc(request.user)
 
         try:
             listing = ChequeListing.objects.select_for_update().get(id=listing_id)

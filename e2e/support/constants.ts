@@ -7,13 +7,16 @@ export const USERS = {
   investor: "investor1",
   moderator: "moderator1",
   admin: "admin1",
+  holderKycPending: "holderkyc1",
 } as const;
 
 /** Stable cheque serials from enriched `seed_demo`. */
 export const SEED = {
   acceptMatchSerial: "2000000000000001",
+  declineMatchSerial: "2000000000000002",
   expressInterestSerial: "2000000000000022",
   approvePendingSerial: "3000000000000001",
+  rejectPendingSerial: "3000000000000012",
   publishedCount: 22,
   pendingCount: 12,
   notificationCount: 12,
@@ -25,12 +28,21 @@ export const ROUTES = {
   login: "/login",
   marketplace: "/marketplace",
   moderation: "/moderation",
+  moderationKyc: "/moderation/kyc",
   matches: "/matches",
   myListings: "/listings/my",
   listingCreate: "/listings/create",
   notifications: "/notifications",
+  adminStats: "/admin/stats",
+  adminFeatureFlags: "/admin/feature-flags",
+  adminAudit: "/admin/audit",
+  profile: "/me",
   expressInterest: (listingId: number | string) =>
     `/matches/express-interest/${listingId}`,
+  moderationReview: (listingId: number | string) =>
+    `/moderation/review/${listingId}`,
+  kycReview: (verificationId: number | string) =>
+    `/moderation/kyc/${verificationId}`,
 } as const;
 
 /**
@@ -57,7 +69,10 @@ export const TEST_IDS = {
   matchesPanelSent: "matches-panel-sent",
   matchAcceptBtn: "match-accept-btn",
   matchAcceptConfirm: "match-accept-confirm",
+  matchDeclineBtn: "match-decline-btn",
+  matchDeclineConfirm: "match-decline-confirm",
   matchStatusAccepted: "match-status-accepted",
+  matchStatusDeclined: "match-status-declined",
   expressInterestPage: "express-interest-page",
   expressInterestMessage: "express-interest-message",
   expressInterestSubmit: "express-interest-submit",
@@ -65,6 +80,13 @@ export const TEST_IDS = {
   listingCreatePage: "listing-create-page",
   listingFillSample: "listing-fill-sample",
   listingCreateSubmit: "listing-create-submit",
+  moderationRejectBtn: "moderation-reject-btn",
+  moderationRejectConfirm: "moderation-reject-confirm",
+  kycApproveBtn: "kyc-approve-btn",
+  kycRejectBtn: "kyc-reject-btn",
+  kycSubmitBtn: "kyc-submit-btn",
+  adminStatsPage: "admin-stats-page",
+  adminFeatureFlagsPage: "admin-feature-flags-page",
   notificationsPage: "notifications-page",
   notificationItem: "notification-item",
   notificationMarkRead: "notification-mark-read",

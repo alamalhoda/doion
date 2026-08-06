@@ -15,7 +15,10 @@
 ## Phase 1 — Remaining
 
 - [ ] Add tests for identity endpoints (serializer + permission)
-- [ ] Add rate limiting to register endpoint
+- [x] Add rate limiting to register endpoint
+- [x] Enforce KYC_APPROVED before listing create / express interest
+- [x] Scope IssuerProfile update/delete to creator or staff (`created_by`)
+- [x] Default `ordering` on FeatureFlag / Verification / Match / ChequeListing / IssuerProfile
 - [ ] Add OpenAPI schema annotations (drf-spectacular)
 
 ## Phase 2 — KYC — Completed
@@ -136,8 +139,8 @@
 ### Cross-cutting (خارج از این مونورپو یا موج جدا)
 - [x] E2E smoke harness در `e2e/` (Playwright) با `VITE_USE_MOCK=false` + `seed_demo` / demo DB — see [`docs/development/E2E_LOCAL_RUNBOOK.md`](../docs/development/E2E_LOCAL_RUNBOOK.md)
 - [x] E2E critical-path specs + rich `seed_demo` (express interest / accept / moderation approve / create listing / notifications mark-read) — runbook + [`AI_STUDIO_E2E_CRITICAL_PATH_PROMPT.md`](../docs/development/AI_STUDIO_E2E_CRITICAL_PATH_PROMPT.md); needs Studio testids then `npm run test:critical`
-- [ ] CI Playwright (smoke + critical)
-- [ ] ادامه تست‌های UI در `checkyar-googleai` (store/API-client با mock کنترل‌شده) فقط از طریق AI Studio — selector prep: [`docs/development/AI_STUDIO_E2E_PREP_PROMPT.md`](../docs/development/AI_STUDIO_E2E_PREP_PROMPT.md)
+- [x] CI Playwright (smoke + critical) — `.github/workflows/ci-e2e.yml`
+- [ ] ادامه تست‌های UI در `checkyar-googleai` (store/API-client با mock کنترل‌شده) فقط از طریق AI Studio — selector prep: [`docs/development/AI_STUDIO_E2E_PREP_PROMPT.md`](../docs/development/AI_STUDIO_E2E_PREP_PROMPT.md) + Phase A: [`V1_PHASE_A_STUDIO_PROMPT.md`](../docs/development/V1_PHASE_A_STUDIO_PROMPT.md)
 
 ### Phase 8 — Remaining (requires shell, blocked in this environment)
 - [ ] `python manage.py makemigrations` + `migrate` (generates compliance 0001 and the pending integrations/moderation/notifications migrations)

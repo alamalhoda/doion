@@ -11,6 +11,7 @@ from doion.checks.factories import ChequeListingFactory
 from doion.checks.factories import IssuerProfileFactory
 from doion.checks.models import ChequeListing
 from doion.identity.factories import ProfileFactory
+from doion.identity.factories import VerificationFactory
 from doion.users.factories import UserFactory
 
 
@@ -23,6 +24,7 @@ def api_client():
 def check_holder(db):
     user = UserFactory.create(password=get_random_string(12))
     ProfileFactory.create(user=user, role=user.role)
+    VerificationFactory.create(user=user, approved=True)
     return user
 
 
@@ -30,6 +32,7 @@ def check_holder(db):
 def other_holder(db):
     user = UserFactory.create(password=get_random_string(12))
     ProfileFactory.create(user=user, role=user.role)
+    VerificationFactory.create(user=user, approved=True)
     return user
 
 
@@ -166,7 +169,21 @@ class TestChequeListingCreate:
 
 
 @pytest.mark.django_db
-class TestChequeListingListRetrieveMy:
+class TestChequeListingKycGate:
+    def test_create_listing_requires_approved_kyc(self, api_client, issuer, db):
+        user = UserFactory.create(password=get_random_string(12))
+        ProfileFactory.create(user=user, role=user.role)
+        api_client.force_authenticate(user=user)
+
+        response = api_client.post(
+            "/api/v1/listings/",
+            _listing_payload(issuer),
+            format="json",
+        )
+
+        assert response.status_code == 403
+        assert response.data["error"]["code"] == "PERMISSION_ERROR"
+
     def test_list_returns_only_own_listings_for_check_holder(
         self, api_client, check_holder, other_holder, issuer
     ):

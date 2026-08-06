@@ -14,8 +14,16 @@ from doion.documents.models import Document
 class IssuerProfileSerializer(serializers.ModelSerializer):
     class Meta:
         model = IssuerProfile
-        fields = ["id", "national_or_company_id", "name", "credit_score", "created_at", "updated_at"]
-        read_only_fields = ["id", "credit_score", "created_at", "updated_at"]
+        fields = [
+            "id",
+            "national_or_company_id",
+            "name",
+            "credit_score",
+            "created_by",
+            "created_at",
+            "updated_at",
+        ]
+        read_only_fields = ["id", "credit_score", "created_by", "created_at", "updated_at"]
 
 
 class ChequeListingSerializer(serializers.ModelSerializer):
