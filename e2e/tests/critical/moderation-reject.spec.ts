@@ -39,39 +39,52 @@ test.describe("critical: moderation reject", () => {
       SEED.rejectPendingSerial,
     );
 
-    await page.goto(ROUTES.moderationReview(listingId));
+    await page.goto(ROUTES.moderation);
+    await expect(page.getByTestId(TEST_IDS.moderationQueuePage)).toBeVisible({
+      timeout: 20_000,
+    });
+
+    const row = page.locator(
+      `[data-testid="${TEST_IDS.moderationItem}"][data-serial="${SEED.rejectPendingSerial}"]`,
+    );
+    await expect(row).toBeVisible({ timeout: 20_000 });
+    await row.getByTestId("moderation-review-open").click();
     await expect(page).toHaveURL(/\/moderation\/review\//, { timeout: 20_000 });
+
+    // Review defaults to MOD_101; optional note helps Live UX parity with queue modal.
+    const note = page.getByPlaceholder(/توضیحات تکمیلی|یادداشت محرمانه|توضیحات/);
+    if (await note.count()) {
+      await note.first().fill("E2E reject: incomplete listing documents");
+    }
 
     const rejectBtn = page.getByTestId(TEST_IDS.moderationRejectBtn);
     if (await rejectBtn.count()) {
-      await rejectBtn.click();
+      await rejectBtn.first().click();
     } else {
-      await page
-        .getByRole("button", { name: /رد آگهی|رد و بازگرداندن/ })
-        .first()
-        .click();
+      await page.getByRole("button", { name: /رد آگهی/ }).first().click();
     }
 
-    const confirm = page.getByTestId(TEST_IDS.moderationRejectConfirm);
-    if (await confirm.count()) {
-      await confirm.click();
-    }
+    const token = await page.evaluate(
+      (key) => localStorage.getItem(key),
+      "chequeyar_access_token",
+    );
+    const apiBase = process.env.API_URL || "http://localhost:8000/api/v1";
 
-    // After reject, either return to queue or show rejected state.
     await expect
-      .poll(async () => {
-        const token = await page.evaluate(
-          (key) => localStorage.getItem(key),
-          "chequeyar_access_token",
-        );
-        const apiBase = process.env.API_URL || "http://localhost:8000/api/v1";
-        const res = await page.request.get(`${apiBase}/listings/${listingId}/`, {
-          headers: { Authorization: `Bearer ${token}` },
-        });
-        if (!res.ok()) return "";
-        const body = await res.json();
-        return body.status || "";
-      }, { timeout: 20_000 })
+      .poll(
+        async () => {
+          const res = await page.request.get(
+            `${apiBase}/listings/${listingId}/`,
+            {
+              headers: { Authorization: `Bearer ${token}` },
+            },
+          );
+          if (!res.ok()) return "";
+          const body = await res.json();
+          return body.status || "";
+        },
+        { timeout: 20_000 },
+      )
       .toBe("rejected");
 
     void DEMO_PASSWORD;
