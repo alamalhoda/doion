@@ -43,7 +43,7 @@ test.describe("critical: decline match", () => {
     await clickConfirmDialog(
       page,
       TEST_IDS.matchDeclineConfirm,
-      /تأیید|تایید|رد پیشنهاد/,
+      /^ثبت و رد پیشنهاد$/,
     );
 
     const status = page.getByTestId(TEST_IDS.matchStatusDeclined);
