@@ -39,39 +39,42 @@ test.describe("critical: moderation reject", () => {
       SEED.rejectPendingSerial,
     );
 
-    await page.goto(ROUTES.moderationReview(listingId));
-    await expect(page).toHaveURL(/\/moderation\/review\//, { timeout: 20_000 });
+    // Prefer queue reject modal (sends MOD_* codes). Review page options are
+    // not contract-aligned and reject without rejection_code fails validation.
+    await page.goto(ROUTES.moderation);
+    await expect(page.getByTestId(TEST_IDS.moderationQueuePage)).toBeVisible({
+      timeout: 20_000,
+    });
 
-    const rejectBtn = page.getByTestId(TEST_IDS.moderationRejectBtn);
-    if (await rejectBtn.count()) {
-      await rejectBtn.click();
-    } else {
-      await page
-        .getByRole("button", { name: /رد آگهی|رد و بازگرداندن/ })
-        .first()
-        .click();
-    }
+    const row = page.locator("tr").filter({ hasText: `#${listingId}` });
+    await expect(row).toBeVisible({ timeout: 20_000 });
+    await row.getByRole("button", { name: /^رد آگهی$/ }).click();
 
-    const confirm = page.getByTestId(TEST_IDS.moderationRejectConfirm);
-    if (await confirm.count()) {
-      await confirm.click();
-    }
+    await page
+      .getByPlaceholder(/علت دقیق رد|توضیح کامل|ناخوانا/)
+      .fill("E2E reject: incomplete listing documents");
+    await page.getByRole("button", { name: /ثبت رد آگهی/ }).click();
 
-    // After reject, either return to queue or show rejected state.
     await expect
-      .poll(async () => {
-        const token = await page.evaluate(
-          (key) => localStorage.getItem(key),
-          "chequeyar_access_token",
-        );
-        const apiBase = process.env.API_URL || "http://localhost:8000/api/v1";
-        const res = await page.request.get(`${apiBase}/listings/${listingId}/`, {
-          headers: { Authorization: `Bearer ${token}` },
-        });
-        if (!res.ok()) return "";
-        const body = await res.json();
-        return body.status || "";
-      }, { timeout: 20_000 })
+      .poll(
+        async () => {
+          const token = await page.evaluate(
+            (key) => localStorage.getItem(key),
+            "chequeyar_access_token",
+          );
+          const apiBase = process.env.API_URL || "http://localhost:8000/api/v1";
+          const res = await page.request.get(
+            `${apiBase}/listings/${listingId}/`,
+            {
+              headers: { Authorization: `Bearer ${token}` },
+            },
+          );
+          if (!res.ok()) return "";
+          const body = await res.json();
+          return body.status || "";
+        },
+        { timeout: 20_000 },
+      )
       .toBe("rejected");
 
     void DEMO_PASSWORD;
