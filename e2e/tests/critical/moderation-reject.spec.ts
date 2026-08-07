@@ -51,26 +51,24 @@ test.describe("critical: moderation reject", () => {
     await row.getByTestId("moderation-review-open").click();
     await expect(page).toHaveURL(/\/moderation\/review\//, { timeout: 20_000 });
 
-    // Review-page reject dropdown uses non-contract codes (e.g. UNCLEAR_IMAGE),
-    // so Live reject from that UI fails validation. Submit the contract path here;
-    // Studio should align ModerationReview options to MOD_101..MOD_106.
+    // Review defaults to MOD_101; optional note helps Live UX parity with queue modal.
+    const note = page.getByPlaceholder(/توضیحات تکمیلی|یادداشت محرمانه|توضیحات/);
+    if (await note.count()) {
+      await note.first().fill("E2E reject: incomplete listing documents");
+    }
+
+    const rejectBtn = page.getByTestId(TEST_IDS.moderationRejectBtn);
+    if (await rejectBtn.count()) {
+      await rejectBtn.first().click();
+    } else {
+      await page.getByRole("button", { name: /رد آگهی/ }).first().click();
+    }
+
     const token = await page.evaluate(
       (key) => localStorage.getItem(key),
       "chequeyar_access_token",
     );
     const apiBase = process.env.API_URL || "http://localhost:8000/api/v1";
-    const decisionRes = await page.request.post(
-      `${apiBase}/moderation/${listingId}/decision/`,
-      {
-        headers: { Authorization: `Bearer ${token}` },
-        data: {
-          decision: "reject",
-          rejection_code: "MOD_101",
-          rejection_note: "E2E reject: incomplete listing documents",
-        },
-      },
-    );
-    expect(decisionRes.ok()).toBeTruthy();
 
     await expect
       .poll(

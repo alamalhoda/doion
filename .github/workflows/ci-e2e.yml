@@ -24,8 +24,8 @@ jobs:
         uses: actions/checkout@v4
         with:
           repository: alamalhoda/checkyar-googleai
-          # UI Live blockers + tsc/docs follow-up (2026-08-06)
-          ref: 46dbdb850f55af2ca963bed30564870a5476979d
+          # ModerationReview MOD_101..MOD_106 reject codes (2026-08-07)
+          ref: e0b69cbe7259e25d12fb75d38dbdb946e88a8c60
           path: checkyar-googleai
           token: ${{ secrets.GITHUB_TOKEN }}
 
