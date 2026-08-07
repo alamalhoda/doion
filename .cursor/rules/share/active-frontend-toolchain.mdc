@@ -2,7 +2,6 @@
 description: Active UI (checkyar-googleai) local toolchain — Bun SSOT, one-way AI Studio sync; do not use npm lockfile
 globs:
   - "docs/development/FRONTEND_DEVELOPMENT_STATUS.md"
-  - "frontend-legacy/**"
   - "**/FRONTEND_DEVELOPMENT_STATUS.md"
 alwaysApply: false
 ---
@@ -11,7 +10,7 @@ alwaysApply: false
 
 ## Scope
 
-Applies while the product UI lives in external repo `alamalhoda/checkyar-googleai` (Google AI Studio) and this monorepo keeps `frontend-legacy/` archived.
+Applies while the product UI lives in external repo `alamalhoda/checkyar-googleai` (Google AI Studio).
 
 Full policy SSOT: `docs/development/FRONTEND_DEVELOPMENT_STATUS.md`.
 
@@ -40,4 +39,3 @@ Open `http://127.0.0.1:3000/`. Full rationale: `docs/development/FRONTEND_DEVELO
 ## Do not
 
 - Suggest `npm install` as the default for the active UI.
-- Treat `frontend-legacy/` as the runnable product frontend.

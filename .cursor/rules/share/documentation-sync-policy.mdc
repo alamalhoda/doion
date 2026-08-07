@@ -3,7 +3,6 @@ description: Keep TODO/README/PLAN and project docs synchronized after major cha
 globs:
   - "backend/**/*.py"
   - "frontend/src/**/*.{js,ts,vue}"
-  - "frontend-legacy/src/**/*.{js,ts,vue}"
   - "shared/**/*.{js,ts}"
   - "docs/**/*.md"
   - "**/*README*.md"
@@ -29,8 +28,7 @@ alwaysApply: false
 - تغییرات cross-domain یا اولویت‌ها -> `TODO.md`
 - تغییرات backend -> `backend/TODO.md`, `backend/README.md`
 - تغییرات UI فعال (فعلاً repo خارجی) -> سیاست در `docs/development/FRONTEND_DEVELOPMENT_STATUS.md`؛ قرارداد API همچنان فقط در این مونورپو
-- تغییرات درخت آرشیو -> `frontend-legacy/README.md` (و در صورت نیاز `frontend-legacy/TODO.md`)
-- تغییرات roadmap/phase درخت آرشیو -> `frontend-legacy/IMPLEMENTATION_PLAN.md` در صورت وجود
+- تغییرات UI داخل مونورپو (پس از مهاجرت به `frontend/`) -> `frontend/README.md` در صورت وجود
 - تغییرات قرارداد API -> **`docs/development/MASTER_API_CONTRACT.md` فقط** (SSOT واحد؛ `API_CONTRACT_REGISTRY.md` deprecated stub است)
 - تغییرات وضعیت flow صفحات -> `docs/development/PAGE_REVIEW_LOG.md`
 

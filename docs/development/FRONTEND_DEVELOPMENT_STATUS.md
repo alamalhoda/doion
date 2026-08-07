@@ -10,8 +10,7 @@ This document is the SSOT for *where* active UI work happens and how it relates 
 |-----------|----------|------|
 | **Backend + API contract** | This repo (`doion`) — `backend/`, `docs/development/MASTER_API_CONTRACT.md` | Source of truth for API; developed with GitFlow (`feature/*` → PR → `develop`) |
 | **Active frontend** | External: [alamalhoda/checkyar-googleai](https://github.com/alamalhoda/checkyar-googleai) | Product UI under active development |
-| **Legacy frontend** | `frontend-legacy/` in this repo | Archived; documentation and historical reference only — **not maintained** |
-| **Cursor frontend rules** | `.cursor/rules/frontend/` | Still apply to future `frontend/` code and to edits under `frontend-legacy/` when touched |
+| **Cursor frontend rules** | `.cursor/rules/frontend/` | Apply to future in-monorepo `frontend/` code after AI Studio exit |
 
 ## One-way sync rule (mandatory while AI Studio is the UI source)
 
@@ -36,7 +35,6 @@ Active UI is authored in [Google AI Studio](https://aistudio.google.com/), which
 
 - Commit or push UI source changes from local/Cursor to `checkyar-googleai` (AI Studio will not see them → divergence).
 - Use `npm install` / commit `package-lock.json` for the active UI (creates drift vs AI Studio’s `bun.lock`).
-- Treat `frontend-legacy/` as the active app or wire CI/deploy to it.
 - Copy the active UI into this monorepo until leaving AI Studio (planned exit: adopt into `frontend/` via a feature PR, then archive the external repo).
 
 ## Package manager (active UI)
@@ -100,7 +98,7 @@ Browser smoke tests live in this monorepo under `e2e/` (not in `checkyar-googlea
 When the active UI is acceptable:
 
 1. Final `git pull` on `checkyar-googleai`.
-2. Feature branch on `doion`: place code in `frontend/`, keep `frontend-legacy/` as archive.
+2. Feature branch on `doion`: place the adopted UI under `frontend/`.
 3. PR → `develop`; then archive the `checkyar-googleai` GitHub repository.
 4. From then on, UI GitFlow is two-way inside this monorepo only.
 
@@ -118,7 +116,6 @@ UI remains external + one-way until after MVP acceptance. Do **not** migrate int
 
 ## Related docs
 
-- Legacy UI: [`../../frontend-legacy/README.md`](../../frontend-legacy/README.md)
 - Active UI repo README: https://github.com/alamalhoda/checkyar-googleai
 - API SSOT: [`MASTER_API_CONTRACT.md`](./MASTER_API_CONTRACT.md)
 - Backend demo / seed / (no) mock: [`BACKEND_DEMO_SEED_AND_DATA.md`](./BACKEND_DEMO_SEED_AND_DATA.md)
