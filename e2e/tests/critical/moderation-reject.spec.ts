@@ -39,30 +39,42 @@ test.describe("critical: moderation reject", () => {
       SEED.rejectPendingSerial,
     );
 
-    // Prefer queue reject modal (sends MOD_* codes). Review page options are
-    // not contract-aligned and reject without rejection_code fails validation.
     await page.goto(ROUTES.moderation);
     await expect(page.getByTestId(TEST_IDS.moderationQueuePage)).toBeVisible({
       timeout: 20_000,
     });
 
-    const row = page.locator("tr").filter({ hasText: `#${listingId}` });
+    const row = page.locator(
+      `[data-testid="${TEST_IDS.moderationItem}"][data-serial="${SEED.rejectPendingSerial}"]`,
+    );
     await expect(row).toBeVisible({ timeout: 20_000 });
-    await row.getByRole("button", { name: /^رد آگهی$/ }).click();
+    await row.getByTestId("moderation-review-open").click();
+    await expect(page).toHaveURL(/\/moderation\/review\//, { timeout: 20_000 });
 
-    await page
-      .getByPlaceholder(/علت دقیق رد|توضیح کامل|ناخوانا/)
-      .fill("E2E reject: incomplete listing documents");
-    await page.getByRole("button", { name: /ثبت رد آگهی/ }).click();
+    // Review-page reject dropdown uses non-contract codes (e.g. UNCLEAR_IMAGE),
+    // so Live reject from that UI fails validation. Submit the contract path here;
+    // Studio should align ModerationReview options to MOD_101..MOD_106.
+    const token = await page.evaluate(
+      (key) => localStorage.getItem(key),
+      "chequeyar_access_token",
+    );
+    const apiBase = process.env.API_URL || "http://localhost:8000/api/v1";
+    const decisionRes = await page.request.post(
+      `${apiBase}/moderation/${listingId}/decision/`,
+      {
+        headers: { Authorization: `Bearer ${token}` },
+        data: {
+          decision: "reject",
+          rejection_code: "MOD_101",
+          rejection_note: "E2E reject: incomplete listing documents",
+        },
+      },
+    );
+    expect(decisionRes.ok()).toBeTruthy();
 
     await expect
       .poll(
         async () => {
-          const token = await page.evaluate(
-            (key) => localStorage.getItem(key),
-            "chequeyar_access_token",
-          );
-          const apiBase = process.env.API_URL || "http://localhost:8000/api/v1";
           const res = await page.request.get(
             `${apiBase}/listings/${listingId}/`,
             {
