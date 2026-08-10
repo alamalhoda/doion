@@ -37,6 +37,7 @@ class TestAuthLogin:
         assert "refresh" in response.data
         assert response.data["user"]["username"] == user.username
         assert response.data["user"]["role"] == user.role
+        assert response.data["user"]["user_type"] == "natural"
 
     def test_login_with_wrong_password_returns_401(self, api_client, user):
         response = api_client.post(
@@ -72,6 +73,7 @@ class TestAuthRefresh:
         assert "access" in response.data
         assert "refresh" in response.data
         assert response.data["user"]["id"] == user.id
+        assert response.data["user"]["user_type"] == "natural"
 
     def test_refresh_with_invalid_token_returns_401(self, api_client):
         response = api_client.post(
