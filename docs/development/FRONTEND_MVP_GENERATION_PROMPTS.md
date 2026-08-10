@@ -102,17 +102,18 @@ export interface ApiErrorEnvelope { error: { code: string; message: string; deta
 
 export interface LoginRequest { identifier: string; password: string; }
 export interface LoginResponse { access: string; refresh: string; user: { id: number; username: string; email: string; name: string; }; }
-export interface RegisterRequest { username: string; email?: string; password: string; password_confirm: string; name?: string; phone?: string; role: 'check_holder' | 'investor'; }
-export interface RegisterResponse { access: string; refresh: string; user: { id: number; username: string; email: string; name: string; role: 'check_holder' | 'investor'; }; }
+export type UserType = 'natural' | 'legal';
+export interface RegisterRequest { username: string; email?: string; password: string; password_confirm: string; name?: string; phone?: string; role: 'check_holder' | 'investor'; user_type: UserType; }
+export interface RegisterResponse { access: string; refresh: string; user: { id: number; username: string; email: string; name: string; role: 'check_holder' | 'investor'; user_type: UserType; }; }
 export interface RefreshTokenRequest { refresh: string; }
 export interface RefreshTokenResponse { access: string; refresh: string; user: { id: number; username: string; email: string; name: string; }; }
 
-export interface User { id: number; username: string; email: string; name: string; phone?: string | null; role: UserRole; is_verified: boolean; }
-export interface Profile { id: number; username: string; email: string; name: string; phone: string; role: UserRole; bio: string; is_verified: boolean; created_at: string; updated_at: string; }
+export interface User { id: number; username: string; email: string; name: string; phone?: string | null; role: UserRole; user_type: UserType; is_verified: boolean; }
+export interface Profile { id: number; username: string; email: string; name: string; phone: string; role: UserRole; user_type: UserType; bio: string; is_verified: boolean; created_at: string; updated_at: string; }
 
 export interface Document { id: number; document_type: DocumentType; file: string; file_size: number; }
-export interface Verification { id: number; full_name: string; national_id: string; company_name: string; status: VerificationStatus; rejection_reason: string; rejection_code: string; documents: Document[]; }
-export interface CreateVerificationRequest { full_name: string; national_id?: string; company_name?: string; national_id_front: File; national_id_back: File; selfie?: File; }
+export interface Verification { id: number; full_name: string; national_id: string; company_name: string; user_type: UserType; status: VerificationStatus; rejection_reason: string; rejection_code: string; documents: Document[]; }
+export interface CreateVerificationRequest { full_name: string; national_id: string; company_name?: string; national_id_front: File; national_id_back: File; selfie?: File; }
 
 export interface IssuerProfile { id: number; national_or_company_id: string; name: string; credit_score: number | null; created_at: string; updated_at: string; }
 export interface ChequeListing { id: number; owner_id: number; issuer_profile: IssuerProfile; bank_name: string; cheque_serial_number: string; face_amount: string; due_date: string; issuer_type: IssuerType; issuer_name: string; issuer_national_id: string; description: string; suggested_discount_rate: string | null; risk_tier: 'low' | 'medium' | 'high' | null; status: ListingStatus; rejection_reason: string; rejection_code: string | null; resubmit_count: number; created_at: string; updated_at: string; }

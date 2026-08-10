@@ -32,6 +32,21 @@ class TestIdentityProfileAndMe:
         assert response.status_code == status.HTTP_200_OK
         assert response.data["username"] == user_with_profile.username
         assert response.data["bio"] == "old bio"
+        assert response.data["user_type"] == "natural"
+
+    def test_patch_profile_cannot_change_user_type(self, api_client, user_with_profile):
+        api_client.force_authenticate(user=user_with_profile)
+
+        response = api_client.patch(
+            "/api/v1/identity/profile/",
+            {"user_type": "legal", "bio": "still natural"},
+            format="json",
+        )
+
+        assert response.status_code == status.HTTP_200_OK
+        user_with_profile.profile.refresh_from_db()
+        assert user_with_profile.profile.user_type == "natural"
+        assert user_with_profile.profile.bio == "still natural"
 
     def test_patch_profile_updates_bio_and_name(self, api_client, user_with_profile):
         api_client.force_authenticate(user=user_with_profile)
@@ -56,6 +71,7 @@ class TestIdentityProfileAndMe:
         assert response.status_code == status.HTTP_200_OK
         assert response.data["username"] == user_with_profile.username
         assert response.data["role"] == user_with_profile.role
+        assert response.data["user_type"] == "natural"
 
     def test_patch_identity_me_updates_phone(self, api_client, user_with_profile):
         api_client.force_authenticate(user=user_with_profile)

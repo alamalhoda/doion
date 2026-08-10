@@ -26,11 +26,15 @@ from doion.notifications.models import NotificationPreference
 from doion.users.models import User
 
 DEMO_USERS = (
-    ("holder1", User.Role.CHECK_HOLDER, "CheckHolder"),
-    ("investor1", User.Role.INVESTOR, "Investor"),
-    ("moderator1", User.Role.MODERATOR, "Moderator"),
-    ("admin1", User.Role.ADMIN, "Admin"),
-    ("holderkyc1", User.Role.CHECK_HOLDER, "CheckHolder"),
+    # username, role, group_name, user_type
+    ("holder1", User.Role.CHECK_HOLDER, "CheckHolder", Profile.UserType.NATURAL),
+    ("investor1", User.Role.INVESTOR, "Investor", Profile.UserType.NATURAL),
+    ("moderator1", User.Role.MODERATOR, "Moderator", Profile.UserType.NATURAL),
+    ("admin1", User.Role.ADMIN, "Admin", Profile.UserType.NATURAL),
+    ("holderkyc1", User.Role.CHECK_HOLDER, "CheckHolder", Profile.UserType.NATURAL),
+    ("holderkyclegal1", User.Role.CHECK_HOLDER, "CheckHolder", Profile.UserType.LEGAL),
+    ("holderlegal1", User.Role.CHECK_HOLDER, "CheckHolder", Profile.UserType.LEGAL),
+    ("investorlegal1", User.Role.INVESTOR, "Investor", Profile.UserType.LEGAL),
 )
 
 # Stable serials for E2E critical-path fixtures (16-digit sayad-style).
@@ -75,16 +79,21 @@ class Command(BaseCommand):
         password = options["password"] or get_random_string(12)
 
         if options["reset"]:
-            usernames = [username for username, _, _ in DEMO_USERS]
+            usernames = [username for username, _, _, _ in DEMO_USERS]
             deleted, _ = User.objects.filter(username__in=usernames).delete()
             self.stdout.write(f"Removed existing demo users ({deleted} related objects).")
 
         users: dict[str, User] = {}
-        for username, role, group_name in DEMO_USERS:
+        for username, role, group_name, user_type in DEMO_USERS:
+            display_name = {
+                "holderlegal1": "Demo Legal Holdings Co",
+                "holderkyclegal1": "Pending Legal Co",
+                "investorlegal1": "Demo Legal Investor Fund",
+            }.get(username, username)
             defaults = {
                 "role": role,
                 "email": f"{username}@demo.chequeyar.local",
-                "name": username,
+                "name": display_name,
                 "is_staff": role in {User.Role.MODERATOR, User.Role.ADMIN},
                 "is_superuser": role == User.Role.ADMIN,
             }
@@ -95,15 +104,21 @@ class Command(BaseCommand):
             user.set_password(password)
             user.save()
 
+            is_kyc_pending = username in {"holderkyc1", "holderkyclegal1"}
             Profile.objects.update_or_create(
                 user=user,
-                defaults={"role": role, "is_verified": True, "bio": ""},
+                defaults={
+                    "role": role,
+                    "user_type": user_type,
+                    "is_verified": not is_kyc_pending,
+                    "bio": "",
+                },
             )
             group, _ = Group.objects.get_or_create(name=group_name)
             user.groups.add(group)
             users[username] = user
             action = "created" if created else "updated"
-            self.stdout.write(f"  {action}: {username} ({role})")
+            self.stdout.write(f"  {action}: {username} ({role}, {user_type})")
 
             if username == "holderkyc1":
                 Verification.objects.filter(
@@ -114,9 +129,37 @@ class Command(BaseCommand):
                     user=user,
                     status=Verification.Status.PENDING,
                     defaults={
-                        "full_name": "KYC Pending Holder",
+                        "full_name": "KYC Pending Natural Holder",
                         "national_id": "0012345678",
                         "company_name": "",
+                        "rejection_reason": "",
+                        "rejection_code": "",
+                    },
+                )
+            elif username == "holderkyclegal1":
+                Verification.objects.filter(
+                    user=user,
+                    status=Verification.Status.APPROVED,
+                ).delete()
+                Verification.objects.get_or_create(
+                    user=user,
+                    status=Verification.Status.PENDING,
+                    defaults={
+                        "full_name": "Pending Legal Representative",
+                        "national_id": "10100987654",
+                        "company_name": "Pending Legal Co",
+                        "rejection_reason": "",
+                        "rejection_code": "",
+                    },
+                )
+            elif username in {"holderlegal1", "investorlegal1"}:
+                Verification.objects.get_or_create(
+                    user=user,
+                    status=Verification.Status.APPROVED,
+                    defaults={
+                        "full_name": "Legal Representative",
+                        "national_id": "10100345678" if username == "holderlegal1" else "10100112233",
+                        "company_name": display_name,
                         "rejection_reason": "",
                         "rejection_code": "",
                     },

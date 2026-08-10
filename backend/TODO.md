@@ -14,7 +14,7 @@
 
 ## Phase 1 — Remaining
 
-- [ ] Add tests for identity endpoints (serializer + permission)
+- [x] Add tests for identity endpoints (serializer + permission)
 - [x] Add rate limiting to register endpoint
 - [x] Enforce KYC_APPROVED before listing create / express interest
 - [x] Scope IssuerProfile update/delete to creator or staff (`created_by`)

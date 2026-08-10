@@ -34,12 +34,16 @@ python manage.py seed_demo --password "$DEMO_SEED_PASSWORD"
 
 نمونه لاگین بعد از seed با رمز ثابت:
 
-| Username | Password |
-|----------|----------|
-| `holder1` | مقدار `$DEMO_SEED_PASSWORD` (یا همان رمزی که در خروجی چاپ شد) |
-| `investor1` | همان |
-| `moderator1` | همان |
-| `admin1` | همان |
+| Username | Password | Notes |
+|----------|----------|--------|
+| `holder1` | مقدار `$DEMO_SEED_PASSWORD` (یا همان رمزی که در خروجی چاپ شد) | `user_type=natural`، KYC approved |
+| `investor1` | همان | `user_type=natural`، KYC approved |
+| `moderator1` | همان | ناظر |
+| `admin1` | همان | مدیر |
+| `holderkyc1` | همان | `user_type=natural`، KYC **pending** (صف ناظر) |
+| `holderkyclegal1` | همان | `user_type=legal`، KYC **pending** (صف ناظر) |
+| `holderlegal1` | همان | `user_type=legal`، KYC approved (دارنده حقوقی) |
+| `investorlegal1` | همان | `user_type=legal`، KYC approved (سرمایه‌گذار حقوقی) |
 
 ---
 

@@ -12,6 +12,10 @@ class Profile(TimeStampedModel):
         MODERATOR = "moderator", _("Moderator")
         ADMIN = "admin", _("Admin")
 
+    class UserType(models.TextChoices):
+        NATURAL = "natural", _("Natural Person")
+        LEGAL = "legal", _("Legal Entity")
+
     user = models.OneToOneField(
         settings.AUTH_USER_MODEL,
         on_delete=models.CASCADE,
@@ -21,6 +25,12 @@ class Profile(TimeStampedModel):
         max_length=20,
         choices=Role.choices,
         default=Role.CHECK_HOLDER,
+    )
+    user_type = models.CharField(
+        max_length=20,
+        choices=UserType.choices,
+        default=UserType.NATURAL,
+        db_index=True,
     )
     bio = models.TextField(blank=True, default="")
     is_verified = models.BooleanField(default=False)
@@ -45,7 +55,7 @@ class Verification(TimeStampedModel):
         related_name="verifications",
     )
     full_name = models.CharField(max_length=255)
-    national_id = models.CharField(max_length=10, blank=True)
+    national_id = models.CharField(max_length=11, blank=True)
     company_name = models.CharField(max_length=255, blank=True)
     status = models.CharField(max_length=20, choices=Status.choices, default=Status.PENDING)
     rejection_reason = models.TextField(blank=True)

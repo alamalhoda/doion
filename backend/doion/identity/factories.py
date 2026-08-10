@@ -16,11 +16,13 @@ class ProfileFactory(DjangoModelFactory):
 
     user = factory.SubFactory(UserFactory)
     role = factory.LazyAttribute(lambda o: o.user.role or Profile.Role.CHECK_HOLDER)
+    user_type = Profile.UserType.NATURAL
     bio = ""
     is_verified = False
 
     class Params:
         verified = factory.Trait(is_verified=True)
+        legal = factory.Trait(user_type=Profile.UserType.LEGAL)
 
 
 class VerificationFactory(DjangoModelFactory):
@@ -39,4 +41,8 @@ class VerificationFactory(DjangoModelFactory):
             status=Verification.Status.REJECTED,
             rejection_code="KYC_001",
             rejection_reason="Documents unclear",
+        )
+        legal = factory.Trait(
+            national_id="10100345678",
+            company_name="Demo Legal Co",
         )

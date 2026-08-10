@@ -150,6 +150,7 @@ These are **payload enum values** for `rejection_code` on listing moderation dec
     "email": "user@example.com",
     "name": "رضا کریمی",
     "role": "check_holder",
+    "user_type": "natural",
     "phone": "+989123456789"
   }
 }
@@ -185,6 +186,7 @@ These are **payload enum values** for `rejection_code` on listing moderation dec
     "email": "user@example.com",
     "name": "رضا کریمی",
     "role": "check_holder",
+    "user_type": "natural",
     "phone": "+989123456789"
   }
 }
@@ -210,7 +212,8 @@ These are **payload enum values** for `rejection_code` on listing moderation dec
   "password_confirm": "secure-pass",
   "name": "رضا کریمی",
   "phone": "+989123456789",
-  "role": "check_holder"
+  "role": "check_holder",
+  "user_type": "natural"
 }
 ```
 
@@ -220,9 +223,10 @@ These are **payload enum values** for `rejection_code` on listing moderation dec
 | `email` | `string` | No | Valid email |
 | `password` | `string` | Yes | Min 8 chars |
 | `password_confirm` | `string` | Yes | Must match `password` |
-| `name` | `string` | No | Full name |
+| `name` | `string` | Conditional | Optional for `natural`. **Required** for `legal` (official company name) |
 | `phone` | `string` | No | Phone number |
 | `role` | `"check_holder" \| "investor"` | Yes | User role |
+| `user_type` | `"natural" \| "legal"` | Yes | Natural person or legal entity; stored on `Profile` and immutable after registration |
 
 **Response 201:**
 
@@ -235,12 +239,13 @@ These are **payload enum values** for `rejection_code` on listing moderation dec
     "username": "09121234567",
     "email": "user@example.com",
     "name": "رضا کریمی",
-    "role": "check_holder"
+    "role": "check_holder",
+    "user_type": "natural"
   }
 }
 ```
 
-**Errors:** `VALIDATION_ERROR` (400) — field-level details for duplicate username/phone, password mismatch
+**Errors:** `VALIDATION_ERROR` (400) — field-level details for duplicate username/phone, password mismatch, missing `user_type`, missing company `name` for legal entities
 
 ---
 
@@ -262,6 +267,7 @@ These are **payload enum values** for `rejection_code` on listing moderation dec
   "name": "رضا کریمی",
   "phone": "+989123456789",
   "role": "check_holder",
+  "user_type": "natural",
   "is_verified": false,
   "url": "http://example.com/api/v1/users/09121234567/"
 }
@@ -269,7 +275,7 @@ These are **payload enum values** for `rejection_code` on listing moderation dec
 
 Note: The `me` action is **GET-only**. Partial updates for the cookiecutter user route use `PATCH /api/v1/users/{username}/` (queryset is limited to the authenticated user). Prefer `PATCH /api/v1/identity/me/` for profile-style self-updates.
 
-Also available: `GET /api/v1/users/` (list of self only), `GET|PUT|PATCH /api/v1/users/{username}/`.
+Also available: `GET /api/v1/users/` (list of self only), `GET|PUT|PATCH /api/v1/users/{username}/`. `user_type` comes from `Profile` (read-only).
 
 ---
 
@@ -291,6 +297,7 @@ Also available: `GET /api/v1/users/` (list of self only), `GET|PUT|PATCH /api/v1
   "name": "رضا کریمی",
   "phone": "+989123456789",
   "role": "check_holder",
+  "user_type": "natural",
   "bio": "",
   "is_verified": false,
   "created_at": "2025-04-25T08:30:00Z",
@@ -306,14 +313,13 @@ Also available: `GET /api/v1/users/` (list of self only), `GET|PUT|PATCH /api/v1
 | `name` | `string` | No | Mapped to `user.name` |
 | `phone` | `string` | No | Mapped to `user.phone` |
 | `role` | `string` | Yes | Profile role (`read_only_fields`) |
+| `user_type` | `"natural" \| "legal"` | Yes | Natural person or legal entity; immutable after registration |
 | `bio` | `string` | No | Profile bio |
 | `is_verified` | `boolean` | Yes | KYC verification status |
 | `created_at` | `string` (ISO 8601) | Yes | |
 | `updated_at` | `string` (ISO 8601) | Yes | |
 
-**Request Body (partial):** `email`, `name`, `phone`, `bio` — **not** `role` / `is_verified`.
-
-**Known runtime gap:** `ProfileViewSet.get_object` references `Profile` without importing it in `identity/api/views.py`, which can raise `NameError` on these routes until fixed.
+**Request Body (partial):** `email`, `name`, `phone`, `bio` — **not** `role` / `user_type` / `is_verified`.
 
 Router also exposes detail stubs `GET|PUT|PATCH /api/v1/identity/profile/{pk}/` (same viewset).
 
@@ -327,7 +333,7 @@ Router also exposes detail stubs `GET|PUT|PATCH /api/v1/identity/profile/{pk}/` 
 
 **Permission:** IsAuthenticated
 
-**Response 200:** `UserMeSerializer` — `{id, username, email, name, phone, role, is_verified}` (`role` / `is_verified` read-only). Writable: `email`, `name`, `phone`, `username` (model fields not marked read-only).
+**Response 200:** `UserMeSerializer` — `{id, username, email, name, phone, role, user_type, is_verified}` (`role` / `user_type` / `is_verified` read-only). Writable: `email`, `name`, `phone`, `username` (model fields not marked read-only).
 
 Router also exposes `GET|PUT|PATCH /api/v1/identity/me/{pk}/`.
 
@@ -343,14 +349,40 @@ Router also exposes `GET|PUT|PATCH /api/v1/identity/me/{pk}/`.
 
 **Request Body (multipart/form-data):**
 
+Validation is conditional on the authenticated user's `Profile.user_type`. ID checks are **digits-only + exact length** (no Iranian checksum).
+
 | Field | Type | Required | Description |
 |-------|------|----------|-------------|
-| `full_name` | `string` | Yes | Full name |
-| `national_id` | `string` | No | 10-digit national ID |
-| `company_name` | `string` | No | Company name (optional) |
-| `national_id_front` | `file` | Yes | Front of ID card |
-| `national_id_back` | `file` | Yes | Back of ID card |
-| `selfie` | `file` | No | Selfie image (optional) |
+| `full_name` | `string` | Yes | Natural: person name. Legal: authorized representative name |
+| `national_id` | `string` | Yes | Natural: exactly 10 digits. Legal: exactly 11 digits (corporate ID) |
+| `company_name` | `string` | Conditional | Natural: must be empty (non-empty → 400). Legal: required official company name |
+| `national_id_front` | `file` | Yes | Front of ID card (representative ID for legal) |
+| `national_id_back` | `file` | Yes | Back of ID card (representative ID for legal) |
+| `selfie` | `file` | No | Selfie image (optional for both types) |
+
+**Natural person example:**
+
+```json
+{
+  "full_name": "رضا کریمی",
+  "national_id": "0012345678",
+  "company_name": "",
+  "national_id_front": "<file>",
+  "national_id_back": "<file>"
+}
+```
+
+**Legal entity example:**
+
+```json
+{
+  "full_name": "نماینده مجاز",
+  "national_id": "10100345678",
+  "company_name": "شرکت آسان‌پرداخت",
+  "national_id_front": "<file>",
+  "national_id_back": "<file>"
+}
+```
 
 **Response 201:**
 
@@ -359,7 +391,8 @@ Router also exposes `GET|PUT|PATCH /api/v1/identity/me/{pk}/`.
   "id": 1,
   "full_name": "رضا کریمی",
   "national_id": "0012345678",
-  "company_name": "شرکت آسان‌پرداخت",
+  "company_name": "",
+  "user_type": "natural",
   "status": "pending",
   "rejection_reason": "",
   "rejection_code": "",
@@ -380,6 +413,8 @@ Router also exposes `GET|PUT|PATCH /api/v1/identity/me/{pk}/`.
 }
 ```
 
+**Errors:** `VALIDATION_ERROR` (400) with field-level `details` (wrong ID length, company name rules, missing representative name, etc.)
+
 ---
 
 ### 4.2 List Verifications
@@ -399,6 +434,7 @@ Router also exposes `GET|PUT|PATCH /api/v1/identity/me/{pk}/`.
     "full_name": "رضا کریمی",
     "national_id": "0012345678",
     "company_name": "",
+    "user_type": "natural",
     "status": "pending",
     "rejection_reason": "",
     "rejection_code": "",
@@ -468,7 +504,19 @@ Note: Only `full_name`, `national_id`, and `company_name` are writable. `status`
     "id": 1,
     "full_name": "رضا کریمی",
     "national_id": "0012345678",
-    "company_name": "شرکت آسان‌پرداخت",
+    "company_name": "",
+    "user_type": "natural",
+    "status": "pending",
+    "rejection_reason": "",
+    "rejection_code": "",
+    "documents": []
+  },
+  {
+    "id": 2,
+    "full_name": "نماینده مجاز",
+    "national_id": "10100987654",
+    "company_name": "Pending Legal Co",
+    "user_type": "legal",
     "status": "pending",
     "rejection_reason": "",
     "rejection_code": "",
@@ -476,6 +524,8 @@ Note: Only `full_name`, `national_id`, and `company_name` are writable. `status`
   }
 ]
 ```
+
+Demo seed includes at least one pending **natural** (`holderkyc1`) and one pending **legal** (`holderkyclegal1`) verification for moderation QA.
 
 ---
 
@@ -1522,10 +1572,24 @@ Model/profile store all four roles; `POST /identity/register/` only accepts `che
 
 ---
 
+## 17.1 User Type Values
+
+| Value | Description | Notes |
+|-------|-------------|--------|
+| `natural` | Natural person (شخص حقیقی) | Default for existing profiles; KYC national ID = 10 digits |
+| `legal` | Legal entity (شخصیت حقوقی) | Register `name` = company name; KYC national ID = 11-digit corporate ID; `full_name` = representative |
+
+`user_type` is set at registration, stored on `Profile`, returned on register/login/refresh/profile/me payloads, and is **not** writable via profile/me PATCH.
+
+Distinct from listing `issuer_type` (cheque issuer classification).
+
+---
+
 ## 18. Changelog
 
 | Date | Change |
 |------|--------|
+| 2026-08-10 | Identity `user_type` (`natural`/`legal`): register + profile/me/login/refresh payloads; conditional KYC validation (10 vs 11 digit IDs); `Verification.national_id` max_length 11; verification responses include read-only `user_type`; demo seed pending natural+legal KYC |
 | 2026-07-31 | Consolidated as sole API SSOT; aligned with live backend (error catalog, refresh TTL, pagination, issuer CRUD, permissions, operational notes, legacy mount); marked spec-only codes; deprecated `API_CONTRACT_REGISTRY.md` |
 | 2026-07-29 | Phase 1 backend connectivity: role/phone on login/refresh; identity profile/me without pk; matches/my + status; feature-flag toggle |
 | 2026-07-23 | Initial contract derived from backend code (Phases 0–8) |
