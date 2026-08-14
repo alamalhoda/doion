@@ -6,18 +6,23 @@ title: Cheque Platform Low-Level Design
 summary: Django implementation details for Layer 1 Marketplace — models, APIs, events, settlement port abstraction
 category: architecture
 applies_to:
-  - "backend/apps/**/*.py"
-  - "backend/apps/**/models.py"
-  - "backend/apps/**/views.py"
+  - "backend/doion/**/*.py"
+  - "backend/doion/**/models.py"
+  - "backend/doion/**/views.py"
 priority: 45
 ---
 
 # Cheque Platform Low-Level Design
-## پلتفرم اتصال دارندگان چک و سرمایه‌گذاران — لایه ۱
+## چک‌یار (Cheque Yar) — لایه ۱ Marketplace
 
-> این سند ادامه‌ی منطقی `cheque-platform-technical-architecture.md` (سند سطح بالا) است و باید همراه با آن خوانده شود. هر بخش از این سند مستقیماً به یک بخش از سند سطح بالا ارجاع می‌دهد. جزئیات بسیار دقیق‌تر (مثل JSON Schema کامل هر endpoint، فایل‌های migration واقعی، تست‌ها) در سند بعدی (سطح بسیار پایین) خواهد آمد.
+> ادامهٔ منطقی [`cheque-platform-technical-architecture.md.md`](cheque-platform-technical-architecture.md.md).  
+> **قرارداد API زنده (SSOT):** [`docs/development/MASTER_API_CONTRACT.md`](development/MASTER_API_CONTRACT.md) — این LLD نگاشت معماری است؛ جزئیات فیلد/کد خطا را از قرارداد استخراج کنید نه از این جدول.
 
-**پشته فنی:** Python 3.12، Django 5.x، Django REST Framework (DRF)، PostgreSQL، Redis، Celery.
+**به‌روزرسانی وضعیت:** ۱۴۰۵/۰۵/۲۳ (2026-08-14) — لایه ۱ در `backend/doion/` پیاده‌سازی شده است. UI فعال در ریپوی خارجی `checkyar-googleai` است، نه در `frontend/` این مونورپو.
+
+**پشته واقعی:** Python 3.12، Django 5.2، DRF، SimpleJWT (access ۱ ساعت؛ refresh پیش‌فرض ۱ روز)، PostgreSQL در تولید / SQLite در توسعه، Redis + Celery برای jobها، structlog + correlation id.
+
+**شناسه‌ها:** PKها `BigAutoField` هستند، نه UUID.
 
 ## ۱. دلیل انتخاب پشته فنی
 
@@ -31,25 +36,29 @@ Django به‌خاطر سه ویژگی آماده‌ی خود برای این ف
 
 ## ۲. ساختار پروژه (نگاشت ماژول‌ها به Django Apps)
 
+ساختار هدف LLD اولیه `backend/apps/` بود؛ **تصمیم اجرایی:** appهای دامنه زیر `backend/doion/` هم‌راستا با Cookiecutter (`users`) ساخته شدند. مهاجرت فیزیکی به `apps/` پس از MVP انجام نشده و در برنامه جاری نیست.
+
 ```
 backend/
-├── config/                  # settings, urls, asgi/wsgi, celery.py
-├── apps/
-│   ├── core/                 # کلاس‌های پایه، Event Dispatcher، Settlement Port
-│   ├── identity/              # Identity & KYC  → User, Profile, Verification
-│   ├── documents/             # سرویس مشترک مدارک (نه ماژول کسب‌وکاری مستقل)
-│   ├── pricing/               # موتور ریسک/نرخ تنزیل (مستقل و قابل‌استفاده در لایه ۲/۳)
-│   ├── checks/                 # Check Registry → ChequeListing, IssuerProfile
-│   ├── marketplace/            # Listing & Search → فقط View/Filter روی ChequeListing
-│   ├── matching/               # Matching & Notification → Match, Notification
-│   ├── moderation/             # Moderation & Admin → ModerationDecision + Admin
-│   ├── compliance/                # عرضی: Audit & Compliance → AuditEvent, FeatureFlag
-│   └── integrations/               # Integration Layer → adapterهای بیرونی
-├── requirements/
-└── docker/
+├── config/                  # settings, urls, asgi/wsgi, celery.py, api_router.py
+├── doion/
+│   ├── core/                 # TimeStampedModel، permission classes، seed_demo
+│   ├── users/                # User سفارشی، JWT login/refresh
+│   ├── identity/             # Profile, Verification, register/me
+│   ├── documents/            # Document (سرویس مشترک مدارک)
+│   ├── pricing/              # موتور stub نرخ پیشنهادی / risk_tier
+│   ├── checks/               # ChequeListing, IssuerProfile
+│   ├── marketplace/          # فیلتر و لیست published + latest
+│   ├── matching/             # Match, SettlementPort model, OffPlatformSettlement
+│   ├── moderation/           # صف آگهی و KYC + decision
+│   ├── notifications/        # Notification, NotificationPreference
+│   ├── compliance/           # AuditEvent, FeatureFlag, stats
+│   └── integrations/         # SMS stub (SMSLog)
+├── pyproject.toml
+└── uv.lock
 ```
 
-**نکته‌ی فنی نسبت به سند سطح بالا (بخش ۷):** Django به‌صورت پیش‌فرض همه‌ی جدول‌ها را در schema عمومی `public` با نام‌گذاری `app_label_modelname` قرار می‌دهد، نه در schemaهای فیزیکی جدا. برای MVP پیشنهاد می‌کنم به‌جای schema فیزیکی جدا (که نیاز به پکیج‌های اضافه مثل `django-db-multitenant` یا router دستی دارد)، از همین مکانیزم پیش‌فرض استفاده شود؛ مرز منطقی bounded context همچنان از طریق app حفظ می‌شود و در آینده در صورت نیاز، هر app بدون تغییر مدل دامنه به schema یا سرویس مستقل منتقل می‌شود.
+**نکته نسبت به سند سطح بالا (بخش ۷):** Django همه جدول‌ها را در schema عمومی `public` با نام `app_label_modelname` می‌گذارد. برای MVP از همین پیش‌فرض استفاده شده؛ schema فیزیکی جدا ساخته نشده است.
 
 ---
 
@@ -223,14 +232,17 @@ erDiagram
     USER ||--o{ MODERATION_DECISION : "moderator decides"
 ```
 
-**محدودیت‌های کلیدی (سطح migration، نه فقط منطق برنامه):**
-- `unique_together` روی `(issuer.national_or_company_id, bank_name, cheque_serial_number)` در `ChequeListing` برای جلوگیری از ثبت تکراری (مطابق بخش ۶ سند سطح بالا).
-- `status` در `ChequeListing` و `Match` به‌صورت `TextChoices` در Django تعریف می‌شود، نه boolean پراکنده، تا گسترش state machine در لایه ۲/۳ بدون migration مخرب ممکن باشد.
-- `Match.settlement_type` مقدار پیش‌فرض `"off_platform"` با `choices` باز برای افزودن `"escrow"`, `"principal_ledger"` بعداً.
+**محدودیت‌های کلیدی (سطح migration):**
+- `UniqueConstraint` روی `(issuer, bank_name, cheque_serial_number)` در `ChequeListing` (فیلد FK صادرکننده، نه `national_or_company_id` به‌تنهایی).
+- `status` در `ChequeListing` و `Match` به‌صورت `TextChoices`.
+- `Match.settlement_type` پیش‌فرض `"off_platform"`؛ مقادیر `escrow` و `principal_ledger` رزرو شده‌اند.
+- `Profile.user_type`: `natural` | `legal` (جایگزین نقش جداگانه InstitutionalInvestor).
 
 ---
 
 ## ۴. قرارداد API (DRF — بخش‌های اصلی)
+
+جدول زیر نمای کلی است. شکل دقیق request/response و کد خطا فقط در [`MASTER_API_CONTRACT.md`](development/MASTER_API_CONTRACT.md) معتبر است.
 
 | متد | مسیر | نقش مجاز | توضیح |
 |---|---|---|---|
@@ -343,40 +355,18 @@ sequenceDiagram
 
 ## ۷. پیاده‌سازی Settlement Port (بخش ۵.۲ سند سطح بالا)
 
-```python
-# apps/core/settlement.py
-from typing import Protocol
-from dataclasses import dataclass
+لایه ۱ با مدل‌های `SettlementPort` و `OffPlatformSettlement` در `doion.matching` پیاده شده است. تأیید تسویه از طریق `POST /api/v1/matches/{id}/confirm-off-platform/` ثبت می‌شود؛ وجه جابه‌جا نمی‌شود.
 
-@dataclass
-class SettlementResult:
-    match_id: str
-    settlement_type: str
-    recorded_at: str
-    reference: str | None = None
-
-class SettlementPort(Protocol):
-    def initiate(self, match) -> SettlementResult: ...
-    def confirm(self, match, evidence: dict) -> SettlementResult: ...
-    def get_status(self, match) -> str: ...
-
-class OffPlatformSettlement:
-    """پیاده‌سازی لایه ۱ — فقط رکورد می‌کند، تسویه بیرون از پلتفرم انجام می‌شود."""
-    def initiate(self, match) -> SettlementResult: ...
-    def confirm(self, match, evidence: dict) -> SettlementResult: ...
-    def get_status(self, match) -> str:
-        return "off_platform_unconfirmed"
-```
-
-`MatchService` در app `matching` این رابط را از طریق یک تنظیم در `settings.py` دریافت می‌کند (مثلاً `SETTLEMENT_BACKEND = "apps.checks.settlement.OffPlatformSettlement"`)، نه با import مستقیم. تغییر به `EscrowSettlement` در لایه ۲ فقط یک تغییر در settings است، نه تغییر کد `matching`.
+مسیر مفهومی قدیمی `apps/core/settlement.py` و تنظیم `SETTLEMENT_BACKEND` در کد فعلی استفاده نشده. گسترش به escrow در لایه ۲ باید همان app `matching` را از طریق پیاده‌سازی جدید Port گسترش دهد، نه با بازنویسی `ChequeListing`.
 
 ---
 
 ## ۸. احراز هویت و کنترل دسترسی
 
-- **JWT:** `djangorestframework-simplejwt` — access token ۱۵ دقیقه، refresh token ۷ روز.
-- **نقش‌ها (Django Groups):** `CheckHolder`, `Investor`, `InstitutionalInvestor`, `Moderator`, `Admin`.
-- **Permission Classes سفارشی:** `IsCheckHolder`, `IsInvestor`, `IsModerator`, `IsOwner` (برای ویرایش آگهی فقط توسط مالک).
+- **JWT:** `djangorestframework-simplejwt` — access token ۱ ساعت؛ refresh token ۱ روز (پیش‌فرض SimpleJWT؛ در settings override نشده).
+- **نقش‌ها:** `check_holder`, `investor`, `moderator`, `admin` (روی User/Profile و Django Groups). ثبت‌نام API فقط دو نقش اول را می‌پذیرد.
+- **نوع کاربر:** `Profile.user_type` = `natural` | `legal` — نقش InstitutionalInvestor جداگانه پیاده نشده.
+- **Permission Classes:** `IsCheckHolder`, `IsInvestor`, `IsModerator` و کنترل مالکیت آگهی.
 
 | عملیات | CheckHolder | Investor | Moderator | Admin |
 |---|---|---|---|---|
@@ -410,19 +400,12 @@ class OffPlatformSettlement:
 
 ## ۱۱. نقشه استقرار (MVP)
 
-```
-docker-compose:
-  web        → gunicorn + Django (API/BFF + Core Domain)
-  worker     → celery worker
-  beat       → celery beat (job‌های زمان‌بندی‌شده)
-  redis      → broker + cache
-  postgres   → پایگاه داده اصلی
-  nginx      → reverse proxy + TLS termination
-```
-جزئیات IaC، CI/CD، و مقیاس‌پذیری افقی به سند سطح بسیار پایین (در صورت نیاز) موکول می‌شود.
+**توسعه محلی:** Django `runserver` + UI با Bun روی `127.0.0.1:3000`؛ دمو با `seed_demo` و در صورت نیاز SQLite جدا (`DJANGO_DEMO_DATABASE=1`).
 
----
+**تولید هدف (چابکان):** سرویس جدا برای API (`chequeyar-back`، Gunicorn + Postgres + Redis) و SPA (`chequeyar-front` از build ریپوی `checkyar-googleai`). جزئیات: [`PRODUCTION_CHABOKAN_DEPLOY.md`](development/PRODUCTION_CHABOKAN_DEPLOY.md).
+
+docker-compose کامل با nginx در این مونورپو مسیر اصلی استقرار فعلی نیست.
 
 ## ۱۲. جمع‌بندی
 
-این سند، پنج ماژول و نقطه‌ی توسعه‌ی سند سطح بالا را به ساختار اجرایی Django (apps، models، API، signals) تبدیل کرده، بدون این‌که هیچ مرز یا تصمیم معماری سند سطح بالا را نقض کند. سطح بعدی جزئیات (در صورت نیاز) شامل: schema کامل JSON هر endpoint، فایل‌های migration واقعی، تعریف دقیق سریالایزرها، و سناریوهای تست خواهد بود.
+پنج ماژول سند سطح بالا به appهای `backend/doion/` نگاشت شده‌اند. Settlement در لایه ۱ off-platform است. قرارداد زنده API در MASTER_API_CONTRACT است. UI در مونورپو نیست تا زمان مهاجرت از AI Studio.

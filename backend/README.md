@@ -1,12 +1,15 @@
-# doion
+# چک‌یار (Cheque Yar) — Backend
 
-Doion Project
+بک‌اند Django مونورپوی [doion](https://github.com/alamalhoda/doion) برای محصول چک‌یار.
+
+**وضعیت محصول:** v1 لایه ۱ آماده پایلوت — نه در حال ساخت MVP، نه v1 لانچ‌شده.  
+مرجع: [`docs/سند پایه پروژه (Core Brief).md`](../docs/سند%20پایه%20پروژه%20(Core%20Brief).md) · کار باز: [`TODO.md`](TODO.md)
 
 [![Built with Cookiecutter Django](https://img.shields.io/badge/built%20with-Cookiecutter%20Django-ff69b4.svg?logo=cookiecutter)](https://github.com/cookiecutter/cookiecutter-django/)
 
 ## درباره پروژه
 
-پروژه doion با استفاده از **Cookiecutter Django** ساخته شده و از بهترین شیوه‌های توسعه Django پیروی می‌کند.
+API لایه ۱ Marketplace: ثبت‌نام و KYC، آگهی چک، moderation، بازارچه، Match، تسویه **بیرون از پلتفرم**، اعلان، audit و Feature Flag. پشته از Cookiecutter Django است؛ دامنه زیر `doion/` است.
 
 ### Frontend (وضعیت فعلی)
 
@@ -24,9 +27,10 @@ Doion Project
 - **دیتابیس توسعه**: SQLite
 - **زبان پیش‌فرض**: انگلیسی (en-us)
 - **Timezone**: Asia/Tehran
-- **احراز هویت**: django-allauth
-- **API**: Django REST Framework + drf-spectacular
-- **CORS**: django-cors-headers (development allows all origins; specific origins listed in `config/settings/local.py`)
+- **احراز هویت:** django-allauth (جلسات قالب) + SimpleJWT برای `/api/v1/`
+- **API:** Django REST Framework + drf-spectacular
+- **پس‌زمینه:** Celery (انقضای آگهی؛ SMS stub)
+- **CORS:** django-cors-headers (development allows all origins; specific origins listed in `config/settings/local.py`)
 
 ---
 
@@ -85,7 +89,9 @@ uv sync --frozen
 uv run pytest
 ```
 
-`ruff` فعلاً gate اجباری CI نیست (بدهی lint موجود در codebase)؛ لوکال می‌توانید `uv run ruff check .` را اجرا کنید. E2E (Playwright) و deploy هنوز در CI نیستند.
+`ruff` فعلاً gate اجباری CI نیست (بدهی lint موجود در codebase)؛ لوکال می‌توانید `uv run ruff check .` را اجرا کنید.
+
+E2E Playwright در [`.github/workflows/ci-e2e.yml`](../.github/workflows/ci-e2e.yml) هست (smoke + critical در برابر UI فعال). Deploy به چابکان در GitHub Actions خودکار نیست؛ دستی با CLI (بخش بعد).
 
 ---
 
@@ -107,7 +113,9 @@ chabok deploy
 | `nginx.conf` | سرو `/static/` از `staticfiles/` (نه `/app/static/`) |
 | `chabok-pre-start.sh` | `migrate` + `collectstatic` قبل از Gunicorn |
 
-Secrets و `DATABASE_URL` فقط در پنل سرویس تنظیم شوند؛ فایل `.env` آپلود نشود. Production جدا بعداً از `master`/`main` پیشنهاد می‌شود.
+Secrets و `DATABASE_URL` فقط در پنل سرویس تنظیم شوند؛ فایل `.env` آپلود نشود.
+
+این محیط **staging/پایلوت** است، نه لانچ عمومی. Production جدا (سرویس API + SPA) در [`docs/development/PRODUCTION_CHABOKAN_DEPLOY.md`](../docs/development/PRODUCTION_CHABOKAN_DEPLOY.md) آمده است. Postgres برای staging/پایلوت الزامی است؛ SQLite فقط لوکال/دمو.
 
 ---
 
@@ -222,23 +230,18 @@ backend/                            ← ریشه بک‌اند (Django)
 │   ├── __init__.py
 │   ├── conftest.py                 ← تنظیمات تست پایه
 │   │
-│   ├── users/                      ← اپ مدیریت کاربران
-│   │   ├── __init__.py
-│   │   ├── models.py               ← مدل User سفارشی (AbstractUser)
-│   │   ├── views.py                ← ویوهای کاربر (Detail, Update, Redirect)
-│   │   ├── urls.py                 ← URLهای مربوط به کاربران
-│   │   ├── admin.py                ← تنظیمات پنل ادمین
-│   │   ├── forms.py                ← فرم‌های ثبت‌نام و احراز هویت
-│   │   ├── adapters.py             ← آداپتورهای django-allauth
-│   │   ├── apps.py                 ← تنظیمات اپ
-│   │   ├── context_processors.py   ← پردازشگرهای زمینه
-│   │   ├── api/                    ← لایه REST API برای کاربران
-│   │   │   ├── __init__.py
-│   │   │   ├── views.py            ← UserViewSet (Retrieve, List, Update, Me)
-│   │   │   └── serializers.py      ← UserSerializer
-│   │   └── migrations/             ← مایگریشن‌های دیتابیس
-│   │       ├── __init__.py
-│   │       └── 0001_initial.py
+│   ├── users/                      ← اپ مدیریت کاربران (+ JWT login/refresh)
+│   ├── core/                       ← مدل‌های پایه، permissions، seed_demo
+│   ├── identity/                   ← Profile, Verification, register/me
+│   ├── documents/                  ← Document
+│   ├── checks/                     ← ChequeListing, IssuerProfile
+│   ├── pricing/                    ← موتور stub نرخ پیشنهادی
+│   ├── marketplace/                ← جست‌وجو/فیلتر آگهی‌های published
+│   ├── matching/                   ← Match + تسویه off-platform
+│   ├── moderation/                 ← صف آگهی و KYC
+│   ├── notifications/              ← اعلان درون‌برنامه‌ای
+│   ├── compliance/                 ← AuditEvent, FeatureFlag, stats
+│   ├── integrations/               ← SMS stub
 │   │
 │   ├── contrib/                    ← کدهای کمکی
 │   │   └── sites/                  ← اپ sites جنگو
@@ -319,6 +322,9 @@ backend/                            ← ریشه بک‌اند (Django)
 | `/api/v1/moderation/queue/` | صف نظارت |
 | `/api/v1/compliance/stats/` | آمار ادمین |
 | `/api/v1/compliance/feature-flags/` | فلگ‌های قابلیت |
+| `/api/v1/issuer-profiles/` | پروفایل صادرکننده |
+| `/api/v1/moderation/kyc/` | صف KYC |
+| `/api/v1/compliance/audit/` | رویدادهای audit |
 | `/api/schema/` | اسکیمای API |
 | `/api/docs/` | مستندات Swagger |
 
@@ -347,7 +353,9 @@ backend/                            ← ریشه بک‌اند (Django)
 |------|------|--------|
 | django | 5.2.14 | فریمورک اصلی |
 | djangorestframework | 3.15 - 3.18 | ساخت API |
-| django-allauth | 64.0 - 66.0 | احراز هویت |
+| django-allauth | 64.0 - 66.0 | احراز هویت قالب |
+| djangorestframework-simplejwt | (pyproject) | JWT برای `/api/v1/` |
+| celery | 5.4+ | job پس‌زمینه |
 | drf-spectacular | 0.29.0 | مستندسازی API |
 | django-cors-headers | 4.9.0 | مدیریت CORS |
 | django-crispy-forms | 2.5+ | فرم‌های Bootstrap 5 |
@@ -357,9 +365,17 @@ backend/                            ← ریشه بک‌اند (Django)
 
 ---
 
-## Deployment (آینده)
+## Deployment
 
-پروژه برای Docker و PaaSها (مانند Railway, Render, Fly.io) آماده‌سازی خواهد شد.
+استقرار فعلی روی **چابکان** است (نه Railway/Render/Fly):
+
+| محیط | وضعیت |
+|------|--------|
+| لوکال | SQLite + `runserver` (دمو: `DJANGO_DEMO_DATABASE=1` + `seed_demo`) |
+| Staging / پایلوت | `chabok deploy` از `develop` روی `chequeyar-back` — Postgres در پنل |
+| Production | runbook موجود؛ **لانچ عمومی نشده** — [`PRODUCTION_CHABOKAN_DEPLOY.md`](../docs/development/PRODUCTION_CHABOKAN_DEPLOY.md) |
+
+هرگز `seed_demo --reset` روی دیتابیس کاربران واقعی اجرا نکنید.
 
 ---
 
@@ -370,6 +386,8 @@ backend/                            ← ریشه بک‌اند (Django)
 - زبان پیش‌فرض انگلیسی و timezone روی تهران تنظیم شده است
 - مدیریت وابستگی‌ها با `uv` انجام می‌شود
 
+- کار باز بک‌اند: [`TODO.md`](TODO.md)
+
 ---
 
-**خوش‌آمدید به پروژه doion!** 🚀
+**چک‌یار — v1 لایه ۱ آماده پایلوت.**
