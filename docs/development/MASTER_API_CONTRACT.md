@@ -1357,13 +1357,13 @@ Note: Default DRF `PageNumberPagination` is used (page size fixed at **20**). Cl
 
 **Endpoint:** `GET /api/v1/compliance/feature-flags/`
 
-**Permission:** IsAuthenticated (moderator/admin only)
+**Permission:** AllowAny (read). Mutations remain moderator/admin only.
 
 **Response 200:**
 
 ```json
 {
-  "count": 2,
+  "count": 3,
   "next": null,
   "previous": null,
   "results": [
@@ -1371,6 +1371,12 @@ Note: Default DRF `PageNumberPagination` is used (page size fixed at **20**). Cl
       "key": "matching_enabled",
       "description": "Enable investor express-interest / matching flow",
       "is_enabled": true,
+      "is_system": false
+    },
+    {
+      "key": "show_risk_tier",
+      "description": "Show listing risk tier on public marketplace and listing cards. Moderators always see risk during review.",
+      "is_enabled": false,
       "is_system": false
     }
   ]
@@ -1383,7 +1389,7 @@ Note: Default DRF `PageNumberPagination` is used (page size fixed at **20**). Cl
 
 **Endpoint:** `GET /api/v1/compliance/feature-flags/{key}/`
 
-**Permission:** IsAuthenticated (moderator/admin only)
+**Permission:** AllowAny (read)
 
 **Response 200:** Single `FeatureFlag` object.
 
@@ -1541,7 +1547,7 @@ Behaviors that affect API responses or observed data without being separate endp
 | **Marketplace list cache** | `GET /marketplace/listings/` cached 60s under key `marketplace:listings:{page}`. Invalidated when listing status changes to published/rejected/expired/withdrawn. |
 | **Celery `expire_listings`** | Beat every 3600s. Sets `published` listings with `due_date < today` to `expired`. Clients may see status change without an API call. |
 | **Correlation ID** | `CorrelationIDMiddleware` reads/sets `X-Correlation-ID` on every request/response (for logging). |
-| **Feature flags (seeded)** | `matching_enabled`, `notifications_sms_enabled` (among others as seeded). |
+| **Feature flags (seeded)** | `matching_enabled`, `notifications_sms_enabled`, `show_risk_tier` (among others as seeded). `show_risk_tier` defaults to **off**; when on, clients may show listing risk tier on public marketplace/cards. Moderators always see risk for review. |
 | **Moderator permission inconsistency** | Listing moderation (`core.IsModerator`) checks `user.role == moderator`. KYC moderation (`identity.IsModerator`) checks profile role in `moderator` \| `admin`. Compliance uses `user.role` in `moderator` \| `admin`. |
 
 ---
@@ -1589,6 +1595,7 @@ Distinct from listing `issuer_type` (cheque issuer classification).
 
 | Date | Change |
 |------|--------|
+| 2026-08-14 | Seed `show_risk_tier` (default off). `GET` feature-flags list/retrieve is AllowAny so marketplace can gate public risk display; mutations remain moderator/admin. |
 | 2026-08-10 | Identity `user_type` (`natural`/`legal`): register + profile/me/login/refresh payloads; conditional KYC validation (10 vs 11 digit IDs); `Verification.national_id` max_length 11; verification responses include read-only `user_type`; demo seed pending natural+legal KYC |
 | 2026-07-31 | Consolidated as sole API SSOT; aligned with live backend (error catalog, refresh TTL, pagination, issuer CRUD, permissions, operational notes, legacy mount); marked spec-only codes; deprecated `API_CONTRACT_REGISTRY.md` |
 | 2026-07-29 | Phase 1 backend connectivity: role/phone on login/refresh; identity profile/me without pk; matches/my + status; feature-flag toggle |

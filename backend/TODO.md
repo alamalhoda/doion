@@ -102,8 +102,8 @@
 - [x] Create `doion.compliance` app with `AuditEvent` and `FeatureFlag` models
 - [x] `AuditEvent` indexes on `(event_type, -created_at)` and `actor`
 - [x] `FeatureFlag.is_enabled(key, default)` classmethod
-- [x] Seed `matching_enabled` and `notifications_sms_enabled` flags on `post_migrate`
-- [x] `FeatureFlagViewSet`: `GET/PATCH /api/v1/compliance/feature-flags/` and `/{key}/` (Moderator/Admin; system flags protected)
+- [x] Seed `matching_enabled`, `notifications_sms_enabled`, and `show_risk_tier` flags on `post_migrate`
+- [x] `FeatureFlagViewSet`: `GET` public; `PATCH`/`toggle` Moderator/Admin; system flags protected
 - [x] `ComplianceStatsView`: `GET /api/v1/compliance/stats/` aggregate admin stats
 - [x] `AuditEventViewSet`: `GET /api/v1/compliance/audit/` (paginated)
 - [x] Compliance URLs wired into `config/api_router.py`; app added to `LOCAL_APPS`

@@ -3,7 +3,7 @@ from django.utils import timezone
 from django.db.models import Count, Q
 from rest_framework import status
 from rest_framework.decorators import action
-from rest_framework.permissions import IsAuthenticated
+from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
 from rest_framework.viewsets import GenericViewSet, ModelViewSet
 from rest_framework.pagination import PageNumberPagination
@@ -32,6 +32,12 @@ class FeatureFlagViewSet(ModelViewSet):
     permission_classes = [IsModeratorOrAdmin]
     lookup_field = "key"
     lookup_url_kwarg = "key"
+
+    def get_permissions(self):
+        # Public clients need display flags such as show_risk_tier.
+        if self.action in ("list", "retrieve"):
+            return [AllowAny()]
+        return [IsModeratorOrAdmin()]
 
     def partial_update(self, request, *args, **kwargs):
         instance = self.get_object()
