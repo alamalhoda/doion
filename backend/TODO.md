@@ -1,5 +1,12 @@
 # Backend TODO
 
+**وضعیت محصول:** v1 لایه ۱ آماده پایلوت — نه در حال ساخت MVP، نه v1 لانچ‌شده.  
+مرجع: [`docs/سند پایه پروژه (Core Brief).md`](../docs/سند%20پایه%20پروژه%20(Core%20Brief).md)
+
+موارد `[x]` سابقهٔ ساخت‌اند و حذف نمی‌شوند. بخش Follow-ups کار باز برای پایلوت/hardening است.
+
+---
+
 ## Phase 1 — Completed
 
 - [x] Create `doion.core` app with `TimeStampedModel`, `UUIDModel`, permission classes
@@ -19,6 +26,7 @@
 - [x] Enforce KYC_APPROVED before listing create / express interest
 - [x] Scope IssuerProfile update/delete to creator or staff (`created_by`)
 - [x] Default `ordering` on FeatureFlag / Verification / Match / ChequeListing / IssuerProfile
+- [x] Separate `user_type` (`natural` / `legal`) on Profile: register + KYC validation (10 vs 11 digit IDs) — PR #25
 - [ ] Add OpenAPI schema annotations (drf-spectacular)
 
 ## Phase 2 — KYC — Completed
@@ -61,6 +69,16 @@
 - [x] Settlement Port stub implemented
 - [x] Express interest endpoint
 
+> Backend was implemented and merged via PR #6. The matching app exists, is in
+> `INSTALLED_APPS`, and has models/views/serializers/services/urls/tests.
+
+- [x] Match model + state machine
+- [x] Settlement Port implementation
+- [x] Express interest endpoint (`POST /api/v1/matches/`)
+- [x] Match status transitions + listing `MATCHED` side-effect
+- [x] Notification match-event handlers wired
+- [x] Frontend Match flow in active UI (`checkyar-googleai`: express-interest, my-matches, store) + E2E critical-path in `doion/e2e/`
+
 ## Phase 7 — Notifications — Completed
 
 - [x] Create `doion.notifications` app with `Notification` and `NotificationPreference` models
@@ -73,29 +91,6 @@
 - [x] Celery task `expire_listings` for expired listings (every 60 minutes)
 - [x] Notification URLs registered in api_router
 - [x] Tests: test_models.py, test_views.py, test_signals.py, test_services.py, test_celery_task.py
-
-- [x] Create `doion.checks` app with `IssuerProfile` and `ChequeListing` models
-- [x] `TextChoices` enums for `Status` and `IssuerType`
-- [x] `UniqueConstraint` on `(issuer, bank_name, cheque_serial_number)` at DB level
-- [x] Serializers with validation rules LST_201–LST_205
-- [x] `IntegrityError` → `VALIDATION_ERROR` with field-level detail for duplicate sayad
-- [x] `ChequeListingViewSet` with create, list, retrieve, update, destroy, `my/`, `upload_document`
-- [x] Create `doion.pricing` app with synchronous `calculate_suggested_rate` stub
-- [x] Change `Document.related_object_id` from `UUIDField` to `CharField(max_length=255)` for integer PK compatibility
-- [x] Migrations created and applied
-
-## Phase 6 — Matching — Completed (backend), frontend wiring in progress
-
-> Backend was implemented and merged via PR #6. The matching app exists, is in
-> `INSTALLED_APPS`, and has models/views/serializers/services/urls/tests. Remaining
-> work: frontend wiring to consume the API (`features/matches/`).
-
-- [x] Match model + state machine
-- [x] Settlement Port implementation
-- [x] Express interest endpoint (`POST /api/v1/matches/`)
-- [x] Match status transitions + listing `MATCHED` side-effect
-- [x] Notification match-event handlers wired
-- [ ] Frontend `matchService.ts` / `matchStore.ts` / views fully validated end-to-end
 
 ## Phase 8 — Compliance, Jobs & Hardening — Completed
 
@@ -114,6 +109,9 @@
 - [x] Resolved `urls.W005` namespace warning in `config/urls.py`
 - [x] Tests: `test_models.py`, `test_views.py`, `test_celery.py` (expire_listings → EXPIRED), `test_audit.py`
 - [x] API contract consolidated into `docs/development/MASTER_API_CONTRACT.md` (SSOT); `API_CONTRACT_REGISTRY.md` deprecated stub
+- [x] `python manage.py makemigrations` + `migrate` (compliance / integrations / moderation / notifications `0001` in repo)
+- [x] `celery` and `structlog` declared in `pyproject.toml`
+- [x] Tests under `doion.compliance` present in repo
 
 ## Domain factories (prep for demo seed + broader tests)
 
@@ -122,27 +120,22 @@
 - [x] `seed_demo` management command using the same factories
 - [x] Local demo SQLite switch: `DJANGO_DEMO_DATABASE=1` → `db.demo.sqlite3` (see `docs/development/BACKEND_DEMO_SEED_AND_DATA.md`)
 
-## Follow-ups (after `feature/backend-critical-path-test-hardening`)
+## Follow-ups — پایلوت و hardening (باز)
 
-کارهای توصیه‌شده برای بعد از merge این branch — عمداً اینجا انجام نشد تا PR کوچک و قابل‌بازبینی بماند.
-جزئیات دمو/چابکان: [`docs/development/BACKEND_DEMO_SEED_AND_DATA.md`](../docs/development/BACKEND_DEMO_SEED_AND_DATA.md) (بخش Follow-ups).
+کارهای بعد از ساخت v1. جزئیات دمو/چابکان: [`docs/development/BACKEND_DEMO_SEED_AND_DATA.md`](../docs/development/BACKEND_DEMO_SEED_AND_DATA.md).
 
 ### Wave 2 — Automation & quality
 - [x] GitHub Actions: `pytest` روی PR/push به `develop` (`.github/workflows/ci-backend.yml`); `ruff` فعلاً فقط لوکال — gate اجباری بعد از پاک‌سازی lint
-- [ ] رفع `UnorderedObjectListWarning` با `ordering` / `order_by` روی querysetهای FeatureFlag / Verification / Match / ChequeListing / IssuerProfile
+- [ ] `ruff` به‌عنوان gate اجباری CI (پس از پاک‌سازی lint)
+- [ ] رفع `UnorderedObjectListWarning` اگر هنوز روی querysetهایی بدون `order_by` دیده شود (مدل‌های FeatureFlag / Verification / Match / ChequeListing / IssuerProfile خود `Meta.ordering` دارند)
 - [ ] پوشش بیشتر matching API (شاخه‌های باقی‌مانده در `matching/views.py`) و edgeهای upload سند
 
-### Demo / staging (ops)
+### Demo / staging (ops) — پیش‌نیاز پایلوت، نه لانچ عمومی
 - [ ] محیط staging یا demo جدا روی چابکان با **Postgres** + `migrate` + `seed_demo` (نه SQLite روی production)
 - [ ] راهنمای کوتاه در پنل/runbook: رمز دمو فقط از `DEMO_SEED_PASSWORD` / خروجی seed؛ هرگز در production واقعی seed با `--reset` بدون آگاهی
 
-### Cross-cutting (خارج از این مونورپو یا موج جدا)
+### Cross-cutting (UI فعال در `checkyar-googleai`)
 - [x] E2E smoke harness در `e2e/` (Playwright) با `VITE_USE_MOCK=false` + `seed_demo` / demo DB — see [`docs/development/E2E_LOCAL_RUNBOOK.md`](../docs/development/E2E_LOCAL_RUNBOOK.md)
-- [x] E2E critical-path specs + rich `seed_demo` (express interest / accept / moderation approve / create listing / notifications mark-read) — runbook + [`AI_STUDIO_E2E_CRITICAL_PATH_PROMPT.md`](../docs/development/AI_STUDIO_E2E_CRITICAL_PATH_PROMPT.md); needs Studio testids then `npm run test:critical`
+- [x] E2E critical-path specs + rich `seed_demo` (express interest / accept / moderation approve / create listing / notifications mark-read) — [`AI_STUDIO_E2E_CRITICAL_PATH_PROMPT.md`](../docs/development/AI_STUDIO_E2E_CRITICAL_PATH_PROMPT.md)
 - [x] CI Playwright (smoke + critical) — `.github/workflows/ci-e2e.yml`
-- [ ] ادامه تست‌های UI در `checkyar-googleai` (store/API-client با mock کنترل‌شده) فقط از طریق AI Studio — selector prep: [`docs/development/AI_STUDIO_E2E_PREP_PROMPT.md`](../docs/development/AI_STUDIO_E2E_PREP_PROMPT.md) + Phase A: [`V1_PHASE_A_STUDIO_PROMPT.md`](../docs/development/V1_PHASE_A_STUDIO_PROMPT.md)
-
-### Phase 8 — Remaining (requires shell, blocked in this environment)
-- [ ] `python manage.py makemigrations` + `migrate` (generates compliance 0001 and the pending integrations/moderation/notifications migrations)
-- [ ] `pip install celery structlog` (deps already declared in pyproject.toml)
-- [ ] Run `python manage.py test doion.compliance` to confirm green
+- [ ] ادامه تست‌های UI در `checkyar-googleai` (store/API-client با mock کنترل‌شده) فقط از طریق AI Studio — [`docs/development/AI_STUDIO_E2E_PREP_PROMPT.md`](../docs/development/AI_STUDIO_E2E_PREP_PROMPT.md)

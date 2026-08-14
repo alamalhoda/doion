@@ -21,6 +21,8 @@ kind: architecture
 
 # Django Architecture Rules
 
+**به‌روزرسانی:** ۱۴۰۵/۰۵/۲۳ — دامنه محصول چک‌یار در `backend/doion/<app>/` است. UI فعال در این درخت نیست (`checkyar-googleai`). قرارداد API: `docs/development/MASTER_API_CONTRACT.md`.
+
 ## ساختار پروژه Django
 
 ```
@@ -43,22 +45,21 @@ backend/                            # ریشه بک‌اند (Django)
 │   ├── conftest.py                 # تنظیمات تست پایه
 │   │
 │   ├── users/                      # اپ مدیریت کاربران
-│   │   ├── __init__.py
 │   │   ├── models.py               # مدل User سفارشی مبتنی بر AbstractUser
-│   │   ├── views.py                # ویوهای کاربر Detail، Update و Redirect
-│   │   ├── urls.py                 # URLهای مربوط به کاربران
-│   │   ├── admin.py                # تنظیمات پنل ادمین
-│   │   ├── forms.py                # فرم‌های ثبت‌نام و احراز هویت
-│   │   ├── adapters.py             # آداپتورهای django-allauth
-│   │   ├── apps.py                 # تنظیمات اپ
-│   │   ├── context_processors.py   # پردازشگرهای زمینه
-│   │   ├── api/                    # لایه REST API برای کاربران
-│   │   │   ├── __init__.py
-│   │   │   ├── views.py            # UserViewSet برای Retrieve، List، Update و Me
-│   │   │   └── serializers.py      # UserSerializer
-│   │   └── migrations/             # مایگریشن‌های دیتابیس
-│   │       ├── __init__.py
-│   │       └── 0001_initial.py
+│   │   ├── api/                    # JWT login/refresh + UserViewSet
+│   │   └── ...
+│   │
+│   ├── core/                       # مدل‌های پایه، permissions، seed_demo
+│   ├── identity/                   # Profile, Verification, register/me
+│   ├── documents/                  # Document (مدارک KYC و آگهی)
+│   ├── checks/                     # ChequeListing, IssuerProfile
+│   ├── pricing/                    # موتور stub نرخ پیشنهادی
+│   ├── marketplace/                # جست‌وجو/فیلتر آگهی‌های published
+│   ├── matching/                   # Match + تسویه off-platform
+│   ├── moderation/                 # صف آگهی و KYC
+│   ├── notifications/              # اعلان درون‌برنامه‌ای + preferences
+│   ├── compliance/                 # AuditEvent, FeatureFlag, stats
+│   ├── integrations/               # SMS stub
 │   │
 │   ├── contrib/                    # کدهای کمکی
 │   │   └── sites/                  # اپ sites جنگو

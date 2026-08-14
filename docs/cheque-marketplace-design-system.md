@@ -1,8 +1,13 @@
 # Design System Reference
-## چک‌بازار — پلتفرم تنزیل چک
+## چک‌یار (Cheque Yar) — پلتفرم معرفی و اتصال فرصت چک
 
-> **دستورالعمل استفاده:**
-> این سند را در ابتدای هر مکالمه‌ای که خروجی UI/UX یا HTML تولید می‌کند ضمیمه کنید و از Claude بخواهید «کاملاً مطابق این Design System عمل کند». هیچ رنگ، فونت، یا تصمیم طراحی خارج از این سند نباید اعمال شود مگر با تأیید صریح.
+> **وضعیت ۱۴۰۵/۰۵ (2026-08-14):** این سند در اصل برای پروتوتایپ HTML (تم کاغذ گرم / navy-gold) نوشته شده. **UI فعال** در [checkyar-googleai](https://github.com/alamalhoda/checkyar-googleai) با **Naive UI + Tailwind CSS v4 + تم تیره (slate/emerald)** پیاده شده و فونت Vazirmatn را **محلی** از `public/fonts/` لود می‌کند (بدون Google Fonts CDN).
+>
+> - توکن‌های `--navy` / `--gold` زیر را مرجع هویت بصری پروتوتایپ و اسناد سرمایه‌گذاری بدانید، نه SSOT پیکسل‌به‌پیکسل UI زنده.
+> - SSOT مسیرها و لایه UI زنده: `checkyar-googleai/docs/ARCHITECTURE.md`.
+> - سیاست توسعه UI: [`FRONTEND_DEVELOPMENT_STATUS.md`](development/FRONTEND_DEVELOPMENT_STATUS.md).
+>
+> **دستورالعمل استفاده برای پروتوتایپ/HTML:** اگر خروجی باید به این تم کاغذ گرم پایبند باشد، این فایل را ضمیمه کنید. برای کار روی UI زنده، از توکن‌های `--theme-*` در `src/index.css` ریپوی UI پیروی کنید.
 
 ---
 
@@ -103,7 +108,10 @@
 ```
 font-family: 'Vazirmatn', sans-serif;
 ```
-فقط از Google Fonts لود می‌شود:
+
+**UI زنده:** فایل‌های woff2 در `checkyar-googleai/public/fonts/vazirmatn/` — بدون CDN خارجی (مناسب شبکه ملی).
+
+**پروتوتایپ تاریخی (دیگر برای UI زنده استفاده نشود):**
 ```html
 <link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 ```
@@ -279,14 +287,28 @@ border-bottom: 1px solid var(--border);
 
 ## ۸. ساختار صفحات (Page Map)
 
+### UI زنده (`checkyar-googleai` — Vue Router)
+
+| مسیر | محتوا |
+|------|--------|
+| `/login`, `/register` | ورود / ثبت‌نام (نقش + حقیقی/حقوقی) |
+| `/marketplace` | بازارچه (مسیر پیش‌فرض پس از ورود؛ `/` به اینجا redirect می‌شود) |
+| `/listings/create`, `/listings/my`, `/listings/:id` | ویزارد ثبت، لیست من، جزئیات |
+| `/matches`, `/matches/:id`, `/matches/express-interest/:listingId` | تطابق و ابراز تمایل |
+| `/notifications` | مرکز اعلان |
+| `/moderation`, `/moderation/kyc` | صف آگهی و KYC |
+| `/admin/stats`, `/admin/feature-flags`, `/admin/audit` | ادمین |
+
+SPA با Vue Router است، نه `showPage(name)` پروتوتایپ.
+
+### پروتوتایپ HTML (تاریخی)
+
 | صفحه | ID | محتوا |
 |---|---|---|
 | خانه | `page-landing` | Hero + Stats + How It Works |
 | بازارچه | `page-marketplace` | فیلتر + grid آگهی‌ها |
 | ثبت آگهی | `page-create` | فرم ۳ مرحله‌ای |
 | داشبورد | `page-dashboard` | تب‌های دارنده/سرمایه‌گذار/فعالیت |
-
-SPA با `showPage(name)` و `display:none/block`.
 
 ---
 
@@ -307,7 +329,8 @@ SPA با `showPage(name)` و `display:none/block`.
 هر بار که بخش جدیدی از UI می‌سازید، این دستور را به Claude بدهید:
 
 ```
-این فایل Design System پروژه چک‌بازار است.
+این فایل Design System پروتوتایپ چک‌یار است (تم کاغذ گرم).
+اگر روی UI زنده (`checkyar-googleai`) کار می‌کنید، از توکن‌های `--theme-*` و Naive UI پیروی کنید، نه لزوماً از `--navy/--gold`.
 تمام خروجی HTML/CSS باید:
 - دقیقاً از CSS Variables این سند استفاده کند (هیچ رنگ hardcode جدیدی مجاز نیست)
 - از فونت Vazirmatn و RTL استفاده کند

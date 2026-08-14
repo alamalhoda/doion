@@ -1,7 +1,18 @@
 # AI-Assisted Feature Implementation Guide
 
-> A systematic, repeatable process for Django/Python engineers to use AI 
+> A systematic, repeatable process for Django/Python engineers to use AI
 > effectively across the full feature development lifecycle.
+
+**Cheque Yar / doion — project context (2026-08-14):**
+
+- Backend lives in `backend/doion/<app>/` (Cookiecutter layout). Activate `backend/.venv` before any Python command.
+- API contract SSOT: `docs/development/MASTER_API_CONTRACT.md`. Update it in the same PR as serializer/view/url changes.
+- Active UI is **not** in this monorepo: `alamalhoda/checkyar-googleai` (Google AI Studio, one-way sync, Bun). Do not push UI source from Cursor.
+- GitFlow: work on `feature/*` from `develop`; never commit directly to `develop`/`main`.
+- Store feature specs under `docs/` or `ai-documents/features/<feature-name>/` as agreed; do not invent a parallel API spec.
+- Layer 1 Marketplace MVP is implemented. New work should extend it (or explicitly mark Layer 2/3) — see `docs/سند پایه پروژه (Core Brief).md`.
+
+Start a new feature with the prompt in `docs/ai_feature_implementaation_start.md`.
 
 ---
 

@@ -1,6 +1,6 @@
 ---
 name: Cheque Marketplace Phases
-overview: برنامه فازبندی‌شده برای تبدیل دو پروتوتایپ HTML به محصول واقعی چک‌بازار، با هم‌ترازی کامل با معماری Modular Monolith (LLD) و Vue 3 feature-based frontend موجود. هر فاز یک vertical slice قابل تست end-to-end است.
+overview: "سابقهٔ ساخت v1 لایه ۱ چک‌یار (فازهای ۰–۸ تکمیل). وضعیت محصول: v1 لایه ۱ آماده پایلوت — نه در حال ساخت MVP، نه v1 لانچ‌شده. UI فعال در checkyar-googleai است."
 todos:
   - id: phase-0-platform-setup-refactoring
     content: "فاز ۰: ریفکتورینگ architecture frontend (composables, ui atoms, layout organisms) + API v1 versioning"
@@ -32,17 +32,25 @@ todos:
 isProject: false
 ---
 
-# برنامه اجرایی فازبندی — چک‌بازار MVP
+# برنامه اجرایی فازبندی — ساخت v1 لایه ۱ چک‌یار
+
+**نقش این فایل:** سابقهٔ ساخت فازهای ۰–۸ است، نه برنامهٔ جاری «در حال ساخت MVP» و نه سند لانچ.
+
+**وضعیت محصول (۱۴۰۵/۰۵/۲۳ / 2026-08-14):** **v1 لایه ۱ آماده پایلوت** — نه در حال ساخت MVP، نه v1 لانچ‌شده. فازهای ۰–۸ در بک‌اند `backend/doion/` انجام شده‌اند. مسیرهای `frontend/src/...` در بخش‌های زیر **تاریخی**اند (UI آرشیو). UI فعال: [checkyar-googleai](https://github.com/alamalhoda/checkyar-googleai). SSOT محصول: [`سند پایه پروژه (Core Brief).md`](../سند%20پایه%20پروژه%20(Core%20Brief).md). سیاست UI: [`development/FRONTEND_DEVELOPMENT_STATUS.md`](../development/FRONTEND_DEVELOPMENT_STATUS.md).
+
+**گام بعدی (خارج از این فازبندی):** پایلوت کنترل‌شده، پروندهٔ حقوقی/رگولاتوری، hardening استقرار — نه فاز ۹ ساخت محصول، نه اعلام عرضه عمومی.
 
 ## وضعیت فعلی (Baseline)
 
 | لایه | وضعیت | مرجع |
 |------|--------|------|
-| Backend | `doion.users` + JWT login + `doion.core` + `doion.identity` + role field + register API + `doion.checks` + `doion.pricing` + `doion.moderation` + `doion.marketplace` | [`backend/doion/`](backend/doion/) |
-| Frontend | Vue 3 + design tokens + UI shells + landing + register + role badge | [`frontend/src/features/`](frontend/src/features/) |
-| مستندات | LLD، معماری، state machines، design system، API contract | [`docs/cheque-platform-low-level-design.md`](docs/cheque-platform-low-level-design.md)، [`ai-preview/mvp-spec.md`](ai-preview/mvp-spec.md)، [`docs/development/MASTER_API_CONTRACT.md`](docs/development/MASTER_API_CONTRACT.md) |
+| Backend | `doion.users` + JWT + identity/KYC + checks + pricing stub + moderation + marketplace + matching + notifications + compliance + integrations | [`backend/doion/`](../../backend/doion/) |
+| Frontend فعال | Vue 3 + Naive UI + Pinia + Bun؛ توسعه در AI Studio | ریپوی خارجی `checkyar-googleai` |
+| قرارداد API | SSOT واحد | [`docs/development/MASTER_API_CONTRACT.md`](../development/MASTER_API_CONTRACT.md) |
+| مستندات معماری | LLD + معماری فنی هم‌تراز با کد ۱۴۰۵/۰۵ | [`cheque-platform-low-level-design.md`](../cheque-platform-low-level-design.md) |
+| وضعیت محصول | v1 لایه ۱ آماده پایلوت | [`سند پایه پروژه (Core Brief).md`](../سند%20پایه%20پروژه%20(Core%20Brief).md) |
 
-**نقشه پروتوتایپ → محصول:**
+**نقشه پروتوتایپ → v1 (آماده پایلوت، نه لانچ‌شده):**
 
 ```mermaid
 flowchart LR
@@ -58,7 +66,7 @@ flowchart LR
     NotifCenter[Notification Center]
     StateViz[State Machines]
   end
-  subgraph product [Production Vue App]
+  subgraph product [v1 Vue App — checkyar-googleai]
     PublicPages[Public + Auth]
     InvestorFlow[Investor Flow]
     HolderFlow[Holder Flow]
@@ -74,7 +82,7 @@ flowchart LR
   StateViz -.->|dev reference only| product
 ```
 
-> **تصمیم ساختاری:** LLD ساختار `backend/apps/` را پیشنهاد می‌دهد؛ کد فعلی Cookiecutter با `backend/doion/` است. در فاز ۱، appهای دامنه را زیر `backend/doion/<app>/` بسازید (هم‌راستا با `users`) و نام‌گذاری bounded context را از LLD حفظ کنید. مهاجرت فیزیکی به `apps/` اختیاری و بعد از MVP است.
+> **تصمیم ساختاری (انجام‌شده):** LLD ساختار `backend/apps/` را پیشنهاد می‌داد؛ appهای دامنه زیر `backend/doion/<app>/` ساخته شدند. مهاجرت فیزیکی به `apps/` در برنامهٔ جاری v1 نیست. بخش‌های فاز ۰–۸ زیر **سابقهٔ ساخت** هستند؛ کار جدید باید روی پایلوت/hardening باشد، نه تکرار این فازها.
 
 ---
 
@@ -461,21 +469,21 @@ flowchart TD
 
 ---
 
-## قراردادهای توسعه (هر فاز)
+## قراردادهای توسعه (تاریخی — برای فازهای ۰–۸)
 
-### Git Flow — الزام بر Rسوپراپ
-تمام توسعه‌ی این برنامه **الزاماً** باید طبق [`shared-gitflow-branch-policy/WORKFLOW.md`](.kilo/workflows/shared-gitflow-branch-policy/WORKFLOW.md) انجام شود:
-- ✅ **فقط** از `feature/phase-N-*` برای شروع کار جدید استفاده شود
-- ✅ branch جدید از `develop` شا�ف می‌شود: `git checkout -b feature/phase-0-platform-setup develop`
-- ✅ هر ادغام به `develop` فقط از طریق Pull Request
-- ✅ commit format: `feat(scope): description` (conventional commits)
-- ✅ قبل از PR: rebase/merge با `origin/develop` و تست‌های موفق
-- ✅ چک‌لیست قبل از PR رعایت شود (build، تست، conflict رفع شده)
+این قراردادها هنگام **ساخت** v1 اعمال می‌شدند. کار جدید: GitFlow از `develop` با `feature/*` (نه لزوماً `feature/phase-N-*`)، قرارداد API در [`MASTER_API_CONTRACT.md`](../development/MASTER_API_CONTRACT.md)، UI فقط از طریق AI Studio → `checkyar-googleai`.
+
+### Git Flow
+مرجع: [`.cursor/rules/share/gitflow-branch-policy.mdc`](../../.cursor/rules/share/gitflow-branch-policy.mdc)
+- هنگام ساخت فازها از `feature/phase-N-*` از `develop` استفاده می‌شد
+- کار جدید (پایلوت/hardening) با `feature/*` از `develop`؛ ادغام فقط از طریق PR
+- commit format: `feat(scope): description`
+- قبل از PR: همگام‌سازی با `origin/develop` و تست‌های موفق
 
 ### مستندسازی هر PR
 - به‌روز [`docs/development/MASTER_API_CONTRACT.md`](docs/development/MASTER_API_CONTRACT.md)
 - به‌روز [`docs/development/PAGE_REVIEW_LOG.md`](docs/development/PAGE_REVIEW_LOG.md)
-- [`backend/TODO.md`](backend/TODO.md) / [`frontend/TODO.md`](frontend/TODO.md)
+- [`backend/TODO.md`](../../backend/TODO.md)؛ UI فعال TODO جدا در مونورپو ندارد
 
 ### Definition of Done (هر فاز)
 1. Backend: migrations + serializer tests + permission tests
@@ -487,7 +495,7 @@ flowchart TD
 
 ---
 
-## تخمین نسبی (تیم ۲ نفر: ۱ BE + ۱ FE)
+## تخمین نسبی (تاریخی — هنگام ساخت)
 
 | فاز | مدت تقریبی | خروجی قابل دمو |
 |-----|------------|----------------|
@@ -499,14 +507,20 @@ flowchart TD
 | ۵ | ۱ هفته | Marketplace browse |
 | ۶ | ۱.۵ هفته | Matching |
 | ۷ | ۱ هفته | Notifications |
-| ۸ | ۱ هفته | Production-ready MVP |
-| **جمع** | **~۱۰–۱۱ هفته** | |
+| ۸ | ۱ هفته | **v1 لایه ۱ آماده پایلوت** — نه لانچ‌شده |
+| **جمع** | **~۱۰–۱۱ هفته** | ساخت v1 لایه ۱ (تکمیل) |
 
 ---
 
-## موارد خارج از scope MVP (YAGNI)
+## موارد خارج از دامنه v1 لایه ۱ (YAGNI)
 
-- State machine visualization page (فقط مرجع dev در [`WorkflowPrototypeView`](frontend/src/features/workflow/views/WorkflowPrototypeView.vue))
+این موارد عمداً در ساخت v1 نیامده‌اند و پیش‌نیاز پایلوت نیستند:
+
+- State machine visualization page (فقط مرجع dev تاریخی)
 - Escrow / payment / in-platform messaging
-- Real SMS/KYC provider (adapter stub کافی است)
-- Analytics dashboard (از AuditEvent بعداً)
+- ارائه‌دهنده واقعی SMS/KYC (adapter stub کافی است)
+- Analytics dashboard مستقل (از `AuditEvent` بعداً)
+- monetization (کارمزد آگهی/اشتراک/match)
+- عرضه عمومی / لانچ
+
+کار جاری پس از این فایل: پایلوت، انطباق حقوقی، و hardening استقرار — مطابق Core Brief.
