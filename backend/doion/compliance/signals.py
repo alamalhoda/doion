@@ -112,3 +112,14 @@ def seed_default_feature_flags(sender, **kwargs):
             "description": "Enable SMS notifications",
         },
     )
+    FeatureFlag.objects.get_or_create(
+        key="show_risk_tier",
+        defaults={
+            "is_enabled": False,
+            "is_system": False,
+            "description": (
+                "Show listing risk tier on public marketplace and listing cards. "
+                "Moderators always see risk during review."
+            ),
+        },
+    )

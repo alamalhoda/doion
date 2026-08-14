@@ -67,10 +67,35 @@ class TestFeatureFlagEndpoints:
         )
         assert resp.status_code == 403
 
-    def test_normal_user_denied(self, normal_user):
+    def test_anyone_can_list_flags(self, normal_user):
         client = APIClient()
         client.force_authenticate(user=normal_user)
         resp = client.get(f"{BASE}/feature-flags/")
+        assert resp.status_code == 200
+
+    def test_anonymous_can_list_flags(self):
+        client = APIClient()
+        resp = client.get(f"{BASE}/feature-flags/")
+        assert resp.status_code == 200
+
+    def test_show_risk_tier_seed_present(self, admin):
+        client = APIClient()
+        client.force_authenticate(user=admin)
+        resp = client.get(f"{BASE}/feature-flags/show_risk_tier/")
+        assert resp.status_code == 200
+        assert resp.data["key"] == "show_risk_tier"
+        assert resp.data["is_enabled"] is False
+        assert resp.data["is_system"] is False
+
+    def test_normal_user_cannot_patch_flag(self, normal_user):
+        FeatureFlag.objects.create(key="toggle_me", is_enabled=False)
+        client = APIClient()
+        client.force_authenticate(user=normal_user)
+        resp = client.patch(
+            f"{BASE}/feature-flags/toggle_me/",
+            {"is_enabled": True},
+            format="json",
+        )
         assert resp.status_code in (403, 401)
 
 
