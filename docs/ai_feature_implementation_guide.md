@@ -3,6 +3,10 @@
 > A systematic, repeatable process for Django/Python engineers to use AI
 > effectively across the full feature development lifecycle.
 
+Stack-agnostic variant (frontend-only, backend-only, or full-stack):
+`docs/ai_feature_implementation_guide_generic.md`.
+Invoke with skill `ai-feature-implementation` (explicit only; does not auto-run).
+
 **Cheque Yar / doion — project context (2026-08-14):**
 
 - Backend lives in `backend/doion/<app>/` (Cookiecutter layout). Activate `backend/.venv` before any Python command.
