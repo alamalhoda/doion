@@ -52,3 +52,7 @@ Thumbs.db
 backend/db.sqlite3
 .cursor/.DS_Store
 backend/.env
+
+# Investor deck exports (source of truth is Markdown in docs/)
+presentation/
+peresentation/
