@@ -106,7 +106,7 @@ flowchart LR
   - ایجاد `frontend/src/components/ui/` برای atoms (Button, Input, Badge, Pill, Icon)
   - ایجاد `frontend/src/components/layout/` برای organisms (Nav, Footer, PageHeader)
   - پایه‌سازی i18n (fa) + RTL در main.ts (همراسی با design system)
-  - sync کامل CSS variables با `cheque-marketplace-design-system.md`
+  - sync کامل CSS variables با [`design-system.md`](../design-system.md)
 
 ### معیار پذیرش فاز ۰
 - Login/logout/refresh پایدار

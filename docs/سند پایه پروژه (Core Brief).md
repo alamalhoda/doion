@@ -26,7 +26,8 @@
 
 **نرخ تنزیل در کد:** موتور stub فقط `suggested_discount_rate` و `risk_tier` پیشنهاد می‌دهد؛ نرخ الزام‌آور نیست و توافق نهایی بیرون از پلتفرم است.
 
-جزئیات فنی: [`cheque-platform-technical-architecture.md.md`](cheque-platform-technical-architecture.md.md)، [`cheque-platform-low-level-design.md`](cheque-platform-low-level-design.md)، [`FRONTEND_DEVELOPMENT_STATUS.md`](development/FRONTEND_DEVELOPMENT_STATUS.md).
+جزئیات فنی: [`cheque-platform-technical-architecture.md.md`](cheque-platform-technical-architecture.md.md)، [`cheque-platform-low-level-design.md`](cheque-platform-low-level-design.md)، [`FRONTEND_DEVELOPMENT_STATUS.md`](development/FRONTEND_DEVELOPMENT_STATUS.md).  
+زبان طراحی / هویت بصری: [`design-system.md`](design-system.md).
 
 ---
 
