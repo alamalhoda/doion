@@ -1,7 +1,7 @@
 # مشخصات فنی MVP — چک‌بازار
 ## Frontend & UX Specification for Engineering Team
 
-> **راهنمای استفاده:** این سند مرجع اجرایی تیم فنی است. هر بخش یک سؤال UX را از پیش پاسخ می‌دهد تا توسعه بدون ابهام آغاز شود. سند را همراه با `cheque-platform-low-level-design.md` و `cheque-marketplace-design-system.md` مطالعه کنید.
+> **راهنمای استفاده:** این سند مرجع اجرایی تیم فنی است. هر بخش یک سؤال UX را از پیش پاسخ می‌دهد تا توسعه بدون ابهام آغاز شود. سند را همراه با `cheque-platform-low-level-design.md` مطالعه کنید. زبان طراحی فقط [`docs/design-system.md`](../docs/design-system.md) است.
 
 ---
 
