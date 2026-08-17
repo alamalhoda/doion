@@ -28,13 +28,15 @@
 
 ## Implementation Steps
 
-### - [ ] Step 1: seed فلگ در backend (`doion`)
+### - [x] Step 1: seed فلگ در backend (`doion`)
 
 - افزودن رکورد `show_landing_page` با `is_enabled=false` به `seed_default_feature_flags` در `backend/doion/compliance/signals.py`، دقیقاً هم‌الگوی seed موجود `show_risk_tier`.
 - idempotent با `get_or_create` (رفتار موجود همان receiver روی `post_migrate`).
 - تست: رکورد پس از مهاجرت وجود دارد و `GET /api/v1/compliance/feature-flags/show_landing_page/` برای مهمان `200` می‌دهد.
 - GitFlow: شاخه `feature/landing-flag-seed` از `develop` → PR. مستقل از UI و قابل merge پیش از آن.
 - به‌روزرسانی جدول تغییرات در `docs/development/MASTER_API_CONTRACT.md` (فقط ثبت seed؛ قرارداد تغییر نمی‌کند).
+
+**REVIEW NOTE (اجراشده):** کامیت `c03af87` روی شاخه `feature/landing-flag-seed`؛ سه فایل: `signals.py`، `compliance/tests/test_views.py`، `MASTER_API_CONTRACT.md`. تست `test_show_landing_page_seed_present_and_readable_by_guest` مهمان بدون احراز هویت را می‌آزماید (`200`، `is_enabled=false`، `is_system=false`)؛ کل ۱۷۸ تست backend پاس. روی دیتابیس توسعه موجود هم تأیید شد که `migrate` بدون هیچ مهاجرت جدید، رکورد را می‌سازد (idempotent). هنوز push و PR انجام نشده. یافته مهم برای پرامپت‌های UI: پاسخ `GET /compliance/feature-flags/` صفحه‌بندی‌شده است (`{count, next, previous, results}`)، نه آرایه ساده.
 
 ### - [ ] Step 2: پرامپت A — اسکلت، مسیر، و گیت فلگ
 
