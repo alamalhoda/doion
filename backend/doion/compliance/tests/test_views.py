@@ -87,6 +87,14 @@ class TestFeatureFlagEndpoints:
         assert resp.data["is_enabled"] is False
         assert resp.data["is_system"] is False
 
+    def test_show_landing_page_seed_present_and_readable_by_guest(self):
+        client = APIClient()
+        resp = client.get(f"{BASE}/feature-flags/show_landing_page/")
+        assert resp.status_code == 200
+        assert resp.data["key"] == "show_landing_page"
+        assert resp.data["is_enabled"] is False
+        assert resp.data["is_system"] is False
+
     def test_normal_user_cannot_patch_flag(self, normal_user):
         FeatureFlag.objects.create(key="toggle_me", is_enabled=False)
         client = APIClient()
