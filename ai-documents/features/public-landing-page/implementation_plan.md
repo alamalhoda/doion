@@ -30,8 +30,8 @@
 
 ### - [ ] Step 1: seed فلگ در backend (`doion`)
 
-- مهاجرت data در اپ `compliance` که رکورد `show_landing_page` را با `is_enabled=false` می‌سازد، هم‌الگوی seed موجود `show_risk_tier`.
-- idempotent با `get_or_create`؛ reverse به‌صورت no-op.
+- افزودن رکورد `show_landing_page` با `is_enabled=false` به `seed_default_feature_flags` در `backend/doion/compliance/signals.py`، دقیقاً هم‌الگوی seed موجود `show_risk_tier`.
+- idempotent با `get_or_create` (رفتار موجود همان receiver روی `post_migrate`).
 - تست: رکورد پس از مهاجرت وجود دارد و `GET /api/v1/compliance/feature-flags/show_landing_page/` برای مهمان `200` می‌دهد.
 - GitFlow: شاخه `feature/landing-flag-seed` از `develop` → PR. مستقل از UI و قابل merge پیش از آن.
 - به‌روزرسانی جدول تغییرات در `docs/development/MASTER_API_CONTRACT.md` (فقط ثبت seed؛ قرارداد تغییر نمی‌کند).
@@ -127,6 +127,7 @@
 6. فرض: کلید فلگ `show_landing_page` است. اگر Step 1 نام دیگری تثبیت کرد، همه پرامپت‌ها باید هم‌زمان اصلاح و هر دو مسیر از نو اجرا شوند.
 7. بازگشت عمیق پس از ورود پیاده نمی‌شود؛ `LoginView` دست‌نخورده می‌ماند.
 8. **عدم تقارن آگاهانه پیش‌فرض فلگ:** در شبیه‌ساز روشن، در backend خاموش. دلیل: شبیه‌ساز محیط دمو است و صفحه باید بدون تنظیم دستی دیده شود، ولی محصول واقعی نباید صفحه ناتمام را به مهمان نشان دهد.
+9. **مکانیزم seed فلگ:** طرح اولیه «مهاجرت data» فرض کرده بود، اما seed فلگ‌ها در این ریپو با receiver `post_migrate` (`seed_default_feature_flags`) انجام می‌شود، نه با مهاجرت data. برای حفظ SSOT سیدِ فلگ در یک نقطه، Step 1 همان receiver را گسترش می‌دهد.
 
 ## Open Questions
 
