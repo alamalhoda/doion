@@ -123,3 +123,14 @@ def seed_default_feature_flags(sender, **kwargs):
             ),
         },
     )
+    FeatureFlag.objects.get_or_create(
+        key="show_landing_page",
+        defaults={
+            "is_enabled": False,
+            "is_system": False,
+            "description": (
+                "Serve the public landing page at /landing and route / to it. "
+                "Off by default until the page is ready to show to guests."
+            ),
+        },
+    )
