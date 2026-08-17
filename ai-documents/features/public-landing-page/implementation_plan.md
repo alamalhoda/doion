@@ -38,7 +38,7 @@
 
 **REVIEW NOTE (اجراشده):** کامیت `c03af87` روی شاخه `feature/landing-flag-seed`؛ سه فایل: `signals.py`، `compliance/tests/test_views.py`، `MASTER_API_CONTRACT.md`. تست `test_show_landing_page_seed_present_and_readable_by_guest` مهمان بدون احراز هویت را می‌آزماید (`200`، `is_enabled=false`، `is_system=false`)؛ کل ۱۷۸ تست backend پاس. روی دیتابیس توسعه موجود هم تأیید شد که `migrate` بدون هیچ مهاجرت جدید، رکورد را می‌سازد (idempotent). هنوز push و PR انجام نشده. یافته مهم برای پرامپت‌های UI: پاسخ `GET /compliance/feature-flags/` صفحه‌بندی‌شده است (`{count, next, previous, results}`)، نه آرایه ساده.
 
-### - [ ] Step 2: پرامپت A — اسکلت، مسیر، و گیت فلگ
+### - [x] Step 2: پرامپت A — اسکلت، مسیر، و گیت فلگ
 
 خروجی: `prompts/01-skeleton.md`
 
@@ -55,6 +55,18 @@
 - فهرست `data-testid`های موردنیاز E2E در همین پرامپت درخواست شود.
 
 پوشش قوانین spec: ۱، ۲، ۳، ۵، ۶، ۱۸ (فوتر placeholder)، ۲۲، ۲۶، ۲۷، ۲۸.
+
+**REVIEW NOTE (اجراشده):** پرامپت در [`prompts/01-skeleton.md`](prompts/01-skeleton.md). سه مورد بیش از دامنه اولیه Step 2 وارد پرامپت شد، هر سه با دلیل:
+
+1. **حالت مهمان در mock (تصمیم کاربر).** `loadSavedUser()` در حالت mock خودکار `holder1` را لاگین می‌کند، پس بعد از logout اولین بارگذاری مجدد دوباره کاربر را وارد می‌کند و سناریو ۲۲ و همه سناریوهای مهمان در mock غیرقابل‌تأیید بودند. راه‌حل انتخاب‌شده: نشانگر صریح خروج در `localStorage`. راحتی دموی فعلی حفظ می‌شود و تصمیم قبلی ثبت‌شده در `docs/development/AI_STUDIO_E2E_PREP_PROMPT.md` («demo fallback seed فقط در mock») نقض نمی‌شود.
+2. **قفل پوسته `dark`.** قانون ۲۳ و Out of Scope پوسته‌های دیگر را روی این صفحه رد می‌کنند، ولی `NConfigProvider` در `App.vue` پوسته Naive را از ترجیح کاربر می‌گیرد. پرامپت `data-theme="dark"` روی ریشه صفحه و پوسته dark برای مسیرهای `publicChrome` را می‌خواهد، بدون تغییر ترجیح ذخیره‌شده کاربر.
+3. **حالت بارگذاری بوت سرد.** `#app` در `index.html` خالی است، پس قانون ۳ («فقط حالت بارگذاری دیده شود») روی بوت سرد نقض می‌شد. پرامپت یک placeholder کوچک RTL داخل `#app` می‌خواهد.
+
+فرض ثبت‌شده: فوتر آخرین عنصر صفحه است و بخش «سرمایه‌گذاری روی چک‌یار» قبل از آن می‌آید، برخلاف ترتیب عینی ردیف‌های ۱۲ و ۱۳ در spec §۲.۳.
+
+تصحیح یک برداشت قبلی: قرارداد `data-testid` در ریپوی UI از قبل وجود دارد (`login-submit`، `mock-mode-switch`، `marketplace-listing-card`، ثبت‌شده در `AI_STUDIO_E2E_PREP_PROMPT.md`)، پس پرامپت testidهای landing را در ادامه همان قرارداد kebab-case می‌خواهد.
+
+هنوز در هیچ‌کدام از دو مسیر اجرا نشده است.
 
 ### - [ ] Step 3: پرامپت B — بخش‌های محتوایی ثابت
 
