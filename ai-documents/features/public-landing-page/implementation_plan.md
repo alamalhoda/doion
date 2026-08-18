@@ -138,7 +138,7 @@
 
 **پرامپت ۰۲ (محتوا) بسته شد.** HEAD UI: `746cea6`. قدم بعد: نوشتن [`prompts/03-live-data-and-forms.md`](prompts/03-live-data-and-forms.md).
 
-### - [ ] Step 4: پرامپت C — بخش داده‌دار و فرم‌ها
+### - [x] Step 4: پرامپت C — بخش داده‌دار و فرم‌ها
 
 خروجی: `prompts/03-live-data-and-forms.md`
 
@@ -153,6 +153,16 @@
 - درخواست به‌روزرسانی مستندات UI (`docs/ARCHITECTURE*.md`، `docs/TESTING*.md`) در همان commit.
 
 پوشش قوانین spec: ۴، ۷–۱۴، ۱۶، ۱۷، ۲۵، ۲۹.
+
+**REVIEW NOTE (نوشته‌شده):** پرامپت در [`prompts/03-live-data-and-forms.md`](prompts/03-live-data-and-forms.md). نسبت به طرح اولیه Step 4:
+
+1. **ویجت بازارچه ممنوع است** — `LatestListingsWidget` نرخ ساختگی «۲.۵»، رنگ indigo/amber، و کلیک همیشه به جزئیات آگهی دارد؛ برای مهمان خلاف قانون ۱۳ است.
+2. **فرمت‌کننده‌ها در `persianUtils`** — `formatTomanFromRial` و `formatJalaliDate` تا سومین کپی `formatTomans` ساخته نشود.
+3. **پیام موفقیت فرم قفل شد** تا Studio ارسال واقعی ادعا نکند.
+4. **فرم تماس** فیلدهای نام/ایمیل/پیام مشخص شد (spec فقط «ایمیل/فرم» گفته بود).
+5. **CTA حالت خالی برای کاربر واردشده** → بازارچه، نه ثبت‌نام.
+
+HEAD UI مبنا: `746cea6`.
 
 ### - [ ] Step 5: اجرای مسیر A و pull
 
