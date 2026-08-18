@@ -108,6 +108,13 @@ On newer CI hosts you may set `PLAYWRIGHT_CHANNEL=chromium` after `npx playwrigh
 | `moderation-queue.spec.ts` | `moderator1` | `/moderation` without pagination/filter errors |
 | `listings-my-holder.spec.ts` | `holder1` | `/listings/my` table without crash |
 | `login-failed.spec.ts` | `holder1` + bad password | stays on `/login` + error message |
+| `landing-guest.spec.ts` | guest (Live API) | flag off → no landing; flag on → `/` → `/landing`, key sections, listing card → `/login` |
+
+Requires `show_landing_page` seed (develop / PR #31). Spec toggles the flag via admin API and restores `is_enabled=false` in `afterAll`. **UI must run with `VITE_USE_MOCK=false`** (mock simulator always enables the landing flag). Run only this file:
+
+```bash
+npx playwright test tests/smoke/landing-guest.spec.ts
+```
 
 ## Critical-path coverage
 

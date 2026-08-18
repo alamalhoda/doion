@@ -6,8 +6,8 @@ set -euo pipefail
 E2E_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 cd "${E2E_DIR}"
 
-FRONTEND_URL="${FRONTEND_URL:-http://localhost:3000}"
-API_URL="${API_URL:-http://localhost:8000/api/v1}"
+FRONTEND_URL="${FRONTEND_URL:-http://127.0.0.1:3000}"
+API_URL="${API_URL:-http://127.0.0.1:8000/api/v1}"
 
 echo "==> checking frontend ${FRONTEND_URL}"
 curl --connect-timeout 5 -m 10 -sf -o /dev/null "${FRONTEND_URL}/" || {

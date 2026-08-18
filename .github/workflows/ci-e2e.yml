@@ -24,8 +24,8 @@ jobs:
         uses: actions/checkout@v4
         with:
           repository: alamalhoda/checkyar-googleai
-          # ModerationReview MOD_101..MOD_106 reject codes (2026-08-07)
-          ref: e0b69cbe7259e25d12fb75d38dbdb946e88a8c60
+          # Landing decor + guest smoke selectors (2026-08-18)
+          ref: d518d20fbcc9a66c83b2fdd273aad723148ff848
           path: checkyar-googleai
           token: ${{ secrets.GITHUB_TOKEN }}
 

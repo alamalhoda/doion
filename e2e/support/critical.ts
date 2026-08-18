@@ -31,7 +31,7 @@ export async function fetchListingIdBySerial(
   expect(token).toBeTruthy();
 
   const apiBase =
-    process.env.API_URL || "http://localhost:8000/api/v1";
+    process.env.API_URL || "http://127.0.0.1:8000/api/v1";
 
   // Marketplace page size is fixed at 20; walk pages until serial found.
   for (let pageNum = 1; pageNum <= 3; pageNum += 1) {

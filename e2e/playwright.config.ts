@@ -4,7 +4,7 @@ import { defineConfig, devices } from "@playwright/test";
  * Servers are started outside Playwright (see scripts/ and E2E_LOCAL_RUNBOOK.md).
  * baseURL points at the active UI (checkyar-googleai) with VITE_USE_MOCK=false.
  */
-const frontendUrl = process.env.FRONTEND_URL || "http://localhost:3000";
+const frontendUrl = process.env.FRONTEND_URL || "http://127.0.0.1:3000";
 
 export default defineConfig({
   testDir: "./tests",

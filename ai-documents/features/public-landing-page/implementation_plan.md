@@ -170,38 +170,167 @@ HEAD UI مبنا: `746cea6`.
 
 سه ایراد کوچک در [`prompts/03-live-data-and-forms-fixes.md`](prompts/03-live-data-and-forms-fixes.md): `&larr;` روی کارت + «ورود برای معامله»؛ توکن ناموجود `--theme-surface-hover`؛ `animate-pulse` روی اسکلت بارگذاری.
 
-### - [ ] Step 5: اجرای مسیر A و pull
+**دور اصلاح Studio — کامیت `6358a0c` (پذیرفته):** ۴ فایل، ۸ افزوده / ۵ حذف. هر سه ایراد برطرف شد:
+
+1. **فلش LTR و متن کارت:** `&larr;` حذف شد؛ «ورود برای معامله» → «ورود برای مشاهده»؛ هر دو رشته (`guestCardAction`، `authCardAction`) در `landingContent.liveListings` + تست SSOT.
+2. **توکن hover:** `--theme-surface-hover` → `--theme-surface-muted`.
+3. **اسکلت بارگذاری:** `animate-pulse` حذف شد؛ layout و `min-h-[280px]` حفظ شد.
+
+بازتولید محلی پس از `git pull`: `tsc --noEmit` تمیز، ۱۹ فایل / ۱۱۵ تست پاس. diff با خلاصه Studio هم‌خوان بود.
+
+**پرامپت ۰۳ (داده‌دار و فرم‌ها) بسته شد.** HEAD UI: `6358a0c`.
+
+### - [x] Step 4b: پرامپت D — ارتقای ظاهر حرفه‌ای (پیش از sandbox)
+
+**درخواست کاربر:** صفحه Landing از نظر بصری ساده است؛ قبل از اجرای پرامپت‌ها در sandbox، ظاهر حرفه‌ای‌تر شود.
+
+**روش (تأیید کاربر):** پرامپت پیگیری **۰۴** در Studio → `git pull` → همان diff در sandbox (پس از اجرای ۰۱–۰۳ یا هم‌تراز با baseline محصول).
+
+خروجی: [`prompts/04-visual-polish.md`](prompts/04-visual-polish.md)
+
+دامنه:
+- کامپوننت‌های مشترک بصری (`LandingSectionShell`, `LandingSurfaceCard`, `LandingIconBadge`)
+- هیرو دوستونه با preview شماتیک (بدون داده زنده)
+- ریتم بخش‌ها، سایه/هاور کارت، تایپوگرافی، FAQ و فرم
+- **ممنوع:** تغییر متن قفل‌شده، routing، validation، `data-testid`، animate-pulse، رنگ‌های amber/rose/indigo
+
+**اجرای Studio — کامیت `a8250bd` (پذیرفته):** ۲۲ فایل، ۹۴۶ افزوده / ۶۷۶ حذف. سه primitive جدید در `components/`؛ هر ۱۱ بخش محتوایی از `LandingSectionShell` استفاده می‌کنند؛ `landingContent.visual` (caption + eyebrows) + تست؛ مستندات Architecture.
+
+بازتولید محلی پس از `git pull`: `tsc --noEmit` تمیز، **۱۹ فایل / ۱۱۶ تست** پاس. grep: بدون `animate-pulse`، `indigo`، `amber` (identity)، `&larr;`؛ `rose` فقط خطای فرم و variant `danger` در badge (معنایی). همه `landing-section-*` testidها از طریق shell حفظ شدند.
+
+درست: هیرو lg دو ستونه + mark «چک» ۴۸px + accent bar RTL + preview شماتیک با caption؛ CTA primary با متن تیره روی emerald؛ header lockup ۴۰px «چک» + shadow.
+
+اختیاری پیاده‌نشده (non-blocking): connector خط‌چین بین گام‌های «نحوه کار» در lg (در پرامپت optional بود).
+
+**پرامپت ۰۴ (visual polish) بسته شد.** HEAD UI: **`a8250bd`**. قدم بعد: Step 6 — اجرای پرامپت‌های ۰۱–۰۳ در sandbox، سپس اعمال diff `a8250bd` (یا پرامپت ۰۴) برای هم‌ترازی.
+
+### - [x] Step 4c: پرامپت E — لایه بصری مدرن (گرادیانت، الگو، glass، وکتور)
+
+**بازخورد کاربر (پس از ۰۴):** صفحه هنوز ساده است؛ می‌خواهد المان‌های مدرن‌تر: گرادیانت، پس‌زمینه نقطه‌ای/راه‌راه، شفافیت، وکتور.
+
+**روش:** پرامپت **۰۵** در Studio → pull → همان diff در sandbox (بعد از ۰۱–۰۳+۰۴).
+
+خروجی: [`prompts/05-modern-decor-layer.md`](prompts/05-modern-decor-layer.md)
+
+دامنه:
+- SSOT دکور: `landingDecor.css` + `LandingDecorLayer.vue` + `landingVectors.ts`
+- گرadiant mesh، dot/grid/stripe، glass cards، SVG وکتور abstract
+- **تعادل design-system §2:** لایه‌بندی ظریف — نه گرادیان شلوغ یا glass تمام‌صفحه
+- همان محدودیت‌های ۰۴ (متن قفل، behavior، testid، بدون animate-pulse)
+
+**وضعیت:** منتظر اجرا در Studio.
+
+**اجرای Studio — کامیت `9c19d9e` (پذیرفته):** ۲۵ فایل، ۶۷۸ افزوده / ۹۹ حذف. SSOT دکور: `landingDecor.css` (dots/grid/stripes/mesh/glass/gradient-border)؛ `LandingDecorLayer.vue` + `landingVectors.ts`؛ `LandingSectionShell` با `decorPattern`؛ glass/gradientBorder روی `LandingSurfaceCard`؛ هیرو mesh+dots+grid+SVG nodes؛ هر ۱۲ بخش الگوی اختصاصی؛ connector خط‌چین lg در «نحوه کار».
+
+**وابستگی جدید:** `@vue/test-utils` (dev) + `LandingSurfaceCard.test.ts` (۸ تست). پس از `git pull` حتماً `bun install` — بدون آن `tsc` خطای import می‌دهد.
+
+بازتولید محلی: `bun install` → `tsc` تمیز، **۲۰ فایل / ۱۲۴ تست** پاس. grep: بدون `animate-pulse`، `indigo`، `amber` (identity). `rose` فقط validation.
+
+**پرامپت ۰۵ (modern decor) بسته شد.** HEAD UI: **`9c19d9e`**. قدم بعد: Step 6 sandbox (۰۱–۰۳ → ۰۴ → ۰۵ → ۰۶).
+
+### - [x] Step 4d: پرامپت F — محصول‌محور در چارچوب SSOT
+
+**تصمیم کاربر:** اولویت با SSOT و design system؛ بخش اجرایی پیشنهاد خارجی (product-led) در پرامپت بعدی.
+
+خروجی: [`prompts/06-product-led-ssot-safe.md`](prompts/06-product-led-ssot-safe.md)
+
+**در scope:**
+- composable مشترک `useLandingLatestListings` (یک fetch برای Hero + Live Listings)
+- Hero: preview واقعی ۱–۲ آگهی به‌جای schematic
+- `LandingTrustStrip` بین Hero و Problem/Solution + لینک به §2.5
+- timeline افقی/عمودی برای «نحوه کار»
+- کارت آگهی غنی‌تر (chip نرخ، mask صادرکننده، status از `LISTING_STATUS_LABELS`)
+- decor خطی در Problem/Solution
+
+**عمداً out of scope:** بازچینی بخش‌ها، copy/CTA جدید Hero، پالت آبی/طلایی، فیلتر جعلی، مبلغ دریافتی، sticky mobile CTA، پنهان‌کردن §2.5
+
+**اجرای Studio — کامیت `56c9d49` (پذیرفته):** ۲۰ فایل، ۹۱۱ افزوده / ۱۵۶ حذف. composable singleton + trust strip + hero preview واقعی + timeline + کارت غنی‌تر + ۷ فایل تست. بازتولید: **۲۶ فایل / ۱۴۵ تست** پاس.
+
+**نکات جزئی non-blocking:** `--theme-text` در trust strip (توکن ناموجود)؛ hardcode «تابلوی زنده» در preview؛ timeline دسکتاپ ۳×۲ نه ۱×۶.
+
+**پرامپت ۰۶ بسته شد.** HEAD UI: **`56c9d49`**.
+
+### - [x] Step 4e: پرامپت G — estética پس‌زمینه/باکس sandbox + fixes مقایسه
+
+**تصمیم کاربر (پس از مقایسه زنده):** هر دو خروجی خوب بودند؛ sandbox در **backgroundها** و **box/cardها** ترجیح داده شد. می‌خواهد علاوه بر fixes لازم، Studio به همان حس بصری نزدیک شود.
+
+خروجی: [`prompts/07-sandbox-visual-adopt.md`](prompts/07-sandbox-visual-adopt.md)
+
+**در scope:**
+- الگوهای neutral (slate dots/grid) + mesh emerald با intensity variables
+- `overlay` روی `LandingDecorLayer` (mesh + dots)
+- glass با `color-mix`، gradient border با pseudo-element، rim `border-white/5`
+- fixes: `--theme-text-primary`، SSOT hero preview strings، timeline یک‌ردیفه lg، حفظ `landing-step-*` و اعداد فارسی
+
+**اجرای Studio — کامیت `d518d20` (پذیرفته):** ۱۸ فایل، ۲۷۴ افزوده / ۱۴۱ حذف. decor neutral + overlay + noise Hero؛ glass/gradient-border pseudo-element؛ trust strip توکن درست؛ hero preview strings در `landingContent.hero`؛ listing cards با glass + hover border. docs به‌روز. بازتولید: **۲۶ فایل / ۱۴۵ تست** (یک timeout flaky در `LandingHeroListingsPreview.test.ts` — non-blocking).
+
+**نکات جزئی non-blocking:** timeline دسکتاپ هنوز grid ۳×۲ با chevron flow است (نه یک ردیف ۱×۶ sandbox) — اختیاری برای clarifications بعدی.
+
+**پرامپت ۰۷ بسته شد.** HEAD UI: **`d518d20`**.
+
+### - [x] Step 5: اجرای مسیر A و pull
 
 - کاربر پرامپت‌ها را به‌ترتیب در AI Studio اجرا می‌کند و بعد از هر کدام commit SHA برمی‌گرداند.
 - `git pull origin main` در کلون محصول؛ تأیید اینکه HEAD شامل commitهای گزارش‌شده است.
 - بازبینی diff در برابر متن پرامپت: فایل‌های خواسته‌شده، بدون ریفکتور بی‌ربط، بدون `package-lock.json`، بدون تغییر backend.
 - ثبت شکاف‌ها؛ در صورت نیاز پرامپت پیگیری (نه اصلاح محلی UI).
 
-### - [ ] Step 6: اجرای مسیر B در sandbox
+**REVIEW NOTE (اجراشده):** هر سه پرامپت در Studio اجرا و بسته شدند. زنجیره کامیت UI:
 
-- همان سه پرامپت، بدون تغییر، در `/Users/alamalhoda/Projects/checkyar-cursor-lab` روی شاخه `experiment/landing-cursor`.
+| پرامپت | اجرا | اصلاح | HEAD |
+|--------|------|-------|------|
+| ۰۱ اسکلت | `85ec0be` | `86ee6e3` | `86ee6e3` |
+| ۰۲ محتوا | `568cf01` | `746cea6` | `746cea6` |
+| ۰۳ داده/فرم | `6fa040a` | `6358a0c` | `6358a0c` |
+| ۰۴ visual polish | `a8250bd` | — | `a8250bd` |
+| ۰۵ modern decor | `9c19d9e` | — | `9c19d9e` |
+| ۰۶ product-led | `56c9d49` | — | `56c9d49` |
+| ۰۷ sandbox visual | `d518d20` | — | **`d518d20`** |
+
+`git pull origin main` + `bun install` در کلون محصول؛ HEAD محلی = `d518d20`. پرامپت ۰۷ بسته شد.
+
+### - [x] Step 6: اجرای مسیر B در sandbox
+
+- پرامپت‌های **۰۱–۰۶** به‌ترتیب، بدون تغییر، در `/Users/alamalhoda/Projects/checkyar-cursor-lab` روی شاخه `experiment/landing-cursor`.
 - اجرا روی پورت ۳۰۰۱: `bun run dev -- --host 127.0.0.1 --port 3001`.
 - commit پس از هر پرامپت تا diff هر مرحله قابل تفکیک بماند.
 
-### - [ ] Step 7: مقایسه دو خروجی
+**REVIEW NOTE (اجراشده):** baseline `c24fc46`؛ بدون پوش. زنجیره:
 
-خروجی: `comparison_notes.md`
+| پرامپت | SHA sandbox |
+|--------|-------------|
+| ۰۱ | `96fa3d1` — lint پاک، ۷۳ تست |
+| ۰۲ | `36321e2` — ۸۰ تست؛ fixes ۰۲ در همان commit |
+| ۰۳ | `fed5782` — ۹۹ تست؛ fixes ۰۳ در همان commit |
+| ۰۴ | `8d9fb12` — ۱۰۰ تست |
+| ۰۵ | `41b941c` — ۱۰۰ تست؛ بدون dep جدید |
+| ۰۶ | **`b6843cf`** — ۱۰۹ تست |
 
-- مقایسه diff در برابر diff: خروجی Studio (روی `main`) و خروجی sandbox (`git diff main...experiment/landing-cursor`).
+Dev: `http://127.0.0.1:3001/landing` (`VITE_USE_MOCK=true`).
+
+### - [x] Step 7: مقایسه دو خروجی
+
+خروجی: [`comparison_notes.md`](comparison_notes.md)
+
+- مقایسه diff در برابر diff: خروجی Studio (روی `main`، HEAD `56c9d49`) و خروجی sandbox (`experiment/landing-cursor`، HEAD `b6843cf`).
 - معیارها: پوشش قوانین spec، وفاداری به دیزاین سیستم، صحت متن رگولاتوری، رفتار حالت‌های خطا/خالی، کیفیت ریسپانسیو، خوانایی کد، تعداد رفت‌وبرگشت لازم.
-- مشاهده هم‌زمان: نسخه محصول روی ۳۰۰۰، نسخه sandbox روی ۳۰۰۱، هر دو روی همان بک‌اند.
-- خروجی تصمیم‌محور: چه چیزهایی از نسخه بازنده باید به‌صورت پرامپت پیگیری به Studio تزریق شود.
+- مشاهده هم‌زمان: محصول `127.0.0.1:3000`، sandbox `127.0.0.1:3001`، هر دو `VITE_USE_MOCK=true`.
+- خروجی تصمیم‌محور: چهار کاندید پیگیری Studio (timeline یک‌ردیفه، توکن Trust strip، SSOT رشته‌های preview). **+ پرامپت ۰۷:** estética background/box sandbox (تصمیم کاربر پس از مقایسه زنده) — **انجام شد** (`d518d20`); timeline هنوز ۳×۲ با chevron (اختیاری).
 
-### - [ ] Step 8: E2E در `doion` (در صورت نیاز)
+### - [x] Step 8: E2E در `doion` (در صورت نیاز)
 
 - یک spec سبک smoke در `doion/e2e/` برای مهمان: با فلگ روشن `/` به `/landing` می‌رسد، بخش‌های کلیدی دیده می‌شوند، کلیک کارت به `/login` می‌رود.
 - اگر `data-testid` لازم موجود نبود، پرامپت پیگیری Studio (بدون ویرایش محلی UI).
 - GitFlow در `doion`.
 
-### - [ ] Step 9: sync مستندات
+**REVIEW NOTE (اجراشده):** `e2e/tests/smoke/landing-guest.spec.ts` + `e2e/support/landing.ts` + testid constants. Live API: admin PATCH `show_landing_page`، fail-closed وقتی خاموش، سپس redirect/sections/card→login؛ `afterAll` فلگ را off می‌کند. `E2E_LOCAL_RUNBOOK.md` و pin CI UI → `d518d20`. **بازتولید محلی:** ۴/۴ پاس با `VITE_USE_MOCK=false` روی UI (پورت ۳۰۰۲).
+
+### - [x] Step 9: sync مستندات
 
 - `doion`: ثبت وضعیت صفحه در `docs/development/PAGE_REVIEW_LOG.md`؛ در PR ذکر شود که قرارداد API تغییر نکرده (`Docs impact: none` برای MASTER_API_CONTRACT به‌جز ثبت seed فلگ).
-- ریپوی UI: مستندات Architecture/Testing از طریق Studio آمده باشند (نه ویرایش محلی).
+- ریپوی UI: مستندات Architecture/Testing از طریق Studio آمده باشند (نه ویرایش محلی UI).
+
+**REVIEW NOTE (اجراشده):** `PAGE_REVIEW_LOG.md` ایجاد شد (ورودی landing + summary table). `FRONTEND_DEVELOPMENT_STATUS.md` به‌روز (landing track + لینک‌ها). `MASTER_API_CONTRACT.md` قبلاً در PR #31 seed `show_landing_page` را دارد — تغییر API جدیدی نیست. Architecture UI فقط در Studio (`d518d20`).
 
 ## Key Decisions & Assumptions
 

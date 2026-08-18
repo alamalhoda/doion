@@ -37,6 +37,7 @@ export const ROUTES = {
   adminFeatureFlags: "/admin/feature-flags",
   adminAudit: "/admin/audit",
   profile: "/me",
+  landing: "/landing",
   expressInterest: (listingId: number | string) =>
     `/matches/express-interest/${listingId}`,
   moderationReview: (listingId: number | string) =>
@@ -91,4 +92,17 @@ export const TEST_IDS = {
   notificationItem: "notification-item",
   notificationMarkRead: "notification-mark-read",
   notificationsPagination: "notifications-pagination",
+  landingPage: "landing-page",
+  landingHeader: "landing-header",
+  landingFooter: "landing-footer",
+  landingTrustStrip: "landing-trust-strip",
+  landingSectionHero: "landing-section-hero",
+  landingSectionHowItWorks: "landing-section-how-it-works",
+  landingSectionLiveListings: "landing-section-live-listings",
+  landingSectionFaq: "landing-section-faq",
+  landingListingsGrid: "landing-listings-grid",
+  landingListingsLoading: "landing-listings-loading",
+  landingListingsError: "landing-listings-error",
+  landingHeroPrimaryCta: "landing-hero-primary-cta",
+  landingNavLogin: "landing-nav-login",
 } as const;
