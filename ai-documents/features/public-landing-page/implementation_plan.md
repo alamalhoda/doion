@@ -166,6 +166,10 @@ HEAD UI مبنا: `746cea6`.
 
 **رفت‌وبرگشت اول (Studio):** Studio پیش از پیاده‌سازی قالب تاریخ شمسی، نمایش نرخ، UI نقش لید، toast موفقیت، و ناوبری کارت را پیشنهاد کرد. پاسخ در [`prompts/03-live-data-and-forms-clarifications.md`](prompts/03-live-data-and-forms-clarifications.md). یک اصلاح: `landing-lead-role` فقط یک عنصر (گروه/سلکت)، نه روی هر رادیو.
 
+**اجرای Studio — کامیت `6fa040a`:** ۲۱ فایل، ۹۹۲ افزوده. بازبینی زنده: چهار کارت شبیه‌ساز؛ مهمان → `/login` بدون درخواست جزئیات؛ واردشده → `/listings/101`؛ ریسک خاموش؛ نقش لید یک select؛ اعتبارسنجی و toast قفل‌شده؛ بدون `axios`/`fetch`؛ ۳۶۰px سالم؛ ۱۱۵ تست پاس.
+
+سه ایراد کوچک در [`prompts/03-live-data-and-forms-fixes.md`](prompts/03-live-data-and-forms-fixes.md): `&larr;` روی کارت + «ورود برای معامله»؛ توکن ناموجود `--theme-surface-hover`؛ `animate-pulse` روی اسکلت بارگذاری.
+
 ### - [ ] Step 5: اجرای مسیر A و pull
 
 - کاربر پرامپت‌ها را به‌ترتیب در AI Studio اجرا می‌کند و بعد از هر کدام commit SHA برمی‌گرداند.
