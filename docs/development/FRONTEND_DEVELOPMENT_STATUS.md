@@ -1,6 +1,6 @@
 # Frontend Development Status
 
-**As of:** 2026-08-06
+**As of:** 2026-08-18
 
 This document is the SSOT for *where* active UI work happens and how it relates to this monorepo.
 
@@ -102,13 +102,14 @@ When the active UI is acceptable:
 3. PR → `develop`; then archive the `checkyar-googleai` GitHub repository.
 4. From then on, UI GitFlow is two-way inside this monorepo only.
 
-## MVP v1 execution status (2026-08-06)
+## MVP v1 execution status (2026-08-18)
 
 | Track | Status |
 |-------|--------|
 | Backend gates (KYC, issuer ownership, register throttle, ordering) | Landed on `feature/v1-backend-mvp-gates` (PR #23) |
 | UI Live blockers (KYC submit/review, moderation details, doc upload bytes) | Landed `70c80e74` + tsc/docs follow-up `46dbdb85` |
-| E2E expansion + CI Playwright | Specs + `.github/workflows/ci-e2e.yml` |
+| **Public landing page** | UI `d518d20` (Studio prompts 01–07); flag seed PR #31; E2E `landing-guest.spec.ts` |
+| E2E expansion + CI Playwright | Specs + `.github/workflows/ci-e2e.yml` (UI pin `d518d20`) |
 | Chabokan production | Runbook: [`PRODUCTION_CHABOKAN_DEPLOY.md`](./PRODUCTION_CHABOKAN_DEPLOY.md) |
 | Codespaces | `.devcontainer/` in doion (dev only; not production host) |
 
@@ -124,5 +125,7 @@ UI remains external + one-way until after MVP acceptance. Do **not** migrate int
 - AI Studio CI (GitHub Actions) prompt: [`AI_STUDIO_CI_GITHUB_ACTIONS_PROMPT.md`](./AI_STUDIO_CI_GITHUB_ACTIONS_PROMPT.md)
 - AI Studio E2E prep prompt: [`AI_STUDIO_E2E_PREP_PROMPT.md`](./AI_STUDIO_E2E_PREP_PROMPT.md)
 - AI Studio E2E critical-path prompt: [`AI_STUDIO_E2E_CRITICAL_PATH_PROMPT.md`](./AI_STUDIO_E2E_CRITICAL_PATH_PROMPT.md)
+- Public landing feature spec: [`ai-documents/features/public-landing-page/feature_spec.md`](../../ai-documents/features/public-landing-page/feature_spec.md)
+- Page review log: [`PAGE_REVIEW_LOG.md`](./PAGE_REVIEW_LOG.md)
 - V1 Phase A Studio prompt (KYC / upload / moderation Live): [`V1_PHASE_A_STUDIO_PROMPT.md`](./V1_PHASE_A_STUDIO_PROMPT.md)
 - Production Chabokan: [`PRODUCTION_CHABOKAN_DEPLOY.md`](./PRODUCTION_CHABOKAN_DEPLOY.md)
