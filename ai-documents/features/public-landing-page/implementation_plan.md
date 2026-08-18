@@ -134,6 +134,10 @@
 
 چهار ایراد در [`prompts/02-content-sections-fixes.md`](prompts/02-content-sections-fixes.md): (۱) ادعای «پذیرش شرکای پایلوت»، سه بار «مطالبات»، و `(user_type)` انگلیسی در UI مهمان؛ (۲) رنگ‌های amber/rose/indigo خارج از توکن + `animate-pulse` خلاف دیزاین‌سیستم؛ (۳) متن‌های «مرز مسئولیت رگولاتوری»، «تسویه مستقیم»، «مدل آتی» خارج از SSOT؛ (۴) فلش LTR بعد از لینک tertiary.
 
+**دور اصلاح Studio — کامیت `746cea6` (پذیرفته):** ۹ فایل. همه چهار ایراد برطرف شد. زنده: صفحه مهمان بدون «مطالبات» / «پذیرش شرکای پایلوت» / `user_type`؛ بدون amber/rose/indigo و `animate-pulse`؛ tertiary بدون فلش؛ توضیح وضعیت محصول مطابق رشته جایگزین. `tsc` تمیز، ۹۰ تست پاس.
+
+**پرامپت ۰۲ (محتوا) بسته شد.** HEAD UI: `746cea6`. قدم بعد: نوشتن [`prompts/03-live-data-and-forms.md`](prompts/03-live-data-and-forms.md).
+
 ### - [ ] Step 4: پرامپت C — بخش داده‌دار و فرم‌ها
 
 خروجی: `prompts/03-live-data-and-forms.md`
