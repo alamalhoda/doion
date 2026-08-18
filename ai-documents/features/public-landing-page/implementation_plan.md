@@ -87,6 +87,20 @@
 
 **درس فرایندی:** خلاصه Studio با کامیت خودش نمی‌خواند — هفت بخش نام برد که در کد نیستند (`social-proof`، `for-holders`، `for-investors`، `trust`، `comparison`، `final-cta`، `sticky-cta`) و برچسب CTA را «ورود به سامانه» گفت در حالی که کد «ورود به بازارچه» است. کد درست بود و گزارش غلط. از این پس diff و بررسی زنده مبنای پذیرش است، نه خلاصه عامل. برای Step 7 هم ثبت می‌شود.
 
+**دور اصلاح Studio — کامیت `86ee6e3` (پذیرفته):** ۱۳ فایل، ۸۴ افزوده / ۲۴ حذف. همه پنج ایراد blocking/non-blocking برطرف شد:
+
+1. **ZWNJ:** `constants.ts` با `\u200c` escape + `landingConstants.test.ts` (≥۳ نیم‌فاصله + تطابق عین متن). بازبینی زنده: `document.title.includes('\u200c') === true`.
+2. **testid تکراری:** پسوند `-mobile` برای سه دکمه منوی موبایل. در ۳۶۰px `[data-testid="landing-nav-login"]` دقیقاً یک عنصر؛ کلیک `landing-nav-login-mobile` پس از باز کردن همبرگر OK.
+3. **بارگذاری بوت سرد:** `router.isReady().then(() => app.mount('#app'))` — placeholder تا لحظه ظاهر شدن landing-page باقی می‌ماند؛ بدون فریم خالی بین رفتن loader و آمدن محتوا. برای ناوبری درون‌برنامه‌ای، Studio الگوی SPA (صفحه قبلی visible) را صریح انتخاب و توضیح داد — قابل قبول طبق پرامپت اصلاح.
+4. **مستندات:** action bar/sticky/hero CTA حذف؛ testidهای موبایل اضافه؛ `landingConstants.test.ts` در ماتریس تست.
+5. **سال فوتر:** `getCurrentJalaliYear()` در `persianUtils.ts` + تست؛ فوتر «۱۴۰۵» نشان می‌دهد.
+
+موارد کوچک هم انجام شد: حذف پارامتر بلااستفاده `handlePlaceholderClick`، `meta: { publicChrome: true }` روی `/`.
+
+بازتولید محلی: `tsc --noEmit` تمیز، ۷۵ تست (۱۴ فایل) پاس. خلاصه Studio این بار با diff هم‌خوان بود.
+
+**پرامپت ۰۱ (اسکلت) بسته شد.** HEAD UI: `86ee6e3`. قدم بعد: نوشتن [`prompts/02-content-sections.md`](prompts/02-content-sections.md).
+
 **رفت‌وبرگشت اول (Studio):** Studio پیش از پیاده‌سازی سؤال پرسید و پیشنهاد مشخص برای شناسه بخش‌ها، لینک‌های فوتر، معماری گارد، عنوان/متا، و مدیریت پوسته و نشانگر خروج داد. پاسخ در [`prompts/01-skeleton-clarifications.md`](prompts/01-skeleton-clarifications.md) ثبت شد و در sandbox هم به‌عنوان پیام دوم استفاده می‌شود تا ورودی دو مسیر یکسان و شمارش رفت‌وبرگشت معتبر بماند. دو اصلاح در آن دور: توضیح متا از «مدیریت مطالبات» (ادعای قابلیتی که محصول ندارد) به زبان spec برگشت، و پنج مورد غایب از خلاصه Studio (حالت بارگذاری، تأیید merge شبیه‌ساز، فهرست vitest، مستندات دوزبانه، فهرست do-not) صریحاً یادآوری شد.
 
 ### - [ ] Step 3: پرامپت B — بخش‌های محتوایی ثابت
