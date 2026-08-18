@@ -126,6 +126,8 @@
 
 کامپوننت‌ها در `src/features/landing/sections/`؛ `LandingView.vue` فقط compose می‌کند. HEAD UI مبنا: `86ee6e3`.
 
+**رفت‌وبرگشت اول (Studio):** Studio پیش از پیاده‌سازی سؤال ZWNJ canonical، FAQ testid/accordion، و رفتار scroll CTA پرسید. پاسخ در [`prompts/02-content-sections-clarifications.md`](prompts/02-content-sections-clarifications.md). یک اصلاح: A1 باید «نگه\u200cداری» باشد نه «نگهداری». بقیه تأیید شد.
+
 ### - [ ] Step 4: پرامپت C — بخش داده‌دار و فرم‌ها
 
 خروجی: `prompts/03-live-data-and-forms.md`
