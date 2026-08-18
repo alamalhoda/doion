@@ -128,6 +128,12 @@
 
 **رفت‌وبرگشت اول (Studio):** Studio پیش از پیاده‌سازی سؤال ZWNJ canonical، FAQ testid/accordion، و رفتار scroll CTA پرسید. پاسخ در [`prompts/02-content-sections-clarifications.md`](prompts/02-content-sections-clarifications.md). یک اصلاح: A1 باید «نگه\u200cداری» باشد نه «نگهداری». بقیه تأیید شد.
 
+**اجرای Studio — کامیت `568cf01`:** ۱۷ فایل، ۹۲۶ افزوده / ۱۶۲ حذف. دامنه درست (بدون routing/auth/API، سه placeholder باقی). بازبینی زنده با Playwright روی `127.0.0.1:3100`.
+
+درست: متن قفل‌شده §۲.۵/۲.۶/FAQ/disclaimer روی صفحه؛ A1 شامل «نگه‌داری»؛ CTA هیرو مهمان/واردشده + tertiary؛ اسکرول سرمایه‌گذاری به `#contact-us`؛ FAQ شش آیتم پیش‌فرض بسته؛ فوتر از SSOT؛ ۳۶۰px بدون اسکرول افقی؛ `tsc` تمیز، ۸۶ تست پاس.
+
+چهار ایراد در [`prompts/02-content-sections-fixes.md`](prompts/02-content-sections-fixes.md): (۱) ادعای «پذیرش شرکای پایلوت»، سه بار «مطالبات»، و `(user_type)` انگلیسی در UI مهمان؛ (۲) رنگ‌های amber/rose/indigo خارج از توکن + `animate-pulse` خلاف دیزاین‌سیستم؛ (۳) متن‌های «مرز مسئولیت رگولاتوری»، «تسویه مستقیم»، «مدل آتی» خارج از SSOT؛ (۴) فلش LTR بعد از لینک tertiary.
+
 ### - [ ] Step 4: پرامپت C — بخش داده‌دار و فرم‌ها
 
 خروجی: `prompts/03-live-data-and-forms.md`
