@@ -2,6 +2,7 @@ from django.utils import timezone
 from rest_framework import serializers
 
 from doion.banks.models import Bank
+from doion.banks.serializers import BankSummarySerializer
 from doion.banks.services import BANK_NAME_NOT_ACCEPTED
 from doion.banks.services import UNKNOWN_OR_INACTIVE_BANK_CODE
 from doion.banks.services import UnknownOrInactiveBankError
@@ -24,6 +25,18 @@ class CatalogBankInputMixin:
         attrs = super().validate(attrs)
         if "bank_name" in self.initial_data:
             raise serializers.ValidationError({"bank": [BANK_NAME_NOT_ACCEPTED]})
+        if isinstance(attrs.get("bank"), Bank):
+            return attrs
+        raw_bank = self.initial_data.get("bank", serializers.empty)
+        if raw_bank is not serializers.empty:
+            if not isinstance(raw_bank, str):
+                raise serializers.ValidationError({"bank": [UNKNOWN_OR_INACTIVE_BANK_CODE]})
+            try:
+                attrs["bank"] = get_active_by_code(raw_bank)
+            except UnknownOrInactiveBankError as exc:
+                raise serializers.ValidationError(
+                    {"bank": [UNKNOWN_OR_INACTIVE_BANK_CODE]},
+                ) from exc
         return attrs
 
 
@@ -45,7 +58,7 @@ class IssuerProfileSerializer(serializers.ModelSerializer):
 class ChequeListingSerializer(CatalogBankInputMixin, serializers.ModelSerializer):
     issuer_profile = IssuerProfileSerializer(read_only=True)
     owner_id = serializers.IntegerField(source="owner.id", read_only=True)
-    bank = serializers.SlugField(write_only=True, required=False)
+    bank = BankSummarySerializer(read_only=True)
 
     class Meta:
         model = ChequeListing
@@ -151,6 +164,15 @@ class ChequeListingCreateSerializer(CatalogBankInputMixin, serializers.ModelSeri
         apply_bank_to_listing(listing, bank)
         listing.save()
         return listing
+
+    def to_representation(self, instance):
+        data = super().to_representation(instance)
+        data["bank"] = (
+            BankSummarySerializer(instance.bank, context=self.context).data
+            if instance.bank_id
+            else None
+        )
+        return data
 
 
 class DocumentUploadSerializer(serializers.ModelSerializer):

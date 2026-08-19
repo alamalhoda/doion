@@ -4,6 +4,8 @@ from datetime import timedelta
 import pytest
 from rest_framework.test import APIClient
 
+from doion.banks.models import Bank
+from doion.banks.seed import seed_catalog_banks
 from doion.checks.factories import ChequeListingFactory
 from doion.checks.factories import IssuerProfileFactory
 from doion.checks.models import ChequeListing
@@ -25,11 +27,12 @@ def issuer(db):
 
 @pytest.fixture
 def published_listing_low_risk(db, investor, issuer):
+    seed_catalog_banks()
     return ChequeListingFactory.create(
         published=True,
         owner=investor,
         issuer=issuer,
-        bank_name="بانک ملت",
+        bank=Bank.objects.get(code="mellat"),
         cheque_serial_number="1111222233334444",
         face_amount=500000000,
         due_date=date.today() + timedelta(days=60),
@@ -43,11 +46,12 @@ def published_listing_low_risk(db, investor, issuer):
 
 @pytest.fixture
 def published_listing_high_risk(db, investor, issuer):
+    seed_catalog_banks()
     return ChequeListingFactory.create(
         published=True,
         owner=investor,
         issuer=issuer,
-        bank_name="بانک صادرات",
+        bank=Bank.objects.get(code="saderat"),
         cheque_serial_number="5555666677778888",
         face_amount=200000000,
         due_date=date.today() + timedelta(days=20),
@@ -173,6 +177,56 @@ class TestMarketplaceListingsEndpoint:
         ids = [item["id"] for item in results]
         assert published_listing_low_risk.id not in ids
         assert published_listing_high_risk.id in ids
+
+    def test_filter_by_bank_code(
+        self, published_listing_low_risk, published_listing_high_risk
+    ):
+        client = APIClient()
+        client.force_authenticate(user=published_listing_low_risk.owner)
+
+        response = client.get("/api/v1/marketplace/listings/", {"bank": "mellat"})
+        results = response.data["results"] if "results" in response.data else response.data
+        assert all(item["bank"]["code"] == "mellat" for item in results)
+        ids = [item["id"] for item in results]
+        assert published_listing_low_risk.id in ids
+        assert published_listing_high_risk.id not in ids
+
+    def test_filter_by_bank_name_alias(self, investor, issuer):
+        seed_catalog_banks()
+        listing = ChequeListingFactory.create(
+            published=True,
+            owner=investor,
+            issuer=issuer,
+            bank=Bank.objects.get(code="melli"),
+            cheque_serial_number="1212121212121212",
+        )
+        client = APIClient()
+        client.force_authenticate(user=investor)
+
+        response = client.get("/api/v1/marketplace/listings/", {"bank_name": "ملی"})
+        results = response.data["results"] if "results" in response.data else response.data
+        ids = [item["id"] for item in results]
+        assert listing.id in ids
+
+    def test_nested_bank_on_list_and_latest(self, published_listing_low_risk):
+        client = APIClient()
+        client.force_authenticate(user=published_listing_low_risk.owner)
+
+        list_response = client.get("/api/v1/marketplace/listings/")
+        latest_response = client.get("/api/v1/marketplace/listings/latest/")
+
+        results = (
+            list_response.data["results"]
+            if "results" in list_response.data
+            else list_response.data
+        )
+        item = next(r for r in results if r["id"] == published_listing_low_risk.id)
+        assert item["bank"]["code"] == "mellat"
+        latest_item = next(
+            r for r in latest_response.data if r["id"] == published_listing_low_risk.id
+        )
+        assert latest_item["bank"]["code"] == "mellat"
+        assert "aliases" not in latest_item["bank"]
 
     def test_filter_by_bank_name(self, published_listing_low_risk):
         client = APIClient()

@@ -33,11 +33,16 @@ class MarketplaceViewSet(ReadOnlyModelViewSet):
     def get_queryset(self):
         return (
             ChequeListing.objects.filter(status=ChequeListing.Status.PUBLISHED)
-            .select_related("issuer", "owner")
+            .select_related("issuer", "owner", "bank")
             .order_by("-created_at")
         )
 
     def list(self, request, *args, **kwargs):
+        extra_params = request.query_params.copy()
+        extra_params.pop("page", None)
+        if extra_params:
+            return super().list(request, *args, **kwargs)
+
         page = request.query_params.get("page", "1")
         cache_key = f"{self.CACHE_KEY_PREFIX}:{page}"
         cached = cache.get(cache_key)
@@ -52,8 +57,12 @@ class MarketplaceViewSet(ReadOnlyModelViewSet):
     def latest_listings(self, request):
         queryset = (
             ChequeListing.objects.filter(status=ChequeListing.Status.PUBLISHED)
-            .select_related("issuer", "owner")
+            .select_related("issuer", "owner", "bank")
             .order_by("-created_at")[:4]
         )
-        serializer = MarketplaceLatestSerializer(queryset, many=True)
+        serializer = MarketplaceLatestSerializer(
+            queryset,
+            many=True,
+            context={"request": request},
+        )
         return Response(serializer.data)

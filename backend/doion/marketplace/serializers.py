@@ -2,12 +2,14 @@ from datetime import date
 
 from rest_framework import serializers
 
+from doion.banks.serializers import BankSummarySerializer
 from doion.checks.models import ChequeListing
 from doion.checks.serializers import IssuerProfileSerializer
 
 
 class MarketplaceLatestSerializer(serializers.ModelSerializer):
     issuer_profile = IssuerProfileSerializer(read_only=True)
+    bank = BankSummarySerializer(read_only=True)
     days_to_due = serializers.SerializerMethodField()
 
     class Meta:
@@ -15,6 +17,7 @@ class MarketplaceLatestSerializer(serializers.ModelSerializer):
         fields = [
             "id",
             "issuer_profile",
+            "bank",
             "bank_name",
             "face_amount",
             "due_date",
@@ -39,6 +42,7 @@ class MarketplaceLatestSerializer(serializers.ModelSerializer):
 class MarketplaceListingSerializer(serializers.ModelSerializer):
     issuer_profile = IssuerProfileSerializer(read_only=True)
     owner_id = serializers.IntegerField(source="owner.id", read_only=True)
+    bank = BankSummarySerializer(read_only=True)
     days_to_due = serializers.SerializerMethodField()
     interest_count = serializers.SerializerMethodField()
     published_at = serializers.SerializerMethodField()
@@ -49,6 +53,7 @@ class MarketplaceListingSerializer(serializers.ModelSerializer):
             "id",
             "owner_id",
             "issuer_profile",
+            "bank",
             "bank_name",
             "cheque_serial_number",
             "face_amount",

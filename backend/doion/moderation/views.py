@@ -28,8 +28,8 @@ class ModerationViewSet(GenericViewSet):
     @action(detail=False, methods=["get"], url_path="queue")
     def queue(self, request):
         queryset = ChequeListing.objects.filter(
-            status=ChequeListing.Status.PENDING_MODERATION
-        ).order_by("created_at")
+            status=ChequeListing.Status.PENDING_MODERATION,
+        ).select_related("bank", "issuer", "owner").order_by("created_at")
 
         page = self.paginate_queryset(queryset)
         if page is not None:

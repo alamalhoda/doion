@@ -78,6 +78,7 @@ class TestChequeListingCreate:
         assert listing.bank is not None
         assert listing.bank.code == "mellat"
         assert listing.bank_name == "بانک ملت"
+        assert response.data["bank"]["code"] == "mellat"
         assert listing.suggested_discount_rate is not None
         assert listing.risk_tier in {"low", "medium", "high"}
 

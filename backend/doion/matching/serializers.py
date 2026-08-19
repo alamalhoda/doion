@@ -1,5 +1,6 @@
 from rest_framework import serializers
 
+from doion.banks.serializers import BankSummarySerializer
 from doion.checks.models import ChequeListing
 from doion.matching.constants import Status, SettlementType
 from doion.matching.models import Match, OffPlatformSettlement, SettlementPort
@@ -13,10 +14,13 @@ class UserSummarySerializer(serializers.ModelSerializer):
 
 
 class ChequeListingMinimalSerializer(serializers.ModelSerializer):
+    bank = BankSummarySerializer(read_only=True)
+
     class Meta:
         model = ChequeListing
         fields = [
             "id",
+            "bank",
             "bank_name",
             "face_amount",
             "due_date",
