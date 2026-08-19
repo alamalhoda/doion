@@ -33,6 +33,7 @@ jobs:
         uses: astral-sh/setup-uv@v6
         with:
           enable-cache: true
+          prune-cache: false
           python-version: "3.12"
 
       - name: Setup Bun
@@ -112,3 +113,9 @@ jobs:
           DEMO_SEED_PASSWORD: password123
           PLAYWRIGHT_CHANNEL: chromium
         run: npm run test:critical
+
+      - name: Stop background servers
+        if: always()
+        run: |
+          pkill -f "manage.py runserver" || true
+          pkill -f "bun run dev" || true

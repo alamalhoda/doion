@@ -1,7 +1,7 @@
 from doion.compliance.models import AuditEvent
 
 
-def audit_event(
+def audit_event(  # noqa: PLR0913
     event_type,
     actor=None,
     object_type=None,

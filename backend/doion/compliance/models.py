@@ -60,7 +60,7 @@ class FeatureFlag(TimeStampedModel):
         return self.key
 
     @classmethod
-    def is_flag_enabled(cls, key: str, default: bool = False) -> bool:
+    def is_flag_enabled(cls, key: str, *, default: bool = False) -> bool:
         try:
             return cls.objects.get(key=key).is_enabled
         except cls.DoesNotExist:

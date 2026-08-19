@@ -3,7 +3,8 @@ import pytest
 from doion.checks.factories import ChequeListingFactory
 from doion.moderation.factories import ModerationDecisionFactory
 from doion.moderation.models import ModerationDecision
-from doion.users.factories import UserFactory
+
+EXPECTED_DECISION_COUNT = 2
 
 
 @pytest.mark.django_db
@@ -57,4 +58,4 @@ class TestModerationDecisionModel:
             rejection_code="MOD_102",
         )
 
-        assert listing.moderation_decisions.count() == 2
+        assert listing.moderation_decisions.count() == EXPECTED_DECISION_COUNT

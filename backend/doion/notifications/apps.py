@@ -6,4 +6,4 @@ class NotificationsConfig(AppConfig):
     name = "doion.notifications"
 
     def ready(self):
-        import doion.notifications.signals  # noqa: F401
+        import doion.notifications.signals  # noqa: F401, PLC0415

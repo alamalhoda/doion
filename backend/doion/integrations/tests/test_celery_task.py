@@ -1,9 +1,9 @@
 """Celery task tests for expire_listings (SSOT)."""
 
-from datetime import date
 from datetime import timedelta
 
 import pytest
+from django.utils import timezone
 
 from doion.checks.factories import ChequeListingFactory
 from doion.checks.factories import IssuerProfileFactory
@@ -36,7 +36,7 @@ class TestExpireListingsTask:
             bank_name="بانک ملت",
             cheque_serial_number="1111111111111111",
             face_amount=500000000,
-            due_date=date.today() - timedelta(days=1),
+            due_date=timezone.localdate() - timedelta(days=1),
             issuer_type="legal",
             issuer_name="Test Issuer",
             issuer_national_id="1234567890",
@@ -49,7 +49,7 @@ class TestExpireListingsTask:
             bank_name="بانک ملت",
             cheque_serial_number="2222222222222222",
             face_amount=300000000,
-            due_date=date.today() + timedelta(days=10),
+            due_date=timezone.localdate() + timedelta(days=10),
             issuer_type="natural",
             issuer_name="Natural Issuer",
             issuer_national_id="0987654321",
@@ -71,7 +71,7 @@ class TestExpireListingsTask:
             bank_name="بانک ملت",
             cheque_serial_number="3333333333333333",
             face_amount=200000000,
-            due_date=date.today() - timedelta(days=1),
+            due_date=timezone.localdate() - timedelta(days=1),
             issuer_type="legal",
             issuer_name="Test Issuer",
             issuer_national_id="1234567890",

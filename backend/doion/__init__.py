@@ -5,6 +5,8 @@ __version_info__ = tuple(
 )
 
 try:
-    from config.celery import app as celery_app  # noqa: F401
-except Exception:
-    pass
+    from config.celery import app as celery_app
+except ImportError:
+    celery_app = None
+
+__all__ = ("celery_app",)

@@ -30,22 +30,24 @@ class RegisterSerializer(serializers.Serializer):
 
     def validate_username(self, value: str) -> str:
         if User.objects.filter(username=value).exists():
-            raise serializers.ValidationError("This username is already taken.")
+            msg = "This username is already taken."
+            raise serializers.ValidationError(msg)
         return value
 
     def validate_phone(self, value: str) -> str:
         if value and User.objects.filter(phone=value).exists():
-            raise serializers.ValidationError("This phone number is already registered.")
+            msg = "This phone number is already registered."
+            raise serializers.ValidationError(msg)
         return value
 
     def validate(self, attrs: dict[str, Any]) -> dict[str, Any]:
         if attrs["password"] != attrs.pop("password_confirm"):
             raise serializers.ValidationError(
-                {"password_confirm": "Passwords do not match."}
+                {"password_confirm": "Passwords do not match."},
             )
         if attrs["user_type"] == Profile.UserType.LEGAL and not (attrs.get("name") or "").strip():
             raise serializers.ValidationError(
-                {"name": "Company name is required for Legal Entities."}
+                {"name": "Company name is required for Legal Entities."},
             )
         return attrs
 
@@ -181,7 +183,8 @@ class VerificationCreateSerializer(serializers.ModelSerializer):
 
     def validate_national_id(self, value: str) -> str:
         if not DIGITS_ONLY_PATTERN.fullmatch(value):
-            raise serializers.ValidationError("National ID must contain digits only.")
+            msg = "National ID must contain digits only."
+            raise serializers.ValidationError(msg)
         return value
 
     def validate(self, attrs: dict[str, Any]) -> dict[str, Any]:
@@ -198,16 +201,16 @@ class VerificationCreateSerializer(serializers.ModelSerializer):
                     {
                         "national_id": (
                             "National ID must be exactly 10 digits for Natural Persons."
-                        )
-                    }
+                        ),
+                    },
                 )
             if company_name:
                 raise serializers.ValidationError(
                     {
                         "company_name": (
                             "Company name must be empty for Natural Persons."
-                        )
-                    }
+                        ),
+                    },
                 )
             attrs["company_name"] = ""
         elif user_type == Profile.UserType.LEGAL:
@@ -216,16 +219,16 @@ class VerificationCreateSerializer(serializers.ModelSerializer):
                     {
                         "national_id": (
                             "National ID must be exactly 11 digits for Legal Entities."
-                        )
-                    }
+                        ),
+                    },
                 )
             if not company_name:
                 raise serializers.ValidationError(
-                    {"company_name": "Company Name is required for Legal Entities."}
+                    {"company_name": "Company Name is required for Legal Entities."},
                 )
         else:
             raise serializers.ValidationError(
-                {"user_type": "Unsupported profile user type."}
+                {"user_type": "Unsupported profile user type."},
             )
 
         return attrs

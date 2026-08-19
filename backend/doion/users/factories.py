@@ -19,7 +19,7 @@ class UserFactory(DjangoModelFactory):
     name = factory.LazyAttribute(lambda o: o.username)
 
     @factory.post_generation
-    def password(self, create: bool, extracted: str | None, **kwargs) -> None:
+    def password(self, create: bool, extracted: str | None, **kwargs) -> None:  # noqa: FBT001
         raw_password = extracted if extracted is not None else "testpass123"
         self.set_password(raw_password)
         if create:

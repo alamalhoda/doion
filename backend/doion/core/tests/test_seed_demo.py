@@ -10,6 +10,8 @@ from doion.core.management.commands.seed_demo import DECLINE_MATCH_SERIAL
 from doion.matching.models import Match
 from doion.users.models import User
 
+EXPECTED_INVESTOR_MATCHES = 2
+
 
 @pytest.mark.django_db
 class TestSeedDemoCommand:
@@ -28,7 +30,7 @@ class TestSeedDemoCommand:
         assert holder.profile.is_verified is True
 
         statuses = set(
-            ChequeListing.objects.filter(owner=holder).values_list("status", flat=True)
+            ChequeListing.objects.filter(owner=holder).values_list("status", flat=True),
         )
         assert ChequeListing.Status.PENDING_MODERATION in statuses
         assert ChequeListing.Status.PUBLISHED in statuses
@@ -48,7 +50,7 @@ class TestSeedDemoCommand:
         assert ChequeListing.objects.filter(cheque_serial_number=ACCEPT_MATCH_SERIAL).count() == 1
         assert ChequeListing.objects.filter(cheque_serial_number=DECLINE_MATCH_SERIAL).count() == 1
         # seed_demo creates one pending match each for accept + decline E2E paths
-        assert Match.objects.filter(investor__username="investor1").count() == 2
+        assert Match.objects.filter(investor__username="investor1").count() == EXPECTED_INVESTOR_MATCHES
         assert Match.objects.filter(
             listing__cheque_serial_number=ACCEPT_MATCH_SERIAL,
             investor__username="investor1",

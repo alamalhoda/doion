@@ -3,6 +3,8 @@ import pytest
 from doion.checks.factories import ChequeListingFactory
 from doion.checks.factories import IssuerProfileFactory
 from doion.checks.models import ChequeListing
+from doion.moderation.signals import ChequeListingPublished
+from doion.moderation.signals import ListingRejected
 from doion.notifications.constants import NotificationType
 from doion.notifications.models import Notification
 from doion.users.factories import UserFactory
@@ -47,8 +49,6 @@ class TestNotificationSignals:
             issuer_national_id="1234567890",
         )
 
-        # Simulate listing published signal
-        from doion.moderation.signals import ChequeListingPublished
         ChequeListingPublished.send(sender=ChequeListing, listing=listing, moderator=moderator)
 
         notifications = Notification.objects.filter(
@@ -73,7 +73,6 @@ class TestNotificationSignals:
             issuer_national_id="1234567890",
         )
 
-        from doion.moderation.signals import ListingRejected
         ListingRejected.send(
             sender=ChequeListing,
             listing=listing,

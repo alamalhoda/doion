@@ -2,18 +2,22 @@
 
 from __future__ import annotations
 
+from typing import TYPE_CHECKING
 from typing import Any
 
 from django.contrib.auth.models import AbstractBaseUser
 from django.contrib.auth.models import Group
-from django.core.files.uploadedfile import UploadedFile
 from django.db import transaction
 from rest_framework.exceptions import PermissionDenied
 
 from doion.documents.models import Document
 from doion.identity.models import Profile
 from doion.identity.models import Verification
+from doion.identity.signals import verification_submitted
 from doion.users.models import User
+
+if TYPE_CHECKING:
+    from django.core.files.uploadedfile import UploadedFile
 
 KYC_REQUIRED_MESSAGE = "Approved KYC verification is required before this action"
 
@@ -119,8 +123,6 @@ class CreateVerificationService:
                     file=selfie,
                     file_size=selfie.size,
                 )
-
-            from doion.identity.signals import verification_submitted
 
             verification_submitted.send(
                 sender=self.__class__,

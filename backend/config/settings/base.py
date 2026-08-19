@@ -1,8 +1,8 @@
-# ruff: noqa: ERA001, E501
+# ruff: noqa: ERA001
 """Base settings to build other settings files upon."""
 
-from pathlib import Path
 from datetime import timedelta
+from pathlib import Path
 
 import environ
 
@@ -289,7 +289,7 @@ LOGGING = {
 }
 
 try:
-    import structlog  # noqa: F401
+    import structlog
 
     LOGGING["formatters"]["structlog_json"] = {
         "()": "structlog.stdlib.ProcessorFormatter",

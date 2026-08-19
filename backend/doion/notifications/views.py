@@ -41,7 +41,7 @@ class NotificationViewSet(ModelViewSet):
             serializer = self.get_serializer(page, many=True)
             response = self.get_paginated_response(serializer.data)
             response.data["unread_count"] = self.get_queryset().exclude(
-                status=NotificationStatus.READ
+                status=NotificationStatus.READ,
             ).count()
             return response
 
@@ -80,7 +80,7 @@ class NotificationViewSet(ModelViewSet):
             return Response(serializer.data)
 
         serializer = NotificationPreferenceSerializer(
-            preference, data=request.data, partial=True
+            preference, data=request.data, partial=True,
         )
         serializer.is_valid(raise_exception=True)
         serializer.save()

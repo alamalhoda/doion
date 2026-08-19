@@ -1,8 +1,9 @@
+from pathlib import Path
+
 from .base import *  # noqa: F403
 from .base import INSTALLED_APPS
 from .base import MIDDLEWARE
 from .base import env
-from pathlib import Path
 
 # GENERAL
 # ------------------------------------------------------------------------------
@@ -28,7 +29,7 @@ DATABASES = {
         "ENGINE": "django.db.backends.sqlite3",
         "NAME": str(BASE_DIR / _SQLITE_NAME),
         "ATOMIC_REQUESTS": True,
-    }
+    },
 }
 
 # CACHES

@@ -23,8 +23,8 @@ class Notification(TimeStampedModel):
     )
     title = models.CharField(max_length=255)
     message = models.TextField()
-    related_object_type = models.CharField(max_length=50, null=True, blank=True)
-    related_object_id = models.CharField(max_length=255, null=True, blank=True)
+    related_object_type = models.CharField(max_length=50, null=True, blank=True)  # noqa: DJ001
+    related_object_id = models.CharField(max_length=255, null=True, blank=True)  # noqa: DJ001
     read_at = models.DateTimeField(null=True, blank=True)
     sent_at = models.DateTimeField(null=True, blank=True)
 

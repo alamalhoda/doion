@@ -11,6 +11,8 @@ from doion.identity.models import Profile
 from doion.identity.models import Verification
 from doion.users.factories import UserFactory
 
+EXPECTED_QUEUE_COUNT = 2
+
 
 @pytest.fixture
 def api_client():
@@ -185,7 +187,7 @@ class TestVerificationAPI:
         api_client.force_authenticate(user=moderator_user)
         response = api_client.get("/api/v1/verifications/")
         assert response.status_code == status.HTTP_200_OK
-        assert len(response.data["results"]) == 2
+        assert len(response.data["results"]) == EXPECTED_QUEUE_COUNT
 
     def test_regular_user_cannot_see_other_verifications(self, natural_client):
         user2 = UserFactory.create(username="user2")

@@ -40,7 +40,7 @@ class QueueListingSerializer(serializers.ModelSerializer):
 
 class ModerationDecisionSerializer(serializers.ModelSerializer):
     rejection_code_display = serializers.CharField(
-        source="get_rejection_code_display", read_only=True
+        source="get_rejection_code_display", read_only=True,
     )
 
     class Meta:
@@ -61,8 +61,8 @@ class ModerationDecisionSerializer(serializers.ModelSerializer):
 class DecisionRequestSerializer(serializers.Serializer):
     decision = serializers.ChoiceField(choices=["approve", "reject"])
     rejection_code = serializers.ChoiceField(
-        choices=RejectionCode.CHOICES, required=False
+        choices=RejectionCode.CHOICES, required=False,
     )
     rejection_note = serializers.CharField(
-        required=False, default="", allow_blank=True
+        required=False, default="", allow_blank=True,
     )

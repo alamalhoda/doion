@@ -1,4 +1,5 @@
-from rest_framework import serializers, status
+from rest_framework import serializers
+from rest_framework import status
 from rest_framework.decorators import action
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
@@ -6,13 +7,12 @@ from rest_framework.viewsets import GenericViewSet
 
 from doion.checks.models import ChequeListing
 from doion.core.permissions import IsModerator
+from doion.moderation.constants import MAX_LISTING_RESUBMITS
 from doion.moderation.exceptions import ModerationResubmitLimitExceeded
 from doion.moderation.models import ModerationDecision
-from doion.moderation.serializers import (
-    DecisionRequestSerializer,
-    ModerationDecisionSerializer,
-    QueueListingSerializer,
-)
+from doion.moderation.serializers import DecisionRequestSerializer
+from doion.moderation.serializers import ModerationDecisionSerializer
+from doion.moderation.serializers import QueueListingSerializer
 from doion.moderation.services import ModerationService
 
 
@@ -62,14 +62,14 @@ class ModerationViewSet(GenericViewSet):
             else:
                 if not rejection_code:
                     raise serializers.ValidationError(
-                        {"rejection_code": "This field is required for rejection."}
+                        {"rejection_code": "This field is required for rejection."},
                     )
                 ModerationService.reject_listing(
-                    listing.id, request.user, rejection_code, rejection_note
+                    listing.id, request.user, rejection_code, rejection_note,
                 )
         except ValueError as exc:
             raise serializers.ValidationError(
-                {"error": {"code": "VALIDATION_ERROR", "message": str(exc)}}
+                {"error": {"code": "VALIDATION_ERROR", "message": str(exc)}},
             ) from exc
 
         decision_record = ModerationDecision.objects.create(
@@ -95,7 +95,7 @@ class ModerationViewSet(GenericViewSet):
                     "error": {
                         "code": "PERMISSION_ERROR",
                         "message": "Only the listing owner can resubmit",
-                    }
+                    },
                 },
                 status=status.HTTP_403_FORBIDDEN,
             )
@@ -106,8 +106,8 @@ class ModerationViewSet(GenericViewSet):
                 status=status.HTTP_400_BAD_REQUEST,
             )
 
-        if listing.resubmit_count >= 3:
-            raise ModerationResubmitLimitExceeded()
+        if listing.resubmit_count >= MAX_LISTING_RESUBMITS:
+            raise ModerationResubmitLimitExceeded
 
         listing.status = ChequeListing.Status.PENDING_MODERATION
         listing.save(update_fields=["status", "updated_at"])

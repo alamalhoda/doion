@@ -1,4 +1,5 @@
 import pytest
+from rest_framework import status
 from rest_framework.test import APIClient
 
 from doion.notifications.constants import NotificationStatus
@@ -6,6 +7,8 @@ from doion.notifications.constants import NotificationType
 from doion.notifications.factories import NotificationFactory
 from doion.notifications.models import Notification
 from doion.users.factories import UserFactory
+
+UNREAD_BEFORE_MARK_ALL = 2
 
 
 @pytest.fixture
@@ -35,7 +38,7 @@ class TestNotificationListEndpoint:
 
         response = client.get("/api/v1/notifications/")
 
-        assert response.status_code == 200
+        assert response.status_code == status.HTTP_200_OK
         results = response.data.get("results", response.data)
         assert len(results) >= 1
 
@@ -62,7 +65,7 @@ class TestNotificationListEndpoint:
 
         response = client.get("/api/v1/notifications/?type=match_created")
 
-        assert response.status_code == 200
+        assert response.status_code == status.HTTP_200_OK
         results = response.data.get("results", response.data)
         assert all(r["type"] == "match_created" for r in results)
 
@@ -89,7 +92,7 @@ class TestNotificationListEndpoint:
 
         response = client.get("/api/v1/notifications/?is_read=false")
 
-        assert response.status_code == 200
+        assert response.status_code == status.HTTP_200_OK
         results = response.data.get("results", response.data)
         assert all(r["status"] != "read" for r in results)
         assert "unread_count" in response.data
@@ -97,7 +100,7 @@ class TestNotificationListEndpoint:
     def test_list_requires_authentication(self):
         client = APIClient()
         response = client.get("/api/v1/notifications/")
-        assert response.status_code == 401
+        assert response.status_code == status.HTTP_401_UNAUTHORIZED
 
 
 @pytest.mark.django_db
@@ -111,7 +114,7 @@ class TestNotificationMarkReadEndpoint:
             {"is_read": True},
         )
 
-        assert response.status_code == 200
+        assert response.status_code == status.HTTP_200_OK
         notification.refresh_from_db()
         assert notification.status == NotificationStatus.READ
         assert notification.read_at is not None
@@ -135,7 +138,7 @@ class TestNotificationMarkReadEndpoint:
             {"is_read": True},
         )
 
-        assert response.status_code == 404
+        assert response.status_code == status.HTTP_404_NOT_FOUND
 
 
 @pytest.mark.django_db
@@ -167,14 +170,14 @@ class TestNotificationMarkAllReadEndpoint:
         )
 
         unread_count = Notification.objects.filter(user=user, status=NotificationStatus.PENDING).count()
-        assert unread_count == 2
+        assert unread_count == UNREAD_BEFORE_MARK_ALL
 
         client = APIClient()
         client.force_authenticate(user=user)
 
         response = client.post("/api/v1/notifications/mark-all-read/")
 
-        assert response.status_code == 200
+        assert response.status_code == status.HTTP_200_OK
         unread_count = Notification.objects.filter(user=user, status=NotificationStatus.PENDING).count()
         assert unread_count == 0
 
@@ -187,7 +190,7 @@ class TestNotificationPreferencesEndpoint:
 
         response = client.get("/api/v1/notifications/preferences/")
 
-        assert response.status_code == 200
+        assert response.status_code == status.HTTP_200_OK
         assert response.data["in_app_enabled"] is True
         assert response.data["sms_enabled"] is False
         assert response.data["email_enabled"] is True
@@ -201,10 +204,10 @@ class TestNotificationPreferencesEndpoint:
             {"sms_enabled": True},
         )
 
-        assert response.status_code == 200
+        assert response.status_code == status.HTTP_200_OK
         assert response.data["sms_enabled"] is True
 
     def test_preferences_requires_auth(self):
         client = APIClient()
         response = client.get("/api/v1/notifications/preferences/")
-        assert response.status_code == 401
+        assert response.status_code == status.HTTP_401_UNAUTHORIZED

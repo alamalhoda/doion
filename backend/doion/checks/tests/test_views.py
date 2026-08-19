@@ -5,6 +5,7 @@ from datetime import timedelta
 import pytest
 from django.utils import timezone
 from django.utils.crypto import get_random_string
+from rest_framework import status
 from rest_framework.test import APIClient
 
 from doion.checks.factories import ChequeListingFactory
@@ -72,7 +73,7 @@ class TestChequeListingCreate:
             format="json",
         )
 
-        assert response.status_code == 201
+        assert response.status_code == status.HTTP_201_CREATED
         listing = ChequeListing.objects.get(owner=check_holder)
         assert listing.status == ChequeListing.Status.PENDING_MODERATION
         assert listing.bank is not None
@@ -88,10 +89,10 @@ class TestChequeListingCreate:
             _listing_payload(issuer),
             format="json",
         )
-        assert response.status_code == 401
+        assert response.status_code == status.HTTP_401_UNAUTHORIZED
 
     def test_create_listing_rejects_non_positive_face_amount(
-        self, api_client, check_holder, issuer
+        self, api_client, check_holder, issuer,
     ):
         api_client.force_authenticate(user=check_holder)
 
@@ -101,10 +102,10 @@ class TestChequeListingCreate:
             format="json",
         )
 
-        assert response.status_code == 400
+        assert response.status_code == status.HTTP_400_BAD_REQUEST
 
     def test_create_listing_rejects_due_date_not_in_future(
-        self, api_client, check_holder, issuer
+        self, api_client, check_holder, issuer,
     ):
         api_client.force_authenticate(user=check_holder)
 
@@ -114,10 +115,10 @@ class TestChequeListingCreate:
             format="json",
         )
 
-        assert response.status_code == 400
+        assert response.status_code == status.HTTP_400_BAD_REQUEST
 
     def test_create_listing_rejects_invalid_sayad_length(
-        self, api_client, check_holder, issuer
+        self, api_client, check_holder, issuer,
     ):
         api_client.force_authenticate(user=check_holder)
 
@@ -127,10 +128,10 @@ class TestChequeListingCreate:
             format="json",
         )
 
-        assert response.status_code == 400
+        assert response.status_code == status.HTTP_400_BAD_REQUEST
 
     def test_create_listing_rejects_duplicate_sayad_for_issuer_bank(
-        self, api_client, check_holder, issuer
+        self, api_client, check_holder, issuer,
     ):
         ChequeListingFactory.create(
             owner=check_holder,
@@ -146,14 +147,14 @@ class TestChequeListingCreate:
             format="json",
         )
 
-        assert response.status_code == 400
+        assert response.status_code == status.HTTP_400_BAD_REQUEST
         assert response.data["error"]["code"] == "VALIDATION_ERROR"
         details = response.data["error"]["details"]
         detail_text = str(details)
         assert "cheque_serial_number" in detail_text or "unique" in detail_text.lower()
 
     def test_create_listing_rejects_when_daily_limit_reached(
-        self, api_client, check_holder, issuer
+        self, api_client, check_holder, issuer,
     ):
         for index in range(10):
             ChequeListingFactory.create(
@@ -169,10 +170,10 @@ class TestChequeListingCreate:
             format="json",
         )
 
-        assert response.status_code == 400
+        assert response.status_code == status.HTTP_400_BAD_REQUEST
 
     def test_create_listing_rejects_bank_name_without_code(
-        self, api_client, check_holder, issuer
+        self, api_client, check_holder, issuer,
     ):
         api_client.force_authenticate(user=check_holder)
         payload = _listing_payload(issuer)
@@ -181,12 +182,12 @@ class TestChequeListingCreate:
 
         response = api_client.post("/api/v1/listings/", payload, format="json")
 
-        assert response.status_code == 400
+        assert response.status_code == status.HTTP_400_BAD_REQUEST
         assert response.data["error"]["code"] == "VALIDATION_ERROR"
         assert ChequeListing.objects.filter(owner=check_holder).count() == 0
 
     def test_create_listing_rejects_unknown_bank_code(
-        self, api_client, check_holder, issuer
+        self, api_client, check_holder, issuer,
     ):
         api_client.force_authenticate(user=check_holder)
 
@@ -196,7 +197,7 @@ class TestChequeListingCreate:
             format="json",
         )
 
-        assert response.status_code == 400
+        assert response.status_code == status.HTTP_400_BAD_REQUEST
         assert response.data["error"]["code"] == "VALIDATION_ERROR"
         assert ChequeListing.objects.filter(owner=check_holder).count() == 0
 
@@ -214,11 +215,11 @@ class TestChequeListingKycGate:
             format="json",
         )
 
-        assert response.status_code == 403
+        assert response.status_code == status.HTTP_403_FORBIDDEN
         assert response.data["error"]["code"] == "PERMISSION_ERROR"
 
     def test_list_returns_only_own_listings_for_check_holder(
-        self, api_client, check_holder, other_holder, issuer
+        self, api_client, check_holder, other_holder, issuer,
     ):
         own = ChequeListingFactory.create(owner=check_holder, issuer=issuer)
         other = ChequeListingFactory.create(
@@ -230,8 +231,8 @@ class TestChequeListingKycGate:
 
         response = api_client.get("/api/v1/listings/")
 
-        assert response.status_code == 200
-        results = response.data["results"] if "results" in response.data else response.data
+        assert response.status_code == status.HTTP_200_OK
+        results = response.data.get("results", response.data)
         ids = [item["id"] for item in results]
         assert own.id in ids
         assert other.id not in ids
@@ -242,11 +243,11 @@ class TestChequeListingKycGate:
 
         response = api_client.get(f"/api/v1/listings/{listing.id}/")
 
-        assert response.status_code == 200
+        assert response.status_code == status.HTTP_200_OK
         assert response.data["id"] == listing.id
 
     def test_my_listings_returns_owner_listings_only(
-        self, api_client, check_holder, other_holder, issuer
+        self, api_client, check_holder, other_holder, issuer,
     ):
         own = ChequeListingFactory.create(owner=check_holder, issuer=issuer)
         ChequeListingFactory.create(
@@ -258,19 +259,19 @@ class TestChequeListingKycGate:
 
         response = api_client.get("/api/v1/listings/my/")
 
-        assert response.status_code == 200
+        assert response.status_code == status.HTTP_200_OK
         ids = [item["id"] for item in response.data]
         assert ids == [own.id]
 
     def test_list_requires_authentication(self, api_client):
         response = api_client.get("/api/v1/listings/")
-        assert response.status_code == 401
+        assert response.status_code == status.HTTP_401_UNAUTHORIZED
 
 
 @pytest.mark.django_db
 class TestChequeListingUpdate:
     def test_owner_can_patch_pending_listing_bank_code(
-        self, api_client, check_holder, issuer
+        self, api_client, check_holder, issuer,
     ):
         listing = ChequeListingFactory.create(
             pending=True,
@@ -285,14 +286,14 @@ class TestChequeListingUpdate:
             format="json",
         )
 
-        assert response.status_code == 200
+        assert response.status_code == status.HTTP_200_OK
         listing.refresh_from_db()
         assert listing.bank.code == "tejarat"
         assert listing.bank_name == "بانک تجارت"
         assert response.data["bank"]["code"] == "tejarat"
 
     def test_patch_rejects_bank_name_without_code(
-        self, api_client, check_holder, issuer
+        self, api_client, check_holder, issuer,
     ):
         listing = ChequeListingFactory.create(
             pending=True,
@@ -307,7 +308,7 @@ class TestChequeListingUpdate:
             format="json",
         )
 
-        assert response.status_code == 400
+        assert response.status_code == status.HTTP_400_BAD_REQUEST
         assert response.data["error"]["code"] == "VALIDATION_ERROR"
         listing.refresh_from_db()
         assert listing.bank.code == "mellat"
@@ -327,7 +328,7 @@ class TestChequeListingUpdate:
             format="json",
         )
 
-        assert response.status_code == 200
+        assert response.status_code == status.HTTP_200_OK
         listing.refresh_from_db()
         assert listing.description == "after"
 
@@ -345,7 +346,7 @@ class TestChequeListingUpdate:
             format="json",
         )
 
-        assert response.status_code == 400
+        assert response.status_code == status.HTTP_400_BAD_REQUEST
         assert response.data["error"]["code"] == "PERMISSION_ERROR"
 
     def test_patch_requires_authentication(self, api_client, check_holder, issuer):
@@ -357,4 +358,4 @@ class TestChequeListingUpdate:
             format="json",
         )
 
-        assert response.status_code == 401
+        assert response.status_code == status.HTTP_401_UNAUTHORIZED

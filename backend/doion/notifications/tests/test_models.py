@@ -1,8 +1,13 @@
 import pytest
 
-from doion.notifications.constants import NotificationChannel, NotificationStatus, NotificationType
+from doion.notifications.constants import NotificationChannel
+from doion.notifications.constants import NotificationStatus
+from doion.notifications.constants import NotificationType
 from doion.notifications.factories import NotificationFactory
+from doion.notifications.models import Notification
 from doion.users.factories import UserFactory
+
+EXPECTED_NOTIFICATION_COUNT = 2
 
 
 @pytest.mark.django_db
@@ -55,9 +60,7 @@ class TestNotificationModel:
             message="Message 2",
         )
 
-        from doion.notifications.models import Notification
-
-        assert Notification.objects.filter(user=user).count() == 2
+        assert Notification.objects.filter(user=user).count() == EXPECTED_NOTIFICATION_COUNT
 
     def test_notification_with_read_at(self):
         user = UserFactory.create()

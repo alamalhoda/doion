@@ -13,6 +13,9 @@ from doion.checks.models import IssuerProfile
 from doion.documents.models import Document
 from doion.pricing.engine import calculate_suggested_rate
 
+SAYAD_NUMBER_LENGTH = 16
+DAILY_LISTING_CREATE_LIMIT = 10
+
 
 class CatalogBankInputMixin:
     def validate_bank(self, value: str) -> Bank:
@@ -120,26 +123,29 @@ class ChequeListingCreateSerializer(CatalogBankInputMixin, serializers.ModelSeri
 
     def validate_face_amount(self, value):
         if value <= 0:
-            raise serializers.ValidationError("face_amount must be greater than 0")
+            msg = "face_amount must be greater than 0"
+            raise serializers.ValidationError(msg)
         return value
 
     def validate_due_date(self, value):
         if value <= timezone.now().date():
-            raise serializers.ValidationError("due_date must be in the future")
+            msg = "due_date must be in the future"
+            raise serializers.ValidationError(msg)
         return value
 
     def validate_cheque_serial_number(self, value):
-        if len(value) != 16 or not value.isdigit():
-            raise serializers.ValidationError("sayad_number must be 16 digits")
+        if len(value) != SAYAD_NUMBER_LENGTH or not value.isdigit():
+            msg = "sayad_number must be 16 digits"
+            raise serializers.ValidationError(msg)
         return value
 
     def validate(self, attrs):
         attrs = super().validate(attrs)
         today = timezone.now().date()
         count = ChequeListing.objects.filter(owner=self.context["request"].user, created_at__date=today).count()
-        if count >= 10:
+        if count >= DAILY_LISTING_CREATE_LIMIT:
             raise serializers.ValidationError(
-                {"non_field_errors": ["Daily limit of 10 listings reached"]}
+                {"non_field_errors": ["Daily limit of 10 listings reached"]},
             )
         return attrs
 
@@ -185,7 +191,7 @@ class DocumentUploadSerializer(serializers.ModelSerializer):
         listing = self.context["listing"]
         document_type = validated_data["document_type"]
         uploaded_file = validated_data["file"]
-        document = Document.objects.create(
+        return Document.objects.create(
             owner=listing.owner,
             related_object_type="cheque_listing",
             related_object_id=listing.id,
@@ -193,4 +199,3 @@ class DocumentUploadSerializer(serializers.ModelSerializer):
             file=uploaded_file,
             file_size=uploaded_file.size,
         )
-        return document

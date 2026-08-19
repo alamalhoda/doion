@@ -1,24 +1,27 @@
 from django.shortcuts import get_object_or_404
 from rest_framework import status
 from rest_framework.decorators import action
-from rest_framework.mixins import RetrieveModelMixin, UpdateModelMixin
-from rest_framework.permissions import AllowAny, IsAuthenticated
+from rest_framework.mixins import RetrieveModelMixin
+from rest_framework.mixins import UpdateModelMixin
+from rest_framework.permissions import AllowAny
+from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.throttling import ScopedRateThrottle
 from rest_framework.views import APIView
-from rest_framework.viewsets import GenericViewSet, ModelViewSet
+from rest_framework.viewsets import GenericViewSet
+from rest_framework.viewsets import ModelViewSet
 from rest_framework_simplejwt.tokens import RefreshToken
 
-from doion.identity.api.serializers import (
-    ProfileSerializer,
-    RegisterSerializer,
-    UserMeSerializer,
-    VerificationCreateSerializer,
-    VerificationSerializer,
-)
 from doion.identity.api.permissions import IsModerator
+from doion.identity.api.serializers import ProfileSerializer
+from doion.identity.api.serializers import RegisterSerializer
+from doion.identity.api.serializers import UserMeSerializer
+from doion.identity.api.serializers import VerificationCreateSerializer
+from doion.identity.api.serializers import VerificationSerializer
 from doion.identity.models import Verification
-from doion.users.models import User
+from doion.identity.services import get_or_create_profile
+from doion.identity.signals import verification_approved
+from doion.identity.signals import verification_rejected
 
 
 class RegisterViewSet(GenericViewSet):
@@ -54,8 +57,6 @@ class ProfileViewSet(RetrieveModelMixin, UpdateModelMixin, GenericViewSet):
     permission_classes = [IsAuthenticated]
 
     def get_object(self):
-        from doion.identity.services import get_or_create_profile
-
         return get_or_create_profile(self.request.user)
 
 
@@ -64,8 +65,6 @@ class UserMeViewSet(RetrieveModelMixin, UpdateModelMixin, GenericViewSet):
     permission_classes = [IsAuthenticated]
 
     def get_object(self):
-        from doion.identity.services import get_or_create_profile
-
         get_or_create_profile(self.request.user)
         return self.request.user
 
@@ -98,7 +97,7 @@ class VerificationViewSet(ModelViewSet):
     @action(detail=False, methods=["get"], url_path="me")
     def my_verification(self, request):
         verification = Verification.objects.filter(user=request.user).order_by(
-            "-created_at"
+            "-created_at",
         ).first()
         if not verification:
             return Response(
@@ -137,9 +136,8 @@ class ModerationVerificationDecisionView(APIView):
             verification.rejection_code = ""
             verification.save()
 
-            from doion.identity.signals import verification_approved
             verification_approved.send(
-                sender=self.__class__, verification=verification
+                sender=self.__class__, verification=verification,
             )
             return Response({"status": "approved"})
 
@@ -154,7 +152,6 @@ class ModerationVerificationDecisionView(APIView):
             verification.rejection_code = rejection_code
             verification.save()
 
-            from doion.identity.signals import verification_rejected
             verification_rejected.send(
                 sender=self.__class__,
                 verification=verification,

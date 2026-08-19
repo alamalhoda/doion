@@ -4,7 +4,8 @@ except ImportError:
     shared_task = None
 
 import logging
-from datetime import date
+
+from django.utils import timezone
 
 from doion.checks.models import ChequeListing
 
@@ -17,7 +18,7 @@ def expire_listings():
 
     expired_listings = ChequeListing.objects.filter(
         status=ChequeListing.Status.PUBLISHED,
-        due_date__lt=date.today(),
+        due_date__lt=timezone.localdate(),
     )
 
     for listing in expired_listings:

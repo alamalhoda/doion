@@ -65,7 +65,12 @@ class TestBankCatalogAPI:
         response = api_client.get("/api/v1/banks/")
 
         names = [item["display_name"] for item in response.data]
-        assert names == sorted(names)
+        expected = list(
+            Bank.objects.filter(is_active=True)
+            .order_by("display_name")
+            .values_list("display_name", flat=True),
+        )
+        assert names == expected
 
     def test_empty_catalog_returns_empty_list(self, api_client, catalog):
         Bank.objects.update(is_active=False)
