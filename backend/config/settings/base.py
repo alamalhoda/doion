@@ -97,6 +97,7 @@ LOCAL_APPS = [
     "doion.users",
     "doion.identity",
     "doion.documents",
+    "doion.banks",
     "doion.checks",
     "doion.pricing",
     "doion.moderation",
