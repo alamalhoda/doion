@@ -154,6 +154,7 @@ Factoryهای دامنه در ماژول‌های اپ (خارج از `tests/`) 
 | ماژول | Factoryها |
 |-------|-----------|
 | `doion.users.factories` | `UserFactory` (+ traits: `as_investor`, `as_moderator`, `as_admin`) |
+| `doion.banks.factories` | `BankFactory` |
 | `doion.checks.factories` | `IssuerProfileFactory`, `ChequeListingFactory` |
 | `doion.identity.factories` | `ProfileFactory`, `VerificationFactory` |
 | `doion.notifications.factories` | `NotificationFactory`, `NotificationPreferenceFactory` |

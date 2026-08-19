@@ -24,6 +24,7 @@
 4. [KYC / Verifications](#4-kyc--verifications)
 5. [Documents](#5-documents)
 6. [Cheque Listings](#6-cheque-listings)
+   - [6.0 Bank catalog](#60-bank-catalog)
 7. [Issuer Profiles](#7-issuer-profiles)
 8. [Marketplace & Search](#8-marketplace--search)
 9. [Matches](#9-matches)
@@ -597,6 +598,44 @@ Documents are created as part of Verification creation or Listing document uploa
 
 ## 6. Cheque Listings
 
+### 6.0 Bank catalog
+
+**Endpoint:** `GET /api/v1/banks/`
+
+**Permission:** AllowAny (guest and authenticated)
+
+**Write:** none. Create/update/logo upload is Django admin only. `POST`/`PUT`/`PATCH`/`DELETE` are not registered as mutating actions (`405` on non-GET).
+
+**Behavior:** Unpaginated JSON array of **active** banks (`is_active=True`), ordered by `display_name` ascending. Empty catalog returns `[]` (HTTP 200). Inactive banks are omitted from this list but still appear as nested `bank` on listings already linked to them.
+
+**Response 200:**
+
+```json
+[
+  {
+    "code": "mellat",
+    "display_name": "بانک ملت",
+    "aliases": ["بانک ملت"],
+    "logo_url": null,
+    "brand_color_light": "#E21836",
+    "brand_color_dark": "#C4112C"
+  }
+]
+```
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `code` | `string` | Stable unique catalog id |
+| `display_name` | `string` | Official UI name |
+| `aliases` | `string[]` | Match names including `display_name` |
+| `logo_url` | `string \| null` | Product media URL, or `null` if no logo |
+| `brand_color_light` | `string` | `#RRGGBB` |
+| `brand_color_dark` | `string` | `#RRGGBB` |
+
+Nested listing `bank` objects use the same fields **except** `aliases`. If a listing has no catalog row, JSON `bank` is `null` and `bank_name` stays the stored text.
+
+---
+
 ### 6.1 Create Listing
 
 **Endpoint:** `POST /api/v1/listings/`
@@ -608,7 +647,7 @@ Documents are created as part of Verification creation or Listing document uploa
 ```json
 {
   "issuer": 1,
-  "bank_name": "بانک ملت",
+  "bank": "mellat",
   "cheque_serial_number": "1402103568712345",
   "face_amount": 500000000,
   "due_date": "2025-06-10",
@@ -622,7 +661,7 @@ Documents are created as part of Verification creation or Listing document uploa
 | Field | Type | Required | Description |
 |-------|------|----------|-------------|
 | `issuer` | `number` | Yes | IssuerProfile ID |
-| `bank_name` | `string` | Yes | Bank name, max 100 chars |
+| `bank` | `string` | Yes | Active catalog `code` (e.g. `mellat`). `bank_name` as a substitute is rejected (`400 VALIDATION_ERROR`) |
 | `cheque_serial_number` | `string` | Yes | Exactly 16 digits |
 | `face_amount` | `number` | Yes | Must be > 0 |
 | `due_date` | `string` (date) | Yes | Must be in the future |
@@ -635,13 +674,13 @@ Documents are created as part of Verification creation or Listing document uploa
 
 ```json
 {
-  "id": 1,
-  "owner_id": 1,
-  "issuer_profile": {
-    "id": 1,
-    "national_or_company_id": "10100345678",
-    "name": "شرکت آسان‌پرداخت",
-    "credit_score": 78
+  "issuer": 1,
+  "bank": {
+    "code": "mellat",
+    "display_name": "بانک ملت",
+    "logo_url": null,
+    "brand_color_light": "#E21836",
+    "brand_color_dark": "#C4112C"
   },
   "bank_name": "بانک ملت",
   "cheque_serial_number": "1402103568712345",
@@ -650,21 +689,13 @@ Documents are created as part of Verification creation or Listing document uploa
   "issuer_type": "legal",
   "issuer_name": "شرکت آسان‌پرداخت",
   "issuer_national_id": "10100345678",
-  "description": "",
-  "suggested_discount_rate": "3.80",
-  "risk_tier": "low",
-  "status": "pending_moderation",
-  "rejection_reason": "",
-  "rejection_code": "",
-  "resubmit_count": 0,
-  "created_at": "2025-04-25T09:00:00Z",
-  "updated_at": "2025-04-25T09:00:00Z"
+  "description": "توضیحات اختیاری"
 }
 ```
 
-**Errors:** `VALIDATION_ERROR` (400) for face_amount / due_date / serial / daily limit / duplicate; `PERMISSION_ERROR` on illegal updates.
+**Errors:** `VALIDATION_ERROR` (400) for missing/invalid `bank`, `bank_name` substitute, face_amount / due_date / serial / daily limit / duplicate; `PERMISSION_ERROR` on illegal updates.
 
-**Note:** Response create serializer returns create fields; list/retrieve use `ChequeListingSerializer` with nested field named `issuer_profile`. Model FK is `issuer` and the nested serializer currently has no `source="issuer"` — treat nested issuer as a known serialization gap until fixed.
+**Note:** Create uses `ChequeListingCreateSerializer` (write `bank` as catalog code; response nested `bank` + `bank_name` = catalog `display_name`). List/retrieve/update responses use `ChequeListingSerializer` with nested `issuer_profile` and nested `bank` (no `aliases`). Model FK is `issuer` and the nested issuer serializer currently has no `source="issuer"` — treat nested issuer as a known serialization gap until fixed.
 
 ---
 
@@ -829,11 +860,12 @@ Full CRUD via `IssuerProfileViewSet`. **List/retrieve/create:** any authenticate
 | `max_amount` | `number` | Maximum face amount (Rials) |
 | `max_days_to_due` | `number` | Maximum days until due date |
 | `issuer_type` | `string` | Filter by issuer type (`legal`, `natural`) |
-| `bank_name` | `string` | Partial match on bank name (icontains) |
+| `bank` | `string` | Exact match on catalog `bank.code`. Takes precedence over `bank_name` when both are sent |
+| `bank_name` | `string` | Partial match on listing `bank_name`, linked bank `display_name`, or aliases |
 | `ordering` | `string` | Sort field: `created_at`, `-created_at`, `face_amount`, `-face_amount`, `suggested_discount_rate`, `-suggested_discount_rate`, `due_date`, `-due_date` |
 | `page` | `number` | Page number (default: 1) |
 
-Note: Default DRF `PageNumberPagination` is used (page size fixed at **20**). Client `page_size` override is **not** enabled for marketplace. Cache key is `marketplace:listings:{page}` only (filter variance is not part of the cache key).
+Note: Default DRF `PageNumberPagination` is used (page size fixed at **20**). Client `page_size` override is **not** enabled for marketplace. Unfiltered list responses are cached 60s under `marketplace:listings:{page}`. Requests with additional query params (filters/search/ordering) are not cached.
 
 **Response 200:**
 
@@ -851,6 +883,13 @@ Note: Default DRF `PageNumberPagination` is used (page size fixed at **20**). Cl
         "national_or_company_id": "10100345678",
         "name": "شرکت آسان‌پرداخت",
         "credit_score": 78
+      },
+      "bank": {
+        "code": "mellat",
+        "display_name": "بانک ملت",
+        "logo_url": null,
+        "brand_color_light": "#E21836",
+        "brand_color_dark": "#C4112C"
       },
       "bank_name": "بانک ملت",
       "cheque_serial_number": "1402103568712345",
@@ -897,6 +936,13 @@ Note: Default DRF `PageNumberPagination` is used (page size fixed at **20**). Cl
       "name": "شرکت آسان‌پرداخت",
       "credit_score": 78
     },
+    "bank": {
+      "code": "mellat",
+      "display_name": "بانک ملت",
+      "logo_url": null,
+      "brand_color_light": "#E21836",
+      "brand_color_dark": "#C4112C"
+    },
     "bank_name": "بانک ملت",
     "face_amount": "500000000",
     "due_date": "2025-06-10",
@@ -941,6 +987,13 @@ Note: Default DRF `PageNumberPagination` is used (page size fixed at **20**). Cl
   "id": 1,
   "listing": {
     "id": 1,
+    "bank": {
+      "code": "mellat",
+      "display_name": "بانک ملت",
+      "logo_url": null,
+      "brand_color_light": "#E21836",
+      "brand_color_dark": "#C4112C"
+    },
     "bank_name": "بانک ملت",
     "face_amount": "500000000",
     "due_date": "2025-06-10",
@@ -1125,6 +1178,13 @@ Note: Default DRF `PageNumberPagination` is used (page size fixed at **20**). Cl
         "national_or_company_id": "1234567890",
         "name": "شرکت فناوری نوین",
         "credit_score": 750
+      },
+      "bank": {
+        "code": "mellat",
+        "display_name": "بانک ملت",
+        "logo_url": null,
+        "brand_color_light": "#E21836",
+        "brand_color_dark": "#C4112C"
       },
       "bank_name": "بانک ملت",
       "cheque_serial_number": "1234567890123456",
@@ -1521,6 +1581,7 @@ Default list pagination uses DRF `PageNumberPagination` with fixed `PAGE_SIZE = 
 | `GET /compliance/audit/` | Yes (`StandardResultPagination`) | 100 |
 
 Exceptions (unpaginated array responses):
+- `GET /banks/` — array of active catalog banks
 - `GET /listings/my/` — raw array
 - `GET /marketplace/listings/latest/` — array of up to 4
 - Some verification list views may return non-paginated arrays depending on queryset size / view config
@@ -1550,7 +1611,7 @@ Behaviors that affect API responses or observed data without being separate endp
 
 | Behavior | Effect |
 |----------|--------|
-| **Marketplace list cache** | `GET /marketplace/listings/` cached 60s under key `marketplace:listings:{page}`. Invalidated when listing status changes to published/rejected/expired/withdrawn. |
+| **Marketplace list cache** | Unfiltered `GET /marketplace/listings/` cached 60s under key `marketplace:listings:{page}`. Filtered/search/ordering requests are not cached. Invalidated when listing status changes to published/rejected/expired/withdrawn. |
 | **Celery `expire_listings`** | Beat every 3600s. Sets `published` listings with `due_date < today` to `expired`. Clients may see status change without an API call. |
 | **Correlation ID** | `CorrelationIDMiddleware` reads/sets `X-Correlation-ID` on every request/response (for logging). |
 | **Feature flags (seeded)** | `matching_enabled`, `notifications_sms_enabled`, `show_risk_tier`, `show_landing_page` (among others as seeded). Seeding happens in the `post_migrate` receiver `seed_default_feature_flags` (`doion/compliance/signals.py`), so new keys appear on any `migrate` run. `show_risk_tier` defaults to **off**; when on, clients may show listing risk tier on public marketplace/cards. Moderators always see risk for review. `show_landing_page` defaults to **off**; when on, clients serve the public landing page at `/landing` and route `/` to it. |
@@ -1601,6 +1662,7 @@ Distinct from listing `issuer_type` (cheque issuer classification).
 
 | Date | Change |
 |------|--------|
+| 2026-08-19 | Bank catalog: public `GET /api/v1/banks/` (unpaginated active array). Listing create/update write `bank` (catalog code); `bank_name` input rejected. Listing/marketplace/match/moderation reads include nested `bank` (nullable) plus display `bank_name`. Marketplace filter `bank` (exact code) precedes `bank_name` (partial on name/aliases). Filtered marketplace list responses are not cached. |
 | 2026-08-17 | Seed `show_landing_page` (default off) for the public landing page. No endpoint, schema, or permission change — seed record only. |
 | 2026-08-14 | Seed `show_risk_tier` (default off). `GET` feature-flags list/retrieve is AllowAny so marketplace can gate public risk display; mutations remain moderator/admin. |
 | 2026-08-10 | Identity `user_type` (`natural`/`legal`): register + profile/me/login/refresh payloads; conditional KYC validation (10 vs 11 digit IDs); `Verification.national_id` max_length 11; verification responses include read-only `user_type`; demo seed pending natural+legal KYC |

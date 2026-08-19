@@ -80,6 +80,9 @@ class TestMatchViewSet:
         assert response.status_code == 201
         assert response.data["status"] == Status.PENDING
         assert response.data["listing"]["id"] == listing.id
+        assert response.data["listing"]["bank"]["code"] == "mellat"
+        assert response.data["listing"]["bank_name"] == "Bank Melli"
+        assert "aliases" not in response.data["listing"]["bank"]
 
     def test_list_matches_filtered_by_role(self, api_client, investor, check_holder, issuer):
         listing = create_listing(owner=check_holder, issuer=issuer)

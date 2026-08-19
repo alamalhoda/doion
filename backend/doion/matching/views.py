@@ -20,16 +20,31 @@ from doion.matching.services import MatchingService
 
 class MatchViewSet(GenericViewSet):
     permission_classes = [IsAuthenticated]
-    queryset = Match.objects.select_related("listing", "investor", "check_holder").all()
+    queryset = Match.objects.select_related(
+        "listing",
+        "listing__bank",
+        "investor",
+        "check_holder",
+    ).all()
     serializer_class = MatchSerializer
 
     def get_queryset(self):
         user = self.request.user
         role = getattr(user, "role", None)
         if role == "check_holder":
-            return Match.objects.filter(check_holder=user).select_related("listing", "investor", "check_holder")
+            return Match.objects.filter(check_holder=user).select_related(
+                "listing",
+                "listing__bank",
+                "investor",
+                "check_holder",
+            )
         if role == "investor":
-            return Match.objects.filter(investor=user).select_related("listing", "investor", "check_holder")
+            return Match.objects.filter(investor=user).select_related(
+                "listing",
+                "listing__bank",
+                "investor",
+                "check_holder",
+            )
         return Match.objects.none()
 
     def list(self, request):

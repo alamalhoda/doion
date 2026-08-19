@@ -39,6 +39,11 @@ test.describe("critical: create listing", () => {
       page.getByRole("textbox", { name: /صیادی|1234567890123456/ }).first(),
     ).toHaveValue(sampleSerial, { timeout: 10_000 });
 
+    const bankSelect = page.getByTestId(TEST_IDS.listingFormBank);
+    if (await bankSelect.count()) {
+      await expect(bankSelect.first()).toBeVisible();
+    }
+
     const publishBtn = page.getByRole("button", {
       name: /تأیید و ارسال نهایی/,
     });
@@ -75,10 +80,16 @@ test.describe("critical: create listing", () => {
         ? myBodyAfter
         : myBodyAfter.results || [];
       const createdViaUi = myListAfter.find(
-        (row: { cheque_serial_number?: string }) =>
-          row.cheque_serial_number === sampleSerial,
+        (row: {
+          cheque_serial_number?: string;
+          id?: number;
+          bank?: { code?: string } | null;
+          bank_name?: string;
+        }) => row.cheque_serial_number === sampleSerial,
       );
       expect(createdViaUi?.id).toBeTruthy();
+      expect(createdViaUi.bank?.code ?? createdViaUi.bank).toBe("mellat");
+      expect(createdViaUi.bank_name).toBe("بانک ملت");
       await page.goto(ROUTES.myListings);
       await expect(
         page.locator("tr").filter({ hasText: `#${createdViaUi.id}` }),
@@ -120,7 +131,7 @@ test.describe("critical: create listing", () => {
       headers,
       data: {
         issuer: issuer.id,
-        bank_name: "بانک ملت",
+        bank: "mellat",
         cheque_serial_number: uniqueSerial,
         face_amount: 150000000,
         due_date: due.toISOString().slice(0, 10),
@@ -141,10 +152,16 @@ test.describe("critical: create listing", () => {
     const myBody = await myRes.json();
     const myList = Array.isArray(myBody) ? myBody : myBody.results || [];
     const created = myList.find(
-      (row: { cheque_serial_number?: string }) =>
-        row.cheque_serial_number === uniqueSerial,
+      (row: {
+        cheque_serial_number?: string;
+        id?: number;
+        bank?: { code?: string } | null;
+        bank_name?: string;
+      }) => row.cheque_serial_number === uniqueSerial,
     );
     expect(created?.id).toBeTruthy();
+    expect(created.bank?.code ?? created.bank).toBe("mellat");
+    expect(created.bank_name).toBe("بانک ملت");
 
     await page.goto(ROUTES.myListings);
     await expect(

@@ -70,6 +70,10 @@ class TestModerationQueueEndpoint:
         ids = [item["id"] for item in results]
         assert pending_listing.id in ids
         assert published_listing.id not in ids
+        pending_item = next(item for item in results if item["id"] == pending_listing.id)
+        assert pending_item["bank"]["code"] == "mellat"
+        assert pending_item["bank_name"] == "بانک ملت"
+        assert "aliases" not in pending_item["bank"]
 
     def test_queue_empty_when_no_pending(self, moderator, published_listing):
         client = APIClient()

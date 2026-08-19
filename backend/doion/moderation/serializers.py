@@ -1,5 +1,6 @@
 from rest_framework import serializers
 
+from doion.banks.serializers import BankSummarySerializer
 from doion.checks.models import ChequeListing
 from doion.checks.serializers import IssuerProfileSerializer
 from doion.moderation.constants import RejectionCode
@@ -9,6 +10,7 @@ from doion.moderation.models import ModerationDecision
 class QueueListingSerializer(serializers.ModelSerializer):
     issuer_profile = IssuerProfileSerializer(read_only=True)
     owner_id = serializers.IntegerField(source="owner.id", read_only=True)
+    bank = BankSummarySerializer(read_only=True)
 
     class Meta:
         model = ChequeListing
@@ -16,6 +18,7 @@ class QueueListingSerializer(serializers.ModelSerializer):
             "id",
             "owner_id",
             "issuer_profile",
+            "bank",
             "bank_name",
             "cheque_serial_number",
             "face_amount",

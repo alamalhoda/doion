@@ -51,6 +51,13 @@ class ChequeListing(TimeStampedModel):
         related_name="cheque_listings",
     )
     bank_name = models.CharField(max_length=100)
+    bank = models.ForeignKey(
+        "banks.Bank",
+        on_delete=models.PROTECT,
+        null=True,
+        blank=True,
+        related_name="cheque_listings",
+    )
     cheque_serial_number = models.CharField(max_length=50)
     face_amount = models.DecimalField(max_digits=15, decimal_places=0)
     due_date = models.DateField()

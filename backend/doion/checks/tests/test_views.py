@@ -48,7 +48,7 @@ def _future_due_date(days: int = 45):
 def _listing_payload(issuer, **overrides):
     payload = {
         "issuer": issuer.id,
-        "bank_name": "بانک ملت",
+        "bank": "mellat",
         "cheque_serial_number": "1234567890123456",
         "face_amount": "500000000",
         "due_date": _future_due_date(),
@@ -75,6 +75,10 @@ class TestChequeListingCreate:
         assert response.status_code == 201
         listing = ChequeListing.objects.get(owner=check_holder)
         assert listing.status == ChequeListing.Status.PENDING_MODERATION
+        assert listing.bank is not None
+        assert listing.bank.code == "mellat"
+        assert listing.bank_name == "بانک ملت"
+        assert response.data["bank"]["code"] == "mellat"
         assert listing.suggested_discount_rate is not None
         assert listing.risk_tier in {"low", "medium", "high"}
 
@@ -167,6 +171,35 @@ class TestChequeListingCreate:
 
         assert response.status_code == 400
 
+    def test_create_listing_rejects_bank_name_without_code(
+        self, api_client, check_holder, issuer
+    ):
+        api_client.force_authenticate(user=check_holder)
+        payload = _listing_payload(issuer)
+        payload.pop("bank")
+        payload["bank_name"] = "بانک ملت"
+
+        response = api_client.post("/api/v1/listings/", payload, format="json")
+
+        assert response.status_code == 400
+        assert response.data["error"]["code"] == "VALIDATION_ERROR"
+        assert ChequeListing.objects.filter(owner=check_holder).count() == 0
+
+    def test_create_listing_rejects_unknown_bank_code(
+        self, api_client, check_holder, issuer
+    ):
+        api_client.force_authenticate(user=check_holder)
+
+        response = api_client.post(
+            "/api/v1/listings/",
+            _listing_payload(issuer, bank="not-a-bank"),
+            format="json",
+        )
+
+        assert response.status_code == 400
+        assert response.data["error"]["code"] == "VALIDATION_ERROR"
+        assert ChequeListing.objects.filter(owner=check_holder).count() == 0
+
 
 @pytest.mark.django_db
 class TestChequeListingKycGate:
@@ -236,6 +269,49 @@ class TestChequeListingKycGate:
 
 @pytest.mark.django_db
 class TestChequeListingUpdate:
+    def test_owner_can_patch_pending_listing_bank_code(
+        self, api_client, check_holder, issuer
+    ):
+        listing = ChequeListingFactory.create(
+            pending=True,
+            owner=check_holder,
+            issuer=issuer,
+        )
+        api_client.force_authenticate(user=check_holder)
+
+        response = api_client.patch(
+            f"/api/v1/listings/{listing.id}/",
+            {"bank": "tejarat"},
+            format="json",
+        )
+
+        assert response.status_code == 200
+        listing.refresh_from_db()
+        assert listing.bank.code == "tejarat"
+        assert listing.bank_name == "بانک تجارت"
+        assert response.data["bank"]["code"] == "tejarat"
+
+    def test_patch_rejects_bank_name_without_code(
+        self, api_client, check_holder, issuer
+    ):
+        listing = ChequeListingFactory.create(
+            pending=True,
+            owner=check_holder,
+            issuer=issuer,
+        )
+        api_client.force_authenticate(user=check_holder)
+
+        response = api_client.patch(
+            f"/api/v1/listings/{listing.id}/",
+            {"bank_name": "بانک ملت"},
+            format="json",
+        )
+
+        assert response.status_code == 400
+        assert response.data["error"]["code"] == "VALIDATION_ERROR"
+        listing.refresh_from_db()
+        assert listing.bank.code == "mellat"
+
     def test_owner_can_patch_pending_listing(self, api_client, check_holder, issuer):
         listing = ChequeListingFactory.create(
             pending=True,

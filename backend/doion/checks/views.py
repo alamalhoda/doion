@@ -71,8 +71,12 @@ class ChequeListingViewSet(ModelViewSet):
     def get_queryset(self):
         user = self.request.user
         if user.profile.role in ["moderator", "admin"]:
-            return ChequeListing.objects.all()
-        return ChequeListing.objects.filter(owner=user)
+            return ChequeListing.objects.select_related("bank", "issuer", "owner").all()
+        return ChequeListing.objects.filter(owner=user).select_related(
+            "bank",
+            "issuer",
+            "owner",
+        )
 
     def get_serializer_class(self):
         if self.action == "create":
@@ -109,7 +113,11 @@ class ChequeListingViewSet(ModelViewSet):
 
     @action(detail=False, methods=["get"], url_path="my")
     def my_listings(self, request):
-        queryset = ChequeListing.objects.filter(owner=request.user)
+        queryset = ChequeListing.objects.filter(owner=request.user).select_related(
+            "bank",
+            "issuer",
+            "owner",
+        )
         serializer = self.get_serializer(queryset, many=True)
         return Response(serializer.data)
 

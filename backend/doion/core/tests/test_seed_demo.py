@@ -34,6 +34,7 @@ class TestSeedDemoCommand:
         assert ChequeListing.Status.PUBLISHED in statuses
         assert ChequeListing.Status.REJECTED in statuses
         assert Match.objects.filter(investor__username="investor1").exists()
+        assert ChequeListing.objects.filter(owner=holder, bank__isnull=True).count() == 0
 
         captured = capsys.readouterr()
         assert password in captured.out
