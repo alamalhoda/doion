@@ -191,6 +191,22 @@ class TestMarketplaceListingsEndpoint:
         assert published_listing_low_risk.id in ids
         assert published_listing_high_risk.id not in ids
 
+    def test_filter_bank_code_wins_over_bank_name(
+        self, published_listing_low_risk, published_listing_high_risk
+    ):
+        client = APIClient()
+        client.force_authenticate(user=published_listing_low_risk.owner)
+
+        response = client.get(
+            "/api/v1/marketplace/listings/",
+            {"bank": "mellat", "bank_name": "صادرات"},
+        )
+        results = response.data["results"] if "results" in response.data else response.data
+        ids = [item["id"] for item in results]
+        assert published_listing_low_risk.id in ids
+        assert published_listing_high_risk.id not in ids
+        assert all(item["bank"]["code"] == "mellat" for item in results)
+
     def test_filter_by_bank_name_alias(self, investor, issuer):
         seed_catalog_banks()
         listing = ChequeListingFactory.create(
@@ -300,3 +316,8 @@ class TestMarketplaceLatestListingsEndpoint:
         assert published_listing_low_risk.id in ids
         assert published_listing_high_risk.id in ids
         assert pending_listing.id not in ids
+        mellat_item = next(
+            item for item in response.data if item["id"] == published_listing_low_risk.id
+        )
+        assert mellat_item["bank"]["code"] == "mellat"
+        assert "aliases" not in mellat_item["bank"]

@@ -54,6 +54,27 @@ class TestBankCatalogAPI:
             status.HTTP_405_METHOD_NOT_ALLOWED,
         }
 
+    def test_retrieve_is_not_allowed(self, api_client, catalog):
+        bank = Bank.objects.get(code="mellat")
+
+        response = api_client.get(f"/api/v1/banks/{bank.pk}/")
+
+        assert response.status_code == status.HTTP_405_METHOD_NOT_ALLOWED
+
+    def test_list_is_ordered_by_display_name(self, api_client, catalog):
+        response = api_client.get("/api/v1/banks/")
+
+        names = [item["display_name"] for item in response.data]
+        assert names == sorted(names)
+
+    def test_empty_catalog_returns_empty_list(self, api_client, catalog):
+        Bank.objects.update(is_active=False)
+
+        response = api_client.get("/api/v1/banks/")
+
+        assert response.status_code == status.HTTP_200_OK
+        assert response.data == []
+
 
 @pytest.mark.django_db
 class TestNestedBankOnListings:

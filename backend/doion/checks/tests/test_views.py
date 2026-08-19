@@ -269,6 +269,49 @@ class TestChequeListingKycGate:
 
 @pytest.mark.django_db
 class TestChequeListingUpdate:
+    def test_owner_can_patch_pending_listing_bank_code(
+        self, api_client, check_holder, issuer
+    ):
+        listing = ChequeListingFactory.create(
+            pending=True,
+            owner=check_holder,
+            issuer=issuer,
+        )
+        api_client.force_authenticate(user=check_holder)
+
+        response = api_client.patch(
+            f"/api/v1/listings/{listing.id}/",
+            {"bank": "tejarat"},
+            format="json",
+        )
+
+        assert response.status_code == 200
+        listing.refresh_from_db()
+        assert listing.bank.code == "tejarat"
+        assert listing.bank_name == "بانک تجارت"
+        assert response.data["bank"]["code"] == "tejarat"
+
+    def test_patch_rejects_bank_name_without_code(
+        self, api_client, check_holder, issuer
+    ):
+        listing = ChequeListingFactory.create(
+            pending=True,
+            owner=check_holder,
+            issuer=issuer,
+        )
+        api_client.force_authenticate(user=check_holder)
+
+        response = api_client.patch(
+            f"/api/v1/listings/{listing.id}/",
+            {"bank_name": "بانک ملت"},
+            format="json",
+        )
+
+        assert response.status_code == 400
+        assert response.data["error"]["code"] == "VALIDATION_ERROR"
+        listing.refresh_from_db()
+        assert listing.bank.code == "mellat"
+
     def test_owner_can_patch_pending_listing(self, api_client, check_holder, issuer):
         listing = ChequeListingFactory.create(
             pending=True,
