@@ -9,9 +9,16 @@ import factory
 from django.utils import timezone
 from factory.django import DjangoModelFactory
 
+from doion.banks.models import Bank
+from doion.banks.seed import seed_catalog_banks
 from doion.checks.models import ChequeListing
 from doion.checks.models import IssuerProfile
 from doion.users.factories import UserFactory
+
+
+def get_default_listing_bank() -> Bank:
+    seed_catalog_banks()
+    return Bank.objects.get(code="mellat")
 
 
 class IssuerProfileFactory(DjangoModelFactory):
@@ -29,7 +36,10 @@ class ChequeListingFactory(DjangoModelFactory):
 
     owner = factory.SubFactory(UserFactory)
     issuer = factory.SubFactory(IssuerProfileFactory)
-    bank_name = "بانک ملت"
+    bank = factory.LazyFunction(get_default_listing_bank)
+    bank_name = factory.LazyAttribute(
+        lambda o: o.bank.display_name if o.bank is not None else "بانک ناشناس",
+    )
     cheque_serial_number = factory.Sequence(lambda n: f"{1000000000000000 + n}")
     face_amount = Decimal("100000000")
     due_date = factory.LazyFunction(lambda: timezone.now().date() + timedelta(days=30))

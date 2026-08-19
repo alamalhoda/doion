@@ -1,14 +1,30 @@
-from decimal import Decimal
-
-from django.contrib.auth.models import Group
-from django.db import transaction
 from django.utils import timezone
 from rest_framework import serializers
 
+from doion.banks.models import Bank
+from doion.banks.services import BANK_NAME_NOT_ACCEPTED
+from doion.banks.services import UNKNOWN_OR_INACTIVE_BANK_CODE
+from doion.banks.services import UnknownOrInactiveBankError
+from doion.banks.services import apply_bank_to_listing
+from doion.banks.services import get_active_by_code
 from doion.checks.models import ChequeListing
 from doion.checks.models import IssuerProfile
-from doion.pricing.engine import calculate_suggested_rate
 from doion.documents.models import Document
+from doion.pricing.engine import calculate_suggested_rate
+
+
+class CatalogBankInputMixin:
+    def validate_bank(self, value: str) -> Bank:
+        try:
+            return get_active_by_code(value)
+        except UnknownOrInactiveBankError as exc:
+            raise serializers.ValidationError(UNKNOWN_OR_INACTIVE_BANK_CODE) from exc
+
+    def validate(self, attrs: dict) -> dict:
+        attrs = super().validate(attrs)
+        if "bank_name" in self.initial_data:
+            raise serializers.ValidationError({"bank": [BANK_NAME_NOT_ACCEPTED]})
+        return attrs
 
 
 class IssuerProfileSerializer(serializers.ModelSerializer):
@@ -26,9 +42,10 @@ class IssuerProfileSerializer(serializers.ModelSerializer):
         read_only_fields = ["id", "credit_score", "created_by", "created_at", "updated_at"]
 
 
-class ChequeListingSerializer(serializers.ModelSerializer):
+class ChequeListingSerializer(CatalogBankInputMixin, serializers.ModelSerializer):
     issuer_profile = IssuerProfileSerializer(read_only=True)
     owner_id = serializers.IntegerField(source="owner.id", read_only=True)
+    bank = serializers.SlugField(write_only=True, required=False)
 
     class Meta:
         model = ChequeListing
@@ -36,6 +53,7 @@ class ChequeListingSerializer(serializers.ModelSerializer):
             "id",
             "owner_id",
             "issuer_profile",
+            "bank",
             "bank_name",
             "cheque_serial_number",
             "face_amount",
@@ -50,14 +68,33 @@ class ChequeListingSerializer(serializers.ModelSerializer):
             "created_at",
             "updated_at",
         ]
-        read_only_fields = ["id", "owner_id", "status", "created_at", "updated_at"]
+        read_only_fields = [
+            "id",
+            "owner_id",
+            "bank_name",
+            "status",
+            "created_at",
+            "updated_at",
+        ]
+
+    def update(self, instance, validated_data):
+        bank = validated_data.pop("bank", None)
+        instance = super().update(instance, validated_data)
+        if bank is not None:
+            apply_bank_to_listing(instance, bank)
+            instance.save(update_fields=["bank", "bank_name", "updated_at"])
+        return instance
 
 
-class ChequeListingCreateSerializer(serializers.ModelSerializer):
+class ChequeListingCreateSerializer(CatalogBankInputMixin, serializers.ModelSerializer):
+    bank = serializers.SlugField(write_only=True)
+    bank_name = serializers.CharField(read_only=True)
+
     class Meta:
         model = ChequeListing
         fields = [
             "issuer",
+            "bank",
             "bank_name",
             "cheque_serial_number",
             "face_amount",
@@ -84,6 +121,7 @@ class ChequeListingCreateSerializer(serializers.ModelSerializer):
         return value
 
     def validate(self, attrs):
+        attrs = super().validate(attrs)
         today = timezone.now().date()
         count = ChequeListing.objects.filter(owner=self.context["request"].user, created_at__date=today).count()
         if count >= 10:
@@ -103,12 +141,15 @@ class ChequeListingCreateSerializer(serializers.ModelSerializer):
             issuer_credit_score=issuer.credit_score,
         )
 
-        listing = ChequeListing.objects.create(
+        bank = validated_data.pop("bank")
+        listing = ChequeListing(
             owner=request.user,
             suggested_discount_rate=rate,
             risk_tier=risk_tier,
             **validated_data,
         )
+        apply_bank_to_listing(listing, bank)
+        listing.save()
         return listing
 
 

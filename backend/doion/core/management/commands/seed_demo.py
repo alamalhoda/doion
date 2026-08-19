@@ -11,6 +11,10 @@ from django.db import transaction
 from django.utils import timezone
 from django.utils.crypto import get_random_string
 
+from doion.banks.models import Bank
+from doion.banks.seed import seed_catalog_banks
+from doion.banks.services import apply_bank_to_listing
+from doion.banks.services import get_active_by_code
 from doion.checks.models import ChequeListing
 from doion.checks.models import IssuerProfile
 from doion.identity.models import Profile
@@ -47,12 +51,12 @@ EXPRESS_INTEREST_SERIAL = "2000000000000022"
 REJECT_PENDING_SERIAL = "3000000000000012"
 REJECTED_SERIAL = "4000000000000001"
 
-BANKS = (
-    "بانک ملت",
-    "بانک ملی",
-    "بانک صادرات",
-    "بانک پاسارگاد",
-    "بانک تجارت",
+DEMO_BANK_CODES = (
+    "mellat",
+    "melli",
+    "saderat",
+    "pasargad",
+    "tejarat",
 )
 
 
@@ -192,6 +196,11 @@ class Command(BaseCommand):
             issuer.created_by = holder
             issuer.save(update_fields=["created_by", "updated_at"])
 
+        seed_catalog_banks()
+        demo_banks = {
+            code: get_active_by_code(code) for code in DEMO_BANK_CODES
+        }
+
         due = timezone.now().date() + timedelta(days=60)
         published: dict[str, ChequeListing] = {}
         pending: dict[str, ChequeListing] = {}
@@ -202,7 +211,7 @@ class Command(BaseCommand):
                 issuer=issuer,
                 owner=holder,
                 serial=serial,
-                bank_name=BANKS[(index - 1) % len(BANKS)],
+                bank=demo_banks[DEMO_BANK_CODES[(index - 1) % len(DEMO_BANK_CODES)]],
                 status=ChequeListing.Status.PUBLISHED,
                 due=due,
                 description=f"Demo published listing {index}",
@@ -215,7 +224,7 @@ class Command(BaseCommand):
                 issuer=issuer,
                 owner=holder,
                 serial=serial,
-                bank_name=BANKS[(index - 1) % len(BANKS)],
+                bank=demo_banks[DEMO_BANK_CODES[(index - 1) % len(DEMO_BANK_CODES)]],
                 status=ChequeListing.Status.PENDING_MODERATION,
                 due=due,
                 description=f"Demo pending listing {index}",
@@ -226,7 +235,7 @@ class Command(BaseCommand):
             issuer=issuer,
             owner=holder,
             serial=REJECTED_SERIAL,
-            bank_name="بانک صادرات",
+            bank=demo_banks["saderat"],
             status=ChequeListing.Status.REJECTED,
             due=due,
             description="Demo rejected listing",
@@ -311,30 +320,34 @@ class Command(BaseCommand):
         issuer: IssuerProfile,
         owner: User,
         serial: str,
-        bank_name: str,
+        bank: Bank,
         status: str,
         due,
         description: str,
         rejection_code: str | None = None,
         rejection_reason: str = "",
     ) -> ChequeListing:
-        listing, _ = ChequeListing.objects.update_or_create(
+        listing = ChequeListing.objects.filter(
             issuer=issuer,
-            bank_name=bank_name,
             cheque_serial_number=serial,
-            defaults={
-                "owner": owner,
-                "face_amount": Decimal("500000000"),
-                "due_date": due,
-                "issuer_type": ChequeListing.IssuerType.LEGAL,
-                "issuer_name": issuer.name,
-                "issuer_national_id": issuer.national_or_company_id,
-                "description": description,
-                "suggested_discount_rate": Decimal("5.00"),
-                "risk_tier": "medium",
-                "status": status,
-                "rejection_code": rejection_code,
-                "rejection_reason": rejection_reason,
-            },
-        )
+        ).first()
+        if listing is None:
+            listing = ChequeListing(
+                issuer=issuer,
+                cheque_serial_number=serial,
+            )
+        listing.owner = owner
+        listing.face_amount = Decimal("500000000")
+        listing.due_date = due
+        listing.issuer_type = ChequeListing.IssuerType.LEGAL
+        listing.issuer_name = issuer.name
+        listing.issuer_national_id = issuer.national_or_company_id
+        listing.description = description
+        listing.suggested_discount_rate = Decimal("5.00")
+        listing.risk_tier = "medium"
+        listing.status = status
+        listing.rejection_code = rejection_code
+        listing.rejection_reason = rejection_reason
+        apply_bank_to_listing(listing, bank)
+        listing.save()
         return listing
