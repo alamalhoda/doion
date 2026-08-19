@@ -22,14 +22,14 @@ Chat 2 فقط یک گام از لیست زیر را در هر نوبت پیاد�
   **Verify:** `uv run ruff check .` و pytest لوکال روی SQLite؛ در Actions روی PR به `develop` هر دو job/گام سبز با Postgres.  
   **REVIEW NOTE:** (2026-08-19) `uv run ruff check .` پاک است؛ `uv run pytest` لوکال ۲۰۸ تست روی SQLite (`config.settings.test` بدون `GITHUB_ACTIONS`) پاس شد. مسیر `config.settings.local` دست نخورده. CI: job جدا `ruff` + `pytest` با سرویس Postgres 16 و `DATABASE_URL`؛ اگر `GITHUB_ACTIONS` باشد و engine پستگرس نباشد `RuntimeError`. E2E required نشده. تناقض spec: `test.py` قبلاً SQLite قفل بود — اصلاح شد. `DJ001` روی چند CharField nullable بدون migration (خط noqa). `line-length=119` (هم‌تراز djLint؛ ignore جدید سراسری اضافه نشد). رجیستری Docker مربوط به Step 10 است.
 
-- [ ] **Step 2 — cicd-frontend: پرامپت Studio برای CI تست PR (بدون CD)**  
+- [x] **Step 2 — cicd-frontend: پرامپت Studio برای CI تست PR (بدون CD)**  
   ریپو: `checkyar-googleai` فقط از Studio. Cursor push نمی‌کند.  
   - فایل پرامپت را در `ai-documents/features/cicd-chabokan-prod/prompts/01-ci-live-build.md` بنویس و کاربر در Studio پیست کند.  
   - CI موجود: typecheck، Vitest، `vite build`؛ افزودن build جدا با `VITE_USE_MOCK=false` و `VITE_API_BASE_URL=https://chequeyar-back.chbkn.dev/api/v1`.  
   - `cd-demo.yml` و سرویس دمو را تغییر نده.  
   - شاخهٔ `product` و Docker و deploy در این گام نیست.  
   **Verify:** پس از SHA پوش Studio، CI روی `main` هر چهار گام را نشان می‌دهد؛ دمو mock مثل قبل deploy می‌شود.  
-  **REVIEW NOTE:**
+  **REVIEW NOTE:** (2026-08-19) SHA `20a999d` روی `main`. `ci.yml` چهار گام دارد؛ `cd-demo.yml` در diff نیست. Actions: [CI success](https://github.com/alamalhoda/checkyar-googleai/actions/runs/32293613427) و [CD Demo success](https://github.com/alamalhoda/checkyar-googleai/actions/runs/32293613525). Docs EN+FA به‌روز. Cursor به UI push نکرد.
 
 ### onboarding لوکال (اختیاری Postgres)
 
