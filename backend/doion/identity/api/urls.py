@@ -1,10 +1,10 @@
-from django.urls import include, path
+from django.urls import include
+from django.urls import path
 from rest_framework.routers import DefaultRouter
-from doion.identity.api.views import (
-    ModerationVerificationDecisionView,
-    ModerationVerificationListView,
-    VerificationViewSet,
-)
+
+from doion.identity.api.views import ModerationVerificationDecisionView
+from doion.identity.api.views import ModerationVerificationListView
+from doion.identity.api.views import VerificationViewSet
 
 router = DefaultRouter()
 router.register("verifications", VerificationViewSet, basename="verification")

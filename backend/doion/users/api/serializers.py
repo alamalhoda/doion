@@ -1,6 +1,7 @@
 from rest_framework import serializers
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 
+from doion.identity.services import get_or_create_profile
 from doion.users.models import User
 
 LOGIN_REQUIRED_MESSAGE = "Both identifier and password are required."
@@ -29,8 +30,6 @@ class UserSerializer(serializers.ModelSerializer[User]):
         }
 
     def to_representation(self, instance: User) -> dict:
-        from doion.identity.services import get_or_create_profile
-
         get_or_create_profile(instance)
         return super().to_representation(instance)
 

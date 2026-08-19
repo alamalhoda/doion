@@ -7,7 +7,8 @@ class ComplianceConfig(AppConfig):
     name = "doion.compliance"
 
     def ready(self):
-        from django.db.models.signals import post_migrate
-        from doion.compliance.signals import seed_default_feature_flags
+        from django.db.models.signals import post_migrate  # noqa: PLC0415
+
+        from doion.compliance.signals import seed_default_feature_flags  # noqa: PLC0415
         post_migrate.connect(seed_default_feature_flags, sender=self)
-        import doion.compliance.signals  # noqa: F401
+        import doion.compliance.signals  # noqa: F401, PLC0415

@@ -4,7 +4,8 @@ from doion.checks.factories import ChequeListingFactory
 from doion.checks.factories import IssuerProfileFactory
 from doion.checks.models import ChequeListing
 from doion.matching.constants import Status
-from doion.matching.exceptions import InvalidMatchStatus, MatchNotAllowed
+from doion.matching.exceptions import InvalidMatchStatus
+from doion.matching.exceptions import MatchNotAllowed
 from doion.matching.models import OffPlatformSettlement
 from doion.matching.services import MatchingService
 from doion.users.factories import UserFactory
@@ -189,7 +190,7 @@ class TestMatchingServiceCancelMatch:
         match = MatchingService.create_match(listing.id, investor)
         accepted = MatchingService.accept_match(match.id, check_holder)
 
-        cancelled = MatchingService.cancel_match(accepted.id, investor)
+        MatchingService.cancel_match(accepted.id, investor)
 
         listing.refresh_from_db()
         assert listing.status == ChequeListing.Status.PUBLISHED

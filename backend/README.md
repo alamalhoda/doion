@@ -24,7 +24,8 @@ API لایه ۱ Marketplace: ثبت‌نام و KYC، آگهی چک، moderation
 - **Python**: 3.12
 - **Django**: 5.2.14 (LTS)
 - **مدیریت وابستگی**: uv
-- **دیتابیس توسعه**: SQLite
+- **دیتابیس توسعهٔ لوکال**: SQLite (بدون Docker؛ مسیر معتبر). Postgres داخل Docker در گام‌های بعدی CI/CD اختیاری است
+- **دیتابیس CI و محصول**: فقط PostgreSQL (بدون fallback به SQLite)
 - **زبان پیش‌فرض**: انگلیسی (en-us)
 - **Timezone**: Asia/Tehran
 - **احراز هویت:** django-allauth (جلسات قالب) + SimpleJWT برای `/api/v1/`
@@ -77,21 +78,22 @@ python manage.py runserver
 
 ## CI (GitHub Actions)
 
-روی هر `pull_request` و `push` به شاخه `develop`، workflowی [`.github/workflows/ci-backend.yml`](../.github/workflows/ci-backend.yml) در پوشه `backend/` اجرا می‌شود:
+روی هر `pull_request` و `push` به شاخه `develop`، workflowی [`.github/workflows/ci-backend.yml`](../.github/workflows/ci-backend.yml) در پوشه `backend/` دو job اجباری اجرا می‌کند:
 
-1. `uv sync --frozen`
-2. `uv run pytest` (با `config.settings.test` از `pyproject.toml`)
+1. `uv run ruff check .`
+2. `uv run pytest` روی **PostgreSQL** سرویس Actions (`DATABASE_URL`؛ اگر Postgres آماده نباشد Check ناموفق است و به SQLite برنمی‌گردد)
 
-معادل لوکال (از داخل `backend/`):
+معادل لوکال (از داخل `backend/`؛ pytest لوکال روی SQLite جدا از `db.sqlite3`):
 
 ```bash
 uv sync --frozen
+uv run ruff check .
 uv run pytest
 ```
 
-`ruff` فعلاً gate اجباری CI نیست (بدهی lint موجود در codebase)؛ لوکال می‌توانید `uv run ruff check .` را اجرا کنید.
+مسیر لوکال پیش‌فرض (`config.settings.local` / SQLite بدون Docker) همچنان معتبر است.
 
-E2E Playwright در [`.github/workflows/ci-e2e.yml`](../.github/workflows/ci-e2e.yml) هست (smoke + critical در برابر UI فعال). Deploy به چابکان در GitHub Actions خودکار نیست؛ دستی با CLI (بخش بعد).
+E2E Playwright در [`.github/workflows/ci-e2e.yml`](../.github/workflows/ci-e2e.yml) هست و **gate ادغام PR به `develop` نیست**. Deploy به چابکان در GitHub Actions در این گام خودکار نیست؛ دستی با CLI (بخش بعد).
 
 ---
 

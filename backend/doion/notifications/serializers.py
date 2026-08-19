@@ -1,6 +1,5 @@
 from rest_framework import serializers
 
-from doion.notifications.constants import NotificationStatus
 from doion.notifications.models import Notification
 from doion.notifications.models import NotificationPreference
 

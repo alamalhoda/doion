@@ -2,6 +2,7 @@
 
 import pytest
 from django.utils.crypto import get_random_string
+from rest_framework import status
 from rest_framework.test import APIClient
 
 from doion.checks.factories import IssuerProfileFactory
@@ -43,13 +44,13 @@ class TestIssuerProfileAPI:
             format="json",
         )
 
-        assert response.status_code == 201
+        assert response.status_code == status.HTTP_201_CREATED
         issuer = IssuerProfile.objects.get(national_or_company_id="5555666677")
         assert issuer.created_by_id == user.id
 
     def test_list_issuer_profiles_requires_auth(self, api_client):
         response = api_client.get("/api/v1/issuer-profiles/")
-        assert response.status_code == 401
+        assert response.status_code == status.HTTP_401_UNAUTHORIZED
 
     def test_list_issuer_profiles_authenticated(self, api_client, user):
         IssuerProfileFactory.create(national_or_company_id="1111222233", name="A")
@@ -57,8 +58,8 @@ class TestIssuerProfileAPI:
 
         response = api_client.get("/api/v1/issuer-profiles/")
 
-        assert response.status_code == 200
-        results = response.data["results"] if "results" in response.data else response.data
+        assert response.status_code == status.HTTP_200_OK
+        results = response.data.get("results", response.data)
         assert len(results) >= 1
 
     def test_filter_by_national_or_company_id(self, api_client, user):
@@ -71,8 +72,8 @@ class TestIssuerProfileAPI:
             {"national_or_company_id": "1111222233"},
         )
 
-        assert response.status_code == 200
-        results = response.data["results"] if "results" in response.data else response.data
+        assert response.status_code == status.HTTP_200_OK
+        results = response.data.get("results", response.data)
         assert len(results) == 1
         assert results[0]["national_or_company_id"] == "1111222233"
 
@@ -86,7 +87,7 @@ class TestIssuerProfileAPI:
             format="json",
         )
 
-        assert response.status_code == 200
+        assert response.status_code == status.HTTP_200_OK
         issuer.refresh_from_db()
         assert issuer.name == "Updated Name"
 
@@ -100,7 +101,7 @@ class TestIssuerProfileAPI:
             format="json",
         )
 
-        assert response.status_code == 403
+        assert response.status_code == status.HTTP_403_FORBIDDEN
 
     def test_delete_own_issuer_profile(self, api_client, user):
         issuer = IssuerProfileFactory.create(created_by=user)
@@ -108,5 +109,5 @@ class TestIssuerProfileAPI:
 
         response = api_client.delete(f"/api/v1/issuer-profiles/{issuer.id}/")
 
-        assert response.status_code == 204
+        assert response.status_code == status.HTTP_204_NO_CONTENT
         assert not IssuerProfile.objects.filter(id=issuer.id).exists()

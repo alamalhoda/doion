@@ -3,6 +3,7 @@
 import pytest
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.utils.crypto import get_random_string
+from rest_framework import status
 from rest_framework.test import APIClient
 
 from doion.checks.factories import ChequeListingFactory
@@ -51,7 +52,7 @@ class TestListingDocumentUpload:
             format="multipart",
         )
 
-        assert response.status_code == 201
+        assert response.status_code == status.HTTP_201_CREATED
         assert Document.objects.filter(
             owner=owner,
             related_object_type="cheque_listing",
@@ -81,7 +82,7 @@ class TestListingDocumentUpload:
             format="multipart",
         )
 
-        assert response.status_code == 401
+        assert response.status_code == status.HTTP_401_UNAUTHORIZED
 
     def test_upload_rejects_invalid_document_type(self, api_client, owner, listing):
         api_client.force_authenticate(user=owner)
@@ -93,4 +94,4 @@ class TestListingDocumentUpload:
             format="multipart",
         )
 
-        assert response.status_code == 400
+        assert response.status_code == status.HTTP_400_BAD_REQUEST

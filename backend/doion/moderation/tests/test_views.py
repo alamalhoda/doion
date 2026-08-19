@@ -1,4 +1,5 @@
 import pytest
+from rest_framework import status
 from rest_framework.test import APIClient
 
 from doion.checks.factories import ChequeListingFactory
@@ -65,8 +66,8 @@ class TestModerationQueueEndpoint:
 
         response = client.get("/api/v1/moderation/queue/")
 
-        assert response.status_code == 200
-        results = response.data["results"] if "results" in response.data else response.data
+        assert response.status_code == status.HTTP_200_OK
+        results = response.data.get("results", response.data)
         ids = [item["id"] for item in results]
         assert pending_listing.id in ids
         assert published_listing.id not in ids
@@ -81,8 +82,8 @@ class TestModerationQueueEndpoint:
 
         response = client.get("/api/v1/moderation/queue/")
 
-        assert response.status_code == 200
-        results = response.data["results"] if "results" in response.data else response.data
+        assert response.status_code == status.HTTP_200_OK
+        results = response.data.get("results", response.data)
         assert len(results) == 0
 
     def test_queue_requires_moderator_role(self, check_holder, pending_listing):
@@ -91,14 +92,14 @@ class TestModerationQueueEndpoint:
 
         response = client.get("/api/v1/moderation/queue/")
 
-        assert response.status_code == 403
+        assert response.status_code == status.HTTP_403_FORBIDDEN
 
     def test_queue_requires_authentication(self, pending_listing):
         client = APIClient()
 
         response = client.get("/api/v1/moderation/queue/")
 
-        assert response.status_code == 401
+        assert response.status_code == status.HTTP_401_UNAUTHORIZED
 
 
 @pytest.mark.django_db
@@ -112,7 +113,7 @@ class TestModerationDecisionEndpoint:
             {"decision": "approve"},
         )
 
-        assert response.status_code == 201
+        assert response.status_code == status.HTTP_201_CREATED
         assert response.data["decision"] == "approved"
 
         pending_listing.refresh_from_db()
@@ -131,7 +132,7 @@ class TestModerationDecisionEndpoint:
             },
         )
 
-        assert response.status_code == 201
+        assert response.status_code == status.HTTP_201_CREATED
         assert response.data["decision"] == "rejected"
         assert response.data["rejection_code"] == "MOD_101"
 
@@ -149,7 +150,7 @@ class TestModerationDecisionEndpoint:
             {"decision": "reject"},
         )
 
-        assert response.status_code == 400
+        assert response.status_code == status.HTTP_400_BAD_REQUEST
 
     def test_reject_after_three_resubmits_returns_mod_306(self, moderator, pending_listing):
         pending_listing.resubmit_count = 3
@@ -167,7 +168,7 @@ class TestModerationDecisionEndpoint:
             },
         )
 
-        assert response.status_code == 400
+        assert response.status_code == status.HTTP_400_BAD_REQUEST
         assert response.data["error"]["code"] == "MOD_306"
 
     def test_decision_requires_moderator_role(self, check_holder, pending_listing):
@@ -179,7 +180,7 @@ class TestModerationDecisionEndpoint:
             {"decision": "approve"},
         )
 
-        assert response.status_code == 403
+        assert response.status_code == status.HTTP_403_FORBIDDEN
 
     def test_decision_requires_authentication(self, pending_listing):
         client = APIClient()
@@ -189,7 +190,7 @@ class TestModerationDecisionEndpoint:
             {"decision": "approve"},
         )
 
-        assert response.status_code == 401
+        assert response.status_code == status.HTTP_401_UNAUTHORIZED
 
     def test_invalid_decision_value_returns_400(self, moderator, pending_listing):
         client = APIClient()
@@ -200,7 +201,7 @@ class TestModerationDecisionEndpoint:
             {"decision": "invalid"},
         )
 
-        assert response.status_code == 400
+        assert response.status_code == status.HTTP_400_BAD_REQUEST
 
     def test_reject_published_listing_returns_400(self, moderator, published_listing):
         client = APIClient()
@@ -215,7 +216,7 @@ class TestModerationDecisionEndpoint:
             },
         )
 
-        assert response.status_code == 400
+        assert response.status_code == status.HTTP_400_BAD_REQUEST
 
 
 @pytest.fixture
@@ -243,7 +244,7 @@ class TestModerationResubmitEndpoint:
 
         response = client.post(f"/api/v1/moderation/{rejected_listing.id}/resubmit/")
 
-        assert response.status_code == 200
+        assert response.status_code == status.HTTP_200_OK
         rejected_listing.refresh_from_db()
         assert rejected_listing.status == ChequeListing.Status.PENDING_MODERATION
 
@@ -253,7 +254,7 @@ class TestModerationResubmitEndpoint:
 
         response = client.post(f"/api/v1/moderation/{pending_listing.id}/resubmit/")
 
-        assert response.status_code == 400
+        assert response.status_code == status.HTTP_400_BAD_REQUEST
         assert response.data["error"]["code"] == "VALIDATION_ERROR"
 
     def test_resubmit_at_limit_returns_mod_306(self, check_holder, rejected_listing):
@@ -265,7 +266,7 @@ class TestModerationResubmitEndpoint:
 
         response = client.post(f"/api/v1/moderation/{rejected_listing.id}/resubmit/")
 
-        assert response.status_code == 400
+        assert response.status_code == status.HTTP_400_BAD_REQUEST
         assert response.data["error"]["code"] == "MOD_306"
 
     def test_resubmit_requires_authentication(self, rejected_listing):
@@ -273,7 +274,7 @@ class TestModerationResubmitEndpoint:
 
         response = client.post(f"/api/v1/moderation/{rejected_listing.id}/resubmit/")
 
-        assert response.status_code == 401
+        assert response.status_code == status.HTTP_401_UNAUTHORIZED
 
     def test_resubmit_by_non_owner_returns_403(self, rejected_listing):
         other_user = UserFactory.create()
@@ -282,5 +283,5 @@ class TestModerationResubmitEndpoint:
 
         response = client.post(f"/api/v1/moderation/{rejected_listing.id}/resubmit/")
 
-        assert response.status_code == 403
+        assert response.status_code == status.HTTP_403_FORBIDDEN
         assert response.data["error"]["code"] == "PERMISSION_ERROR"

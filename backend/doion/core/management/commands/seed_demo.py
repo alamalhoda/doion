@@ -4,6 +4,7 @@ from __future__ import annotations
 
 from datetime import timedelta
 from decimal import Decimal
+from typing import TYPE_CHECKING
 
 from django.contrib.auth.models import Group
 from django.core.management.base import BaseCommand
@@ -11,7 +12,6 @@ from django.db import transaction
 from django.utils import timezone
 from django.utils.crypto import get_random_string
 
-from doion.banks.models import Bank
 from doion.banks.seed import seed_catalog_banks
 from doion.banks.services import apply_bank_to_listing
 from doion.banks.services import get_active_by_code
@@ -28,6 +28,9 @@ from doion.notifications.constants import NotificationType
 from doion.notifications.models import Notification
 from doion.notifications.models import NotificationPreference
 from doion.users.models import User
+
+if TYPE_CHECKING:
+    from doion.banks.models import Bank
 
 DEMO_USERS = (
     # username, role, group_name, user_type
@@ -79,7 +82,7 @@ class Command(BaseCommand):
         )
 
     @transaction.atomic
-    def handle(self, *args, **options):
+    def handle(self, *args, **options):  # noqa: C901, PLR0915
         password = options["password"] or get_random_string(12)
 
         if options["reset"]:
@@ -311,10 +314,10 @@ class Command(BaseCommand):
             f"| pending={PENDING_COUNT} (reject={REJECT_PENDING_SERIAL}) "
             f"| rejected={rejected.id} "
             f"| match={match.id}/{decline_match.id} "
-            f"| notifications={NOTIFICATION_COUNT}"
+            f"| notifications={NOTIFICATION_COUNT}",
         )
 
-    def _upsert_listing(
+    def _upsert_listing(  # noqa: PLR0913
         self,
         *,
         issuer: IssuerProfile,

@@ -2,6 +2,7 @@ import pytest
 
 from doion.checks.factories import ChequeListingFactory
 from doion.checks.models import ChequeListing
+from doion.moderation.constants import MAX_LISTING_RESUBMITS
 from doion.moderation.exceptions import ModerationResubmitLimitExceeded
 from doion.moderation.models import ModerationDecision
 from doion.moderation.services import ModerationService
@@ -82,11 +83,11 @@ class TestModerationServiceReject:
         )
 
         listing.refresh_from_db()
-        assert listing.resubmit_count == 2
+        assert listing.resubmit_count == MAX_LISTING_RESUBMITS - 1
 
     def test_reject_after_three_resubmits_raises_mod_306(self, user):
         listing = self._create_listing(
-            user, status=ChequeListing.Status.PENDING_MODERATION, resubmit_count=3,
+            user, status=ChequeListing.Status.PENDING_MODERATION, resubmit_count=MAX_LISTING_RESUBMITS,
         )
 
         with pytest.raises(ModerationResubmitLimitExceeded) as exc_info:
@@ -97,7 +98,7 @@ class TestModerationServiceReject:
         assert exc_info.value.default_code == "MOD_306"
 
         listing.refresh_from_db()
-        assert listing.resubmit_count == 3
+        assert listing.resubmit_count == MAX_LISTING_RESUBMITS
 
     def test_reject_non_pending_raises(self, user):
         listing = self._create_listing(user, status=ChequeListing.Status.PUBLISHED)

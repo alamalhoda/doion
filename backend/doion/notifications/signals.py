@@ -1,11 +1,9 @@
 import logging
-from typing import Any
 
 from django.dispatch import receiver
 from django.utils import timezone
 
 from doion.checks.models import ChequeListing
-from doion.integrations.services import send_sms
 from doion.moderation.signals import ChequeListingPublished
 from doion.moderation.signals import ListingRejected
 from doion.notifications.constants import NotificationChannel
@@ -17,13 +15,13 @@ from doion.notifications.models import NotificationPreference
 logger = logging.getLogger(__name__)
 
 
-def create_notification(
+def create_notification(  # noqa: PLR0913
     user,
     notification_type: str,
     title: str,
     message: str,
-    related_object_type: str = None,
-    related_object_id: str = None,
+    related_object_type: str | None = None,
+    related_object_id: str | None = None,
 ) -> Notification:
     """Create a notification for a user."""
     preference, _ = NotificationPreference.objects.get_or_create(user=user)
@@ -46,7 +44,7 @@ def create_notification(
             message=message,
             related_object_type=related_object_type,
             related_object_id=related_object_id,
-            sent_at=timezone.now() if hasattr(timezone, 'now') else None,
+            sent_at=timezone.now() if hasattr(timezone, "now") else None,
         )
 
     return Notification.objects.filter(user=user).first()
@@ -67,7 +65,7 @@ def on_listing_published(sender, listing: ChequeListing, moderator, **kwargs):
 
 @receiver(ListingRejected)
 def on_listing_rejected(
-    sender, listing: ChequeListing, moderator, rejection_code, rejection_note, **kwargs
+    sender, listing: ChequeListing, moderator, rejection_code, rejection_note, **kwargs,
 ):
     logger.info("Listing %s rejected, creating notification for owner", listing.id)
     create_notification(
@@ -149,4 +147,3 @@ def handle_settlement_confirmed(listing: ChequeListing, investor):
 
 
 # Import timezone for sent_at
-from django.utils import timezone  # noqa: E402

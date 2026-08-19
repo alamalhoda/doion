@@ -7,8 +7,8 @@ from doion.checks.factories import IssuerProfileFactory
 from doion.checks.models import ChequeListing
 from doion.identity.factories import ProfileFactory
 from doion.identity.factories import VerificationFactory
-from doion.matching.factories import MatchFactory
 from doion.matching.constants import Status
+from doion.matching.factories import MatchFactory
 from doion.moderation.factories import ModerationDecisionFactory
 from doion.moderation.models import ModerationDecision
 from doion.notifications.factories import NotificationFactory

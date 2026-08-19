@@ -5,16 +5,13 @@ from rest_framework.response import Response
 from rest_framework.viewsets import GenericViewSet
 
 from doion.checks.models import ChequeListing
-from doion.core.permissions import IsCheckHolder, IsInvestor
 from doion.identity.services import require_approved_kyc
-from doion.matching.constants import Status
-from doion.matching.exceptions import InvalidMatchStatus, MatchNotAllowed
+from doion.matching.exceptions import InvalidMatchStatus
+from doion.matching.exceptions import MatchNotAllowed
 from doion.matching.models import Match
-from doion.matching.serializers import (
-    MatchCreateSerializer,
-    MatchSerializer,
-    MatchStatusUpdateSerializer,
-)
+from doion.matching.serializers import MatchCreateSerializer
+from doion.matching.serializers import MatchSerializer
+from doion.matching.serializers import MatchStatusUpdateSerializer
 from doion.matching.services import MatchingService
 
 
@@ -92,12 +89,14 @@ class MatchViewSet(GenericViewSet):
         require_approved_kyc(request.user)
 
         try:
-            listing = ChequeListing.objects.select_for_update().get(id=listing_id)
+            ChequeListing.objects.select_for_update().get(id=listing_id)
         except ChequeListing.DoesNotExist as exc:
-            raise MatchNotAllowed("Listing not found") from exc
+            msg = "Listing not found"
+            raise MatchNotAllowed(msg) from exc
 
         if getattr(request.user, "role", None) != "investor":
-            raise MatchNotAllowed("Only investors can create matches")
+            msg = "Only investors can create matches"
+            raise MatchNotAllowed(msg)
 
         try:
             match = MatchingService.create_match(listing_id, request.user)
@@ -116,7 +115,8 @@ class MatchViewSet(GenericViewSet):
         match = self.get_object()
 
         if getattr(request.user, "role", None) != "check_holder":
-            raise MatchNotAllowed("Only check holders can accept matches")
+            msg = "Only check holders can accept matches"
+            raise MatchNotAllowed(msg)
 
         try:
             updated = MatchingService.accept_match(match.id, request.user)
@@ -130,7 +130,8 @@ class MatchViewSet(GenericViewSet):
         match = self.get_object()
 
         if getattr(request.user, "role", None) != "check_holder":
-            raise MatchNotAllowed("Only check holders can decline matches")
+            msg = "Only check holders can decline matches"
+            raise MatchNotAllowed(msg)
 
         note = request.data.get("note", "")
 
@@ -157,7 +158,8 @@ class MatchViewSet(GenericViewSet):
         match = self.get_object()
 
         if getattr(request.user, "role", None) != "check_holder":
-            raise MatchNotAllowed("Only check holders can confirm settlement")
+            msg = "Only check holders can confirm settlement"
+            raise MatchNotAllowed(msg)
 
         try:
             updated = MatchingService.confirm_off_platform(match.id, request.user)

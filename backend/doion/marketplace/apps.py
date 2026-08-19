@@ -6,4 +6,4 @@ class MarketplaceConfig(AppConfig):
     name = "doion.marketplace"
 
     def ready(self):
-        import doion.marketplace.signals  # noqa: F401
+        import doion.marketplace.signals  # noqa: F401, PLC0415

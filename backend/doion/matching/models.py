@@ -3,7 +3,8 @@ from django.db import models
 
 from doion.checks.models import ChequeListing
 from doion.core.models import TimeStampedModel
-from doion.matching.constants import SettlementType, Status
+from doion.matching.constants import SettlementType
+from doion.matching.constants import Status
 
 
 class Match(TimeStampedModel):

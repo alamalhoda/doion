@@ -2,6 +2,7 @@
 
 import pytest
 from django.utils.crypto import get_random_string
+from rest_framework import status
 from rest_framework.test import APIClient
 from rest_framework_simplejwt.tokens import RefreshToken
 
@@ -32,7 +33,7 @@ class TestAuthLogin:
             format="json",
         )
 
-        assert response.status_code == 200
+        assert response.status_code == status.HTTP_200_OK
         assert "access" in response.data
         assert "refresh" in response.data
         assert response.data["user"]["username"] == user.username
@@ -46,7 +47,7 @@ class TestAuthLogin:
             format="json",
         )
 
-        assert response.status_code == 401
+        assert response.status_code == status.HTTP_401_UNAUTHORIZED
 
     def test_login_with_unknown_identifier_returns_401(self, api_client):
         response = api_client.post(
@@ -55,7 +56,7 @@ class TestAuthLogin:
             format="json",
         )
 
-        assert response.status_code == 401
+        assert response.status_code == status.HTTP_401_UNAUTHORIZED
 
 
 @pytest.mark.django_db
@@ -69,7 +70,7 @@ class TestAuthRefresh:
             format="json",
         )
 
-        assert response.status_code == 200
+        assert response.status_code == status.HTTP_200_OK
         assert "access" in response.data
         assert "refresh" in response.data
         assert response.data["user"]["id"] == user.id
@@ -82,4 +83,4 @@ class TestAuthRefresh:
             format="json",
         )
 
-        assert response.status_code == 401
+        assert response.status_code == status.HTTP_401_UNAUTHORIZED

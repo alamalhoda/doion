@@ -1,12 +1,13 @@
+from django.db.models import Count
+from django.db.models import Q
 from django.utils import timezone
-
-from django.db.models import Count, Q
 from rest_framework import status
 from rest_framework.decorators import action
+from rest_framework.pagination import PageNumberPagination
 from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
-from rest_framework.viewsets import GenericViewSet, ModelViewSet
-from rest_framework.pagination import PageNumberPagination
+from rest_framework.viewsets import GenericViewSet
+from rest_framework.viewsets import ModelViewSet
 
 from doion.checks.models import ChequeListing
 from doion.compliance.models import AuditEvent
@@ -47,7 +48,7 @@ class FeatureFlagViewSet(ModelViewSet):
                     "error": {
                         "code": "PERMISSION_ERROR",
                         "message": "System flags cannot be modified via API.",
-                    }
+                    },
                 },
                 status=status.HTTP_403_FORBIDDEN,
             )
@@ -62,7 +63,7 @@ class FeatureFlagViewSet(ModelViewSet):
                     "error": {
                         "code": "PERMISSION_ERROR",
                         "message": "System flags cannot be toggled via API.",
-                    }
+                    },
                 },
                 status=status.HTTP_403_FORBIDDEN,
             )
@@ -76,12 +77,12 @@ class ComplianceStatsView(GenericViewSet):
     pagination_class = None
 
     def list(self, request, *args, **kwargs):
-        today = timezone.now().date()
+        timezone.now().date()
         listings = ChequeListing.objects.aggregate(
             total=Count("id"),
             published=Count("id", filter=Q(status=ChequeListing.Status.PUBLISHED)),
             pending_moderation=Count(
-                "id", filter=Q(status=ChequeListing.Status.PENDING_MODERATION)
+                "id", filter=Q(status=ChequeListing.Status.PENDING_MODERATION),
             ),
             rejected=Count("id", filter=Q(status=ChequeListing.Status.REJECTED)),
             expired=Count("id", filter=Q(status=ChequeListing.Status.EXPIRED)),
@@ -99,7 +100,7 @@ class ComplianceStatsView(GenericViewSet):
             unread=Count(
                 "id",
                 filter=~Q(
-                    status__in=[NotificationStatus.READ, NotificationStatus.FAILED]
+                    status__in=[NotificationStatus.READ, NotificationStatus.FAILED],
                 ),
             ),
         )
@@ -109,7 +110,7 @@ class ComplianceStatsView(GenericViewSet):
                 "users": users,
                 "verifications": verifications,
                 "notifications": notifications,
-            }
+            },
         )
 
 

@@ -24,7 +24,7 @@ class ModerationDecision(TimeStampedModel):
         related_name="moderation_decisions",
     )
     decision = models.CharField(max_length=20, choices=Decision.choices)
-    rejection_code = models.CharField(
+    rejection_code = models.CharField(  # noqa: DJ001
         max_length=20,
         choices=RejectionCode.CHOICES,
         null=True,

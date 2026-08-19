@@ -1,5 +1,4 @@
-from datetime import date
-
+from django.utils import timezone
 from rest_framework import serializers
 
 from doion.banks.serializers import BankSummarySerializer
@@ -36,7 +35,7 @@ class MarketplaceLatestSerializer(serializers.ModelSerializer):
         ]
 
     def get_days_to_due(self, obj):
-        return (obj.due_date - date.today()).days
+        return (obj.due_date - timezone.localdate()).days
 
 
 class MarketplaceListingSerializer(serializers.ModelSerializer):
@@ -83,7 +82,7 @@ class MarketplaceListingSerializer(serializers.ModelSerializer):
         ]
 
     def get_days_to_due(self, obj):
-        return (obj.due_date - date.today()).days
+        return (obj.due_date - timezone.localdate()).days
 
     def get_interest_count(self, obj):
         return 0

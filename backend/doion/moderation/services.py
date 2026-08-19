@@ -1,9 +1,11 @@
 from django.db import transaction
 
 from doion.checks.models import ChequeListing
+from doion.moderation.constants import MAX_LISTING_RESUBMITS
 from doion.moderation.exceptions import ModerationResubmitLimitExceeded
 from doion.moderation.models import ModerationDecision
-from doion.moderation.signals import ChequeListingPublished, ListingRejected
+from doion.moderation.signals import ChequeListingPublished
+from doion.moderation.signals import ListingRejected
 
 
 class ModerationService:
@@ -13,13 +15,14 @@ class ModerationService:
             listing = ChequeListing.objects.select_for_update().get(id=listing_id)
 
             if listing.status != ChequeListing.Status.PENDING_MODERATION:
-                raise ValueError("Listing is not in pending moderation status")
+                msg = "Listing is not in pending moderation status"
+                raise ValueError(msg)
 
             listing.status = ChequeListing.Status.PUBLISHED
             listing.rejection_reason = ""
             listing.rejection_code = None
             listing.save(
-                update_fields=["status", "rejection_reason", "rejection_code", "updated_at"]
+                update_fields=["status", "rejection_reason", "rejection_code", "updated_at"],
             )
 
             decision = ModerationDecision.objects.create(
@@ -45,10 +48,11 @@ class ModerationService:
                 ChequeListing.Status.PENDING_MODERATION,
                 ChequeListing.Status.REJECTED,
             ):
-                raise ValueError("Listing is not in pending moderation status")
+                msg = "Listing is not in pending moderation status"
+                raise ValueError(msg)
 
-            if listing.resubmit_count >= 3:
-                raise ModerationResubmitLimitExceeded()
+            if listing.resubmit_count >= MAX_LISTING_RESUBMITS:
+                raise ModerationResubmitLimitExceeded
 
             if listing.status == ChequeListing.Status.REJECTED:
                 listing.resubmit_count += 1
@@ -65,7 +69,7 @@ class ModerationService:
                     "rejection_reason",
                     "resubmit_count",
                     "updated_at",
-                ]
+                ],
             )
 
             decision = ModerationDecision.objects.create(

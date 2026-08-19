@@ -67,7 +67,7 @@ class ChequeListing(TimeStampedModel):
     description = models.TextField(blank=True, default="")
 
     suggested_discount_rate = models.DecimalField(max_digits=5, decimal_places=2, null=True, blank=True)
-    risk_tier = models.CharField(
+    risk_tier = models.CharField(  # noqa: DJ001
         max_length=10,
         choices=[("low", "Low"), ("medium", "Medium"), ("high", "High")],
         null=True,
@@ -79,7 +79,7 @@ class ChequeListing(TimeStampedModel):
         default=Status.PENDING_MODERATION,
     )
     rejection_reason = models.TextField(blank=True, default="")
-    rejection_code = models.CharField(
+    rejection_code = models.CharField(  # noqa: DJ001
         max_length=20,
         choices=[
             ("MOD_101", "Incomplete information"),
@@ -102,7 +102,7 @@ class ChequeListing(TimeStampedModel):
             models.UniqueConstraint(
                 fields=["issuer", "bank_name", "cheque_serial_number"],
                 name="unique_cheque_per_issuer_per_bank",
-            )
+            ),
         ]
         indexes = [
             models.Index(fields=["status", "due_date"]),

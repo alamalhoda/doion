@@ -1,9 +1,10 @@
 import logging
 
-from django.db.models.signals import pre_save, post_save, post_migrate
+from django.db.models.signals import post_migrate
+from django.db.models.signals import post_save
+from django.db.models.signals import pre_save
 from django.dispatch import receiver
 
-from doion.checks.models import ChequeListing
 from doion.compliance.audit import audit_event
 from doion.compliance.models import AuditEvent
 from doion.compliance.models import FeatureFlag
@@ -29,7 +30,7 @@ def on_listing_published(sender, listing, moderator, **kwargs):
 
 @receiver(ListingRejected)
 def on_listing_rejected(
-    sender, listing, moderator, rejection_code, rejection_note, **kwargs
+    sender, listing, moderator, rejection_code, rejection_note, **kwargs,
 ):
     audit_event(
         AuditEvent.EventType.LISTING_REJECTED,
@@ -54,7 +55,7 @@ def on_verification_approved(sender, verification, **kwargs):
 
 @receiver(verification_rejected)
 def on_verification_rejected(
-    sender, verification, rejection_code, rejection_note, **kwargs
+    sender, verification, rejection_code, rejection_note, **kwargs,
 ):
     Profile.objects.filter(user=verification.user).update(is_verified=False)
     audit_event(
@@ -70,23 +71,23 @@ def on_verification_rejected(
 def cache_feature_flag_old_state(sender, instance, **kwargs):
     if instance.pk:
         try:
-            instance._old_is_enabled = sender.objects.get(pk=instance.pk).is_enabled
+            instance.previous_is_enabled = sender.objects.get(pk=instance.pk).is_enabled
         except sender.DoesNotExist:
-            instance._old_is_enabled = None
+            instance.previous_is_enabled = None
     else:
-        instance._old_is_enabled = None
+        instance.previous_is_enabled = None
 
 
 @receiver(post_save, sender=FeatureFlag)
 def on_feature_flag_changed(sender, instance, created, **kwargs):
-    if not created and getattr(instance, "_old_is_enabled", None) is not None:
-        if instance._old_is_enabled != instance.is_enabled:
+    if not created and getattr(instance, "previous_is_enabled", None) is not None:
+        if instance.previous_is_enabled != instance.is_enabled:
             audit_event(
                 AuditEvent.EventType.FEATURE_FLAG_CHANGED,
                 object_type="feature_flag",
                 object_id=instance.key,
                 metadata={
-                    "old_value": instance._old_is_enabled,
+                    "old_value": instance.previous_is_enabled,
                     "new_value": instance.is_enabled,
                 },
             )

@@ -125,8 +125,7 @@
 کارهای بعد از ساخت v1. جزئیات دمو/چابکان: [`docs/development/BACKEND_DEMO_SEED_AND_DATA.md`](../docs/development/BACKEND_DEMO_SEED_AND_DATA.md).
 
 ### Wave 2 — Automation & quality
-- [x] GitHub Actions: `pytest` روی PR/push به `develop` (`.github/workflows/ci-backend.yml`); `ruff` فعلاً فقط لوکال — gate اجباری بعد از پاک‌سازی lint
-- [ ] `ruff` به‌عنوان gate اجباری CI (پس از پاک‌سازی lint)
+- [x] GitHub Actions: `pytest` روی PostgreSQL و `ruff check` اجباری روی PR/push به `develop` (`.github/workflows/ci-backend.yml`)
 - [ ] رفع `UnorderedObjectListWarning` اگر هنوز روی querysetهایی بدون `order_by` دیده شود (مدل‌های FeatureFlag / Verification / Match / ChequeListing / IssuerProfile خود `Meta.ordering` دارند)
 - [ ] پوشش بیشتر matching API (شاخه‌های باقی‌مانده در `matching/views.py`) و edgeهای upload سند
 

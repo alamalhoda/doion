@@ -1,10 +1,10 @@
 from django.db import IntegrityError
 from django.db import transaction
-from rest_framework import status
 from rest_framework import serializers
+from rest_framework import status
 from rest_framework.decorators import action
-from rest_framework.parsers import FormParser, MultiPartParser
-from rest_framework.permissions import IsAuthenticated, SAFE_METHODS
+from rest_framework.permissions import SAFE_METHODS
+from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.settings import api_settings
 from rest_framework.throttling import ScopedRateThrottle
@@ -12,12 +12,10 @@ from rest_framework.viewsets import ModelViewSet
 
 from doion.checks.models import ChequeListing
 from doion.checks.models import IssuerProfile
-from doion.checks.serializers import (
-    ChequeListingCreateSerializer,
-    ChequeListingSerializer,
-    DocumentUploadSerializer,
-    IssuerProfileSerializer,
-)
+from doion.checks.serializers import ChequeListingCreateSerializer
+from doion.checks.serializers import ChequeListingSerializer
+from doion.checks.serializers import DocumentUploadSerializer
+from doion.checks.serializers import IssuerProfileSerializer
 from doion.identity.services import require_approved_kyc
 
 
@@ -62,7 +60,7 @@ class ChequeListingViewSet(ModelViewSet):
     def get_throttles(self):
         if self.action == "create":
             return [throttle() for throttle in self.throttle_classes] + [
-                ScopedRateThrottle()
+                ScopedRateThrottle(),
             ]
         return super().get_throttles()
 
@@ -88,14 +86,14 @@ class ChequeListingViewSet(ModelViewSet):
         try:
             with transaction.atomic():
                 serializer.save()
-        except IntegrityError:
+        except IntegrityError as err:
             raise serializers.ValidationError(
                 {
                     "cheque_serial_number": [
-                        "A listing with this cheque serial number already exists for this issuer and bank"
-                    ]
-                }
-            )
+                        "A listing with this cheque serial number already exists for this issuer and bank",
+                    ],
+                },
+            ) from err
 
     def update(self, request, *args, **kwargs):
         listing = self.get_object()

@@ -1,5 +1,7 @@
 from django.contrib import admin
-from doion.identity.models import Profile, Verification
+
+from doion.identity.models import Profile
+from doion.identity.models import Verification
 
 
 @admin.register(Profile)

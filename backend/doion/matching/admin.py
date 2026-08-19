@@ -1,6 +1,8 @@
 from django.contrib import admin
 
-from doion.matching.models import Match, OffPlatformSettlement, SettlementPort
+from doion.matching.models import Match
+from doion.matching.models import OffPlatformSettlement
+from doion.matching.models import SettlementPort
 
 
 @admin.register(Match)
