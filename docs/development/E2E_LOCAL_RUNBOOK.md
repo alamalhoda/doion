@@ -157,11 +157,13 @@ gh workflow run "CI E2E Playwright" --repo alamalhoda/doion -f ui_sha=<full-or-s
 
 `repository_dispatch` type `frontend-e2e` with JSON `{"ui_sha":"<sha>"}` does the same (used by the UI repo after push to `main`; PAT lives in that repo, not here). Missing `ui_sha` on that event fails the job; it does not fall back to the pin.
 
-To bump the pin after reviewing a new UI commit, change `PINNED_UI_SHA` in `ci-e2e.yml` on a feature branch and open a PR to `develop` (do not push the pin to `develop`/`main` directly):
+After that dispatched E2E **succeeds**, job `open pin PR` opens `feature/e2e-ui-pin-<sha>` → `develop` to set `PINNED_UI_SHA` to the resolved 40-character commit. It never pushes the pin to `develop` or `main`. PR/push E2E does not open a pin PR (those runs already use the YAML pin). If the pin already matches, or a PR for that branch exists, the job no-ops.
+
+Manual bump (if you skip the bot PR):
 
 ```bash
 cd /path/to/checkyar-googleai && git pull && git rev-parse HEAD
-# then set PINNED_UI_SHA in .github/workflows/ci-e2e.yml and PR to develop
+# then set PINNED_UI_SHA in .github/workflows/ci-e2e.yml on a feature branch and PR to develop
 ```
 
 ## Out of scope (follow-ups)
