@@ -48,7 +48,7 @@ Chat 2 فقط یک گام از لیست زیر را در هر نوبت پیاد�
   - `pull_request` به `develop` این job را required نکند.  
   - پین داخل YAML را در همین گام به‌صورت خودکار روی `develop` push نکن.  
   **Verify:** اجرای دستی با یک SHA مشخص؛ PR بک‌اند بدون این Check هم قابل ادغام از نظر پیکربندی branch است (یا حداقل job fail آن required نیست).  
-  **REVIEW NOTE:** (2026-08-20) `ci-e2e.yml`: ورودی `ui_sha` روی `workflow_dispatch`؛ `repository_dispatch` type‏ `frontend-e2e` با `client_payload.ui_sha` (بدون SHA شکست، نه fallback به پین). PR/push به `develop` همچنان پین `PINNED_UI_SHA` را چک‌اوت می‌کند. این workflow پین را push نمی‌کند. `gh api` روی `develop`: Branch not protected — هیچ required check از جمله E2E وجود ندارد. اجرای زندهٔ dispatch روی GitHub تا push این YAML به ریموت ممکن نیست.
+  **REVIEW NOTE:** (2026-08-20) `ci-e2e.yml`: ورودی `ui_sha` روی `workflow_dispatch`؛ `repository_dispatch` type‏ `frontend-e2e` با `client_payload.ui_sha` (بدون SHA شکست، نه fallback به پین). PR/push به `develop` همچنان پین `PINNED_UI_SHA` را چک‌اوت می‌کند. این workflow پین را push نمی‌کند. `develop` branch protection ندارد (rulesets خالی) پس E2E نمی‌تواند merge-block باشد. اجرای دستی: [run 32331636536](https://github.com/alamalhoda/doion/actions/runs/32331636536) روی `feature/cicd-chabokan-prod`، `workflow_dispatch`، `ui_sha=20a999d037cabe0a7223efa8cd09e69da2117597` (نه پین `d518d20`)، smoke+critical سبز در ۲ دقیقه. هشدار Actions: Node 20 deprecated روی checkout/setup-node — خارج از scope این گام.
 
 - [ ] **Step 5 — cicd-frontend: پرامپت Studio برای تریگر E2E بعد از push به main**  
   - پرامپت: `prompts/02-dispatch-doion-e2e.md`.  
