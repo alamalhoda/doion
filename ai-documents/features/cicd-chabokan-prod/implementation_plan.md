@@ -60,7 +60,7 @@ Chat 2 فقط یک گام از لیست زیر را در هر نوبت پیاد�
 - [ ] **Step 6 — cicd-backend: bump پین E2E فقط با PR به develop**  
   - یا سند دستی bump بعد از هر UI موفق، یا job که PR باز می‌کند (نه commit مستقیم به `develop`/`main`).  
   **Verify:** پین با GitFlow عوض می‌شود.  
-  **REVIEW NOTE:** (2026-08-20) Job `bump-pin` بعد از E2E موفق فقط روی `repository_dispatch` یا `workflow_dispatch` با `ui_sha` غیرخالی، برنچ `feature/e2e-ui-pin-<12>` می‌سازد و PR به `develop` باز می‌کند؛ به `develop`/`main` push نمی‌کند. PR/push به develop پین را bump نمی‌کند. SHA کامل از `git rev-parse` بعد از checkout UI. Verify زنده: این YAML باید روی `develop` باشد (یا `workflow_dispatch` روی این feature branch) تا PR پین دیده شود.
+  **REVIEW NOTE:** (2026-08-20) Job `bump-pin` بعد از E2E موفق dispatch برنچ `feature/e2e-ui-pin-<12>` و PR به `develop` می‌سازد. Verify اول با YAML شکست خورد: [run 32408366614](https://github.com/alamalhoda/doion/actions/runs/32408366614) — `GITHUB_TOKEN` اجازهٔ push به `.github/workflows/*.yml` ندارد. پین به `e2e/ui-pin` منتقل شد (تناقض عملی با نگه‌داشتن پین داخل YAML). PR/push پین را bump نمی‌کند.
 
 ### Docker تصاویر محصول (هنوز بدون deploy خودکار)
 

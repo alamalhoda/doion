@@ -145,9 +145,9 @@ Same as `seed_demo`: `holder1`, `investor1`, `moderator1`, `admin1`, `holderkyc1
 
 GitHub Actions: [`.github/workflows/ci-e2e.yml`](../../.github/workflows/ci-e2e.yml) — seeds demo backend, starts UI from `alamalhoda/checkyar-googleai`, runs smoke + critical with Chromium.
 
-This workflow is **not** a merge gate for PRs to `develop` (do not add it to required checks). It still may run on those PRs using the YAML pin so you see a non-blocking status.
+This workflow is **not** a merge gate for PRs to `develop` (do not add it to required checks). It still may run on those PRs using the pin in `e2e/ui-pin` so you see a non-blocking status.
 
-The default UI checkout is **pinned to a full commit SHA** (`PINNED_UI_SHA` in the workflow), not a floating branch tip. That keeps the CI trust boundary explicit: compromise of the external repo’s default branch cannot silently change what this job runs on PR/push.
+The default UI checkout is **pinned to a full commit SHA** in [`e2e/ui-pin`](../../e2e/ui-pin), not a floating branch tip and not inside the workflow YAML. GitHub’s `GITHUB_TOKEN` cannot push edits to `.github/workflows/*.yml`; the sidecar file keeps the pin bump on GitFlow PRs.
 
 To run E2E against a specific UI commit **without** changing the pin (manual):
 
@@ -157,13 +157,13 @@ gh workflow run "CI E2E Playwright" --repo alamalhoda/doion -f ui_sha=<full-or-s
 
 `repository_dispatch` type `frontend-e2e` with JSON `{"ui_sha":"<sha>"}` does the same (used by the UI repo after push to `main`; PAT lives in that repo, not here). Missing `ui_sha` on that event fails the job; it does not fall back to the pin.
 
-After that dispatched E2E **succeeds**, job `open pin PR` opens `feature/e2e-ui-pin-<sha>` → `develop` to set `PINNED_UI_SHA` to the resolved 40-character commit. It never pushes the pin to `develop` or `main`. PR/push E2E does not open a pin PR (those runs already use the YAML pin). If the pin already matches, or a PR for that branch exists, the job no-ops.
+After that dispatched E2E **succeeds**, job `open pin PR` opens `feature/e2e-ui-pin-<sha>` → `develop` to set `e2e/ui-pin` to the resolved 40-character commit. It never pushes the pin to `develop` or `main`. PR/push E2E does not open a pin PR (those runs already use the file pin). If the pin already matches, or a PR for that branch exists, the job no-ops.
 
 Manual bump (if you skip the bot PR):
 
 ```bash
 cd /path/to/checkyar-googleai && git pull && git rev-parse HEAD
-# then set PINNED_UI_SHA in .github/workflows/ci-e2e.yml on a feature branch and PR to develop
+# then put that SHA in e2e/ui-pin on a feature branch and PR to develop
 ```
 
 ## Out of scope (follow-ups)

@@ -121,7 +121,7 @@ uv run pytest
 
 مسیر لوکال پیش‌فرض (`config.settings.local` / SQLite بدون Docker) همچنان معتبر است.
 
-E2E Playwright در [`.github/workflows/ci-e2e.yml`](../.github/workflows/ci-e2e.yml) هست و **gate ادغام PR به `develop` نیست**. اجرای دستی علیه یک commit فرانت: `gh workflow run "CI E2E Playwright" -f ui_sha=<sha>`. رویداد `repository_dispatch` با type‏ `frontend-e2e` و `client_payload.ui_sha` همان کار را می‌کند. بعد از E2E موفقِ dispatch، job جدا PR به `develop` برای bump پین باز می‌کند و پین را مستقیم روی `develop`/`main` push نمی‌کند. Deploy به چابکان در GitHub Actions در این گام خودکار نیست؛ دستی با CLI (بخش بعد).
+E2E Playwright در [`.github/workflows/ci-e2e.yml`](../.github/workflows/ci-e2e.yml) هست و **gate ادغام PR به `develop` نیست**. اجرای دستی علیه یک commit فرانت: `gh workflow run "CI E2E Playwright" -f ui_sha=<sha>`. رویداد `repository_dispatch` با type‏ `frontend-e2e` و `client_payload.ui_sha` همان کار را می‌کند. بعد از E2E موفقِ dispatch، job جدا PR به `develop` باز می‌کند و فقط [`e2e/ui-pin`](../e2e/ui-pin) را عوض می‌کند (نه فایل workflow؛ `GITHUB_TOKEN` اجازهٔ ویرایش YAML را ندارد). Deploy به چابکان در GitHub Actions در این گام خودکار نیست؛ دستی با CLI (بخش بعد).
 
 ---
 

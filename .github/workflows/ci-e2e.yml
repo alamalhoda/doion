@@ -2,7 +2,8 @@ name: CI E2E Playwright
 
 # Not a merge gate: do not add this workflow to required checks on develop.
 # After a successful dispatched E2E, job bump-pin opens a feature PR to develop.
-# Never push PINNED_UI_SHA directly to develop or main.
+# The pin lives in e2e/ui-pin (not this YAML): GITHUB_TOKEN cannot push workflow edits.
+# Never push the pin directly to develop or main.
 on:
   pull_request:
     branches: [develop]
@@ -17,10 +18,6 @@ on:
         default: ""
   repository_dispatch:
     types: [frontend-e2e]
-
-env:
-  # Default UI for PR/push to develop. Bump only via feature PR (job bump-pin).
-  PINNED_UI_SHA: d518d20fbcc9a66c83b2fdd273aad723148ff848
 
 jobs:
   e2e:
@@ -43,6 +40,12 @@ jobs:
           PAYLOAD_SHA: ${{ github.event.client_payload.ui_sha }}
         run: |
           set -euo pipefail
+          PINNED="$(tr -d '[:space:]' < e2e/ui-pin)"
+          if ! printf '%s' "$PINNED" | grep -Eq '^[0-9a-fA-F]{40}$'; then
+            echo "e2e/ui-pin must be a 40-character hex SHA"
+            exit 1
+          fi
+          echo "PINNED_UI_SHA=$PINNED" >> "$GITHUB_ENV"
           SHA=""
           case "$EVENT_NAME" in
             workflow_dispatch) SHA="${DISPATCH_SHA:-}" ;;
@@ -53,14 +56,14 @@ jobs:
             exit 1
           fi
           if [ -z "$SHA" ]; then
-            SHA="${PINNED_UI_SHA}"
+            SHA="$PINNED"
           fi
           if ! printf '%s' "$SHA" | grep -Eq '^[0-9a-fA-F]{7,40}$'; then
             echo "Invalid ui_sha (expected 7-40 hex chars)"
             exit 1
           fi
           echo "sha=$SHA" >> "$GITHUB_OUTPUT"
-          echo "Using UI SHA $SHA (event=$EVENT_NAME)"
+          echo "Using UI SHA $SHA (event=$EVENT_NAME pin=$PINNED)"
 
       # Pin by default so PR/push cannot follow a floating UI branch. Dispatch
       # may override with a reviewed SHA (see E2E_LOCAL_RUNBOOK.md).
@@ -213,25 +216,10 @@ jobs:
             exit 0
           fi
           git checkout -b "$BRANCH"
-          python3 -c '
-          import os, pathlib, re, sys
-          path = pathlib.Path(".github/workflows/ci-e2e.yml")
-          text = path.read_text()
-          new = os.environ["NEW_SHA"]
-          updated, n = re.subn(
-              r"^(  PINNED_UI_SHA: )[0-9a-fA-F]{40}$",
-              rf"\g<1>{new}",
-              text,
-              count=1,
-              flags=re.M,
-          )
-          if n != 1:
-              sys.exit(f"expected 1 PINNED_UI_SHA replace, got {n}")
-          path.write_text(updated)
-          '
+          printf '%s\n' "$NEW_SHA" > e2e/ui-pin
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add .github/workflows/ci-e2e.yml
+          git add e2e/ui-pin
           git diff --cached --quiet && { echo "pin already current on develop"; exit 0; }
           git commit -m "chore(e2e): pin UI checkout to ${SHORT}"
           git push -u origin "$BRANCH"
@@ -240,6 +228,6 @@ jobs:
             --body "$(printf '%s\n' \
               "After successful Playwright E2E against \`${NEW_SHA}\`." \
               "" \
-              "Updates \`PINNED_UI_SHA\` so PR/push E2E on \`develop\` uses that UI commit." \
+              "Updates \`e2e/ui-pin\` so PR/push E2E on \`develop\` uses that UI commit." \
               "Does not merge itself. Not a required check." \
               "")"
