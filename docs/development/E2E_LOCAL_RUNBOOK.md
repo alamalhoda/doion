@@ -145,13 +145,23 @@ Same as `seed_demo`: `holder1`, `investor1`, `moderator1`, `admin1`, `holderkyc1
 
 GitHub Actions: [`.github/workflows/ci-e2e.yml`](../../.github/workflows/ci-e2e.yml) — seeds demo backend, starts UI from `alamalhoda/checkyar-googleai`, runs smoke + critical with Chromium.
 
-The UI checkout is **pinned to a full commit SHA** (`ref:` in the workflow), not a floating branch tip. That keeps the CI trust boundary explicit: compromise of the external repo’s default branch cannot silently change what this job runs.
+This workflow is **not** a merge gate for PRs to `develop` (do not add it to required checks). It still may run on those PRs using the YAML pin so you see a non-blocking status.
 
-To bump the pin after reviewing a new UI commit:
+The default UI checkout is **pinned to a full commit SHA** (`PINNED_UI_SHA` in the workflow), not a floating branch tip. That keeps the CI trust boundary explicit: compromise of the external repo’s default branch cannot silently change what this job runs on PR/push.
+
+To run E2E against a specific UI commit **without** changing the pin (manual):
+
+```bash
+gh workflow run "CI E2E Playwright" --repo alamalhoda/doion -f ui_sha=<full-or-short-sha>
+```
+
+`repository_dispatch` type `frontend-e2e` with JSON `{"ui_sha":"<sha>"}` does the same (used by the UI repo after push to `main`; PAT lives in that repo, not here). Missing `ui_sha` on that event fails the job; it does not fall back to the pin.
+
+To bump the pin after reviewing a new UI commit, change `PINNED_UI_SHA` in `ci-e2e.yml` on a feature branch and open a PR to `develop` (do not push the pin to `develop`/`main` directly):
 
 ```bash
 cd /path/to/checkyar-googleai && git pull && git rev-parse HEAD
-# then set that SHA as `ref:` under "Checkout active UI" in ci-e2e.yml
+# then set PINNED_UI_SHA in .github/workflows/ci-e2e.yml and PR to develop
 ```
 
 ## Out of scope (follow-ups)

@@ -1,11 +1,25 @@
 name: CI E2E Playwright
 
+# Not a merge gate: do not add this workflow to required checks on develop.
+# Pin bump is Step 6 (PR to develop only); this job never pushes to develop/main.
 on:
   pull_request:
     branches: [develop]
   push:
     branches: [develop]
   workflow_dispatch:
+    inputs:
+      ui_sha:
+        description: Full or short commit SHA from alamalhoda/checkyar-googleai (empty = YAML pin)
+        required: false
+        type: string
+        default: ""
+  repository_dispatch:
+    types: [frontend-e2e]
+
+env:
+  # Landing decor + guest smoke selectors (2026-08-18). Bump only via PR (Step 6).
+  PINNED_UI_SHA: d518d20fbcc9a66c83b2fdd273aad723148ff848
 
 jobs:
   e2e:
@@ -17,15 +31,40 @@ jobs:
       - name: Checkout doion
         uses: actions/checkout@v4
 
-      # Pin to an immutable commit (not a branch) so CI cannot run attacker-controlled
-      # UI code if checkyar-googleai's default branch is compromised. Bump deliberately
-      # after reviewing the UI commit (see E2E_LOCAL_RUNBOOK.md).
+      - name: Resolve UI SHA
+        id: ui_ref
+        env:
+          EVENT_NAME: ${{ github.event_name }}
+          DISPATCH_SHA: ${{ github.event.inputs.ui_sha }}
+          PAYLOAD_SHA: ${{ github.event.client_payload.ui_sha }}
+        run: |
+          set -euo pipefail
+          SHA=""
+          case "$EVENT_NAME" in
+            workflow_dispatch) SHA="${DISPATCH_SHA:-}" ;;
+            repository_dispatch) SHA="${PAYLOAD_SHA:-}" ;;
+          esac
+          if [ "$EVENT_NAME" = "repository_dispatch" ] && [ -z "$SHA" ]; then
+            echo "repository_dispatch type frontend-e2e requires client_payload.ui_sha"
+            exit 1
+          fi
+          if [ -z "$SHA" ]; then
+            SHA="${PINNED_UI_SHA}"
+          fi
+          if ! printf '%s' "$SHA" | grep -Eq '^[0-9a-fA-F]{7,40}$'; then
+            echo "Invalid ui_sha (expected 7-40 hex chars)"
+            exit 1
+          fi
+          echo "sha=$SHA" >> "$GITHUB_OUTPUT"
+          echo "Using UI SHA $SHA (event=$EVENT_NAME)"
+
+      # Pin by default so PR/push cannot follow a floating UI branch. Dispatch
+      # may override with a reviewed SHA (see E2E_LOCAL_RUNBOOK.md).
       - name: Checkout active UI
         uses: actions/checkout@v4
         with:
           repository: alamalhoda/checkyar-googleai
-          # Landing decor + guest smoke selectors (2026-08-18)
-          ref: d518d20fbcc9a66c83b2fdd273aad723148ff848
+          ref: ${{ steps.ui_ref.outputs.sha }}
           path: checkyar-googleai
           token: ${{ secrets.GITHUB_TOKEN }}
 

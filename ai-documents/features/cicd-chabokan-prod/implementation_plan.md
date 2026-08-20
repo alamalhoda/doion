@@ -22,40 +22,40 @@ Chat 2 فقط یک گام از لیست زیر را در هر نوبت پیاد�
   **Verify:** `uv run ruff check .` و pytest لوکال روی SQLite؛ در Actions روی PR به `develop` هر دو job/گام سبز با Postgres.  
   **REVIEW NOTE:** (2026-08-19) `uv run ruff check .` پاک است؛ `uv run pytest` لوکال ۲۰۸ تست روی SQLite (`config.settings.test` بدون `GITHUB_ACTIONS`) پاس شد. مسیر `config.settings.local` دست نخورده. CI: job جدا `ruff` + `pytest` با سرویس Postgres 16 و `DATABASE_URL`؛ اگر `GITHUB_ACTIONS` باشد و engine پستگرس نباشد `RuntimeError`. E2E required نشده. تناقض spec: `test.py` قبلاً SQLite قفل بود — اصلاح شد. `DJ001` روی چند CharField nullable بدون migration (خط noqa). `line-length=119` (هم‌تراز djLint؛ ignore جدید سراسری اضافه نشد). رجیستری Docker مربوط به Step 10 است.
 
-- [ ] **Step 2 — cicd-frontend: پرامپت Studio برای CI تست PR (بدون CD)**  
+- [x] **Step 2 — cicd-frontend: پرامپت Studio برای CI تست PR (بدون CD)**  
   ریپو: `checkyar-googleai` فقط از Studio. Cursor push نمی‌کند.  
   - فایل پرامپت را در `ai-documents/features/cicd-chabokan-prod/prompts/01-ci-live-build.md` بنویس و کاربر در Studio پیست کند.  
   - CI موجود: typecheck، Vitest، `vite build`؛ افزودن build جدا با `VITE_USE_MOCK=false` و `VITE_API_BASE_URL=https://chequeyar-back.chbkn.dev/api/v1`.  
   - `cd-demo.yml` و سرویس دمو را تغییر نده.  
   - شاخهٔ `product` و Docker و deploy در این گام نیست.  
   **Verify:** پس از SHA پوش Studio، CI روی `main` هر چهار گام را نشان می‌دهد؛ دمو mock مثل قبل deploy می‌شود.  
-  **REVIEW NOTE:**
+  **REVIEW NOTE:** (2026-08-19) SHA `20a999d` روی `main`. `ci.yml` چهار گام دارد؛ `cd-demo.yml` در diff نیست. Actions: [CI success](https://github.com/alamalhoda/checkyar-googleai/actions/runs/32293613427) و [CD Demo success](https://github.com/alamalhoda/checkyar-googleai/actions/runs/32293613525). Docs EN+FA به‌روز. Cursor به UI push نکرد.
 
 ### onboarding لوکال (اختیاری Postgres)
 
-- [ ] **Step 3 — cicd-backend: Compose اختیاری Postgres برای همکار**  
+- [x] **Step 3 — cicd-backend: Compose اختیاری Postgres برای همکار**  
   ریپو: `doion`.  
   - Compose (یا معادل) فقط سرویس Postgres (+ در صورت نیاز حجم/پورت مستند)؛ اپ Django لوکال می‌تواند همچنان روی میزبان با `uv` اجرا شود.  
   - سند کوتاه: مسیر A = SQLite بدون Docker؛ مسیر B = `DATABASE_URL` به Postgres کانتینر. هیچ‌کدام را تنها مسیر نکن.  
   **Verify:** مسیر A بدون Docker کار می‌کند؛ مسیر B با کانتینر به Postgres وصل می‌شود.  
-  **REVIEW NOTE:**
+  **REVIEW NOTE:** (2026-08-19) Compose فقط Postgres 16 + trust. مسیر A: pytest ۲۰۸ پاس SQLite. مسیر B: `migrate` روی میزبان با `DATABASE_URL=postgres://doion@localhost:5432/doion` موفق شد. `127.0.0.1` روی Docker Desktop مک timeout داد؛ سند از `localhost` استفاده می‌کند. TUN/`utun` هم می‌تواند پورت Docker را خراب کند.
 
 ### همگام E2E غیرمسدودکننده
 
-- [ ] **Step 4 — cicd-backend: E2E با `ui_sha` بدون gate روی PR develop**  
+- [x] **Step 4 — cicd-backend: E2E با `ui_sha` بدون gate روی PR develop**  
   ریپو: `doion`.  
   - `workflow_dispatch` / `repository_dispatch` با ورودی commit فرانت؛ checkout همان SHA؛ E2E موجود.  
   - `pull_request` به `develop` این job را required نکند.  
   - پین داخل YAML را در همین گام به‌صورت خودکار روی `develop` push نکن.  
   **Verify:** اجرای دستی با یک SHA مشخص؛ PR بک‌اند بدون این Check هم قابل ادغام از نظر پیکربندی branch است (یا حداقل job fail آن required نیست).  
-  **REVIEW NOTE:**
+  **REVIEW NOTE:** (2026-08-20) `ci-e2e.yml`: ورودی `ui_sha` روی `workflow_dispatch`؛ `repository_dispatch` type‏ `frontend-e2e` با `client_payload.ui_sha` (بدون SHA شکست، نه fallback به پین). PR/push به `develop` همچنان پین `PINNED_UI_SHA` را چک‌اوت می‌کند. این workflow پین را push نمی‌کند. `develop` branch protection ندارد (rulesets خالی) پس E2E نمی‌تواند merge-block باشد. اجرای دستی: [run 32331636536](https://github.com/alamalhoda/doion/actions/runs/32331636536) روی `feature/cicd-chabokan-prod`، `workflow_dispatch`، `ui_sha=20a999d037cabe0a7223efa8cd09e69da2117597` (نه پین `d518d20`)، smoke+critical سبز در ۲ دقیقه. هشدار Actions: Node 20 deprecated روی checkout/setup-node — خارج از scope این گام.
 
 - [ ] **Step 5 — cicd-frontend: پرامپت Studio برای تریگر E2E بعد از push به main**  
   - پرامپت: `prompts/02-dispatch-doion-e2e.md`.  
   - بعد از CI سبز `main`، رویداد به doion با SHA همان commit.  
   - نیاز به راز/PAT در ریپوی فرانت اگر `repository_dispatch` لازم باشد؛ در پرامپت صریح بگو، مقدار راز را hard-code نکن.  
   **Verify:** یک push Studio → run E2E در doion روی همان SHA.  
-  **REVIEW NOTE:**
+  **REVIEW NOTE:** (2026-08-20) پرامپت: `prompts/02-dispatch-doion-e2e.md`. Cursor به UI پوش نمی‌کند. قرارداد: بعد از موفقیت workflow `CI` روی push به `main`، فایل جدا `dispatch-doion-e2e.yml` با `workflow_run` رویداد `frontend-e2e` و `ui_sha` همان commit را به doion می‌فرستد (نه داخل `ci.yml`). راز `DOION_E2E_DISPATCH_TOKEN` روی `checkyar-googleai` ثبت شد (`CHABOKAN_TOKEN` reuse نشد). **بلاکر verify تا ادغام این PR:** `repository_dispatch` فقط YAML روی `develop` را اجرا می‌کند. قانون ۲۴ (bump پین) گام ۶ است.
 
 - [ ] **Step 6 — cicd-backend: bump پین E2E فقط با PR به develop**  
   - یا سند دستی bump بعد از هر UI موفق، یا job که PR باز می‌کند (نه commit مستقیم به `develop`/`main`).  
