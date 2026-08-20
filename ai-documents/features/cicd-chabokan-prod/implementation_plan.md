@@ -42,13 +42,13 @@ Chat 2 فقط یک گام از لیست زیر را در هر نوبت پیاد�
 
 ### همگام E2E غیرمسدودکننده
 
-- [ ] **Step 4 — cicd-backend: E2E با `ui_sha` بدون gate روی PR develop**  
+- [x] **Step 4 — cicd-backend: E2E با `ui_sha` بدون gate روی PR develop**  
   ریپو: `doion`.  
   - `workflow_dispatch` / `repository_dispatch` با ورودی commit فرانت؛ checkout همان SHA؛ E2E موجود.  
   - `pull_request` به `develop` این job را required نکند.  
   - پین داخل YAML را در همین گام به‌صورت خودکار روی `develop` push نکن.  
   **Verify:** اجرای دستی با یک SHA مشخص؛ PR بک‌اند بدون این Check هم قابل ادغام از نظر پیکربندی branch است (یا حداقل job fail آن required نیست).  
-  **REVIEW NOTE:**
+  **REVIEW NOTE:** (2026-08-20) `ci-e2e.yml`: ورودی `ui_sha` روی `workflow_dispatch`؛ `repository_dispatch` type‏ `frontend-e2e` با `client_payload.ui_sha` (بدون SHA شکست، نه fallback به پین). PR/push به `develop` همچنان پین `PINNED_UI_SHA` را چک‌اوت می‌کند. این workflow پین را push نمی‌کند. `gh api` روی `develop`: Branch not protected — هیچ required check از جمله E2E وجود ندارد. اجرای زندهٔ dispatch روی GitHub تا push این YAML به ریموت ممکن نیست.
 
 - [ ] **Step 5 — cicd-frontend: پرامپت Studio برای تریگر E2E بعد از push به main**  
   - پرامپت: `prompts/02-dispatch-doion-e2e.md`.  
