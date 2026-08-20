@@ -1,0 +1,32 @@
+# Optional local PostgreSQL only. Django still runs on the host with uv.
+#
+# Path A (default): do not start this file. config.settings.local uses SQLite.
+# Path B: docker compose up -d
+#         DATABASE_URL=postgres://doion@localhost:5432/doion
+# On macOS + Docker Desktop, use localhost (not 127.0.0.1); IPv4 loopback can time out.
+#
+# Auth is trust on localhost so this file has no password (GitGuardian).
+# If host port 5432 is busy, change the left-hand port only (e.g. "5433:5432")
+# and use that port in DATABASE_URL.
+
+name: doion-local
+
+services:
+  postgres:
+    image: postgres:16
+    environment:
+      POSTGRES_USER: doion
+      POSTGRES_DB: doion
+      POSTGRES_HOST_AUTH_METHOD: trust
+    ports:
+      - "5432:5432"
+    volumes:
+      - doion_pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U doion -d doion"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+volumes:
+  doion_pgdata:

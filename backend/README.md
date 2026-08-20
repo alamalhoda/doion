@@ -24,7 +24,7 @@ API لایه ۱ Marketplace: ثبت‌نام و KYC، آگهی چک، moderation
 - **Python**: 3.12
 - **Django**: 5.2.14 (LTS)
 - **مدیریت وابستگی**: uv
-- **دیتابیس توسعهٔ لوکال**: SQLite (بدون Docker؛ مسیر معتبر). Postgres داخل Docker در گام‌های بعدی CI/CD اختیاری است
+- **دیتابیس توسعهٔ لوکال**: مسیر A = SQLite بدون Docker؛ مسیر B = Postgres اختیاری در Docker (هیچ‌کدام اجباریِ تنها نیست)
 - **دیتابیس CI و محصول**: فقط PostgreSQL (بدون fallback به SQLite)
 - **زبان پیش‌فرض**: انگلیسی (en-us)
 - **Timezone**: Asia/Tehran
@@ -73,6 +73,34 @@ python manage.py runserver
 ```
 
 سپس به آدرس [http://127.0.0.1:8000/](http://127.0.0.1:8000/) بروید.
+
+### دو مسیر دادهٔ لوکال
+
+هیچ‌کدام تنها مسیر معتبر نیست. اپ Django در هر دو حالت روی میزبان با `uv` اجرا می‌شود.
+
+**مسیر A — SQLite (پیش‌فرض، بدون Docker)**
+
+`config.settings.local` تا وقتی `DATABASE_URL` با `postgres` شروع نشود از `db.sqlite3` استفاده می‌کند. همان راه‌اندازی سریع بالا.
+
+**مسیر B — Postgres اختیاری در Docker**
+
+از ریشهٔ مونورپو:
+
+```bash
+docker compose up -d
+```
+
+سپس در `backend/.env`:
+
+```bash
+DATABASE_URL=postgres://doion@localhost:5432/doion
+```
+
+Compose فقط سرویس Postgres است (پورت `5432`، کاربر/دیتابیس `doion`، auth از نوع trust روی localhost؛ رمز در فایل نیست). Django را مثل قبل با `uv`/`runserver` روی میزبان اجرا کنید، بعد `migrate`. روی macOS + Docker Desktop از `localhost` استفاده کنید نه `127.0.0.1` (اتصال IPv4 گاهی timeout می‌شود).
+
+اگر پورت `5432` روی میزبان اشغال است، در `docker-compose.yml` سمت چپ پورت را عوض کنید (مثلاً `5433:5432`) و همان پورت را در `DATABASE_URL` بگذارید.
+
+pytest لوکال: بدون `postgres` در `DATABASE_URL` روی SQLite جدا (`test_db.sqlite3`) می‌ماند. اگر `DATABASE_URL` پستگرس باشد، pytest به همان سرور وصل می‌شود (Django دیتابیس تست جدا می‌سازد).
 
 ---
 

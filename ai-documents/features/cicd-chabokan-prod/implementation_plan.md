@@ -33,12 +33,12 @@ Chat 2 فقط یک گام از لیست زیر را در هر نوبت پیاد�
 
 ### onboarding لوکال (اختیاری Postgres)
 
-- [ ] **Step 3 — cicd-backend: Compose اختیاری Postgres برای همکار**  
+- [x] **Step 3 — cicd-backend: Compose اختیاری Postgres برای همکار**  
   ریپو: `doion`.  
   - Compose (یا معادل) فقط سرویس Postgres (+ در صورت نیاز حجم/پورت مستند)؛ اپ Django لوکال می‌تواند همچنان روی میزبان با `uv` اجرا شود.  
   - سند کوتاه: مسیر A = SQLite بدون Docker؛ مسیر B = `DATABASE_URL` به Postgres کانتینر. هیچ‌کدام را تنها مسیر نکن.  
   **Verify:** مسیر A بدون Docker کار می‌کند؛ مسیر B با کانتینر به Postgres وصل می‌شود.  
-  **REVIEW NOTE:**
+  **REVIEW NOTE:** (2026-08-19) Compose فقط Postgres 16 + trust. مسیر A: pytest ۲۰۸ پاس SQLite. مسیر B: `migrate` روی میزبان با `DATABASE_URL=postgres://doion@localhost:5432/doion` موفق شد. `127.0.0.1` روی Docker Desktop مک timeout داد؛ سند از `localhost` استفاده می‌کند. TUN/`utun` هم می‌تواند پورت Docker را خراب کند.
 
 ### همگام E2E غیرمسدودکننده
 

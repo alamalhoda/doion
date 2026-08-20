@@ -17,20 +17,28 @@ SECRET_KEY = env(
 # https://docs.djangoproject.com/en/dev/ref/settings/#allowed-hosts
 ALLOWED_HOSTS = ["localhost", "0.0.0.0", "127.0.0.1"]  # noqa: S104
 
-# DATABASES - SQLite for local development (PostgreSQL not available)
+# DATABASES
 # ------------------------------------------------------------------------------
-# DJANGO_DEMO_DATABASE=1 → isolated demo file (safe to seed_demo --reset)
-# DJANGO_DEMO_DATABASE=0 / unset → day-to-day local DB
+# Path A (default): SQLite, no Docker.
+# Path B: DATABASE_URL starting with postgres (optional Compose at repo root).
+# DJANGO_DEMO_DATABASE=1 applies only to Path A (db.demo.sqlite3).
 BASE_DIR = Path(__file__).resolve(strict=True).parent.parent.parent
-_USE_DEMO_DATABASE = env.bool("DJANGO_DEMO_DATABASE", default=False)
-_SQLITE_NAME = "db.demo.sqlite3" if _USE_DEMO_DATABASE else "db.sqlite3"
-DATABASES = {
-    "default": {
-        "ENGINE": "django.db.backends.sqlite3",
-        "NAME": str(BASE_DIR / _SQLITE_NAME),
-        "ATOMIC_REQUESTS": True,
-    },
-}
+_database_url = env.str("DATABASE_URL", default="")
+if _database_url.startswith("postgres"):
+    DATABASES = {
+        "default": env.db("DATABASE_URL"),
+    }
+    DATABASES["default"]["ATOMIC_REQUESTS"] = True
+else:
+    _USE_DEMO_DATABASE = env.bool("DJANGO_DEMO_DATABASE", default=False)
+    _SQLITE_NAME = "db.demo.sqlite3" if _USE_DEMO_DATABASE else "db.sqlite3"
+    DATABASES = {
+        "default": {
+            "ENGINE": "django.db.backends.sqlite3",
+            "NAME": str(BASE_DIR / _SQLITE_NAME),
+            "ATOMIC_REQUESTS": True,
+        },
+    }
 
 # CACHES
 # ------------------------------------------------------------------------------
