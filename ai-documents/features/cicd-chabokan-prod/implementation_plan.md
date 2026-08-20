@@ -50,17 +50,17 @@ Chat 2 فقط یک گام از لیست زیر را در هر نوبت پیاد�
   **Verify:** اجرای دستی با یک SHA مشخص؛ PR بک‌اند بدون این Check هم قابل ادغام از نظر پیکربندی branch است (یا حداقل job fail آن required نیست).  
   **REVIEW NOTE:** (2026-08-20) `ci-e2e.yml`: ورودی `ui_sha` روی `workflow_dispatch`؛ `repository_dispatch` type‏ `frontend-e2e` با `client_payload.ui_sha` (بدون SHA شکست، نه fallback به پین). PR/push به `develop` همچنان پین `PINNED_UI_SHA` را چک‌اوت می‌کند. این workflow پین را push نمی‌کند. `develop` branch protection ندارد (rulesets خالی) پس E2E نمی‌تواند merge-block باشد. اجرای دستی: [run 32331636536](https://github.com/alamalhoda/doion/actions/runs/32331636536) روی `feature/cicd-chabokan-prod`، `workflow_dispatch`، `ui_sha=20a999d037cabe0a7223efa8cd09e69da2117597` (نه پین `d518d20`)، smoke+critical سبز در ۲ دقیقه. هشدار Actions: Node 20 deprecated روی checkout/setup-node — خارج از scope این گام.
 
-- [ ] **Step 5 — cicd-frontend: پرامپت Studio برای تریگر E2E بعد از push به main**  
+- [x] **Step 5 — cicd-frontend: پرامپت Studio برای تریگر E2E بعد از push به main**  
   - پرامپت: `prompts/02-dispatch-doion-e2e.md`.  
   - بعد از CI سبز `main`، رویداد به doion با SHA همان commit.  
   - نیاز به راز/PAT در ریپوی فرانت اگر `repository_dispatch` لازم باشد؛ در پرامپت صریح بگو، مقدار راز را hard-code نکن.  
   **Verify:** یک push Studio → run E2E در doion روی همان SHA.  
-  **REVIEW NOTE:** (2026-08-20) پرامپت: `prompts/02-dispatch-doion-e2e.md`. Cursor به UI پوش نمی‌کند. قرارداد: بعد از موفقیت workflow `CI` روی push به `main`، فایل جدا `dispatch-doion-e2e.yml` با `workflow_run` رویداد `frontend-e2e` و `ui_sha` همان commit را به doion می‌فرستد (نه داخل `ci.yml`). راز `DOION_E2E_DISPATCH_TOKEN` روی `checkyar-googleai` ثبت شد (`CHABOKAN_TOKEN` reuse نشد). **بلاکر verify تا ادغام این PR:** `repository_dispatch` فقط YAML روی `develop` را اجرا می‌کند. قانون ۲۴ (bump پین) گام ۶ است.
+  **REVIEW NOTE:** (2026-08-20) SHA Studio `5053b986dc9ee993de1f8224b82135f048164ff6`. `dispatch-doion-e2e.yml` جدا؛ `ci.yml`/`cd-demo.yml` در آن commit نیستند. CI چهار گام سبز. CD Demo سبز. PR [#36](https://github.com/alamalhoda/doion/pull/36) روی `develop`. PAT اول 401 بود؛ بعد از تعویض secret، همان run از نوع `workflow_run` دوباره اجرا شد و سبز شد: [32375579812](https://github.com/alamalhoda/checkyar-googleai/actions/runs/32375579812) با HTTP 204 و `ui_sha=5053b98…`. E2E دویون از Actions: [32403989662](https://github.com/alamalhoda/doion/actions/runs/32403989662). قانون ۲۴ (bump پین) گام ۶ است.
 
 - [ ] **Step 6 — cicd-backend: bump پین E2E فقط با PR به develop**  
   - یا سند دستی bump بعد از هر UI موفق، یا job که PR باز می‌کند (نه commit مستقیم به `develop`/`main`).  
   **Verify:** پین با GitFlow عوض می‌شود.  
-  **REVIEW NOTE:**
+  **REVIEW NOTE:** (2026-08-20) Job `bump-pin` بعد از E2E موفق فقط روی `repository_dispatch` یا `workflow_dispatch` با `ui_sha` غیرخالی، برنچ `feature/e2e-ui-pin-<12>` می‌سازد و PR به `develop` باز می‌کند؛ به `develop`/`main` push نمی‌کند. PR/push به develop پین را bump نمی‌کند. SHA کامل از `git rev-parse` بعد از checkout UI. Verify زنده: این YAML باید روی `develop` باشد (یا `workflow_dispatch` روی این feature branch) تا PR پین دیده شود.
 
 ### Docker تصاویر محصول (هنوز بدون deploy خودکار)
 
