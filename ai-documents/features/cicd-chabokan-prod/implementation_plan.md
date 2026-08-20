@@ -55,7 +55,7 @@ Chat 2 فقط یک گام از لیست زیر را در هر نوبت پیاد�
   - بعد از CI سبز `main`، رویداد به doion با SHA همان commit.  
   - نیاز به راز/PAT در ریپوی فرانت اگر `repository_dispatch` لازم باشد؛ در پرامپت صریح بگو، مقدار راز را hard-code نکن.  
   **Verify:** یک push Studio → run E2E در doion روی همان SHA.  
-  **REVIEW NOTE:**
+  **REVIEW NOTE:** (2026-08-20) پرامپت: `prompts/02-dispatch-doion-e2e.md`. Cursor به UI پوش نمی‌کند. قرارداد: بعد از موفقیت workflow `CI` روی push به `main`، فایل جدا `dispatch-doion-e2e.yml` با `workflow_run` رویداد `frontend-e2e` و `ui_sha` همان commit را به doion می‌فرستد (نه داخل `ci.yml`). راز `DOION_E2E_DISPATCH_TOKEN` روی `checkyar-googleai` ثبت شد (`CHABOKAN_TOKEN` reuse نشد). **بلاکر verify تا ادغام این PR:** `repository_dispatch` فقط YAML روی `develop` را اجرا می‌کند. قانون ۲۴ (bump پین) گام ۶ است.
 
 - [ ] **Step 6 — cicd-backend: bump پین E2E فقط با PR به develop**  
   - یا سند دستی bump بعد از هر UI موفق، یا job که PR باز می‌کند (نه commit مستقیم به `develop`/`main`).  
