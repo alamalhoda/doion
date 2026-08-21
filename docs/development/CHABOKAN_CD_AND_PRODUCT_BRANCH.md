@@ -8,15 +8,20 @@
 
 ---
 
-## ۱. دو ریپو، دو سرویس زنده
+## ۱. دو ریپو، سرویس‌های چابکان، دامنه
 
-| چیز | کجاست | سرویس چابکان |
-|-----|--------|----------------|
-| API (Django) | ریپوی [doion](https://github.com/alamalhoda/doion) | `chequeyar-back` |
-| UI (Vue) | ریپوی [checkyar-googleai](https://github.com/alamalhoda/checkyar-googleai) | `chequeyar-front` |
-| دمو mock | همان ریپوی UI، workflow دیگر | `chequeyar-front-demo` |
+| چیز | سرویس چابکان (`-s`) | آدرس کاربر |
+|-----|---------------------|------------|
+| API (Django) | `chequeyar-back` | https://chequeyar-back.chbkn.dev |
+| SPA محصول | `chequeyar-front` | **https://royasoft.dev** |
+| SPA دمو mock | `chequeyar-front-demo` | **https://royasoftgroup.ir** |
+| Postgres | `chequeyar-db` | سایت نیست؛ دیتابیس `chequeyar-back` |
 
-مرورگر کاربر به فرانت می‌رود؛ فرانت به `https://chequeyar-back.chbkn.dev/api/v1` حرف می‌زند. این دو سرویس **جدا** به‌روز می‌شوند.
+CD همان **نام سرویس** را هدف می‌گیرد، نه دامنه. دامنه فقط برچسب روی همان سرویس است.
+
+مرورگر روی `royasoft.dev` است؛ باندل فعلی API را از `https://chequeyar-back.chbkn.dev/api/v1` می‌زند. در پنل `chequeyar-back` مقدار `CORS_ALLOWED_ORIGINS` باید شامل `https://royasoft.dev` باشد وگرنه مرورگر درخواست را قطع می‌کند.
+
+لینک پنل و جدول کامل: [`PRODUCTION_CHABOKAN_DEPLOY.md`](./PRODUCTION_CHABOKAN_DEPLOY.md).
 
 Studio فقط به `checkyar-googleai` پوش می‌کند. Cursor سورس UI را پوش نمی‌کند.
 
@@ -161,5 +166,5 @@ Check ناموفق است؛ چابکان rollback خودکار ندارد.
 |-----|-----|
 | **همین فایل** | آموزش انسان برای CD و `product` |
 | [`GIT_TAGS_AND_RELEASES.md`](./GIT_TAGS_AND_RELEASES.md) | آموزش تگ / Release / GHCR |
-| [`PRODUCTION_CHABOKAN_DEPLOY.md`](./PRODUCTION_CHABOKAN_DEPLOY.md) | env پنل و معماری سرویس‌ها |
+| [`PRODUCTION_CHABOKAN_DEPLOY.md`](./PRODUCTION_CHABOKAN_DEPLOY.md) | env پنل، دامنهٔ سفارشی، لینک هاب |
 | [`FRONTEND_DEVELOPMENT_STATUS.md`](./FRONTEND_DEVELOPMENT_STATUS.md) | Studio یک‌طرفه؛ `main` در برابر `product` |
