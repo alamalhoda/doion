@@ -117,7 +117,7 @@ Chat 2 فقط یک گام از لیست زیر را در هر نوبت پیاد�
   - `backend/README.md` و در صورت نیاز `docs/development/PRODUCTION_CHABOKAN_DEPLOY.md`: دو مسیر لوکال، CI=Postgres، محصول=Postgres، بدون staging، جریان `product` فرانت، بازیابی دستی.  
   - `MASTER_API_CONTRACT.md` را برای این ویژگی عوض نکن مگر رفتار API عوض شده باشد (نباید شده باشد).  
   **Verify:** سند با spec یکی است.  
-  **REVIEW NOTE:**
+  **REVIEW NOTE:** (2026-08-21) آموزش CD برای مالک: [`CHABOKAN_CD_AND_PRODUCT_BRANCH.md`](../../../docs/development/CHABOKAN_CD_AND_PRODUCT_BRANCH.md). همگام کامل README/runbook با وضعیت نهایی بعد از اولین CD زنده (گام ۱۱/۱۲ Verify). `MASTER_API_CONTRACT.md` دست نخورده.
 
 ## Key Decisions & Assumptions
 

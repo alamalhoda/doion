@@ -123,7 +123,7 @@ gh workflow run Release --ref develop -f version=0.1.0-test.1
 gh workflow run "CD Backend" --ref develop -f tag=v0.1.0-test.1
 ```
 
-اگر job قرمز شد، محصول را با اجرای دوبارهٔ همین workflow روی **آخرین تگ موفقی** که می‌شناسید برگردانید؛ rollback خودکار چابکان در این نسخه نیست.
+اگر job قرمز شد، محصول را با اجرای دوبارهٔ همین workflow روی **آخرین تگ موفقی** که می‌شناسید برگردانید؛ rollback خودکار چابکان در این نسخه نیست. آموزش دکمه به دکمه: [`CHABOKAN_CD_AND_PRODUCT_BRANCH.md`](../docs/development/CHABOKAN_CD_AND_PRODUCT_BRANCH.md).
 
 ---
 

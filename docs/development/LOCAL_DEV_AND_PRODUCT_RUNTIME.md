@@ -95,7 +95,7 @@ Docker فقط Postgres را نگه می‌دارد. مفسر پایتون، pyte
 - تنظیمات: `config.settings.production` (اگر engine اسکیولایت باشد استارت قطع می‌شود)
 - ورود: [`backend/Dockerfile`](../../backend/Dockerfile) + [`backend/docker-entrypoint.sh`](../../backend/docker-entrypoint.sh) → `migrate`، `collectstatic`، Gunicorn
 - داده و کش: Postgres و Redis در **پنل** سرویس `chequeyar-back`؛ رازها فقط در پنل
-- استقرار از سورس با CLI چابکان یا workflow تأییدشدهٔ **CD Backend** در [`PRODUCTION_CHABOKAN_DEPLOY.md`](./PRODUCTION_CHABOKAN_DEPLOY.md) است؛ بدون `workflow_dispatch` مالک سرویس زنده عوض نمی‌شود. آموزش تگ/SemVer: [`GIT_TAGS_AND_RELEASES.md`](./GIT_TAGS_AND_RELEASES.md)
+- استقرار از سورس با CLI چابکان یا workflow تأییدشدهٔ **CD Backend** در [`PRODUCTION_CHABOKAN_DEPLOY.md`](./PRODUCTION_CHABOKAN_DEPLOY.md) است؛ بدون `workflow_dispatch` مالک سرویس زنده عوض نمی‌شود. آموزش تگ: [`GIT_TAGS_AND_RELEASES.md`](./GIT_TAGS_AND_RELEASES.md). آموزش CD و شاخهٔ `product`: [`CHABOKAN_CD_AND_PRODUCT_BRANCH.md`](./CHABOKAN_CD_AND_PRODUCT_BRANCH.md)
 
 لوکال **نباید** هر تست را با `docker build` بزنید. ایمیج را وقتی می‌سازید که بخواهید ایمیج محصول را چک کنید یا برای گام انتشار آماده کنید:
 
