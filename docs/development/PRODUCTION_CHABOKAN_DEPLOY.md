@@ -1,6 +1,12 @@
 # Production deploy (Chabokan) — MVP v1
 
+This is the **product** runtime path (server), not daily laptop development. Daily Postgres-in-Docker + host `runserver` is documented in [`LOCAL_DEV_AND_PRODUCT_RUNTIME.md`](./LOCAL_DEV_AND_PRODUCT_RUNTIME.md).
+
 API and SPA are **separate** services. Do not serve the Vue app from Django nginx.
+
+Product API constraints: `config.settings.production`, **PostgreSQL only** (SQLite raises at startup), Gunicorn via [`backend/Dockerfile`](../../backend/Dockerfile). Secrets live in the Chabokan panel, not in git.
+
+Current ship path for `chequeyar-back` is still `chabok deploy` from `backend/` (source). Tagged image push and owner-approved GitHub CD are later CI/CD steps and do not change this contract.
 
 ## Architecture
 
@@ -67,6 +73,7 @@ Deploy `dist/` to the static front service on Chabokan (separate from `chequeyar
 
 ## Related
 
+- Daily vs product runtimes: [`LOCAL_DEV_AND_PRODUCT_RUNTIME.md`](./LOCAL_DEV_AND_PRODUCT_RUNTIME.md)
 - Backend staging notes: [`backend/README.md`](../../backend/README.md)
 - Demo vs prod DB: [`BACKEND_DEMO_SEED_AND_DATA.md`](./BACKEND_DEMO_SEED_AND_DATA.md)
 - Active UI policy: [`FRONTEND_DEVELOPMENT_STATUS.md`](./FRONTEND_DEVELOPMENT_STATUS.md)

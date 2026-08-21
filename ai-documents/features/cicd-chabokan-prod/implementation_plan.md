@@ -64,12 +64,12 @@ Chat 2 فقط یک گام از لیست زیر را در هر نوبت پیاد�
 
 ### Docker تصاویر محصول (هنوز بدون deploy خودکار)
 
-- [ ] **Step 7 — cicd-backend: Dockerfile بک‌اند**  
+- [x] **Step 7 — cicd-backend: Dockerfile بک‌اند**  
   - ایمیج قابل اجرای Gunicorn/تنظیمات production؛ SQLite پیش‌فرض محصول نباشد.  
   - `.dockerignore` مناسب.  
   - README: build لوکال ایمیج اختیاری است؛ توسعه SQLite سر جایش.  
   **Verify:** `docker build` بک‌اند موفق؛ کانتینر با `DATABASE_URL` پستگرس (Compose یا CI) migrate/run می‌شود.  
-  **REVIEW NOTE:**
+  **REVIEW NOTE:** (2026-08-21) پایه `python:3.12-slim-bookworm` + `uv:0.8.22`. CI عوض نشد. `docker build -t doion-api ./backend` موفق. migrate روی شبکهٔ Compose (`postgres://doion@postgres:5432/doion`) «No migrations to apply». Gunicorn در لاگ Listen روی 8000. `host.docker.internal` به پورت میزبان قطع شد (مثل Path B). entrypoint از `uv run` به باینری `.venv` عوض شد تا هر استارت dev deps دانلود نکند.
 
 - [ ] **Step 8 — cicd-frontend: پرامپت Dockerfile فرانت**  
   - `prompts/03-frontend-docker.md`.  

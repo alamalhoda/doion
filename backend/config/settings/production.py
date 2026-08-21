@@ -28,6 +28,10 @@ CORS_ALLOW_CREDENTIALS = True
 # DATABASES
 # ------------------------------------------------------------------------------
 DATABASES["default"]["CONN_MAX_AGE"] = env.int("CONN_MAX_AGE", default=60)
+_engine = DATABASES["default"].get("ENGINE", "")
+if "sqlite" in _engine:
+    msg = "Production must use PostgreSQL; SQLite is not allowed."
+    raise RuntimeError(msg)
 
 # CACHES
 # ------------------------------------------------------------------------------
