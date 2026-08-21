@@ -109,7 +109,7 @@ Chat 2 فقط یک گام از لیست زیر را در هر نوبت پیاد�
   - ایمیج زنده؛ `workflow_dispatch` پس از merge به `product`.  
   - `cd-demo.yml` بدون تغییر.  
   **Verify:** پس از SHA Studio و تأیید مالک، سرویس محصول SPA (نه دمو) به‌روز می‌شود.  
-  **REVIEW NOTE:** (2026-08-21) پرامپت نوشته شد. اجرا در Studio و dispatch به `chequeyar-front` هنوز نشده. مسیر چابکان مثل دمو آپلود `dist/` است نه pull ایمیج GHCR.
+  **REVIEW NOTE:** (2026-08-21) SHA Studio `bb2b72bd9a15f881c0235dbe43b8fcb08cbc415e` روی `main`: [`cd-product.yml`](https://github.com/alamalhoda/checkyar-googleai/blob/bb2b72bd9a15f881c0235dbe43b8fcb08cbc415e/.github/workflows/cd-product.yml) فقط `workflow_dispatch`، باندل زنده، `chabok deploy -s chequeyar-front`. `cd-demo.yml` / `ci.yml` / `dispatch-doion-e2e.yml` / `chabok.json` در آن commit نیستند. CI سبز: [32463702004](https://github.com/alamalhoda/checkyar-googleai/actions/runs/32463702004). CD Demo (mock، انتظار می‌رود روی push به `main`) سبز: [32463701978](https://github.com/alamalhoda/checkyar-googleai/actions/runs/32463701978). **CD Product اجرا نشد.** `product` هنوز این workflow را ندارد تا PR `main`→`product` merge شود. E2E دویون سبز: [32463813416](https://github.com/alamalhoda/doion/actions/runs/32463813416). پین: [doion#49](https://github.com/alamalhoda/doion/pull/49). Cursor به UI push نکرد.
 
 ### مستندات پایانی doion
 
