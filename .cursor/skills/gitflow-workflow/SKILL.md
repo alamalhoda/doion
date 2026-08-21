@@ -1,6 +1,6 @@
 ---
 name: gitflow-workflow
-description: "این Skill اجرای کامل و امن GitFlow پروژه را از ابتدا تا انتها هدایت می‌کند: بررسی وضعیت فعلی git و branch، ایجاد branchهای feature/bugfix از develop، پیشنهاد commit message استاندارد (type(scope): description)، همگام‌سازی branch با develop قبل از PR (merge یا rebase)، راهنمای حل conflict، push امن (فقط --force-with-lease بعد از rebase)، ساخت PR به develop، و پاک‌سازی branch بعد از PR merge. هر زمان کاربر درباره GitFlow، شروع کار جدید، ساخت branch، همگام‌سازی با develop، رفع conflict، پیام commit استاندارد، آماده‌سازی PR، ادغام feature به develop، یا حذف branch بعد از PR merge سؤال کرد از این Skill استفاده شود. Also use for equivalent English requests about GitFlow workflow."
+description: "این Skill اجرای کامل و امن GitFlow پروژه را از ابتدا تا انتها هدایت می‌کند: بررسی وضعیت فعلی git و branch، ایجاد branchهای feature/bugfix از develop، پیشنهاد commit message استاندارد (type(scope): description)، همگام‌سازی branch با develop قبل از PR (merge یا rebase)، راهنمای حل conflict، push امن (فقط --force-with-lease بعد از rebase)، ساخت PR به develop، پاک‌سازی branch بعد از PR merge، و ارجاع به semver-release برای تگ. هر زمان کاربر درباره GitFlow، شروع کار جدید، ساخت branch، همگام‌سازی با develop، رفع conflict، پیام commit استاندارد، آماده‌سازی PR، ادغام feature به develop، حذف branch بعد از PR merge، تگ، SemVer، یا GitHub Release سؤال کرد از این Skill استفاده شود. Also use for equivalent English requests about GitFlow workflow."
 ---
 
 # GitFlow Workflow
@@ -17,6 +17,7 @@ Primary policy source:
 - User wants to sync a feature branch with `develop`.
 - User is preparing a PR.
 - User wants to integrate feature/bugfix into `develop`.
+- User wants to create a SemVer tag / GitHub Release / GHCR image (use `.cursor/skills/semver-release/SKILL.md`).
 - User needs safe push/rebase guidance.
 
 ## Workflow
@@ -123,6 +124,12 @@ git branch -d feature/<name>
 git push origin --delete feature/<name>
 ```
 
+## 9) SemVer tag / GitHub Release
+
+Do not `git tag` on a feature branch as the product release. Use skill `semver-release`: workflow `Release` via `workflow_dispatch`. Remind once after a feat/fix lands on `develop` if the user talks about shipping.
+
+See `.cursor/skills/semver-release/SKILL.md`.
+
 ## Safety Guardrails
 
 - Never suggest direct commit on `main` or `develop`.
@@ -138,8 +145,9 @@ When user asks for GitFlow help, respond with:
 2. Sync/push command block
 3. PR creation command block (target: `develop`)
 4. Short reason for safety
-5. Optional cleanup step after PR merge
+5. Optional cleanup after PR merge
+6. If they shipped a feat/fix to `develop` and talk about version/deploy: one tag reminder (`semver-release`)
 
 ## Additional Examples
 
-See `examples.md` for common scenarios.
+See `examples.md` for common scenarios. Human tagging guide: `docs/development/GIT_TAGS_AND_RELEASES.md`.

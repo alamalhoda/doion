@@ -1,0 +1,25 @@
+---
+description: SemVer git tags and GitHub Release/GHCR for doion. Use for tag, tagging, git tag, GitHub Release, workflow Release, GHCR, version bump, prerelease, semver, انتشار، تگ، نسخه، رلیز.
+globs: .github/workflows/release.yml
+alwaysApply: false
+---
+
+# SemVer Release Policy
+
+Canonical execution: `.cursor/skills/semver-release/SKILL.md`.
+Reminder when a tag is likely needed: `.cursor/rules/share/gitflow-branch-policy.mdc`.
+Human how-to: `docs/development/GIT_TAGS_AND_RELEASES.md`.
+
+## Do
+
+- Create product tags only via Actions workflow `Release` (`workflow_dispatch`).
+- Use SemVer (`0.1.0` or `0.1.0-test.1`). GitHub tag is `v` + that number.
+- Confirm the version with the owner before dispatch.
+- Prefer a prerelease (`-test.N`) until they explicitly want a production number.
+
+## Do not
+
+- `git tag` / `git push --tags` on `feature/*` as the ship path.
+- Tag every merge to `develop`.
+- `--force` existing tags.
+- Deploy to Chabokan as part of tagging (that is a later CD step).

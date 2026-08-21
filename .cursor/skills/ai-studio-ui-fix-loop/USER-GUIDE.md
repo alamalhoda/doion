@@ -23,6 +23,11 @@ Skill پروژه: `.cursor/skills/ai-studio-ui-fix-loop/`
 - به AI Studio مستقیم وصل نمی‌شود؛ شما پرامپت را کپی می‌کنید.
 - سورس UI، vitest، یا docs UI را از لوکال به GitHub پوش نمی‌کند (قانون one-way).
 - تست Playwright را داخل repo UI اضافه نمی‌کند؛ آن‌ها در `doion/e2e` می‌مانند.
+- تگ گیت روی `checkyar-googleai` نمی‌زند. نسخهٔ محصول همان تگ doion **Release** است (API + SPA). بعد از تغییر قابل‌دیدن کاربر و رفتن به `product`، یک‌بار یادآوری تگ می‌کند.
+
+## Changelog محصول (آینده)
+
+متن کوتاه FA+EN از Studio جمع می‌شود. نمایش داخل اپ (نسخه + تاریخ + خلاصهٔ سرور و کلاینت) در `docs/development/PRODUCT_CHANGELOG.md` مشخص شده؛ در باگ‌فیکس معمولی صفحهٔ Versions ساخته نمی‌شود. آموزش تگ محصول: `docs/development/GIT_TAGS_AND_RELEASES.md`.
 
 ## Docs اول‌بار
 

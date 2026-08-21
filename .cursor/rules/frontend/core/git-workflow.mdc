@@ -21,6 +21,8 @@ alwaysApply: false
 - ایجاد شاخه برای نسخه جدید: `release/v1.0.0`
 - ایجاد شاخه برای رفع فوری: `hotfix/ui-critical-fix`
 
+تگ SemVer محصول از Cursor با `git tag` روی فیچر ساخته نمی‌شود. از `.cursor/skills/semver-release/SKILL.md` استفاده کن.
+
 ## قراردادهای commit message برای تغییرات UI
 
 ### افزودن ویژگی جدید
@@ -68,3 +70,4 @@ chore(ui): reorganize component directory structure
 - تغییرات breaking باید در CHANGELOG.md مستند شوند
 - از semantic versioning استفاده کن
 - تغییرات breaking باید در commit message با `BREAKING CHANGE:` مشخص شوند
+- تگ محصول UI از ریپوی `doion` با workflow `Release` است نه `git tag` روی کلون `checkyar-googleai`. Skill: `.cursor/skills/semver-release/SKILL.md`. آموزش: `docs/development/GIT_TAGS_AND_RELEASES.md`.

@@ -24,7 +24,7 @@
 
 ## ۱. GitFlow Branch Policy — `gitflow-branch-policy.mdc`
 
-**محتوا:** سیاست رسمی GitFlow برای branching، commit convention، sync قبل PR، و guardrailهای merge/push.
+**محتوا:** سیاست رسمی GitFlow برای branching، commit convention، sync قبل PR، و guardrailهای merge/push. شامل یادآوری کوتاه تگ SemVer وقتی feat/fix به `develop` رسیده و کاربر از انتشار حرف می‌زند (اجرا: Skill `semver-release`). آموزش انسانی: `docs/development/GIT_TAGS_AND_RELEASES.md`.
 
 | موضوع | توضیح |
 |-------|-------|

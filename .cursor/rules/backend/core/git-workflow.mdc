@@ -59,3 +59,7 @@ AI باید این موارد را **explicitly اعلام خطر** کند:
 * refactoring بیش از ۱۰۰ خط
 * افزودن dependency جدید
 * حذف field یا endpoint
+
+## SemVer tags
+
+Do not create product git tags from backend feature work with `git tag`. Use `.cursor/skills/semver-release/SKILL.md` (workflow `Release`). Remind once when a user-facing feat/fix is on `develop` and they talk about shipping. Human how-to: `docs/development/GIT_TAGS_AND_RELEASES.md`.
