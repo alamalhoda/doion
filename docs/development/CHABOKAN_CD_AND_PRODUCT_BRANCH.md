@@ -143,7 +143,19 @@ Check ناموفق است؛ چابکان rollback خودکار ندارد.
 
 ---
 
-## ۷. کارهایی که نکن
+## ۷. تلهٔ CLI: `chabok.json` برنده‌تر از `-s` است
+
+کد CLI چابکان اگر در ریشهٔ پروژه `chabok.json` با `"service"` باشد، **فلگ `-s` را نادیده می‌گیرد**.
+
+در ریپوی UI فایل committed می‌گوید `chequeyar-front-demo`. بنابراین `chabok deploy -s chequeyar-front` در Actions به **دمو** رفت. لاگ سبز [CD Product #1](https://github.com/alamalhoda/checkyar-googleai/actions/runs/32469027546): `Deployed to chequeyar-front-demo`. پنل [استقرارهای chequeyar-front](https://hub.chabokan.net/fa/services/detail/WxWBVMz/deploys/) درست است که استقرار جدید ندارد.
+
+اصلاح: پرامپت [`prompts/06-fix-cd-product-chabok-json.md`](../../ai-documents/features/cicd-chabokan-prod/prompts/06-fix-cd-product-chabok-json.md) — روی runner قبل از deploy، `chabok.json` موقت با `chequeyar-front`؛ فایل git همان دمو بماند.
+
+اثر جانبی run اول: باندل **زنده** ممکن است روی `chequeyar-front-demo` / royasoftgroup.ir نشسته باشد. بعد از فیکس، یک‌بار CD Demo (یا پوش بعدی به `main`) دموی mock را برمی‌گرداند.
+
+---
+
+## ۸. کارهایی که نکن
 
 | کار | چرا |
 |-----|-----|
@@ -155,7 +167,7 @@ Check ناموفق است؛ چابکان rollback خودکار ندارد.
 
 ---
 
-## ۸. نقشهٔ اسناد
+## ۹. نقشهٔ اسناد
 
 | سند | نقش |
 |-----|-----|

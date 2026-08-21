@@ -35,3 +35,4 @@ SSOT رفتار: [`feature_spec.md`](./feature_spec.md). این فایل فقط 
 - `03-frontend-docker.md` — Step 8
 - `04-product-branch.md` — Step 9
 - `05-cd-product-front.md` — Step 12
+- `06-fix-cd-product-chabok-json.md` — Step 12 follow-up (CLI `chabok.json` overrides `-s`)
