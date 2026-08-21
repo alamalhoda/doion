@@ -71,12 +71,12 @@ Chat 2 فقط یک گام از لیست زیر را در هر نوبت پیاد�
   **Verify:** `docker build` بک‌اند موفق؛ کانتینر با `DATABASE_URL` پستگرس (Compose یا CI) migrate/run می‌شود.  
   **REVIEW NOTE:** (2026-08-21) پایه `python:3.12-slim-bookworm` + `uv:0.8.22`. CI عوض نشد. `docker build -t doion-api ./backend` موفق. migrate روی شبکهٔ Compose (`postgres://doion@postgres:5432/doion`) «No migrations to apply». Gunicorn در لاگ Listen روی 8000. `host.docker.internal` به پورت میزبان قطع شد (مثل Path B). entrypoint از `uv run` به باینری `.venv` عوض شد تا هر استارت dev deps دانلود نکند.
 
-- [ ] **Step 8 — cicd-frontend: پرامپت Dockerfile فرانت**  
+- [x] **Step 8 — cicd-frontend: پرامپت Dockerfile فرانت**  
   - `prompts/03-frontend-docker.md`.  
   - ایمیج سرو SPA زنده (غیرmock در باندل محصول).  
   - Compose لوکال فرانت اختیاری؛ توسعه بدون Docker معتبر بماند.  
   **Verify:** پس از SHA Studio، `docker build` در CI یا دستور مستند موفق است.  
-  **REVIEW NOTE:**
+  **REVIEW NOTE:** (2026-08-21) SHA Studio `b3fd3a81e239c9c8049fdb3f6a319d85b829f3b3`. Dockerfile دو مرحله: `oven/bun:1-alpine` + `nginx:alpine`؛ ARG پیش‌فرض `VITE_USE_MOCK=false` و `VITE_API_BASE_URL=https://chequeyar-back.chbkn.dev/api/v1`؛ COPY به `/usr/share/nginx/html/dist` مطابق `nginx.conf` موجود. Compose اختیاری پورت `8080:80` و API لوکال `http://localhost:8000/api/v1` (پورت ۳۰۰۰ اشغال `bun run dev` نمی‌شود). CI پنج گام: چهار bun سپس `docker build` تگ `checkyar-frontend:ci`. سبز: [CI](https://github.com/alamalhoda/checkyar-googleai/actions/runs/32449346734)، [CD Demo](https://github.com/alamalhoda/checkyar-googleai/actions/runs/32449346744). `cd-demo.yml` و `dispatch-doion-e2e.yml` در diff نیستند. Cursor به UI push نکرد.
 
 ### مسیر تولید فرانت (`product`) و انتشار
 
