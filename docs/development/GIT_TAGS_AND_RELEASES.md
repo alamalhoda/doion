@@ -137,5 +137,6 @@ git show v0.1.0-test.1
 | [`PRODUCT_CHANGELOG.md`](./PRODUCT_CHANGELOG.md) | قرارداد نمایش «چه خبر» داخل اپ (هنوز پیاده نشده) |
 | [`.cursor/skills/semver-release/SKILL.md`](../../.cursor/skills/semver-release/SKILL.md) | دستور کار Cursor هنگام تگ |
 | [`.cursor/skills/ai-studio-ui-fix-loop/SKILL.md`](../../.cursor/skills/ai-studio-ui-fix-loop/SKILL.md) | بذر changelog از Studio؛ یادآوری تگ بعد از `product` |
+| [`DEVELOPMENT_TO_DEPLOY.md`](./DEVELOPMENT_TO_DEPLOY.md) | نقشهٔ آموزشی از لوکال تا چابکان |
 | [`PRODUCTION_CHABOKAN_DEPLOY.md`](./PRODUCTION_CHABOKAN_DEPLOY.md) | استقرار زنده؛ جدا از ساخت تگ |
 | [`CHABOKAN_CD_AND_PRODUCT_BRANCH.md`](./CHABOKAN_CD_AND_PRODUCT_BRANCH.md) | آموزش CD، شاخهٔ `product`، و دکمه‌هایی که مالک می‌زند |

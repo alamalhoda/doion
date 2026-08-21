@@ -119,7 +119,7 @@ Check ناموفق است؛ چابکان rollback خودکار ندارد.
 
 کد CLI چابکان اگر در ریشهٔ پروژه `chabok.json` با `"service"` باشد، **فلگ `-s` را نادیده می‌گیرد**.
 
-در ریپوی UI فایل committed می‌گوید `chequeyar-front-demo`. بنابراین `chabok deploy -s chequeyar-front` در Actions به **دمو** رفت. لاگ سبز [CD Product #1](https://github.com/alamalhoda/checkyar-googleai/actions/runs/32469027546): `Deployed to chequeyar-front-demo`. پنل [استقرارهای chequeyar-front](https://hub.chabokan.net/fa/services/detail/WxWBVMz/deploys/) درست است که استقرار جدید ندارد.
+در ریپوی UI فایل committed می‌گوید `chequeyar-front-demo`. بنابراین `chabok deploy -s chequeyar-front` در Actions به **دمو** رفت. لاگ سبز [CD Product #1](https://github.com/alamalhoda/checkyar-googleai/actions/runs/32469027546): `Deployed to chequeyar-front-demo`. پنل `chequeyar-front` استقرار جدید نداشت.
 
 اصلاح: پرامپت [`prompts/06-fix-cd-product-chabok-json.md`](../../ai-documents/features/cicd-chabokan-prod/prompts/06-fix-cd-product-chabok-json.md) — روی runner قبل از deploy، `chabok.json` موقت با `chequeyar-front`؛ فایل git همان دمو بماند.
 
@@ -145,6 +145,7 @@ Check ناموفق است؛ چابکان rollback خودکار ندارد.
 | سند | نقش |
 |-----|-----|
 | **همین فایل** | آموزش انسان برای CD و `product` |
+| [`DEVELOPMENT_TO_DEPLOY.md`](./DEVELOPMENT_TO_DEPLOY.md) | نقشهٔ آموزشی توسعه تا استقرار |
 | [`GIT_TAGS_AND_RELEASES.md`](./GIT_TAGS_AND_RELEASES.md) | آموزش تگ / Release / GHCR |
 | [`PRODUCTION_CHABOKAN_DEPLOY.md`](./PRODUCTION_CHABOKAN_DEPLOY.md) | env پنل، دامنهٔ سفارشی، لینک هاب |
 | [`FRONTEND_DEVELOPMENT_STATUS.md`](./FRONTEND_DEVELOPMENT_STATUS.md) | Studio یک‌طرفه؛ `main` در برابر `product` |

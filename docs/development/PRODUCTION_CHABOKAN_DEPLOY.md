@@ -103,6 +103,7 @@ bun run build
 
 ## Related
 
+- End-to-end teaching map (dev → test → deploy): [`DEVELOPMENT_TO_DEPLOY.md`](./DEVELOPMENT_TO_DEPLOY.md)
 - Daily vs product runtimes: [`LOCAL_DEV_AND_PRODUCT_RUNTIME.md`](./LOCAL_DEV_AND_PRODUCT_RUNTIME.md)
 - Backend staging notes: [`backend/README.md`](../../backend/README.md)
 - Demo vs prod DB: [`BACKEND_DEMO_SEED_AND_DATA.md`](./BACKEND_DEMO_SEED_AND_DATA.md)

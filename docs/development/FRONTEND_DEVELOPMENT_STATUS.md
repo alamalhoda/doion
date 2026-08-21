@@ -128,6 +128,7 @@ UI remains external + one-way until after MVP acceptance. Do **not** migrate int
 - Public landing feature spec: [`ai-documents/features/public-landing-page/feature_spec.md`](../../ai-documents/features/public-landing-page/feature_spec.md)
 - Page review log: [`PAGE_REVIEW_LOG.md`](./PAGE_REVIEW_LOG.md)
 - V1 Phase A Studio prompt (KYC / upload / moderation Live): [`V1_PHASE_A_STUDIO_PROMPT.md`](./V1_PHASE_A_STUDIO_PROMPT.md)
+- End-to-end teaching map: [`DEVELOPMENT_TO_DEPLOY.md`](./DEVELOPMENT_TO_DEPLOY.md)
 - Production Chabokan: [`PRODUCTION_CHABOKAN_DEPLOY.md`](./PRODUCTION_CHABOKAN_DEPLOY.md)
 - Product git tags / SemVer (doion Release, not UI repo): [`GIT_TAGS_AND_RELEASES.md`](./GIT_TAGS_AND_RELEASES.md)
 - Owner CD + `product` branch (human how-to): [`CHABOKAN_CD_AND_PRODUCT_BRANCH.md`](./CHABOKAN_CD_AND_PRODUCT_BRANCH.md)
