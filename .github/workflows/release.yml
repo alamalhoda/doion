@@ -1,0 +1,110 @@
+name: Release
+
+# Owner-only SemVer GitHub Release + GHCR images. Does not deploy to Chabokan.
+# Run from Actions → Release → Run workflow. Pick the git ref (usually develop) and a version.
+# Not triggered on merge to develop.
+
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: SemVer without or with a leading v (example 0.1.0-test.1)
+        required: true
+        type: string
+
+permissions:
+  contents: write
+  packages: write
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    env:
+      GHCR_API: ghcr.io/${{ github.repository_owner }}/doion-api
+      GHCR_SPA: ghcr.io/${{ github.repository_owner }}/chequeyar-front
+    steps:
+      - name: Checkout doion
+        uses: actions/checkout@v4
+
+      - name: Normalize SemVer tag
+        id: ver
+        env:
+          RAW: ${{ inputs.version }}
+        run: |
+          set -euo pipefail
+          tag="${RAW#v}"
+          if ! printf '%s' "$tag" | grep -Eq '^[0-9]+\.[0-9]+\.[0-9]+([.-][0-9A-Za-z.-]+)?$'; then
+            echo "version must be SemVer like 0.1.0 or 0.1.0-test.1"
+            exit 1
+          fi
+          echo "tag=v${tag}" >> "$GITHUB_OUTPUT"
+
+      - name: Fail if tag already exists
+        env:
+          GH_TOKEN: ${{ github.token }}
+          TAG: ${{ steps.ver.outputs.tag }}
+        run: |
+          set -euo pipefail
+          if gh api "repos/${{ github.repository }}/git/ref/tags/${TAG}" >/dev/null 2>&1; then
+            echo "tag ${TAG} already exists"
+            exit 1
+          fi
+
+      - name: Read UI pin
+        id: pin
+        run: |
+          set -euo pipefail
+          sha="$(tr -d '[:space:]' < e2e/ui-pin)"
+          if ! printf '%s' "$sha" | grep -Eq '^[0-9a-f]{40}$'; then
+            echo "e2e/ui-pin must be a 40-character commit SHA"
+            exit 1
+          fi
+          echo "sha=${sha}" >> "$GITHUB_OUTPUT"
+
+      - name: Checkout UI pin
+        uses: actions/checkout@v4
+        with:
+          repository: alamalhoda/checkyar-googleai
+          ref: ${{ steps.pin.outputs.sha }}
+          path: checkyar-googleai
+
+      - name: Build API image
+        run: docker build -t "${GHCR_API}:${{ steps.ver.outputs.tag }}" ./backend
+
+      - name: Build SPA image
+        run: |
+          docker build \
+            --build-arg VITE_USE_MOCK=false \
+            --build-arg VITE_API_BASE_URL=https://chequeyar-back.chbkn.dev/api/v1 \
+            -t "${GHCR_SPA}:${{ steps.ver.outputs.tag }}" \
+            ./checkyar-googleai
+
+      - name: Log in to GHCR
+        run: echo "${{ github.token }}" | docker login ghcr.io -u "${{ github.actor }}" --password-stdin
+
+      - name: Push images
+        run: |
+          docker push "${GHCR_API}:${{ steps.ver.outputs.tag }}"
+          docker push "${GHCR_SPA}:${{ steps.ver.outputs.tag }}"
+
+      - name: Create GitHub Release
+        env:
+          GH_TOKEN: ${{ github.token }}
+          TAG: ${{ steps.ver.outputs.tag }}
+        run: |
+          set -euo pipefail
+          git tag "$TAG" "${GITHUB_SHA}"
+          git push origin "refs/tags/${TAG}"
+          notes="Backend image: ${GHCR_API}:${TAG}
+          SPA image (UI pin ${{ steps.pin.outputs.sha }}): ${GHCR_SPA}:${TAG}
+
+          This release does not deploy to Chabokan. Run the later CD workflow to ship."
+          prerelease_flag=()
+          case "$TAG" in
+            *-*) prerelease_flag=(--prerelease) ;;
+          esac
+          gh release create "$TAG" \
+            --title "$TAG" \
+            --notes "$notes" \
+            --target "${GITHUB_SHA}" \
+            "${prerelease_flag[@]}"

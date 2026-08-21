@@ -93,7 +93,7 @@ Chat 2 فقط یک گام از لیست زیر را در هر نوبت پیاد�
   - فقط با اقدام عمدی مالک (مثلاً `workflow_dispatch`)، نه روی هر merge به `develop`.  
   - آموزش انسانی تگ: [`docs/development/GIT_TAGS_AND_RELEASES.md`](../../../docs/development/GIT_TAGS_AND_RELEASES.md).  
   **Verify:** یک تگ آزمایشی Release + ایمیج با همان تگ (محیط محصول را در این گام عوض نکن مگر کاربر بخواهد).  
-  **REVIEW NOTE:**
+  **REVIEW NOTE:** (2026-08-21) رجیستری چابکان در ریپو مشخص نبود → **GHCR** (`ghcr.io/alamalhoda/doion-api` و `ghcr.io/alamalhoda/chequeyar-front`). Workflow [`Release`](../../../.github/workflows/release.yml) فقط `workflow_dispatch`. ایمیج SPA از `e2e/ui-pin`. هنوز تگ آزمایشی زده نشده (منتظر تأیید مالک). Deploy زنده انجام نشد.
 
 - [ ] **Step 11 — cicd-backend: CD تأییدشده به `chequeyar-back`**  
   - `workflow_dispatch` (تأیید مالک = اجرای دستی workflow).  

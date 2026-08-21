@@ -23,7 +23,7 @@ Do **not** maintain a separate marketing version on the Vue repo and another on 
 - That tag versions **both** images: `doion-api` and `chequeyar-front` (SPA from `e2e/ui-pin`).
 - Studio still pushes UI to `main`; `product` is the git line for production SPA. Cursor never tags `checkyar-googleai`.
 
-Until that workflow exists on `develop`, there is no product tag to show.
+Until a Release has been cut on `develop`, there is no product tag to show in the app.
 
 Human how-to (git tags, when/how, SemVer): [`GIT_TAGS_AND_RELEASES.md`](./GIT_TAGS_AND_RELEASES.md).
 

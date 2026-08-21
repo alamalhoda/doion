@@ -6,7 +6,7 @@ API and SPA are **separate** services. Do not serve the Vue app from Django ngin
 
 Product API constraints: `config.settings.production`, **PostgreSQL only** (SQLite raises at startup), Gunicorn via [`backend/Dockerfile`](../../backend/Dockerfile). Secrets live in the Chabokan panel, not in git.
 
-Current ship path for `chequeyar-back` is still `chabok deploy` from `backend/` (source). Tagged image push and owner-approved GitHub CD are later CI/CD steps and do not change this contract. How to tag (education): [`GIT_TAGS_AND_RELEASES.md`](./GIT_TAGS_AND_RELEASES.md).
+Current ship path for `chequeyar-back` is still `chabok deploy` from `backend/` (source). A GitHub **Release** workflow can push tagged images to GHCR (`ghcr.io/alamalhoda/doion-api` and `ghcr.io/alamalhoda/chequeyar-front`); that does not change the live Chabokan services. Owner-approved CD is a later step. How to tag (education): [`GIT_TAGS_AND_RELEASES.md`](./GIT_TAGS_AND_RELEASES.md).
 
 ## Architecture
 

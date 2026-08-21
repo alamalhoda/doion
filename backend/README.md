@@ -101,7 +101,19 @@ uv run pytest
 
 بدون `postgres` در `DATABASE_URL`، pytest لوکال روی `test_db.sqlite3` می‌ماند. CI گیت‌هاب هرگز به SQLite برنمی‌گردد.
 
-E2E Playwright در [`.github/workflows/ci-e2e.yml`](../.github/workflows/ci-e2e.yml) هست و **gate ادغام PR به `develop` نیست**. اجرای دستی علیه یک commit فرانت: `gh workflow run "CI E2E Playwright" -f ui_sha=<sha>`. رویداد `repository_dispatch` با type‏ `frontend-e2e` و `client_payload.ui_sha` همان کار را می‌کند. بعد از E2E موفقِ dispatch، job جدا PR به `develop` باز می‌کند و فقط [`e2e/ui-pin`](../e2e/ui-pin) را عوض می‌کند (نه فایل workflow؛ `GITHUB_TOKEN` اجازهٔ ویرایش YAML را ندارد). Deploy به چابکان در GitHub Actions در این گام خودکار نیست؛ دستی با CLI (بخش بعد).
+E2E Playwright در [`.github/workflows/ci-e2e.yml`](../.github/workflows/ci-e2e.yml) هست و **gate ادغام PR به `develop` نیست**. اجرای دستی علیه یک commit فرانت: `gh workflow run "CI E2E Playwright" -f ui_sha=<sha>`. رویداد `repository_dispatch` با type‏ `frontend-e2e` و `client_payload.ui_sha` همان کار را می‌کند. بعد از E2E موفقِ dispatch، job جدا PR به `develop` باز می‌کند و فقط [`e2e/ui-pin`](../e2e/ui-pin) را عوض می‌کند (نه فایل workflow؛ `GITHUB_TOKEN` اجازهٔ ویرایش YAML را ندارد). Deploy به چابکان در GitHub Actions خودکار نیست؛ دستی با CLI (بخش بعد) یا بعداً با CD تأییدشده.
+
+### انتشار تگ‌شده (GHCR، بدون deploy)
+
+ایمیج API و SPA با یک تگ SemVer روی [GitHub Container Registry](https://github.com/alamalhoda/doion/pkgs) ساخته می‌شود؛ رجیستری چابکان در پنل ست نشده بود. فقط با اجرای دستی workflow [`Release`](../.github/workflows/release.yml) (نه روی هر merge به `develop`). محیط زنده عوض نمی‌شود.
+
+در GitHub: Actions → **Release** → Run workflow → شاخه (معمولاً `develop`) و نسخه مثل `0.1.0-test.1`.
+
+```bash
+gh workflow run Release --ref develop -f version=0.1.0-test.1
+```
+
+تگ تکراری رد می‌شود. نسخهٔ با پسوند (`-test.1`) به‌صورت prerelease ساخته می‌شود. SPA از SHA داخل [`e2e/ui-pin`](../e2e/ui-pin) بیلد می‌شود.
 
 ---
 
@@ -386,7 +398,7 @@ backend/                            ← ریشه بک‌اند (Django)
 | Staging / پایلوت | `chabok deploy` از `develop` روی `chequeyar-back` — Postgres در پنل |
 | Production | runbook موجود؛ **لانچ عمومی نشده** — [`PRODUCTION_CHABOKAN_DEPLOY.md`](../docs/development/PRODUCTION_CHABOKAN_DEPLOY.md) |
 
-تگ SemVer محصول (GitHub Release + ایمیج GHCR، بدون deploy خودکار) در [`GIT_TAGS_AND_RELEASES.md`](../docs/development/GIT_TAGS_AND_RELEASES.md) آموزش داده شده است. تا workflow `Release` روی `develop` نیاید، تگ محصول نزنید.
+تگ SemVer محصول (GitHub Release + ایمیج GHCR، بدون deploy خودکار) در [`GIT_TAGS_AND_RELEASES.md`](../docs/development/GIT_TAGS_AND_RELEASES.md) آموزش داده شده است.
 
 هرگز `seed_demo --reset` روی دیتابیس کاربران واقعی اجرا نکنید.
 

@@ -1,7 +1,7 @@
 # راهنمای آموزشی: تگ گیت، SemVer و انتشار محصول
 
 **مخاطب:** مالک پروژه که قبلاً از تگ گیت استفاده نکرده.  
-**وضعیت:** تگ محصول با workflow [`Release`](../../.github/workflows/release.yml) ساخته می‌شود. تا آن فایل روی `develop` نیاید، دستورهای Actions را اجرا نکنید.
+**وضعیت:** تگ محصول با workflow [`Release`](../../.github/workflows/release.yml) ساخته می‌شود (فقط `workflow_dispatch`؛ محیط زنده عوض نمی‌شود).
 
 سیاست اجرایی برای Cursor: [`.cursor/skills/semver-release/SKILL.md`](../../.cursor/skills/semver-release/SKILL.md).  
 Changelog داخل اپ (آینده): [`PRODUCT_CHANGELOG.md`](./PRODUCT_CHANGELOG.md).
@@ -67,7 +67,7 @@ commit abc123  ←  تگ v0.1.0-test.1
 2. اگر SPA هم در این نسخه است: SHA فرانت روی `product` باشد و [`e2e/ui-pin`](../../e2e/ui-pin) همان SHA را داشته باشد.
 3. فایل `.github/workflows/release.yml` روی همان ref که اجرا می‌کنید وجود داشته باشد.
 
-### اجرا (بعد از آمدن workflow روی `develop`)
+### اجرا
 
 از UI: GitHub → **Actions** → **Release** → **Run workflow** → شاخه `develop` → نسخه مثلاً `0.1.0-test.1`.
 
