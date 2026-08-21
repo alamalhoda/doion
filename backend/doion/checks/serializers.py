@@ -1,3 +1,5 @@
+from datetime import timedelta
+
 from django.utils import timezone
 from rest_framework import serializers
 
@@ -141,8 +143,13 @@ class ChequeListingCreateSerializer(CatalogBankInputMixin, serializers.ModelSeri
 
     def validate(self, attrs):
         attrs = super().validate(attrs)
-        today = timezone.now().date()
-        count = ChequeListing.objects.filter(owner=self.context["request"].user, created_at__date=today).count()
+        # Postgres `__date` uses UTC; TIME_ZONE is Asia/Tehran. Count the local calendar day.
+        day_start = timezone.localtime().replace(hour=0, minute=0, second=0, microsecond=0)
+        count = ChequeListing.objects.filter(
+            owner=self.context["request"].user,
+            created_at__gte=day_start,
+            created_at__lt=day_start + timedelta(days=1),
+        ).count()
         if count >= DAILY_LISTING_CREATE_LIMIT:
             raise serializers.ValidationError(
                 {"non_field_errors": ["Daily limit of 10 listings reached"]},
