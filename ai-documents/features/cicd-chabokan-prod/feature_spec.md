@@ -78,7 +78,7 @@ Playwright E2E در این نسخه **gate ادغام PR به `develop` نیست
 |--------|------|
 | GitHub Check موفق/ناموفق | تنها کانال گزارش به انسان |
 | `chequeyar-back` | API محصول پس از deploy تأییدشده |
-| `chequeyar-front` | SPA زنده در ایمیج Docker پس از deploy تأییدشده |
+| `chequeyar-front` | SPA زنده روی PaaS Static پس از deploy تأییدشده (ایمیج GHCR آرتیفکت نسخه است، نه pull فعلی پنل) |
 | GitHub Release + تگ SemVer | ردیابی commit مستقرشده |
 | ایمیج Docker با همان تگ برای API و SPA | آرتیفکت استقرار و تکرار deploy دستی قبلی |
 | اجرای E2E پس از push فرانت | نتیجه در Actions؛ غیرمسدودکننده برای PR بک‌اند |

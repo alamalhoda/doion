@@ -402,7 +402,7 @@ sequenceDiagram
 
 **توسعه محلی:** Django `runserver` + UI با Bun روی `127.0.0.1:3000`؛ دمو با `seed_demo` و در صورت نیاز SQLite جدا (`DJANGO_DEMO_DATABASE=1`).
 
-**تولید هدف (چابکان):** سرویس جدا برای API (`chequeyar-back`، Gunicorn + Postgres + Redis) و SPA (`chequeyar-front` از build ریپوی `checkyar-googleai`). جزئیات: [`PRODUCTION_CHABOKAN_DEPLOY.md`](development/PRODUCTION_CHABOKAN_DEPLOY.md).
+**تولید هدف (چابکان):** سرویس جدا برای API (`chequeyar-back`) و SPA روی PaaS **Static** (`chequeyar-front`، دامنه https://royasoft.dev). جزئیات: [`PRODUCTION_CHABOKAN_DEPLOY.md`](development/PRODUCTION_CHABOKAN_DEPLOY.md).
 
 docker-compose کامل با nginx در این مونورپو مسیر اصلی استقرار فعلی نیست.
 

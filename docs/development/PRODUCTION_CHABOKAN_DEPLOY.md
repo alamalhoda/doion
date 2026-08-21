@@ -12,12 +12,16 @@ Current ship path for `chequeyar-back` is still Chabokan CLI from `backend/` sou
 
 Chabokan **service name** (CLI `-s`, panel) is not always the URL users type. Custom domains on the SPA services:
 
-| PaaS service | Public site | Panel |
-|--------------|-------------|--------|
-| `chequeyar-front` | https://royasoft.dev | [hub …/WxWBVMz](https://hub.chabokan.net/fa/services/detail/WxWBVMz) |
-| `chequeyar-front-demo` | https://royasoftgroup.ir | [hub …/Gwj1p2q](https://hub.chabokan.net/fa/services/detail/Gwj1p2q) |
-| `chequeyar-back` | https://chequeyar-back.chbkn.dev (no custom domain recorded) | [hub …/yz06Brq](https://hub.chabokan.net/fa/services/detail/yz06Brq) |
-| `chequeyar-db` | not a website — PostgreSQL for `chequeyar-back` | [hub …/Rz36Kow](https://hub.chabokan.net/fa/services/detail/Rz36Kow) |
+| PaaS service | Type | Public site | Panel |
+|--------------|------|-------------|--------|
+| `chequeyar-front` | **Static** | https://royasoft.dev | [hub …/Yq40OKq](https://hub.chabokan.net/fa/services/detail/Yq40OKq) |
+| `chequeyar-front-demo` | **Static** | https://royasoftgroup.ir | [hub …/Gwj1p2q](https://hub.chabokan.net/fa/services/detail/Gwj1p2q) |
+| `chequeyar-back` | Django (source CLI) | https://chequeyar-back.chbkn.dev (no custom domain recorded) | [hub …/yz06Brq](https://hub.chabokan.net/fa/services/detail/yz06Brq) |
+| `chequeyar-db` | Postgres | not a website — PostgreSQL for `chequeyar-back` | [hub …/Rz36Kow](https://hub.chabokan.net/fa/services/detail/Rz36Kow) |
+
+The previous Vue-type `chequeyar-front` was deleted and recreated as Static with the **same service name**. Do not use Vue PaaS nginx (`root /app/dist`) or panel `VITE_*` for this host. Uploaded `nginx.conf` uses `root /usr/share/nginx/html/dist` ([Chabokan Static nginx](https://docs.chabokan.net/cloud-hosting/static/nginx-config/)). Keep `nginx.conf` out of `.chabokignore` while both front services are Static.
+
+SPA `VITE_*` is baked in at GitHub Actions build time. Chabokan Static does not run `npm run build` on the server.
 
 The live SPA bundle is compiled with `VITE_API_BASE_URL=https://chequeyar-back.chbkn.dev/api/v1`. Changing only the front domain does **not** change that API URL. If the product site is `https://royasoft.dev`, the API CORS list on `chequeyar-back` must include that origin (and `https://www.royasoft.dev` if you use www):
 
@@ -47,7 +51,7 @@ chabok deploy
 ```
 
 ```bash
-gh workflow run "CD Backend" --ref develop -f tag=v0.1.0-test.1
+gh workflow run "CD Backend" --ref develop -f tag=v0.1.0-test.2
 ```
 
 Pre-start (`chabok-pre-start.sh`): `migrate` + `collectstatic`.
@@ -69,19 +73,24 @@ Pre-start (`chabok-pre-start.sh`): `migrate` + `collectstatic`.
 
 `SECURE_HSTS_SECONDS` in [`production.py`](../../backend/config/settings/production.py) should be raised after HTTPS is verified (start from short TTL, ramp to long).
 
-## D2 — SPA (`chequeyar-front`)
+## D2 — SPA (`chequeyar-front`, Static)
 
-Build from [checkyar-googleai](https://github.com/alamalhoda/checkyar-googleai) (pull AI Studio `main`):
+Owner path: merge `main` → `product`, then **CD Product (Chabokan live)** on branch `product` (`chabok deploy -s chequeyar-front`). GitHub Actions builds with `VITE_USE_MOCK=false` and `VITE_API_BASE_URL=https://chequeyar-back.chbkn.dev/api/v1`. Confirm mock chrome is absent. Do not edit `cd-demo.yml` for product deploys.
+
+`/landing` is gated by API flag `show_landing_page` (seed default **off**). Mock demo enables that flag in the simulator; live does not until an admin toggles it.
+
+SPA login/JWT uses `users.User.role`, not only Identity → Profile. Django Users admin shows **Role**; saving User or Profile copies the role to the other row.
+
+Manual equivalent (Cursor must not push UI):
 
 ```bash
 cd /path/to/checkyar-googleai
-git pull origin main
-printf 'VITE_USE_MOCK=false\nVITE_API_BASE_URL=https://<api-host>/api/v1\n' > .env.production.local
+git pull origin product
+printf 'VITE_USE_MOCK=false\nVITE_API_BASE_URL=https://chequeyar-back.chbkn.dev/api/v1\n' > .env.production.local
 bun install
 bun run build
+# owner: chabok deploy -s chequeyar-front
 ```
-
-Deploy `dist/` to the static front service on Chabokan (separate from `chequeyar-back`). Confirm mock chrome is absent. Owner-triggered GitHub CD for `chequeyar-front` is Studio prompt [`prompts/05-cd-product-front.md`](../../ai-documents/features/cicd-chabokan-prod/prompts/05-cd-product-front.md) (do not edit `cd-demo.yml`).
 
 ## D3 — Acceptance checklist
 
@@ -94,6 +103,7 @@ Deploy `dist/` to the static front service on Chabokan (separate from `chequeyar
 
 ## Related
 
+- End-to-end teaching map (dev → test → deploy): [`DEVELOPMENT_TO_DEPLOY.md`](./DEVELOPMENT_TO_DEPLOY.md)
 - Daily vs product runtimes: [`LOCAL_DEV_AND_PRODUCT_RUNTIME.md`](./LOCAL_DEV_AND_PRODUCT_RUNTIME.md)
 - Backend staging notes: [`backend/README.md`](../../backend/README.md)
 - Demo vs prod DB: [`BACKEND_DEMO_SEED_AND_DATA.md`](./BACKEND_DEMO_SEED_AND_DATA.md)

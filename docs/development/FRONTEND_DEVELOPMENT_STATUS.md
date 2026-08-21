@@ -1,6 +1,6 @@
 # Frontend Development Status
 
-**As of:** 2026-08-18
+**As of:** 2026-08-21
 
 This document is the SSOT for *where* active UI work happens and how it relates to this monorepo.
 
@@ -9,7 +9,7 @@ This document is the SSOT for *where* active UI work happens and how it relates 
 | Component | Location | Role |
 |-----------|----------|------|
 | **Backend + API contract** | This repo (`doion`) — `backend/`, `docs/development/MASTER_API_CONTRACT.md` | Source of truth for API; developed with GitFlow (`feature/*` → PR → `develop`) |
-| **Active frontend** | External: [alamalhoda/checkyar-googleai](https://github.com/alamalhoda/checkyar-googleai) | Product UI under active development |
+| **Active frontend** | External: [alamalhoda/checkyar-googleai](https://github.com/alamalhoda/checkyar-googleai) | Product UI under active development. Live: [royasoft.dev](https://royasoft.dev/) (`product` + CD Product). Mock demo: [royasoftgroup.ir](https://royasoftgroup.ir/) (`main` + CD Demo). |
 | **Cursor frontend rules** | `.cursor/rules/frontend/` | Apply to future in-monorepo `frontend/` code after AI Studio exit |
 
 ## One-way sync rule (mandatory while AI Studio is the UI source)
@@ -128,6 +128,7 @@ UI remains external + one-way until after MVP acceptance. Do **not** migrate int
 - Public landing feature spec: [`ai-documents/features/public-landing-page/feature_spec.md`](../../ai-documents/features/public-landing-page/feature_spec.md)
 - Page review log: [`PAGE_REVIEW_LOG.md`](./PAGE_REVIEW_LOG.md)
 - V1 Phase A Studio prompt (KYC / upload / moderation Live): [`V1_PHASE_A_STUDIO_PROMPT.md`](./V1_PHASE_A_STUDIO_PROMPT.md)
+- End-to-end teaching map: [`DEVELOPMENT_TO_DEPLOY.md`](./DEVELOPMENT_TO_DEPLOY.md)
 - Production Chabokan: [`PRODUCTION_CHABOKAN_DEPLOY.md`](./PRODUCTION_CHABOKAN_DEPLOY.md)
 - Product git tags / SemVer (doion Release, not UI repo): [`GIT_TAGS_AND_RELEASES.md`](./GIT_TAGS_AND_RELEASES.md)
 - Owner CD + `product` branch (human how-to): [`CHABOKAN_CD_AND_PRODUCT_BRANCH.md`](./CHABOKAN_CD_AND_PRODUCT_BRANCH.md)

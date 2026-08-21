@@ -95,29 +95,29 @@ Chat 2 فقط یک گام از لیست زیر را در هر نوبت پیاد�
   **Verify:** یک تگ آزمایشی Release + ایمیج با همان تگ (محیط محصول را در این گام عوض نکن مگر کاربر بخواهد).  
   **REVIEW NOTE:** (2026-08-21) رجیستری چابکان در ریپو مشخص نبود → **GHCR**. Workflow [`Release`](../../../.github/workflows/release.yml) فقط `workflow_dispatch`. تگ آزمایشی [`v0.1.0-test.1`](https://github.com/alamalhoda/doion/releases/tag/v0.1.0-test.1)؛ job سبز [32462146019](https://github.com/alamalhoda/doion/actions/runs/32462146019). ایمیج‌ها `ghcr.io/alamalhoda/doion-api:v0.1.0-test.1` و `chequeyar-front` همان تگ. Deploy زنده در این گام نشد.
 
-- [ ] **Step 11 — cicd-backend: CD تأییدشده به `chequeyar-back`**  
+- [x] **Step 11 — cicd-backend: CD تأییدشده به `chequeyar-back`**  
   - `workflow_dispatch` (تأیید مالک = اجرای دستی workflow).  
   - فقط اگر تست اجباری همان commit/تگ سبز بوده.  
   - Postgres در پنل چابکان؛ SQLite نه.  
   - `cd-demo` فرانت را لمس نکن.  
   - شکست job: Check قرمز؛ بازیابی = اجرای مجدد deploy آخرین تگ موفق (سند یک پاراگراف در README).  
   **Verify:** dry-run یا deploy واقعی فقط با تأیید صریح کاربر در Chat 2.  
-  **REVIEW NOTE:** (2026-08-21) Workflow [`CD Backend`](../../../.github/workflows/cd-backend.yml): ورودی `tag`، وجود GitHub Release + ایمیج GHCR، آخرین run سبز `CI Backend` روی همان SHA، سپس `chabok deploy -s chequeyar-back -p backend` با `CHABOKAN_TOKEN`. سرویس Django فعلی از سورس تگ بیلد می‌شود (نه pull ایمیج GHCR؛ تبدیل نوع سرویس پنل خارج از این گام). **هنوز dispatch نشده.**
+  **REVIEW NOTE:** (2026-08-21) Workflow [`CD Backend`](../../../.github/workflows/cd-backend.yml): ورودی `tag`، وجود GitHub Release + ایمیج GHCR، آخرین run سبز `CI Backend` روی همان SHA، سپس `chabok deploy -s chequeyar-back -p backend`. سورس تگ روی سرویس Django بیلد می‌شود (نه pull GHCR). Verify: مالک CD را با [`v0.1.0-test.1`](https://github.com/alamalhoda/doion/releases/tag/v0.1.0-test.1) و بعد [`v0.1.0-test.2`](https://github.com/alamalhoda/doion/releases/tag/v0.1.0-test.2) اجرا کرد؛ نقش ادمین `modir` روی API زنده درست شد.
 
-- [ ] **Step 12 — cicd-frontend: پرامپت CD از `product` به `chequeyar-front`**  
+- [x] **Step 12 — cicd-frontend: پرامپت CD از `product` به `chequeyar-front`**  
   - `prompts/05-cd-product-front.md`؛ اصلاح CLI: `prompts/06-fix-cd-product-chabok-json.md`.  
   - ایمیج زنده؛ `workflow_dispatch` پس از merge به `product`.  
   - `cd-demo.yml` بدون تغییر.  
   **Verify:** پس از SHA Studio و تأیید مالک، سرویس محصول SPA (نه دمو) به‌روز می‌شود.  
-  **REVIEW NOTE:** (2026-08-21) SHA Studio `bb2b72bd9a15f881c0235dbe43b8fcb08cbc415e` روی `main`: [`cd-product.yml`](https://github.com/alamalhoda/checkyar-googleai/blob/bb2b72bd9a15f881c0235dbe43b8fcb08cbc415e/.github/workflows/cd-product.yml) فقط `workflow_dispatch`، باندل زنده، `chabok deploy -s chequeyar-front`. `cd-demo.yml` / `ci.yml` / `dispatch-doion-e2e.yml` / `chabok.json` در آن commit نیستند. CI سبز: [32463702004](https://github.com/alamalhoda/checkyar-googleai/actions/runs/32463702004). CD Demo (mock، انتظار می‌رود روی push به `main`) سبز: [32463701978](https://github.com/alamalhoda/checkyar-googleai/actions/runs/32463701978). E2E دویون سبز: [32463813416](https://github.com/alamalhoda/doion/actions/runs/32463813416). پین: [doion#49](https://github.com/alamalhoda/doion/pull/49). (بعداً) Run [32469027546](https://github.com/alamalhoda/checkyar-googleai/actions/runs/32469027546) روی `product` سبز بود ولی لاگ `Deployed to chequeyar-front-demo` — CLI مقدار `chabok.json` را بر `-s` اولویت می‌دهد. پنل `chequeyar-front` استقرار جدید نداشت. پرامپت اصلاح: `prompts/06-fix-cd-product-chabok-json.md`. Cursor به UI push نکرد.
+  **REVIEW NOTE:** (2026-08-21) SHA Studio `bb2b72b` + پرامپت ۰۶ (`chabok.json` روی runner). سرویس Vue حذف و Static هم‌نام ([Yq40OKq](https://hub.chabokan.net/fa/services/detail/Yq40OKq)). `nginx.conf` از `.chabokignore` خارج شد (`4bcf1a1`، [checkyar-googleai#10](https://github.com/alamalhoda/checkyar-googleai/pull/10)). Verify: CD Product روی `product`؛ [royasoft.dev](https://royasoft.dev/) SPA زنده است. `cd-demo.yml` دست نخورده. GHCR SPA آرتیفکت تگ است؛ PaaS هنوز CLI باندل است.
 
 ### مستندات پایانی doion
 
-- [ ] **Step 13 — docs در doion**  
-  - `backend/README.md` و در صورت نیاز `docs/development/PRODUCTION_CHABOKAN_DEPLOY.md`: دو مسیر لوکال، CI=Postgres، محصول=Postgres، بدون staging، جریان `product` فرانت، بازیابی دستی.  
+- [x] **Step 13 — docs در doion**  
+  - `backend/README.md` و در صورت نیاز `docs/development/PRODUCTION_CHABOKAN_DEPLOY.md`: دو مسیر لوکال، CI=Postgres، محصول=Postgres، بدون staging جدید، جریان `product` فرانت، بازیابی دستی.  
   - `MASTER_API_CONTRACT.md` را برای این ویژگی عوض نکن مگر رفتار API عوض شده باشد (نباید شده باشد).  
   **Verify:** سند با spec یکی است.  
-  **REVIEW NOTE:** (2026-08-21) آموزش CD برای مالک: [`CHABOKAN_CD_AND_PRODUCT_BRANCH.md`](../../../docs/development/CHABOKAN_CD_AND_PRODUCT_BRANCH.md). همگام کامل README/runbook با وضعیت نهایی بعد از اولین CD زنده (گام ۱۱/۱۲ Verify). `MASTER_API_CONTRACT.md` دست نخورده.
+  **REVIEW NOTE:** (2026-08-21) پس از Verify گام ۱۱/۱۲: Static `chequeyar-front` پنل Yq40OKq، تگ `v0.1.0-test.2`، راهنمای مالک [`CHABOKAN_CD_AND_PRODUCT_BRANCH.md`](../../../docs/development/CHABOKAN_CD_AND_PRODUCT_BRANCH.md)، README بازیابی دستی CD. `MASTER_API_CONTRACT.md` دست نخورده.
 
 ## Key Decisions & Assumptions
 
