@@ -88,12 +88,12 @@ Chat 2 فقط یک گام از لیست زیر را در هر نوبت پیاد�
   **Verify:** کاربر می‌تواند PR `main` → `product` باز کند و Checks سبز ببیند.  
   **REVIEW NOTE:** (2026-08-21) SHA Studio `885177492fb7102ba0ecdc814c0c680564d28ded` روی `main`: `ci.yml` برای push/PR روی `main` و `product`؛ پنج گام bun+docker همان ترتیب. `cd-demo.yml` و `dispatch-doion-e2e.yml` در diff نیستند. CI و CD Demo روی push به `main` سبز: [32454126822](https://github.com/alamalhoda/checkyar-googleai/actions/runs/32454126822). Studio نتوانست `product` بسازد؛ ref از SHA داکر `b3fd3a8` ساخته شد تا PR خالی نباشد. PR [checkyar-googleai#6](https://github.com/alamalhoda/checkyar-googleai/pull/6) پایه `product` / سر `main`؛ job PR سبز: [32454483883](https://github.com/alamalhoda/checkyar-googleai/actions/runs/32454483883). مالک PR را merge کرد (`fa7952c` روی `product`). پیش‌فرض ریپو همچنان `main`. Deploy به `chequeyar-front` نشد. شاخهٔ `product` خط تولید است و نباید حذف شود.
 
-- [ ] **Step 10 — cicd-backend: GitHub Release / SemVer و ایمیج تگ‌شده**  
+- [x] **Step 10 — cicd-backend: GitHub Release / SemVer و ایمیج تگ‌شده**  
   - تگ SemVer + Release برای commit بک‌اند؛ build/push ایمیج با همان تگ (رجیستری: چابکان یا GHCR — در REVIEW NOTE ثبت شود اگر رجیستری در پنل از قبل معلوم است).  
   - فقط با اقدام عمدی مالک (مثلاً `workflow_dispatch`)، نه روی هر merge به `develop`.  
   - آموزش انسانی تگ: [`docs/development/GIT_TAGS_AND_RELEASES.md`](../../../docs/development/GIT_TAGS_AND_RELEASES.md).  
   **Verify:** یک تگ آزمایشی Release + ایمیج با همان تگ (محیط محصول را در این گام عوض نکن مگر کاربر بخواهد).  
-  **REVIEW NOTE:** (2026-08-21) رجیستری چابکان در ریپو مشخص نبود → **GHCR** (`ghcr.io/alamalhoda/doion-api` و `ghcr.io/alamalhoda/chequeyar-front`). Workflow [`Release`](../../../.github/workflows/release.yml) فقط `workflow_dispatch`. ایمیج SPA از `e2e/ui-pin`. هنوز تگ آزمایشی زده نشده (منتظر تأیید مالک). Deploy زنده انجام نشد.
+  **REVIEW NOTE:** (2026-08-21) رجیستری چابکان در ریپو مشخص نبود → **GHCR**. Workflow [`Release`](../../../.github/workflows/release.yml) فقط `workflow_dispatch`. تگ آزمایشی [`v0.1.0-test.1`](https://github.com/alamalhoda/doion/releases/tag/v0.1.0-test.1)؛ job سبز [32462146019](https://github.com/alamalhoda/doion/actions/runs/32462146019). ایمیج‌ها `ghcr.io/alamalhoda/doion-api:v0.1.0-test.1` و `chequeyar-front` همان تگ. Deploy زنده در این گام نشد.
 
 - [ ] **Step 11 — cicd-backend: CD تأییدشده به `chequeyar-back`**  
   - `workflow_dispatch` (تأیید مالک = اجرای دستی workflow).  
@@ -102,14 +102,14 @@ Chat 2 فقط یک گام از لیست زیر را در هر نوبت پیاد�
   - `cd-demo` فرانت را لمس نکن.  
   - شکست job: Check قرمز؛ بازیابی = اجرای مجدد deploy آخرین تگ موفق (سند یک پاراگراف در README).  
   **Verify:** dry-run یا deploy واقعی فقط با تأیید صریح کاربر در Chat 2.  
-  **REVIEW NOTE:**
+  **REVIEW NOTE:** (2026-08-21) Workflow [`CD Backend`](../../../.github/workflows/cd-backend.yml): ورودی `tag`، وجود GitHub Release + ایمیج GHCR، آخرین run سبز `CI Backend` روی همان SHA، سپس `chabok deploy -s chequeyar-back -p backend` با `CHABOKAN_TOKEN`. سرویس Django فعلی از سورس تگ بیلد می‌شود (نه pull ایمیج GHCR؛ تبدیل نوع سرویس پنل خارج از این گام). **هنوز dispatch نشده.**
 
 - [ ] **Step 12 — cicd-frontend: پرامپت CD از `product` به `chequeyar-front`**  
   - `prompts/05-cd-product-front.md`.  
   - ایمیج زنده؛ `workflow_dispatch` پس از merge به `product`.  
   - `cd-demo.yml` بدون تغییر.  
   **Verify:** پس از SHA Studio و تأیید مالک، سرویس محصول SPA (نه دمو) به‌روز می‌شود.  
-  **REVIEW NOTE:**
+  **REVIEW NOTE:** (2026-08-21) پرامپت نوشته شد. اجرا در Studio و dispatch به `chequeyar-front` هنوز نشده. مسیر چابکان مثل دمو آپلود `dist/` است نه pull ایمیج GHCR.
 
 ### مستندات پایانی doion
 

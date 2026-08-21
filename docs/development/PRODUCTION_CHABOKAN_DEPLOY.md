@@ -6,7 +6,7 @@ API and SPA are **separate** services. Do not serve the Vue app from Django ngin
 
 Product API constraints: `config.settings.production`, **PostgreSQL only** (SQLite raises at startup), Gunicorn via [`backend/Dockerfile`](../../backend/Dockerfile). Secrets live in the Chabokan panel, not in git.
 
-Current ship path for `chequeyar-back` is still `chabok deploy` from `backend/` (source). A GitHub **Release** workflow can push tagged images to GHCR (`ghcr.io/alamalhoda/doion-api` and `ghcr.io/alamalhoda/chequeyar-front`); that does not change the live Chabokan services. Owner-approved CD is a later step. How to tag (education): [`GIT_TAGS_AND_RELEASES.md`](./GIT_TAGS_AND_RELEASES.md).
+Current ship path for `chequeyar-back` is still Chabokan CLI from `backend/` source (local `chabok deploy`, or owner-triggered GitHub workflow **CD Backend** with an existing SemVer tag). GHCR images from **Release** are versioned artifacts; this service type still builds the tagged Django source on Chabokan, not a GHCR pull. How to tag: [`GIT_TAGS_AND_RELEASES.md`](./GIT_TAGS_AND_RELEASES.md).
 
 ## Architecture
 
@@ -21,12 +21,16 @@ Browser → https://chequeyar-front… (static SPA)
 
 ## D1 — API (`chequeyar-back`)
 
-From [`backend/`](../../backend/) after release to `main` (or approved production branch):
+From [`backend/`](../../backend/) after an approved tag, either locally or via Actions **CD Backend** (`workflow_dispatch`, input `tag`):
 
 ```bash
 cd backend
 chabok login
 chabok deploy
+```
+
+```bash
+gh workflow run "CD Backend" --ref develop -f tag=v0.1.0-test.1
 ```
 
 Pre-start (`chabok-pre-start.sh`): `migrate` + `collectstatic`.
@@ -60,7 +64,7 @@ bun install
 bun run build
 ```
 
-Deploy `dist/` to the static front service on Chabokan (separate from `chequeyar-back`). Confirm mock chrome is absent.
+Deploy `dist/` to the static front service on Chabokan (separate from `chequeyar-back`). Confirm mock chrome is absent. Owner-triggered GitHub CD for `chequeyar-front` is Studio prompt [`prompts/05-cd-product-front.md`](../../ai-documents/features/cicd-chabokan-prod/prompts/05-cd-product-front.md) (do not edit `cd-demo.yml`).
 
 ## D3 — Acceptance checklist
 

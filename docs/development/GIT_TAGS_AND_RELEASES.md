@@ -83,7 +83,7 @@ gh workflow run Release --ref develop -f version=0.1.0-test.1
 
 - [Releases ریپوی doion](https://github.com/alamalhoda/doion/releases)
 - پکیج‌های GHCR: `doion-api` و `chequeyar-front` با همان تگ
-- این مرحله **سرویس چابکان را عوض نمی‌کند**
+- این مرحله **سرویس چابکان را عوض نمی‌کند**؛ deploy زنده workflow جدا **CD Backend** است.
 
 گلوله‌های changelog (متن PR بک‌اند + گلوله‌های Studio) را در یادداشت همان Release، بخش Backend / Frontend بگذارید.
 
