@@ -129,3 +129,4 @@ UI remains external + one-way until after MVP acceptance. Do **not** migrate int
 - Page review log: [`PAGE_REVIEW_LOG.md`](./PAGE_REVIEW_LOG.md)
 - V1 Phase A Studio prompt (KYC / upload / moderation Live): [`V1_PHASE_A_STUDIO_PROMPT.md`](./V1_PHASE_A_STUDIO_PROMPT.md)
 - Production Chabokan: [`PRODUCTION_CHABOKAN_DEPLOY.md`](./PRODUCTION_CHABOKAN_DEPLOY.md)
+- Product git tags / SemVer (doion Release, not UI repo): [`GIT_TAGS_AND_RELEASES.md`](./GIT_TAGS_AND_RELEASES.md)

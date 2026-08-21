@@ -80,17 +80,18 @@ Chat 2 فقط یک گام از لیست زیر را در هر نوبت پیاد�
 
 ### مسیر تولید فرانت (`product`) و انتشار
 
-- [ ] **Step 9 — cicd-frontend: پرامپت شاخه `product` و CI روی PR به آن**  
+- [x] **Step 9 — cicd-frontend: پرامپت شاخه `product` و CI روی PR به آن**  
   - `prompts/04-product-branch.md`.  
   - `main` همچنان هدف پوش Studio؛ `product` تولید.  
   - همان تست‌های اجباری Step 2 روی PR به `product`.  
   - از `main` خام به `chequeyar-front` deploy نشود.  
   **Verify:** کاربر می‌تواند PR `main` → `product` باز کند و Checks سبز ببیند.  
-  **REVIEW NOTE:**
+  **REVIEW NOTE:** (2026-08-21) SHA Studio `885177492fb7102ba0ecdc814c0c680564d28ded` روی `main`: `ci.yml` برای push/PR روی `main` و `product`؛ پنج گام bun+docker همان ترتیب. `cd-demo.yml` و `dispatch-doion-e2e.yml` در diff نیستند. CI و CD Demo روی push به `main` سبز: [32454126822](https://github.com/alamalhoda/checkyar-googleai/actions/runs/32454126822). Studio نتوانست `product` بسازد؛ ref از SHA داکر `b3fd3a8` ساخته شد تا PR خالی نباشد. PR [checkyar-googleai#6](https://github.com/alamalhoda/checkyar-googleai/pull/6) پایه `product` / سر `main`؛ job PR سبز: [32454483883](https://github.com/alamalhoda/checkyar-googleai/actions/runs/32454483883). مالک PR را merge کرد (`fa7952c` روی `product`). پیش‌فرض ریپو همچنان `main`. Deploy به `chequeyar-front` نشد. شاخهٔ `product` خط تولید است و نباید حذف شود.
 
 - [ ] **Step 10 — cicd-backend: GitHub Release / SemVer و ایمیج تگ‌شده**  
   - تگ SemVer + Release برای commit بک‌اند؛ build/push ایمیج با همان تگ (رجیستری: چابکان یا GHCR — در REVIEW NOTE ثبت شود اگر رجیستری در پنل از قبل معلوم است).  
   - فقط با اقدام عمدی مالک (مثلاً `workflow_dispatch`)، نه روی هر merge به `develop`.  
+  - آموزش انسانی تگ: [`docs/development/GIT_TAGS_AND_RELEASES.md`](../../../docs/development/GIT_TAGS_AND_RELEASES.md).  
   **Verify:** یک تگ آزمایشی Release + ایمیج با همان تگ (محیط محصول را در این گام عوض نکن مگر کاربر بخواهد).  
   **REVIEW NOTE:** (2026-08-21) رجیستری چابکان در ریپو مشخص نبود → **GHCR** (`ghcr.io/alamalhoda/doion-api` و `ghcr.io/alamalhoda/chequeyar-front`). Workflow [`Release`](../../../.github/workflows/release.yml) فقط `workflow_dispatch`. ایمیج SPA از `e2e/ui-pin`. هنوز تگ آزمایشی زده نشده (منتظر تأیید مالک). Deploy زنده انجام نشد.
 

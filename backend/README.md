@@ -398,6 +398,8 @@ backend/                            ← ریشه بک‌اند (Django)
 | Staging / پایلوت | `chabok deploy` از `develop` روی `chequeyar-back` — Postgres در پنل |
 | Production | runbook موجود؛ **لانچ عمومی نشده** — [`PRODUCTION_CHABOKAN_DEPLOY.md`](../docs/development/PRODUCTION_CHABOKAN_DEPLOY.md) |
 
+تگ SemVer محصول (GitHub Release + ایمیج GHCR، بدون deploy خودکار) در [`GIT_TAGS_AND_RELEASES.md`](../docs/development/GIT_TAGS_AND_RELEASES.md) آموزش داده شده است.
+
 هرگز `seed_demo --reset` روی دیتابیس کاربران واقعی اجرا نکنید.
 
 ---
