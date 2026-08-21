@@ -57,19 +57,19 @@ Chat 2 فقط یک گام از لیست زیر را در هر نوبت پیاد�
   **Verify:** یک push Studio → run E2E در doion روی همان SHA.  
   **REVIEW NOTE:** (2026-08-20) SHA Studio `5053b986dc9ee993de1f8224b82135f048164ff6`. `dispatch-doion-e2e.yml` جدا؛ `ci.yml`/`cd-demo.yml` در آن commit نیستند. CI چهار گام سبز. CD Demo سبز. PR [#36](https://github.com/alamalhoda/doion/pull/36) روی `develop`. PAT اول 401 بود؛ بعد از تعویض secret، همان run از نوع `workflow_run` دوباره اجرا شد و سبز شد: [32375579812](https://github.com/alamalhoda/checkyar-googleai/actions/runs/32375579812) با HTTP 204 و `ui_sha=5053b98…`. E2E دویون از Actions: [32403989662](https://github.com/alamalhoda/doion/actions/runs/32403989662). قانون ۲۴ (bump پین) گام ۶ است.
 
-- [ ] **Step 6 — cicd-backend: bump پین E2E فقط با PR به develop**  
+- [x] **Step 6 — cicd-backend: bump پین E2E فقط با PR به develop**  
   - یا سند دستی bump بعد از هر UI موفق، یا job که PR باز می‌کند (نه commit مستقیم به `develop`/`main`).  
   **Verify:** پین با GitFlow عوض می‌شود.  
-  **REVIEW NOTE:** (2026-08-20) Job `bump-pin` بعد از E2E موفق dispatch برنچ `feature/e2e-ui-pin-<12>` و PR به `develop` می‌سازد. Verify اول با YAML شکست خورد: [run 32408366614](https://github.com/alamalhoda/doion/actions/runs/32408366614) — `GITHUB_TOKEN` اجازهٔ push به `.github/workflows/*.yml` ندارد. پین به `e2e/ui-pin` منتقل شد (تناقض عملی با نگه‌داشتن پین داخل YAML). PR/push پین را bump نمی‌کند.
+  **REVIEW NOTE:** (2026-08-20) پین در `e2e/ui-pin` است نه YAML (`GITHUB_TOKEN` نمی‌تواند workflow را push کند: [run 32408366614](https://github.com/alamalhoda/doion/actions/runs/32408366614)). بعد از تیک Actions «create and approve pull requests»، bot PR ساخت: [#40](https://github.com/alamalhoda/doion/pull/40) (`20a999d…` آزمایشی؛ merge نشود مگر پین عمداً عقب برود). پین زنده روی `develop`: `5053b98…` از [#39](https://github.com/alamalhoda/doion/pull/39). Job روی PR/push به develop پین را bump نمی‌کند. قانون ۲۴ با merge PR پین برآورده می‌شود.
 
 ### Docker تصاویر محصول (هنوز بدون deploy خودکار)
 
-- [ ] **Step 7 — cicd-backend: Dockerfile بک‌اند**  
+- [x] **Step 7 — cicd-backend: Dockerfile بک‌اند**  
   - ایمیج قابل اجرای Gunicorn/تنظیمات production؛ SQLite پیش‌فرض محصول نباشد.  
   - `.dockerignore` مناسب.  
   - README: build لوکال ایمیج اختیاری است؛ توسعه SQLite سر جایش.  
   **Verify:** `docker build` بک‌اند موفق؛ کانتینر با `DATABASE_URL` پستگرس (Compose یا CI) migrate/run می‌شود.  
-  **REVIEW NOTE:**
+  **REVIEW NOTE:** (2026-08-21) پایه `python:3.12-slim-bookworm` + `uv:0.8.22`. CI عوض نشد. `docker build -t doion-api ./backend` موفق. migrate روی شبکهٔ Compose (`postgres://doion@postgres:5432/doion`) «No migrations to apply». Gunicorn در لاگ Listen روی 8000. `host.docker.internal` به پورت میزبان قطع شد (مثل Path B). entrypoint از `uv run` به باینری `.venv` عوض شد تا هر استارت dev deps دانلود نکند.
 
 - [ ] **Step 8 — cicd-frontend: پرامپت Dockerfile فرانت**  
   - `prompts/03-frontend-docker.md`.  
