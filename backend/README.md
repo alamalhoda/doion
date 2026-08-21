@@ -117,10 +117,10 @@ gh workflow run Release --ref develop -f version=0.1.0-test.1
 
 ### CD تأییدشده به `chequeyar-back`
 
-محیط زنده با merge به `develop` عوض نمی‌شود. مالک workflow [`CD Backend`](../.github/workflows/cd-backend.yml) را دستی اجرا می‌کند و تگ موجود را می‌دهد (مثلاً `v0.1.0-test.1`). Job فقط اگر Release و ایمیج GHCR آن تگ موجود باشند و آخرین `CI Backend` روی همان commit سبز باشد، سورس همان تگ را با CLI چابکان به سرویس `chequeyar-back` می‌فرستد (`CHABOKAN_TOKEN` در Secrets ریپو). Postgres از پنل سرویس می‌آید؛ این workflow `DATABASE_URL` را عوض نمی‌کند.
+محیط زنده با merge به `develop` عوض نمی‌شود. مالک workflow [`CD Backend`](../.github/workflows/cd-backend.yml) را دستی اجرا می‌کند و تگ موجود را می‌دهد (مثلاً `v0.1.0-test.2`). Job فقط اگر Release و ایمیج GHCR آن تگ موجود باشند و آخرین `CI Backend` روی همان commit سبز باشد، سورس همان تگ را با CLI چابکان به سرویس `chequeyar-back` می‌فرستد (`CHABOKAN_TOKEN` در Secrets ریپو). Postgres از پنل سرویس می‌آید؛ این workflow `DATABASE_URL` را عوض نمی‌کند.
 
 ```bash
-gh workflow run "CD Backend" --ref develop -f tag=v0.1.0-test.1
+gh workflow run "CD Backend" --ref develop -f tag=v0.1.0-test.2
 ```
 
 اگر job قرمز شد، محصول را با اجرای دوبارهٔ همین workflow روی **آخرین تگ موفقی** که می‌شناسید برگردانید؛ rollback خودکار چابکان در این نسخه نیست. آموزش دکمه به دکمه: [`CHABOKAN_CD_AND_PRODUCT_BRANCH.md`](../docs/development/CHABOKAN_CD_AND_PRODUCT_BRANCH.md).
@@ -129,7 +129,7 @@ gh workflow run "CD Backend" --ref develop -f tag=v0.1.0-test.1
 
 ## Staging روی چابکان (PaaS)
 
-Staging فعلی از شاخهٔ `develop` با CLI چابکان deploy می‌شود. از داخل `backend/`:
+این ویژگی CI/CD **محیط staging جدیدی نساخت.** مسیر زیر همان CLI دستی از داخل `backend/` به سرویس Django موجود است (پایلوت)، جدا از workflow **CD Backend**.
 
 ```bash
 chabok login

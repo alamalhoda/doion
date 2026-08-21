@@ -13,7 +13,7 @@
 | چیز | سرویس چابکان (`-s`) | آدرس کاربر |
 |-----|---------------------|------------|
 | API (Django) | `chequeyar-back` | https://chequeyar-back.chbkn.dev |
-| SPA محصول | `chequeyar-front` | **https://royasoft.dev** |
+| SPA محصول | `chequeyar-front` (**Static**) | **https://royasoft.dev** — پنل [Yq40OKq](https://hub.chabokan.net/fa/services/detail/Yq40OKq) |
 | SPA دمو mock | `chequeyar-front-demo` | **https://royasoftgroup.ir** |
 | Postgres | `chequeyar-db` | سایت نیست؛ دیتابیس `chequeyar-back` |
 
@@ -36,7 +36,7 @@ Studio فقط به `checkyar-googleai` پوش می‌کند. Cursor سورس UI 
 | **CD Product (Chabokan live)** | checkyar-googleai | دستی؛ شاخه را تو انتخاب می‌کنی | **بله** — `chequeyar-front` |
 | **CD Demo (Chabokan mock)** | checkyar-googleai | خودکار روی هر push به `main` | فقط دمو mock |
 
-قانون: **تگ ≠ استقرار.** `v0.1.0-test.1` الان وجود دارد ولی API/SPA محصول را عوض نکرده مگر CD را بزنی.
+قانون: **تگ ≠ استقرار.** تگ فعلی آزمایشی [`v0.1.0-test.2`](https://github.com/alamalhoda/doion/releases/tag/v0.1.0-test.2) است. چابکان عوض نمی‌شود مگر **CD Backend** / **CD Product** را بزنی.
 
 دمو mock با هر پوش Studio به `main` خودش به‌روز می‌شود. این طبیعی است و به معنی به‌روز شدن `chequeyar-front` نیست.
 
@@ -47,7 +47,7 @@ Studio فقط به `checkyar-googleai` پوش می‌کند. Cursor سورس UI 
 **doion**
 
 - `develop` = محل ادغام کار روزانه (با PR)
-- تگ `v0.1.0-test.1` = یک عکس ثابت از `develop` در لحظهٔ Release
+- تگ `v0.1.0-test.2` = عکس `develop` در لحظهٔ آخرین Release (شامل همگام نقش User/Profile)
 
 **checkyar-googleai**
 
@@ -65,20 +65,16 @@ Studio  --push-->  main
 
 ---
 
-## ۴. الان کجا هستیم؟ (۲۱ اوت ۲۰۲۶)
+## ۴. الان کجا هستیم؟ (۲۱ اوت ۲۰۲۶، شب)
 
-انجام شده:
+ویژگی CI/CD چابکان (گام‌های ۱–۱۲) روی محیط زنده **Verify** شده است.
 
-- تگ آزمایشی [`v0.1.0-test.1`](https://github.com/alamalhoda/doion/releases/tag/v0.1.0-test.1)
-- workflow **CD Backend** روی `develop` (هنوز Run نشده)
-- workflow **CD Product** روی `main` با SHA `bb2b72b` (هنوز Run نشده؛ روی `product` نیست تا PR ادغام شود)
-- پین E2E: [doion#49](https://github.com/alamalhoda/doion/pull/49)
+- تگ [`v0.1.0-test.2`](https://github.com/alamalhoda/doion/releases/tag/v0.1.0-test.2) + GHCR؛ **CD Backend** با همین تگ روی `chequeyar-back` اجرا شده (نقش `User`/`Profile` هم‌تراز)
+- **CD Product** از `product` به سرویس Static `chequeyar-front` ([royasoft.dev](https://royasoft.dev/))؛ دمو mock جدا روی [royasoftgroup.ir](https://royasoftgroup.ir/)
+- پین E2E: `4bcf1a1` ([doion#56](https://github.com/alamalhoda/doion/pull/56))
+- Django Users در ادمین فیلد Role دارد؛ SPA از `User.role` می‌خواند
 
-انجام نشده (محیط زنده محصول):
-
-- اجرای **CD Backend**
-- Merge `main` → `product`
-- اجرای **CD Product** روی `product`
+کار محصولی باز (خارج از pipeline): فلگ `show_landing_page` روی API پیش‌فرض خاموش است؛ `/landing` زنده تا روشن شدن فلگ به بازارچه/لاگین می‌رود.
 
 ---
 
@@ -86,54 +82,25 @@ Studio  --push-->  main
 
 Cursor می‌تواند PR باز کند و چک‌ها را گزارش کند. **Merge** روی GitHub و **Run workflow** برای سرویس زنده را تو تأیید می‌کنی (یا صریح در چت می‌گویی «merge کن / CD را بزن»).
 
-### الف) PRهای doion (بدون تغییر سرور)
+### الف) راز `CHABOKAN_TOKEN`
 
-1. [PR 49](https://github.com/alamalhoda/doion/pull/49) — پین UI — **ادغام شد.**
-2. [PR 50](https://github.com/alamalhoda/doion/pull/50) — یادداشت پلن + این راهنما. Merge اگر Checks سبز است.
+باید روی **هر دو** ریپو باشد: [doion](https://github.com/alamalhoda/doion/settings/secrets/actions) برای CD Backend؛ [checkyar-googleai](https://github.com/alamalhoda/checkyar-googleai/settings/secrets/actions) برای CD Product/Demo. مقدار را در چت نفرست.
 
-روی صفحهٔ PR: **Merge pull request** → **Confirm merge**.
+### ب) استقرار API (سرور زنده)
 
-### ب) PR فرانت `main` → `product` (هنوز سرور زنده نیست)
+1. اول **Release** با نسخهٔ SemVer جدید (اگر تگ هنوز نیست)
+2. [doion Actions → CD Backend](https://github.com/alamalhoda/doion/actions/workflows/cd-backend.yml) → **Run workflow** → Branch `develop` → `tag` مثلاً `v0.1.0-test.2`
 
-PR باز است: [checkyar-googleai#7](https://github.com/alamalhoda/checkyar-googleai/pull/7).
+یا در چت: «CD Backend را با v0.1.0-test.2 بزن».
 
-1. صبر کن Checks (CI) سبز شود.
-2. **Merge pull request** را بزن. شاخهٔ `product` فایل `cd-product.yml` را می‌گیرد.
-3. هنوز `chequeyar-front` عوض نمی‌شود تا گام د/ه را بزنی.
+### ج) استقرار SPA (سرور زنده)
 
-### ج) راز `CHABOKAN_TOKEN` روی doion
+1. PR سبز `main` → `product` را merge کن
+2. [CD Product (Chabokan live)](https://github.com/alamalhoda/checkyar-googleai/actions) → **Run workflow** → Branch **`product`** (نه `main`)
 
-دموی فرانت از قبل با همین نام راز کار می‌کند. **CD Backend** از راز **ریپوی doion** می‌خواند.
+یا در چت: «CD Product را روی product بزن».
 
-یک‌بار چک کن: [doion → Settings → Secrets](https://github.com/alamalhoda/doion/settings/secrets/actions) باید `CHABOKAN_TOKEN` داشته باشد (همان توکن API چابکان). مقدار را در چت نفرست.
-
-اگر نباشد، CD Backend با پیام خالی بودن راز قرمز می‌شود؛ سرویس عوض نمی‌شود.
-
-### د) استقرار API (سرور زنده)
-
-فقط وقتی خواستی `chequeyar-back` همان کد تگ آزمایشی را بگیرد:
-
-1. [doion Actions → CD Backend](https://github.com/alamalhoda/doion/actions/workflows/cd-backend.yml)
-2. **Run workflow**
-3. Branch: `develop`
-4. `tag`: `v0.1.0-test.1`
-5. Run. صبر کن job سبز شود.
-
-یا در چت بگو: «CD Backend را با v0.1.0-test.1 بزن».
-
-### ه) استقرار SPA (سرور زنده)
-
-فقط **بعد از** merge شدن `main` به `product`:
-
-1. [checkyar-googleai Actions → CD Product](https://github.com/alamalhoda/checkyar-googleai/actions)
-2. workflow **CD Product (Chabokan live)**
-3. **Run workflow**
-4. Branch را **`product`** بگذار (نه `main`)
-5. Run.
-
-یا در چت بگو: «CD Product را روی product بزن».
-
-ترتیب پیشنهادی: اول API (د)، بعد SPA (ه)، تا فرانت به API تگ‌شده حرف بزند. اجباری نیست اگر فعلاً فقط یکی را می‌خواهی.
+ترتیب پیشنهادی وقتی API و SPA هر دو عوض می‌شوند: اول API (ب)، بعد SPA (ج).
 
 ---
 
@@ -166,7 +133,8 @@ Check ناموفق است؛ چابکان rollback خودکار ندارد.
 |-----|-----|
 | Run workflow روی `main` برای CD Product | خط تولید `product` است |
 | انتظار اینکه Merge PR خودش چابکان را عوض کند | فقط git عوض می‌شود |
-| دست زدن به **CD Demo** | دمو mock است |
+| فرض نوع **Vue** برای `chequeyar-front` | سرویس فعلی **Static** است |
+| اتصال دامنه قبل از دیدن SPA روی deploy | اول CD Product، بعد دامنه |
 | `git tag` روی کلون UI | نسخهٔ محصول تگ doion است |
 | `seed_demo --reset` روی دیتابیس واقعی | دادهٔ کاربر پاک می‌شود |
 

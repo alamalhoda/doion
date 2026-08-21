@@ -1,6 +1,6 @@
 # Frontend Development Status
 
-**As of:** 2026-08-18
+**As of:** 2026-08-21
 
 This document is the SSOT for *where* active UI work happens and how it relates to this monorepo.
 
@@ -9,7 +9,7 @@ This document is the SSOT for *where* active UI work happens and how it relates 
 | Component | Location | Role |
 |-----------|----------|------|
 | **Backend + API contract** | This repo (`doion`) — `backend/`, `docs/development/MASTER_API_CONTRACT.md` | Source of truth for API; developed with GitFlow (`feature/*` → PR → `develop`) |
-| **Active frontend** | External: [alamalhoda/checkyar-googleai](https://github.com/alamalhoda/checkyar-googleai) | Product UI under active development |
+| **Active frontend** | External: [alamalhoda/checkyar-googleai](https://github.com/alamalhoda/checkyar-googleai) | Product UI under active development. Live: [royasoft.dev](https://royasoft.dev/) (`product` + CD Product). Mock demo: [royasoftgroup.ir](https://royasoftgroup.ir/) (`main` + CD Demo). |
 | **Cursor frontend rules** | `.cursor/rules/frontend/` | Apply to future in-monorepo `frontend/` code after AI Studio exit |
 
 ## One-way sync rule (mandatory while AI Studio is the UI source)

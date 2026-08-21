@@ -9,7 +9,8 @@ SSOT رفتار: [`feature_spec.md`](./feature_spec.md). این فایل فقط 
 - از Cursor به این ریپو commit/push نشود.
 - Studio به `main` پوش می‌کند؛ PR روزانه الزامی نیست.
 - شاخهٔ تولید: `product`. استقرار `chequeyar-front` از `product` است نه از `main` خام.
-- `chequeyar-front-demo` و CD mock دست‌نخورده بماند.
+- `chequeyar-front` و `chequeyar-front-demo` هر دو PaaS **Static** هستند. بیلد Vite در Actions است. `nginx.conf` آپلود شود (در `.chabokignore` نباشد). ایمیج GHCR آرتیفکت نسخه است نه runtime پنل.
+- `chequeyar-front-demo` و CD mock دست‌نخورده بماند (env mock).
 - Docker Compose لوکال برای همکار اختیاری است؛ توسعه بدون Docker همچنان معتبر است.
 - دادهٔ محصول و تست CI بک‌اند Postgres است؛ این ریپو UI دیتابیس محصول را عوض نمی‌کند.
 
