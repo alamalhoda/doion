@@ -83,18 +83,18 @@ Cursor می‌تواند PR باز کند و چک‌ها را گزارش کند.
 
 ### الف) PRهای doion (بدون تغییر سرور)
 
-1. [PR 49](https://github.com/alamalhoda/doion/pull/49) — پین UI برای E2E. Merge اگر Checks سبز است.
+1. [PR 49](https://github.com/alamalhoda/doion/pull/49) — پین UI — **ادغام شد.**
 2. [PR 50](https://github.com/alamalhoda/doion/pull/50) — یادداشت پلن + این راهنما. Merge اگر Checks سبز است.
 
 روی صفحهٔ PR: **Merge pull request** → **Confirm merge**.
 
 ### ب) PR فرانت `main` → `product` (هنوز سرور زنده نیست)
 
-بعد از باز شدن PR در checkyar-googleai:
+PR باز است: [checkyar-googleai#7](https://github.com/alamalhoda/checkyar-googleai/pull/7).
 
 1. صبر کن Checks (CI) سبز شود.
-2. Merge کن. شاخهٔ `product` فایل `cd-product.yml` را می‌گیرد.
-3. هنوز `chequeyar-front` عوض نمی‌شود تا گام د را بزنی.
+2. **Merge pull request** را بزن. شاخهٔ `product` فایل `cd-product.yml` را می‌گیرد.
+3. هنوز `chequeyar-front` عوض نمی‌شود تا گام د/ه را بزنی.
 
 ### ج) راز `CHABOKAN_TOKEN` روی doion
 
