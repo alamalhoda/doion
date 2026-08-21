@@ -91,6 +91,7 @@ Chat 2 فقط یک گام از لیست زیر را در هر نوبت پیاد�
 - [ ] **Step 10 — cicd-backend: GitHub Release / SemVer و ایمیج تگ‌شده**  
   - تگ SemVer + Release برای commit بک‌اند؛ build/push ایمیج با همان تگ (رجیستری: چابکان یا GHCR — در REVIEW NOTE ثبت شود اگر رجیستری در پنل از قبل معلوم است).  
   - فقط با اقدام عمدی مالک (مثلاً `workflow_dispatch`)، نه روی هر merge به `develop`.  
+  - آموزش انسانی تگ: [`docs/development/GIT_TAGS_AND_RELEASES.md`](../../../docs/development/GIT_TAGS_AND_RELEASES.md).  
   **Verify:** یک تگ آزمایشی Release + ایمیج با همان تگ (محیط محصول را در این گام عوض نکن مگر کاربر بخواهد).  
   **REVIEW NOTE:**
 

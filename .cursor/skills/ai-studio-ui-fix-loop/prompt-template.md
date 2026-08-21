@@ -41,6 +41,9 @@ Update only sections touched by this change (create files if missing):
    - Vitest vs manual Live vs doion Playwright (link out; do not duplicate e2e suites)
 3) README.md — short links to Architecture + Testing; avoid long duplicated guides
 
+## Changelog seed (user-visible only)
+If an end user would notice this change, end your reply with 1–3 short bullets in FA and EN for a future in-app changelog (version TBD). Skip for cosmetic/CI-only (say changelog: none). Do not add a Versions/changelog page unless this prompt explicitly asks for that UI.
+
 ## Do not
 - Commit package-lock.json / use npm as package manager of record
 - Unrelated refactors or new dependencies
@@ -71,3 +74,4 @@ User should bring back to Cursor:
 2. Commit SHA
 3. Any extra sites discovered in the scan
 4. Docs note: updated paths or `docs: none`
+5. Changelog: FA+EN bullets or `changelog: none`

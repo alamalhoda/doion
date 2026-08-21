@@ -31,6 +31,7 @@ One-way sync policy SSOT: `docs/development/FRONTEND_DEVELOPMENT_STATUS.md`.
 - **Tests (one-way split):** UI unit/`tsc`/vitest → only via Studio prompts → GitHub → pull. Playwright smoke/critical → only in `doion/e2e/` (GitFlow). Missing `data-testid` → Studio follow-up prompt; never edit UI locally for selectors.
 - **Docs (one-way):** UI Architecture + Testing docs (EN+FA) are authored in AI Studio and arrive via pull. Prompts must ask Studio to create/update them when behavior changes. Do not invent doion/backend docs inside the UI repo — link out.
 - Keep test/doc work proportionate: skip both for cosmetic-only fixes.
+- **Never** `git tag` / `git push` tags on `checkyar-googleai` from Cursor. Product SemVer is the doion workflow **Release** (same `v*` for API + SPA images). See `.cursor/skills/semver-release/SKILL.md`.
 
 ## Roles
 
@@ -56,6 +57,7 @@ AI Studio UI fix loop:
 - [ ] 6 Verify diff (code + UI tests + UI docs)
 - [ ] 7 Sync doion E2E if needed → run checks → short status
 - [ ] 8 Follow-up prompt if gaps remain (incl. missing docs)
+- [ ] 9 Tag/changelog reminder if user-visible and heading to `product`
 ```
 
 ### 1) Diagnose
@@ -82,6 +84,7 @@ Must include:
 - Acceptance checks (pages, users, Live mock off)
 - **Tests ask** (when behavior/logic changes): update/add vitest in UI repo; do not invent Playwright in UI repo
 - **Docs ask** (when behavior/modules change): update Architecture + Testing EN/FA in UI repo — see template
+- **Changelog seed** (when an end user would notice the change): ask Studio for 1–3 short FA+EN bullets; do not build a versions page unless the user asked for that feature
 - Optional: “scan for the same class of bug elsewhere and fix those too”
 
 Use the template in [prompt-template.md](prompt-template.md).
@@ -172,6 +175,8 @@ Runbook: `docs/development/E2E_LOCAL_RUNBOOK.md`.
 ```text
 Test: <smoke | critical | manual | skipped-cosmetic>
 Docs: <updated in UI commit | none-cosmetic | missing→follow-up>
+Changelog: <bullets saved | none-cosmetic | missing→ask>
+Tag: <not-needed | remind-Release | user-declined>
 Result: PASS | FAIL
 Notes: <what ran / what failed / follow-up if any>
 ```
@@ -182,6 +187,20 @@ On FAIL: fix via Studio follow-up or doion harness/seed — then re-check the fa
 
 - If verified: short verdict + commit SHA + test/docs status above.
 - If not: one concise follow-up Studio prompt; repeat from step 3.
+
+### 8) Frontend tagging and in-app changelog (when useful)
+
+Daily Studio pushes to `main` are **not** tagged. Cursor does not tag the UI repo.
+
+**When to remind (one question, same tone as backend):**
+
+- User-visible feat/fix is on `main` **and** they merged (or are about to merge) `main` → `product`
+- They talk about shipping SPA, `chequeyar-front`, or a numbered version
+- Cosmetic-only / docs-only / CI-only UI: do **not** remind
+
+**What to remind:** run doion skill `semver-release` so API + SPA share one `v*` (SPA image is built from `e2e/ui-pin`; bump that pin first if this UI SHA is not pinned yet). Do not `git tag` on `checkyar-googleai`.
+
+**Changelog seed:** keep Studio’s FA+EN bullets. Future in-app “what’s new” (server + client, version, date, summary) is specified in `docs/development/PRODUCT_CHANGELOG.md`. Do not implement that page in a routine fix prompt. When a Release is cut, those bullets belong in the GitHub Release notes (and later the changelog API).
 
 ## Common bug classes (hints)
 
@@ -201,3 +220,6 @@ On FAIL: fix via Studio follow-up or doion harness/seed — then re-check the fa
 - `docs/development/AI_STUDIO_E2E_CRITICAL_PATH_PROMPT.md`
 - `docs/development/BACKEND_DEMO_SEED_AND_DATA.md`
 - `docs/development/MASTER_API_CONTRACT.md`
+- `docs/development/PRODUCT_CHANGELOG.md`
+- `docs/development/GIT_TAGS_AND_RELEASES.md`
+- `.cursor/skills/semver-release/SKILL.md`

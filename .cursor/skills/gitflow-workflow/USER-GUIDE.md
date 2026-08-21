@@ -25,7 +25,8 @@ Skill `gitflow-workflow` کمک می‌کند جریان GitFlow پروژه را
 - `میخوام یک feature branch جدید شروع کنم`
 - `قبل از PR برنچ من را با develop sync کن`
 - `برای این تغییر commit message استاندارد پیشنهاد بده`
-- `rebase کردم، push امنش را بگو`
+- `برای این فیچر تگ بزن`
+- `Release روی develop اجرا کن`
 
 ---
 
@@ -68,7 +69,8 @@ Skill `gitflow-workflow` کمک می‌کند جریان GitFlow پروژه را
 - ساخت branch بدون مشخص‌کردن مبدا (`develop`)
 - push اجباری ناامن (`--force`)
 - PR بدون sync شدن با `develop`
-- commit message غیر استاندارد
+- تگ روی feature به‌جای workflow `Release`
+- فراموش کردن تگ وقتی کاربر صریحاً می‌خواهد نسخهٔ قابل استقرار داشته باشد (یک یادآوری کافی است)
 
 ---
 
@@ -77,6 +79,8 @@ Skill `gitflow-workflow` کمک می‌کند جریان GitFlow پروژه را
 این Skill از Rule اصلی پروژه برای GitFlow استفاده می‌کند:
 
 - `.cursor/rules/share/gitflow-branch-policy.mdc`
+- `.cursor/skills/semver-release/SKILL.md` برای تگ / GitHub Release / GHCR
+- `docs/development/GIT_TAGS_AND_RELEASES.md` آموزش تگ و SemVer (برای انسان، نه فقط Agent)
 
 اگر policy پروژه تغییر کند، Skill هم باید به‌روزرسانی شود.
 

@@ -49,3 +49,13 @@ git merge origin/develop
 git push -u origin feature/add-service-history
 gh pr create --base develop --head feature/add-service-history --title "feat(service): add service history" --body "## Summary\n- add service history flow"
 ```
+
+## سناریو ۵: تگ SemVer (انتشار، نه هر PR)
+
+تگ محصول را روی `feature/*` با `git tag` نزن. از workflow `Release` استفاده کن (Skill `semver-release`):
+
+```bash
+gh workflow run Release --ref develop -f version=0.1.0-test.1
+```
+
+بعد از merge یک feat/fix به `develop`، اگر کاربر از انتشار حرف زد یک‌بار یادآوری کن.

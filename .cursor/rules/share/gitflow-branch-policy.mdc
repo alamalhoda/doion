@@ -101,6 +101,12 @@ PR باید:
 - در صورت ابهام در هدف کاربر، اول هدف را شفاف کن و سپس دستور بده.
 - برای ادغام به `develop` ابتدا push branch و سپس PR را راهنمایی/اجرا کن.
 
+## تگ SemVer و یادآوری انتشار
+- مسیر انتشار محصول: workflow [`.github/workflows/release.yml`](../../../.github/workflows/release.yml) با `workflow_dispatch` (تگ + GitHub Release + ایمیج GHCR). روی `feature/*` با `git tag` نسخهٔ محصول نساز.
+- تگ را بازنویسی/force نکن؛ نسخهٔ بعدی بزن. بدون تأیید صریح نسخه، `workflow_dispatch` نزن.
+- **یادآوری (یک سؤال کوتاه، نه سخنرانی):** وقتی کاربر feat/fix را به `develop` ادغام کرده و از تمام‌شدن کار، ship، deploy، چابکان، یا نسخه حرف می‌زند؛ وقتی UI قابل‌دیدن کاربر به `product` رفته؛ یا Verify یک گام CI/CD به ایمیج تگ‌شده نیاز دارد. روی docs/chore/rule alone یا هر کامیت یادآوری نکن.
+- جزئیات اجرا: Skill `.cursor/skills/semver-release/SKILL.md`. آموزش انسانی: `docs/development/GIT_TAGS_AND_RELEASES.md`.
+
 ## پاک‌سازی بعد از PR Merge
 ```bash
 git checkout develop
