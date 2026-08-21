@@ -101,11 +101,11 @@ uv run pytest
 
 بدون `postgres` در `DATABASE_URL`، pytest لوکال روی `test_db.sqlite3` می‌ماند. CI گیت‌هاب هرگز به SQLite برنمی‌گردد.
 
-E2E Playwright در [`.github/workflows/ci-e2e.yml`](../.github/workflows/ci-e2e.yml) هست و **gate ادغام PR به `develop` نیست**. اجرای دستی علیه یک commit فرانت: `gh workflow run "CI E2E Playwright" -f ui_sha=<sha>`. رویداد `repository_dispatch` با type‏ `frontend-e2e` و `client_payload.ui_sha` همان کار را می‌کند. بعد از E2E موفقِ dispatch، job جدا PR به `develop` باز می‌کند و فقط [`e2e/ui-pin`](../e2e/ui-pin) را عوض می‌کند (نه فایل workflow؛ `GITHUB_TOKEN` اجازهٔ ویرایش YAML را ندارد). Deploy به چابکان در GitHub Actions خودکار نیست؛ دستی با CLI (بخش بعد) یا بعداً با CD تأییدشده.
+E2E Playwright در [`.github/workflows/ci-e2e.yml`](../.github/workflows/ci-e2e.yml) هست و **gate ادغام PR به `develop` نیست**. اجرای دستی علیه یک commit فرانت: `gh workflow run "CI E2E Playwright" -f ui_sha=<sha>`. رویداد `repository_dispatch` با type‏ `frontend-e2e` و `client_payload.ui_sha` همان کار را می‌کند. بعد از E2E موفقِ dispatch، job جدا PR به `develop` باز می‌کند و فقط [`e2e/ui-pin`](../e2e/ui-pin) را عوض می‌کند (نه فایل workflow؛ `GITHUB_TOKEN` اجازهٔ ویرایش YAML را ندارد).
 
-### انتشار تگ‌شده (GHCR، بدون deploy)
+### انتشار تگ‌شده (GHCR)
 
-ایمیج API و SPA با یک تگ SemVer روی [GitHub Container Registry](https://github.com/alamalhoda/doion/pkgs) ساخته می‌شود؛ رجیستری چابکان در پنل ست نشده بود. فقط با اجرای دستی workflow [`Release`](../.github/workflows/release.yml) (نه روی هر merge به `develop`). محیط زنده عوض نمی‌شود.
+ایمیج API و SPA با یک تگ SemVer روی [GitHub Container Registry](https://github.com/alamalhoda/doion/pkgs) ساخته می‌شود؛ رجیستری چابکان در پنل ست نشده بود. فقط با اجرای دستی workflow [`Release`](../.github/workflows/release.yml) (نه روی هر merge به `develop`).
 
 در GitHub: Actions → **Release** → Run workflow → شاخه (معمولاً `develop`) و نسخه مثل `0.1.0-test.1`.
 
@@ -114,6 +114,16 @@ gh workflow run Release --ref develop -f version=0.1.0-test.1
 ```
 
 تگ تکراری رد می‌شود. نسخهٔ با پسوند (`-test.1`) به‌صورت prerelease ساخته می‌شود. SPA از SHA داخل [`e2e/ui-pin`](../e2e/ui-pin) بیلد می‌شود.
+
+### CD تأییدشده به `chequeyar-back`
+
+محیط زنده با merge به `develop` عوض نمی‌شود. مالک workflow [`CD Backend`](../.github/workflows/cd-backend.yml) را دستی اجرا می‌کند و تگ موجود را می‌دهد (مثلاً `v0.1.0-test.1`). Job فقط اگر Release و ایمیج GHCR آن تگ موجود باشند و آخرین `CI Backend` روی همان commit سبز باشد، سورس همان تگ را با CLI چابکان به سرویس `chequeyar-back` می‌فرستد (`CHABOKAN_TOKEN` در Secrets ریپو). Postgres از پنل سرویس می‌آید؛ این workflow `DATABASE_URL` را عوض نمی‌کند.
+
+```bash
+gh workflow run "CD Backend" --ref develop -f tag=v0.1.0-test.1
+```
+
+اگر job قرمز شد، محصول را با اجرای دوبارهٔ همین workflow روی **آخرین تگ موفقی** که می‌شناسید برگردانید؛ rollback خودکار چابکان در این نسخه نیست.
 
 ---
 
