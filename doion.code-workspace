@@ -1,0 +1,37 @@
+{
+	"folders": [
+		{
+			"name": "doion",
+			"path": "."
+		},
+		{
+			"name": "checkyar-googleai",
+			"path": "../checkyar-googleai"
+		}
+	],
+	"settings": {
+		"python.defaultInterpreterPath": "${workspaceFolder:doion}/backend/.venv/bin/python",
+		"python.languageServer": "Default",
+		"ruff.nativeServer": "on",
+		"ruff.importStrategy": "fromEnvironment",
+		"ruff.configuration": "${workspaceFolder:doion}/backend/pyproject.toml",
+		"ruff.interpreter": [
+			"${workspaceFolder:doion}/backend/.venv/bin/python"
+		],
+		"[python]": {
+			"editor.defaultFormatter": "charliermarsh.ruff",
+			"editor.formatOnSave": true,
+			"editor.codeActionsOnSave": {
+				"source.fixAll.ruff": "explicit",
+				"source.organizeImports.ruff": "explicit"
+			}
+		}
+	},
+	"extensions": {
+		"recommendations": [
+			"charliermarsh.ruff",
+			"ms-python.python",
+			"ms-python.vscode-pylance"
+		]
+	}
+}
