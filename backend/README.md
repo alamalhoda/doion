@@ -24,8 +24,10 @@ API لایه ۱ Marketplace: ثبت‌نام و KYC، آگهی چک، moderation
 - **Python**: 3.12
 - **Django**: 5.2.14 (LTS)
 - **مدیریت وابستگی**: uv
-- **دیتابیس توسعهٔ لوکال**: مسیر A = SQLite بدون Docker؛ مسیر B = Postgres اختیاری در Docker (هیچ‌کدام اجباریِ تنها نیست)
-- **دیتابیس CI و محصول**: فقط PostgreSQL (بدون fallback به SQLite)
+- **دیتابیس توسعهٔ لوکال روزانه:** PostgreSQL در Docker؛ اپ روی میزبان با `uv`
+- **دیتابیس محصول و CI:** فقط PostgreSQL (بدون fallback به SQLite)
+- **SQLite لوکال:** معتبر اگر Docker نخواهید؛ مسیر توصیه‌شده برای کار روزمره نیست
+- جزئیات: [`docs/development/LOCAL_DEV_AND_PRODUCT_RUNTIME.md`](../docs/development/LOCAL_DEV_AND_PRODUCT_RUNTIME.md)
 - **زبان پیش‌فرض**: انگلیسی (en-us)
 - **Timezone**: Asia/Tehran
 - **احراز هویت:** django-allauth (جلسات قالب) + SimpleJWT برای `/api/v1/`
@@ -36,6 +38,10 @@ API لایه ۱ Marketplace: ثبت‌نام و KYC، آگهی چک، moderation
 ---
 
 ## راه‌اندازی سریع (Local Development)
+
+توضیح دو مسیر **روزانه** (Postgres در Docker + اپ روی میزبان) و **محصول** (ایمیج Gunicorn): [`docs/development/LOCAL_DEV_AND_PRODUCT_RUNTIME.md`](../docs/development/LOCAL_DEV_AND_PRODUCT_RUNTIME.md).
+
+روزانهٔ توصیه‌شده: از ریشه `docker compose up -d`، در `.env` مقدار `DATABASE_URL=postgres://doion@localhost:5432/doion`، بعد دستورهای زیر. SQLite بدون Docker هنوز معتبر است اگر Compose را روشن نکنید.
 
 ### ۱. فعال کردن محیط مجازی
 
@@ -72,35 +78,9 @@ python manage.py createsuperuser
 python manage.py runserver
 ```
 
-سپس به آدرس [http://127.0.0.1:8000/](http://127.0.0.1:8000/) بروید.
+سپس به آدرس [http://localhost:8000/](http://localhost:8000/) بروید.
 
-### دو مسیر دادهٔ لوکال
-
-هیچ‌کدام تنها مسیر معتبر نیست. اپ Django در هر دو حالت روی میزبان با `uv` اجرا می‌شود.
-
-**مسیر A — SQLite (پیش‌فرض، بدون Docker)**
-
-`config.settings.local` تا وقتی `DATABASE_URL` با `postgres` شروع نشود از `db.sqlite3` استفاده می‌کند. همان راه‌اندازی سریع بالا.
-
-**مسیر B — Postgres اختیاری در Docker**
-
-از ریشهٔ مونورپو:
-
-```bash
-docker compose up -d
-```
-
-سپس در `backend/.env`:
-
-```bash
-DATABASE_URL=postgres://doion@localhost:5432/doion
-```
-
-Compose فقط سرویس Postgres است (پورت `5432`، کاربر/دیتابیس `doion`، auth از نوع trust روی localhost؛ رمز در فایل نیست). Django را مثل قبل با `uv`/`runserver` روی میزبان اجرا کنید، بعد `migrate`. روی macOS + Docker Desktop از `localhost` استفاده کنید نه `127.0.0.1` (اتصال IPv4 گاهی timeout می‌شود).
-
-اگر پورت `5432` روی میزبان اشغال است، در `docker-compose.yml` سمت چپ پورت را عوض کنید (مثلاً `5433:5432`) و همان پورت را در `DATABASE_URL` بگذارید.
-
-pytest لوکال: بدون `postgres` در `DATABASE_URL` روی SQLite جدا (`test_db.sqlite3`) می‌ماند. اگر `DATABASE_URL` پستگرس باشد، pytest به همان سرور وصل می‌شود (Django دیتابیس تست جدا می‌سازد).
+جزئیات مسیرها، pytest، امتحان ایمیج (`--profile app`) و ساخت `docker build -t doion-api ./backend`: [`LOCAL_DEV_AND_PRODUCT_RUNTIME.md`](../docs/development/LOCAL_DEV_AND_PRODUCT_RUNTIME.md).
 
 ---
 
@@ -111,7 +91,7 @@ pytest لوکال: بدون `postgres` در `DATABASE_URL` روی SQLite جدا 
 1. `uv run ruff check .`
 2. `uv run pytest` روی **PostgreSQL** سرویس Actions (`DATABASE_URL`؛ اگر Postgres آماده نباشد Check ناموفق است و به SQLite برنمی‌گردد)
 
-معادل لوکال (از داخل `backend/`؛ pytest لوکال روی SQLite جدا از `db.sqlite3`):
+معادل لوکال روزانه (از داخل `backend/` با `DATABASE_URL` پستگرس Compose):
 
 ```bash
 uv sync --frozen
@@ -119,7 +99,7 @@ uv run ruff check .
 uv run pytest
 ```
 
-مسیر لوکال پیش‌فرض (`config.settings.local` / SQLite بدون Docker) همچنان معتبر است.
+بدون `postgres` در `DATABASE_URL`، pytest لوکال روی `test_db.sqlite3` می‌ماند. CI گیت‌هاب هرگز به SQLite برنمی‌گردد.
 
 E2E Playwright در [`.github/workflows/ci-e2e.yml`](../.github/workflows/ci-e2e.yml) هست و **gate ادغام PR به `develop` نیست**. اجرای دستی علیه یک commit فرانت: `gh workflow run "CI E2E Playwright" -f ui_sha=<sha>`. رویداد `repository_dispatch` با type‏ `frontend-e2e` و `client_payload.ui_sha` همان کار را می‌کند. بعد از E2E موفقِ dispatch، job جدا PR به `develop` باز می‌کند و فقط [`e2e/ui-pin`](../e2e/ui-pin) را عوض می‌کند (نه فایل workflow؛ `GITHUB_TOKEN` اجازهٔ ویرایش YAML را ندارد). Deploy به چابکان در GitHub Actions در این گام خودکار نیست؛ دستی با CLI (بخش بعد).
 
