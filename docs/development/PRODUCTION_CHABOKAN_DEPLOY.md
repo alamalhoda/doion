@@ -8,15 +8,32 @@ Product API constraints: `config.settings.production`, **PostgreSQL only** (SQLi
 
 Current ship path for `chequeyar-back` is still Chabokan CLI from `backend/` source (local `chabok deploy`, or owner-triggered GitHub workflow **CD Backend** with an existing SemVer tag). GHCR images from **Release** are versioned artifacts; this service type still builds the tagged Django source on Chabokan, not a GHCR pull. How to tag: [`GIT_TAGS_AND_RELEASES.md`](./GIT_TAGS_AND_RELEASES.md).
 
+## Live hostnames (custom domains)
+
+Chabokan **service name** (CLI `-s`, panel) is not always the URL users type. Custom domains on the SPA services:
+
+| PaaS service | Public site | Panel |
+|--------------|-------------|--------|
+| `chequeyar-front` | https://royasoft.dev | [hub …/WxWBVMz](https://hub.chabokan.net/fa/services/detail/WxWBVMz) |
+| `chequeyar-front-demo` | https://royasoftgroup.ir | [hub …/Gwj1p2q](https://hub.chabokan.net/fa/services/detail/Gwj1p2q) |
+| `chequeyar-back` | https://chequeyar-back.chbkn.dev (no custom domain recorded) | [hub …/yz06Brq](https://hub.chabokan.net/fa/services/detail/yz06Brq) |
+| `chequeyar-db` | not a website — PostgreSQL for `chequeyar-back` | [hub …/Rz36Kow](https://hub.chabokan.net/fa/services/detail/Rz36Kow) |
+
+The live SPA bundle is compiled with `VITE_API_BASE_URL=https://chequeyar-back.chbkn.dev/api/v1`. Changing only the front domain does **not** change that API URL. If the product site is `https://royasoft.dev`, the API CORS list on `chequeyar-back` must include that origin (and `https://www.royasoft.dev` if you use www):
+
+`CORS_ALLOWED_ORIGINS` example: `https://royasoft.dev,https://chequeyar-front.chbkn.dev`
+
+Do not run `chabok deploy` against `chequeyar-db`.
+
 ## Architecture
 
 ```text
-Browser → https://chequeyar-front… (static SPA)
+Browser → https://royasoft.dev          (chequeyar-front)
                 │  VITE_API_BASE_URL
                 ▼
-         https://chequeyar-back…/api/v1  (Django + Gunicorn)
+         https://chequeyar-back.chbkn.dev/api/v1
                 │
-         Postgres + Redis (panel)
+         chequeyar-db (Postgres) + Redis in panel
 ```
 
 ## D1 — API (`chequeyar-back`)
@@ -42,7 +59,7 @@ Pre-start (`chabok-pre-start.sh`): `migrate` + `collectstatic`.
 | `DATABASE_URL` | Postgres (never SQLite for real prod) |
 | `REDIS` / cache URL | Per `production.py` |
 | `SECRET_KEY`, JWT, email | Secrets only in panel |
-| `CORS_ALLOWED_ORIGINS` | Must include SPA origin, e.g. `https://chequeyar-front.chbkn.dev` |
+| `CORS_ALLOWED_ORIGINS` | Must include the **browser** origin of the live SPA, e.g. `https://royasoft.dev` (keep `https://chequeyar-front.chbkn.dev` if that host is still used) |
 | `DJANGO_ADMIN_URL` | Non-default admin path |
 | `DJANGO_SETTINGS_MODULE` | `config.settings.production` |
 
