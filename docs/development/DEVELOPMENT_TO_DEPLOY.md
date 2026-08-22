@@ -241,4 +241,5 @@ Env و دامنه و نوع PaaS: [`PRODUCTION_CHABOKAN_DEPLOY.md`](./PRODUCTION
 | [`E2E_LOCAL_RUNBOOK.md`](./E2E_LOCAL_RUNBOOK.md) | Playwright لوکال |
 | [`BACKEND_DEMO_SEED_AND_DATA.md`](./BACKEND_DEMO_SEED_AND_DATA.md) | seed دمو در برابر DB محصول |
 | [`MASTER_API_CONTRACT.md`](./MASTER_API_CONTRACT.md) | تنها SSOT قرارداد REST |
-| [`ai-documents/features/cicd-chabokan-prod/implementation_plan.md`](../../ai-documents/features/cicd-chabokan-prod/implementation_plan.md) | سابقهٔ گام‌های CI/CD |
+| [`ai-documents/features/cicd-chabokan-prod/implementation_plan.md`](../../ai-documents/features/cicd-chabokan-prod/implementation_plan.md) | سابقهٔ گام‌های CI/CD نسخهٔ فعلی (تمام) |
+| [`CICD_NEXT_ROADMAP.md`](./CICD_NEXT_ROADMAP.md) | نقشه راه CI/CD بعدی (هنوز اجرا نشده) |
