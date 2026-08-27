@@ -8,35 +8,70 @@ alwaysApply: true
 ## هدف
 - این قانون مرجع اصلی Git Flow برای پیشنهادهای AI در این پروژه است.
 - AI باید توسعه را فقط روی branchهای کاری انجام دهد و از commit مستقیم روی `main`/`develop` جلوگیری کند.
+- سه نقطهٔ همگام‌سازی اجباری است تا conflict و شلوغی ریپو کم شود؛ `develop` محلی فقط آینهٔ `origin/develop` است.
 
 ## مدل شاخه‌ها
 - `main`: فقط نسخه پایدار production-ready
-- `develop`: شاخه integration (فقط از طریق PR)
-- `feature/*`: توسعه قابلیت جدید (از `develop`)
+- `develop`: شاخه integration (فقط از طریق PR) — محل توسعه نیست
+- `feature/*`: توسعه قابلیت جدید (از `develop`) — یک هدف، عمر کوتاه
 - `bugfix/*`: رفع باگ محیط توسعه (از `develop`)
 - `release/*`: آماده‌سازی نسخه (از `develop`)
 - `hotfix/*`: رفع فوری production (از `main`)
 
 ## قوانین قطعی
-1. هرگز commit مستقیم روی `main` یا `develop` پیشنهاد نده.
-2. برای شروع کار جدید همیشه اول `develop` را به‌روز کن.
-3. branch جدید را صریحاً از شاخه مبدا بساز (`git checkout -b ... develop`).
-4. قبل از PR، feature branch را با `origin/develop` همگام کن.
+1. هرگز commit مستقیم روی `main` یا `develop` پیشنهاد نده (نه remote، نه local).
+2. همگام‌سازی در **سه نقطه** اجباری است: شروع Task، قبل از PR، بعد از merge.
+3. branch جدید را صریحاً از `develop` به‌روز بساز (`git checkout -b ... develop`).
+4. قبل از PR، پیش‌فرض همگام‌سازی با `origin/develop` **merge** است؛ rebase فقط اگر کاربر صریح بخواهد.
 5. اگر rebase انجام شد، فقط `--force-with-lease` مجاز است (نه `--force`).
 6. ادغام `feature/*` یا `bugfix/*` به `develop` فقط از طریق Pull Request مجاز است.
 7. برای ادغام عادی به `develop` هرگز دستور merge مستقیم محلی (`git merge feature/...`) پیشنهاد نده.
+8. شاخهٔ کاری یک هدف داشته باشد (نه `feature/ali-work` چندروزه با هر موضوع). بعد از merge از remote و local حذف شود.
 
-## ترتیب استاندارد شروع Feature
+## سه نقطهٔ همگام‌سازی (اجباری)
+
+### نقطه ۱ — شروع Task
+`develop` محلی را آینه کن، بعد branch بساز. روی `develop` از `pull --ff-only` استفاده کن تا merge تصادفی ساخته نشود.
+
 ```bash
 git checkout develop
-git pull origin develop
+git fetch origin
+git pull --ff-only origin develop
 git checkout -b feature/<short-name> develop
 ```
 
+اگر `--ff-only` شکست خورد: روی `develop` محلی commit نکن؛ وضعیت را بررسی کن. اگر commit محلی روی `develop` بی‌ارزش است، به `origin/develop` برگرد (`reset --hard` فقط با تأیید کاربر).
+
+برای bugfix همان ترتیب با `bugfix/<short-name>`.
+
+### نقطه ۲ — قبل از PR (پیش‌فرض: merge)
+شروع از develop به‌روز کافی نیست اگر وسط کار `origin/develop` جلو رفته باشد.
+
+```bash
+git checkout feature/<name>
+git fetch origin
+git merge origin/develop
+# فقط اگر کاربر صریح بخواهد:
+# git rebase origin/develop
+```
+
+در صورت conflict: فایل‌ها را اصلاح کن، `git add`، سپس `git merge --continue` یا `git rebase --continue`.
+
+### نقطه ۳ — بعد از merge شدن PR
+شاخهٔ ادغام‌شده را پاک کن و `develop` محلی را دوباره آینه کن.
+
+```bash
+git checkout develop
+git pull --ff-only origin develop
+git branch -d feature/<name>
+git fetch --prune
+```
+
+اگر GitHub هنوز head branch را دارد: `git push origin --delete feature/<name>`. اگر **Automatically delete head branches** روشن است، حذف remote را رد کن؛ `fetch --prune` کافی است.
+
 ## نام‌گذاری پیشنهادی
-- `feature/add-user-profile`
-- `feature/124-login-with-google`
-- `bugfix/login-validation`
+- خوب: `feature/add-user-profile`، `feature/124-login-with-google`، `bugfix/login-validation`
+- بد: `feature/ali-work`، شاخهٔ همه‌کارهٔ طولانی
 - `hotfix/security-patch-2026`
 
 ## Commit Convention
@@ -53,38 +88,23 @@ type(scope): description
 git commit -m "feat(auth): add Google OAuth login flow"
 ```
 
-## همگام‌سازی Feature قبل از PR (اجباری)
-```bash
-git checkout feature/<name>
-git fetch origin
-git merge origin/develop
-# یا در صورت نیاز:
-# git rebase origin/develop
-```
-
-در صورت conflict:
-1. فایل‌ها را اصلاح کن
-2. `git add <file>`
-3. ادامه فرآیند (`git merge --continue` یا `git rebase --continue`)
-
 ## Push و PR (اجباری برای ادغام به `develop`)
 ```bash
 git push -u origin feature/<name>
 # اگر rebase شده:
 git push --force-with-lease origin feature/<name>
 
-# ساخت PR به develop
 gh pr create --base develop --head feature/<name> --title "<title>" --body "<body>"
 ```
 
 PR باید:
-- From: `feature/*`
+- From: `feature/*` یا `bugfix/*`
 - To: `develop`
 - شامل هدف تغییر، خلاصه تغییرات، وضعیت تست/build باشد
 
 ## چک‌لیست قبل از PR
 - `git status` تمیز یا قابل‌انتظار است
-- branch با `origin/develop` به‌روز شده
+- نقطه ۲ انجام شده (branch با `origin/develop` همگام)
 - conflictها حل شده
 - build موفق است
 - تست‌های مرتبط پاس شده‌اند
@@ -95,22 +115,31 @@ PR باید:
 - merge مستقیم محلی روی `develop` برای جریان عادی مجاز نیست.
 - اگر کاربر درخواست merge مستقیم داد، ابتدا مسیر PR را پیشنهاد بده و دلیل ایمنی را کوتاه توضیح بده.
 
+## همکاری داخلی روی GitHub (doion)
+- همکار داخلی: **clone** از `alamalhoda/doion` و Collaborator با **Write** (نه Admin، نه Fork پیش‌فرض).
+- کار روی `feature/*` یا `bugfix/*` همان origin؛ ادغام فقط PR به `develop`.
+- ریپوی خالی جدا در اکانت همکار جایگزین Fork نیست و معمولاً PR به این ریپو نمی‌سازد.
+- Fork فقط وقتی که Write روی این ریپو نباید داده شود؛ آن‌گاه `upstream` = این ریپو و PR به `develop`.
+- UI فعال (`checkyar-googleai`): از Cursor پوش نکن. همکار برای تست لوکال حداکثر **Read** کافی است. منبع تغییر UI فقط AI Studio است؛ در هر لحظه یک UI Editor. جزئیات انسانی: `docs/development/ONBOARDING.md` و `docs/development/FRONTEND_DEVELOPMENT_STATUS.md`.
+- Release / CD / تگ محصول / secretها را برای همکار پیشنهاد نده مگر مالک صریح بخواهد.
+
+## شلوغی GitHub
+- بعد از merge، head branch نباید بماند. در Settings ریپو گزینهٔ **Automatically delete head branches** توصیه می‌شود.
+- Protection روی `main`/`develop` جلوی push مستقیم را می‌گیرد؛ این جایگزین سه نقطهٔ sync نیست.
+- Required status checks روی PR به `develop`: jobهای CI بک‌اند (Ruff و pytest). E2E را merge-gate نکن مگر سیاست عوض شود.
+
 ## رفتار اجباری AI در پیشنهاد دستورات
 - قبل از دستورهای حساس، ابتدا `git status` پیشنهاد بده.
-- در صورت مشاهده الگوی خطرناک (مثل کار روی `main`/`develop`)، هشدار صریح بده.
+- شروع کار جدید = نقطه ۱ (نه ساخت branch از `main` یا develop کهنه).
+- آماده‌سازی PR = نقطه ۲ با **merge** مگر کاربر rebase بخواهد.
+- بعد از merge = نقطه ۳ (local delete + prune).
+- در صورت مشاهده الگوی خطرناک (کار/commit روی `main`/`develop`)، هشدار صریح بده.
 - در صورت ابهام در هدف کاربر، اول هدف را شفاف کن و سپس دستور بده.
 - برای ادغام به `develop` ابتدا push branch و سپس PR را راهنمایی/اجرا کن.
+- برای همکار داخلی Fork یا Write روی ریپوی UI پیشنهاد نده مگر کاربر صریح بخواهد.
 
 ## تگ SemVer و یادآوری انتشار
 - مسیر انتشار محصول: workflow [`.github/workflows/release.yml`](../../../.github/workflows/release.yml) با `workflow_dispatch` (تگ + GitHub Release + ایمیج GHCR). روی `feature/*` با `git tag` نسخهٔ محصول نساز.
 - تگ را بازنویسی/force نکن؛ نسخهٔ بعدی بزن. بدون تأیید صریح نسخه، `workflow_dispatch` نزن.
 - **یادآوری (یک سؤال کوتاه، نه سخنرانی):** وقتی کاربر feat/fix را به `develop` ادغام کرده و از تمام‌شدن کار، ship، deploy، چابکان، یا نسخه حرف می‌زند؛ وقتی UI قابل‌دیدن کاربر به `product` رفته؛ یا Verify یک گام CI/CD به ایمیج تگ‌شده نیاز دارد. روی docs/chore/rule alone یا هر کامیت یادآوری نکن.
 - جزئیات اجرا: Skill `.cursor/skills/semver-release/SKILL.md`. آموزش انسانی: `docs/development/GIT_TAGS_AND_RELEASES.md`.
-
-## پاک‌سازی بعد از PR Merge
-```bash
-git checkout develop
-git pull origin develop
-git branch -d feature/<name>
-git push origin --delete feature/<name>
-```

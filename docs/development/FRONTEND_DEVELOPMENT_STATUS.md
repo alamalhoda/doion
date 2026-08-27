@@ -117,6 +117,7 @@ UI remains external + one-way until after MVP acceptance. Do **not** migrate int
 
 ## Related docs
 
+- Collaborator onboarding (clone, UI Read-only, Studio lock): [`ONBOARDING.md`](./ONBOARDING.md)
 - Active UI repo README: https://github.com/alamalhoda/checkyar-googleai
 - API SSOT: [`MASTER_API_CONTRACT.md`](./MASTER_API_CONTRACT.md)
 - Backend demo / seed / (no) mock: [`BACKEND_DEMO_SEED_AND_DATA.md`](./BACKEND_DEMO_SEED_AND_DATA.md)

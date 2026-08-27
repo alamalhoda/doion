@@ -23,6 +23,8 @@ alwaysApply: false
 
 تگ SemVer محصول از Cursor با `git tag` روی فیچر ساخته نمی‌شود. از `.cursor/skills/semver-release/SKILL.md` استفاده کن.
 
+شروع کار و PR: سه نقطهٔ همگام‌سازی در `.cursor/rules/share/gitflow-branch-policy.mdc` (شروع با `pull --ff-only` روی `develop`، قبل از PR merge با `origin/develop`، بعد از merge پاک‌سازی).
+
 ## قراردادهای commit message برای تغییرات UI
 
 ### افزودن ویژگی جدید

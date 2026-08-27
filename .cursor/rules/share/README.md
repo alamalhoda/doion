@@ -16,7 +16,7 @@
 
 | Rule | Role | Scope | alwaysApply |
 |------|------|-------|-------------|
-| `gitflow-branch-policy.mdc` | سیاست رسمی Git Flow و branching | کل پروژه | ✅ true |
+| `gitflow-branch-policy.mdc` | سیاست رسمی Git Flow، سه نقطهٔ sync، شاخهٔ کوتاه‌عمر | کل پروژه | ✅ true |
 | `engineering-principles.mdc` | اصول مهندسی مشترک (SSOT/SoC/DRY/KISS/YAGNI/...) | کل پروژه | ✅ true |
 | `code-quality-baseline.mdc` | baseline کیفیت کد (خوانایی، naming، magic values، secrets، test expectation) | کل پروژه | ✅ true |
 | `rule-precedence.mdc` | سیاست رسمی اولویت و حل تعارض Ruleها | کل پروژه | ✅ true |

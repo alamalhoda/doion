@@ -303,9 +303,12 @@ alwaysApply: false
 * `release/*`: آماده‌سازی release
 * `hotfix/*`: رفع فوری production
 
+شروع کار و همگام‌سازی: سه نقطه در `gitflow-branch-policy.mdc` (شروع با `pull --ff-only` روی `develop`، قبل از PR merge با `origin/develop`، بعد از merge پاک‌سازی + prune).
+
 ```bash
 git checkout develop
-git pull origin develop
+git fetch origin
+git pull --ff-only origin develop
 git checkout -b feature/add-payment develop
 ```
 
