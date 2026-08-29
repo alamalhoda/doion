@@ -28,8 +28,8 @@
 
 | موضوع | توضیح |
 |-------|-------|
-| Branch Model | `main`, `develop` (فقط آینهٔ remote)، `feature/*` کوتاه‌عمر، `bugfix/*`, `release/*`, `hotfix/*` |
-| Safety Rules | منع commit روی `main/develop`، `pull --ff-only` روی develop، منع `--force` |
+| Branch Model | `master` (پایدار doion، نه `main`)، `develop` (فقط آینهٔ remote)، `feature/*` کوتاه‌عمر، `bugfix/*`, `release/*`, `hotfix/*` |
+| Safety Rules | منع commit روی `master`/`develop`، `pull --ff-only` روی develop، منع `--force` |
 | PR Flow | نقطه ۲: merge با `origin/develop` (rebase اختیاری)، چک‌لیست قبل از PR |
 | Cleanup | نقطه ۳: حذف شاخهٔ محلی/remote، `fetch --prune`؛ توصیهٔ auto-delete در GitHub |
 | Collaboration | clone + Write روی doion؛ نه Fork پیش‌فرض؛ UI بدون پوش Cursor؛ `docs/development/ONBOARDING.md` |

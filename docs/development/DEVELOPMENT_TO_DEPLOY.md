@@ -53,7 +53,7 @@ staging جدا در این نسخه **ساخته نشده**. این‌ها مح�
 
 ### توسعه (هر روز)
 
-- شاخه از `develop`: `feature/…` سپس PR به `develop`. روی `main`/`develop` مستقیم commit نکنید.
+- شاخه از `develop`: `feature/…` سپس PR به `develop`. روی `master`/`develop` مستقیم commit نکنید.
 - محیط مجازی: `source backend/.venv/bin/activate` قبل از هر `python` / `pytest` / `manage.py`.
 - اپ روی **میزبان** است (`uv` + `runserver`)، نه داخل ایمیج Docker روزانه.
 - تنظیمات: `local`؛ Redis لازم نیست.

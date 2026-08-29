@@ -29,7 +29,7 @@ Do not treat “sync once at start” as enough. Always apply:
 2. **Before PR** — merge `origin/develop` into the working branch (default). Rebase only if the user explicitly asks.
 3. **After PR merge** — refresh local `develop`, delete the working branch locally, `git fetch --prune`. Delete remote only if GitHub still has the head branch.
 
-Never commit on local `develop` or `main`. If `git pull --ff-only origin develop` fails, stop; do not invent a merge on `develop`. `reset --hard origin/develop` only with explicit user confirmation after explaining lost commits.
+Never commit on local `develop` or `master`. This repo has no `main`; UI `main` is `checkyar-googleai`. If `git pull --ff-only origin develop` fails, stop; do not invent a merge on `develop`. `reset --hard origin/develop` only with explicit user confirmation after explaining lost commits.
 
 ## Workflow
 
@@ -42,7 +42,7 @@ git status
 git branch --show-current
 ```
 
-If user is on `main` or `develop` and wants to develop features, warn and move to feature flow (sync point 1).
+If user is on `master` or `develop` and wants to develop features, warn and move to feature flow (sync point 1).
 
 ### 2) Start new feature/bugfix (sync point 1)
 
@@ -135,7 +135,7 @@ If branch was already pushed, skip the push line and only create PR.
 
 ### 7) PR readiness checklist
 
-- Branch is not `main`/`develop`
+- Branch is not `master`/`develop`
 - Sync point 2 done (merged with `origin/develop` unless user chose rebase)
 - Conflicts resolved
 - Relevant tests/build pass (backend PR gates: Ruff + pytest; do not treat E2E as merge-block unless policy changes)
@@ -170,7 +170,7 @@ See `.cursor/skills/semver-release/SKILL.md`.
 
 ## Safety Guardrails
 
-- Never suggest direct commit on `main` or `develop`.
+- Never suggest direct commit on `master` or `develop`.
 - Never suggest local direct merge to move feature/bugfix into `develop`.
 - Always show target and source explicitly for merge actions.
 - For uncertain intent, ask one clarifying question before risky git commands.

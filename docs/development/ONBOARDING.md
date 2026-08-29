@@ -56,7 +56,7 @@ Cursor: ریشهٔ **doion** را باز کن. Rules در `.cursor/rules/` و Sk
 
 - [ ] Collaborator `doion` = Write؛ Admin نده
 - [ ] `checkyar-googleai` حداکثر Read
-- [ ] Protection / ruleset روی `main` و `develop` (PR اجباری، بدون force-push، بدون حذف شاخه)
+- [ ] Protection / ruleset روی `master` و `develop` (PR اجباری، بدون force-push، بدون حذف شاخه)
 - [ ] Required checks روی PR به `develop`: **Ruff** و **pytest** (E2E merge-gate نیست)
 - [ ] **Automatically delete head branches**
 - [ ] Require review از CODEOWNERS برای `.github/` در صورت وجود plan مناسب
