@@ -6,18 +6,23 @@ title: Cheque Platform Low-Level Design
 summary: Django implementation details for Layer 1 Marketplace — models, APIs, events, settlement port abstraction
 category: architecture
 applies_to:
-  - "backend/apps/**/*.py"
-  - "backend/apps/**/models.py"
-  - "backend/apps/**/views.py"
+  - "backend/doion/**/*.py"
+  - "backend/doion/**/models.py"
+  - "backend/doion/**/views.py"
 priority: 45
 ---
 
 # Cheque Platform Low-Level Design
-## پلتفرم اتصال دارندگان چک و سرمایه‌گذاران — لایه ۱
+## چک‌یار (Cheque Yar) — لایه ۱ Marketplace
 
-> این سند ادامه‌ی منطقی `cheque-platform-technical-architecture.md` (سند سطح بالا) است و باید همراه با آن خوانده شود. هر بخش از این سند مستقیماً به یک بخش از سند سطح بالا ارجاع می‌دهد. جزئیات بسیار دقیق‌تر (مثل JSON Schema کامل هر endpoint، فایل‌های migration واقعی، تست‌ها) در سند بعدی (سطح بسیار پایین) خواهد آمد.
+> ادامهٔ منطقی [`cheque-platform-technical-architecture.md.md`](cheque-platform-technical-architecture.md.md).  
+> **قرارداد API زنده (SSOT):** [`docs/development/MASTER_API_CONTRACT.md`](development/MASTER_API_CONTRACT.md) — این LLD نگاشت معماری است؛ جزئیات فیلد/کد خطا را از قرارداد استخراج کنید نه از این جدول.
 
-**پشته فنی:** Python 3.12، Django 5.x، Django REST Framework (DRF)، PostgreSQL، Redis، Celery.
+**به‌روزرسانی وضعیت:** ۱۴۰۵/۰۵/۲۳ (2026-08-14) — لایه ۱ در `backend/doion/` پیاده‌سازی شده است. UI فعال در ریپوی خارجی `checkyar-googleai` است، نه در `frontend/` این مونورپو.
+
+**پشته واقعی:** Python 3.12، Django 5.2، DRF، SimpleJWT (access ۱ ساعت؛ refresh پیش‌فرض ۱ روز)، PostgreSQL در تولید / SQLite در توسعه، Redis + Celery برای jobها، structlog + correlation id.
+
+**شناسه‌ها:** PKها `BigAutoField` هستند، نه UUID.
 
 ## ۱. دلیل انتخاب پشته فنی
 
@@ -31,25 +36,29 @@ Django به‌خاطر سه ویژگی آماده‌ی خود برای این ف
 
 ## ۲. ساختار پروژه (نگاشت ماژول‌ها به Django Apps)
 
+ساختار هدف LLD اولیه `backend/apps/` بود؛ **تصمیم اجرایی:** appهای دامنه زیر `backend/doion/` هم‌راستا با Cookiecutter (`users`) ساخته شدند. مهاجرت فیزیکی به `apps/` پس از MVP انجام نشده و در برنامه جاری نیست.
+
 ```
 backend/
-├── config/                  # settings, urls, asgi/wsgi, celery.py
-├── apps/
-│   ├── core/                 # کلاس‌های پایه، Event Dispatcher، Settlement Port
-│   ├── identity/              # Identity & KYC  → User, Profile, Verification
-│   ├── documents/             # سرویس مشترک مدارک (نه ماژول کسب‌وکاری مستقل)
-│   ├── pricing/               # موتور ریسک/نرخ تنزیل (مستقل و قابل‌استفاده در لایه ۲/۳)
-│   ├── checks/                 # Check Registry → ChequeListing, IssuerProfile
-│   ├── marketplace/            # Listing & Search → فقط View/Filter روی ChequeListing
-│   ├── matching/               # Matching & Notification → Match, Notification
-│   ├── moderation/             # Moderation & Admin → ModerationDecision + Admin
-│   ├── compliance/                # عرضی: Audit & Compliance → AuditEvent, FeatureFlag
-│   └── integrations/               # Integration Layer → adapterهای بیرونی
-├── requirements/
-└── docker/
+├── config/                  # settings, urls, asgi/wsgi, celery.py, api_router.py
+├── doion/
+│   ├── core/                 # TimeStampedModel، permission classes، seed_demo
+│   ├── users/                # User سفارشی، JWT login/refresh
+│   ├── identity/             # Profile, Verification, register/me
+│   ├── documents/            # Document (سرویس مشترک مدارک)
+│   ├── pricing/              # موتور stub نرخ پیشنهادی / risk_tier
+│   ├── checks/               # ChequeListing, IssuerProfile
+│   ├── marketplace/          # فیلتر و لیست published + latest
+│   ├── matching/             # Match, SettlementPort model, OffPlatformSettlement
+│   ├── moderation/           # صف آگهی و KYC + decision
+│   ├── notifications/        # Notification, NotificationPreference
+│   ├── compliance/           # AuditEvent, FeatureFlag, stats
+│   └── integrations/         # SMS stub (SMSLog)
+├── pyproject.toml
+└── uv.lock
 ```
 
-**نکته‌ی فنی نسبت به سند سطح بالا (بخش ۷):** Django به‌صورت پیش‌فرض همه‌ی جدول‌ها را در schema عمومی `public` با نام‌گذاری `app_label_modelname` قرار می‌دهد، نه در schemaهای فیزیکی جدا. برای MVP پیشنهاد می‌کنم به‌جای schema فیزیکی جدا (که نیاز به پکیج‌های اضافه مثل `django-db-multitenant` یا router دستی دارد)، از همین مکانیزم پیش‌فرض استفاده شود؛ مرز منطقی bounded context همچنان از طریق app حفظ می‌شود و در آینده در صورت نیاز، هر app بدون تغییر مدل دامنه به schema یا سرویس مستقل منتقل می‌شود.
+**نکته نسبت به سند سطح بالا (بخش ۷):** Django همه جدول‌ها را در schema عمومی `public` با نام `app_label_modelname` می‌گذارد. برای MVP از همین پیش‌فرض استفاده شده؛ schema فیزیکی جدا ساخته نشده است.
 
 ---
 
@@ -58,79 +67,152 @@ backend/
 ```mermaid
 erDiagram
     USER {
-        uuid id PK
-        string phone_number
+        int id PK
+        string username
+        string email
+        string password
+        string name
+        string phone
         string role
-        bool is_verified
+        bool is_active
+        bool is_staff
         datetime date_joined
     }
     PROFILE {
-        uuid id PK
-        uuid user_id FK
-        string full_name
-        string company_name
-        string kyc_level
+        int id PK
+        int user_id FK
+        string role
+        string bio
+        bool is_verified
+        datetime created_at
+        datetime updated_at
     }
     VERIFICATION {
-        uuid id PK
-        uuid user_id FK
-        string verification_type
+        int id PK
+        int user_id FK
+        string full_name
+        string national_id
+        string company_name
         string status
-        datetime reviewed_at
+        string rejection_reason
+        string rejection_code
+        datetime created_at
+        datetime updated_at
     }
     ISSUER_PROFILE {
-        uuid id PK
+        int id PK
         string national_or_company_id
         string name
         int credit_score
+        datetime created_at
+        datetime updated_at
     }
     CHEQUE_LISTING {
-        uuid id PK
-        uuid owner_id FK
-        uuid issuer_id FK
+        int id PK
+        int owner_id FK
+        int issuer_id FK
+        string bank_name
+        string cheque_serial_number
         decimal face_amount
         date due_date
-        string status
+        string issuer_type
+        string issuer_name
+        string issuer_national_id
+        string description
         decimal suggested_discount_rate
         string risk_tier
+        string status
+        string rejection_reason
+        string rejection_code
+        int resubmit_count
+        datetime created_at
+        datetime updated_at
     }
     DOCUMENT {
-        uuid id PK
-        uuid owner_id FK
+        int id PK
+        int owner_id FK
         string related_object_type
-        uuid related_object_id
+        string related_object_id
         string document_type
+        string file
+        int file_size
+        datetime created_at
+        datetime updated_at
     }
     MATCH {
-        uuid id PK
-        uuid listing_id FK
-        uuid investor_id FK
+        int id PK
+        int listing_id FK
+        int investor_id FK
+        int check_holder_id FK
         string status
         string settlement_type
+        decimal final_discount_rate
+        string terms
+        string message
+        datetime created_at
+        datetime updated_at
+    }
+    SETTLEMENT_PORT {
+        int id PK
+        int match_id FK
+        string port_number
+        string bank_name
+        string account_holder
+        bool is_verified
+        datetime created_at
+        datetime updated_at
+    }
+    OFF_PLATFORM_SETTLEMENT {
+        int id PK
+        int match_id FK
+        string confirmation_code
+        int confirmed_by FK
+        datetime confirmed_at
+        string settlement_notes
+        datetime created_at
+        datetime updated_at
     }
     NOTIFICATION {
-        uuid id PK
-        uuid user_id FK
+        int id PK
+        int user_id FK
         string type
         string channel
         string status
+        string title
+        string message
+        string related_object_type
+        string related_object_id
+        datetime read_at
+        datetime sent_at
+        datetime created_at
     }
     AUDIT_EVENT {
-        uuid id PK
-        string event_name
-        uuid actor_user_id FK
-        datetime occurred_at
+        int id PK
+        int actor_id FK
+        string event_type
+        string object_type
+        string object_id
+        json metadata
+        string ip_address
+        datetime created_at
     }
     FEATURE_FLAG {
-        uuid id PK
+        int id PK
         string key
+        string description
         bool is_enabled
+        bool is_system
+        datetime created_at
+        datetime updated_at
     }
     MODERATION_DECISION {
-        uuid id PK
-        uuid listing_id FK
-        uuid moderator_id FK
+        int id PK
+        int listing_id FK
+        int moderator_id FK
         string decision
+        string rejection_code
+        string rejection_note
+        datetime created_at
     }
 
     USER ||--o| PROFILE : has
@@ -139,38 +221,70 @@ erDiagram
     ISSUER_PROFILE ||--o{ CHEQUE_LISTING : "is issuer of"
     CHEQUE_LISTING ||--o{ DOCUMENT : "has attachments"
     USER ||--o{ DOCUMENT : uploads
-    CHEQUE_LISTING ||--o{ MATCH : "matched in"
+    CHEQUE_LISTING ||--o| MATCH : "matched in"
     USER ||--o{ MATCH : "as investor"
+    USER ||--o{ MATCH : "as check_holder"
+    MATCH ||--o| SETTLEMENT_PORT : "has port"
+    MATCH ||--o| OFF_PLATFORM_SETTLEMENT : "has off-platform"
     USER ||--o{ NOTIFICATION : receives
+    USER ||--o{ AUDIT_EVENT : acts
     CHEQUE_LISTING ||--o{ MODERATION_DECISION : "reviewed via"
     USER ||--o{ MODERATION_DECISION : "moderator decides"
 ```
 
-**محدودیت‌های کلیدی (سطح migration، نه فقط منطق برنامه):**
-- `unique_together` روی `(issuer.national_or_company_id, bank_name, cheque_serial_number)` در `ChequeListing` برای جلوگیری از ثبت تکراری (مطابق بخش ۶ سند سطح بالا).
-- `status` در `ChequeListing` و `Match` به‌صورت `TextChoices` در Django تعریف می‌شود، نه boolean پراکنده، تا گسترش state machine در لایه ۲/۳ بدون migration مخرب ممکن باشد.
-- `Match.settlement_type` مقدار پیش‌فرض `"off_platform"` با `choices` باز برای افزودن `"escrow"`, `"principal_ledger"` بعداً.
+**محدودیت‌های کلیدی (سطح migration):**
+- `UniqueConstraint` روی `(issuer, bank_name, cheque_serial_number)` در `ChequeListing` (فیلد FK صادرکننده، نه `national_or_company_id` به‌تنهایی).
+- `status` در `ChequeListing` و `Match` به‌صورت `TextChoices`.
+- `Match.settlement_type` پیش‌فرض `"off_platform"`؛ مقادیر `escrow` و `principal_ledger` رزرو شده‌اند.
+- `Profile.user_type`: `natural` | `legal` (جایگزین نقش جداگانه InstitutionalInvestor).
 
 ---
 
 ## ۴. قرارداد API (DRF — بخش‌های اصلی)
 
+جدول زیر نمای کلی است. شکل دقیق request/response و کد خطا فقط در [`MASTER_API_CONTRACT.md`](development/MASTER_API_CONTRACT.md) معتبر است.
+
 | متد | مسیر | نقش مجاز | توضیح |
 |---|---|---|---|
-| POST | `/api/v1/auth/register/` | عمومی | ثبت‌نام دارنده چک یا سرمایه‌گذار |
 | POST | `/api/v1/auth/login/` | عمومی | دریافت JWT (SimpleJWT) |
 | POST | `/api/v1/auth/refresh/` | عمومی | تمدید access token |
-| GET/PATCH | `/api/v1/users/me/` | کاربر احرازشده | مشاهده/ویرایش پروفایل |
+| POST | `/api/v1/identity/register/` | عمومی | ثبت‌نام + ایجاد User + Profile |
+| GET/PATCH | `/api/v1/users/me/` | کاربر احرازشده | مشاهده/ویرایش اطلاعات کاربر |
+| GET/PATCH | `/api/v1/identity/profile/` | کاربر احرازشده | مشاهده/ویرایش پروفایل |
 | POST | `/api/v1/verifications/` | کاربر احرازشده | شروع فرایند KYC |
+| GET | `/api/v1/verifications/me/` | کاربر احرازشده | آخرین درخواست KYC کاربر |
+| GET | `/api/v1/verifications/` | کاربر احرازشده | لیست درخواست‌های KYC |
 | POST | `/api/v1/listings/` | CheckHolder | ثبت آگهی چک (status=pending_moderation) |
-| PATCH | `/api/v1/listings/{id}/` | CheckHolder (مالک) | ویرایش پیش از انتشار |
+| GET/PATCH | `/api/v1/listings/{id}/` | CheckHolder (مالک) | مشاهده/ویرایش آگهی |
 | POST | `/api/v1/listings/{id}/documents/` | CheckHolder (مالک) | بارگذاری مدارک |
-| GET | `/api/v1/marketplace/listings/` | Investor | جست‌وجو/فیلتر آگهی‌های `published` |
+| POST | `/api/v1/listings/{id}/withdraw/` | CheckHolder (مالک) | پس‌گرفتن آگهی |
+| GET | `/api/v1/listings/my/` | CheckHolder | آگهی‌های من |
+| GET | `/api/v1/marketplace/listings/` | همه | جست‌وجو/فیلتر آگهی‌های `published` |
+| GET | `/api/v1/issuer-profiles/` | همه | لیست پروفایل‌های صادرکننده |
+| GET/PATCH | `/api/v1/issuer-profiles/{id}/` | CheckHolder (مالک) | مشاهده/ویرایش پروفایل |
 | POST | `/api/v1/matches/` | Investor | ابراز تمایل (ایجاد Match) |
-| PATCH | `/api/v1/matches/{id}/status/` | طرفین Match | بروزرسانی وضعیت (مثلاً تایید توافق بیرون از پلتفرم) |
+| GET | `/api/v1/matches/` | کاربر احرازشده | لیست Matchهای کاربر (فیلتر بر اساس نقش) |
+| GET | `/api/v1/matches/my/` | کاربر احرازشده | تطابق‌های من (همانند `/matches/` با فیلتر نقش) |
+| PATCH | `/api/v1/matches/{id}/status/` | طرفین Match | بروزرسانی وضعیت (`status`, `final_discount_rate?`, `terms?`) |
+| POST | `/api/v1/matches/{id}/accept/` | check_holder | پذیرش تطابق |
+| POST | `/api/v1/matches/{id}/decline/` | check_holder | رد تطابق |
+| POST | `/api/v1/matches/{id}/cancel/` | طرفین Match | لغو تطابق |
+| POST | `/api/v1/matches/{id}/confirm-off-platform/` | check_holder | تأیید تسویه بیرون از پلتفرم |
+| GET | `/api/v1/marketplace/listings/latest/` | عمومی | ۴ آگهی آخر منتشر شده |
 | GET | `/api/v1/moderation/queue/` | Moderator | صف آگهی‌های در انتظار بررسی |
-| POST | `/api/v1/moderation/listings/{id}/decision/` | Moderator | تایید/رد آگهی |
-| GET/PATCH | `/api/v1/feature-flags/{key}/` | Admin | مشاهده/تغییر Feature Flag |
+| POST | `/api/v1/moderation/{id}/resubmit/` | CheckHolder | ارسال مجدد آگهی رد شده |
+| GET | `/api/v1/moderation/kyc/` | Moderator | صف درخواست‌های KYC |
+| POST | `/api/v1/moderation/kyc/{id}/decision/` | Moderator | تأیید/رد KYC |
+| GET | `/api/v1/notifications/` | کاربر احرازشده | لیست اعلان‌ها |
+| PATCH | `/api/v1/notifications/{id}/` | کاربر احرازشده | علامت‌گذاری خوانده‌شده |
+| POST | `/api/v1/notifications/mark-all-read/` | کاربر احرازشده | علامت‌گذاری همه خوانده‌شده |
+| GET | `/api/v1/notifications/preferences/` | کاربر احرازشده | تنظیمات اعلان |
+| PATCH | `/api/v1/notifications/preferences/` | کاربر احرازشده | بروزرسانی تنظیمات |
+| GET | `/api/v1/compliance/feature-flags/` | Admin/Moderator | لیست Feature Flags |
+| GET/PATCH | `/api/v1/compliance/feature-flags/{key}/` | Admin | مشاهده/تغییر Feature Flag |
+| POST | `/api/v1/compliance/feature-flags/{key}/toggle/` | Admin | تغییر وضعیت Feature Flag |
+| GET | `/api/v1/compliance/stats/` | Admin/Moderator | آمار داشبورد |
+| GET | `/api/v1/compliance/audit/` | Admin/Moderator | لیست رویدادهای审计 |
 
 ---
 
@@ -241,40 +355,18 @@ sequenceDiagram
 
 ## ۷. پیاده‌سازی Settlement Port (بخش ۵.۲ سند سطح بالا)
 
-```python
-# apps/core/settlement.py
-from typing import Protocol
-from dataclasses import dataclass
+لایه ۱ با مدل‌های `SettlementPort` و `OffPlatformSettlement` در `doion.matching` پیاده شده است. تأیید تسویه از طریق `POST /api/v1/matches/{id}/confirm-off-platform/` ثبت می‌شود؛ وجه جابه‌جا نمی‌شود.
 
-@dataclass
-class SettlementResult:
-    match_id: str
-    settlement_type: str
-    recorded_at: str
-    reference: str | None = None
-
-class SettlementPort(Protocol):
-    def initiate(self, match) -> SettlementResult: ...
-    def confirm(self, match, evidence: dict) -> SettlementResult: ...
-    def get_status(self, match) -> str: ...
-
-class OffPlatformSettlement:
-    """پیاده‌سازی لایه ۱ — فقط رکورد می‌کند، تسویه بیرون از پلتفرم انجام می‌شود."""
-    def initiate(self, match) -> SettlementResult: ...
-    def confirm(self, match, evidence: dict) -> SettlementResult: ...
-    def get_status(self, match) -> str:
-        return "off_platform_unconfirmed"
-```
-
-`MatchService` در app `matching` این رابط را از طریق یک تنظیم در `settings.py` دریافت می‌کند (مثلاً `SETTLEMENT_BACKEND = "apps.checks.settlement.OffPlatformSettlement"`)، نه با import مستقیم. تغییر به `EscrowSettlement` در لایه ۲ فقط یک تغییر در settings است، نه تغییر کد `matching`.
+مسیر مفهومی قدیمی `apps/core/settlement.py` و تنظیم `SETTLEMENT_BACKEND` در کد فعلی استفاده نشده. گسترش به escrow در لایه ۲ باید همان app `matching` را از طریق پیاده‌سازی جدید Port گسترش دهد، نه با بازنویسی `ChequeListing`.
 
 ---
 
 ## ۸. احراز هویت و کنترل دسترسی
 
-- **JWT:** `djangorestframework-simplejwt` — access token ۱۵ دقیقه، refresh token ۷ روز.
-- **نقش‌ها (Django Groups):** `CheckHolder`, `Investor`, `InstitutionalInvestor`, `Moderator`, `Admin`.
-- **Permission Classes سفارشی:** `IsCheckHolder`, `IsInvestor`, `IsModerator`, `IsOwner` (برای ویرایش آگهی فقط توسط مالک).
+- **JWT:** `djangorestframework-simplejwt` — access token ۱ ساعت؛ refresh token ۱ روز (پیش‌فرض SimpleJWT؛ در settings override نشده).
+- **نقش‌ها:** `check_holder`, `investor`, `moderator`, `admin` (روی User/Profile و Django Groups). ثبت‌نام API فقط دو نقش اول را می‌پذیرد.
+- **نوع کاربر:** `Profile.user_type` = `natural` | `legal` — نقش InstitutionalInvestor جداگانه پیاده نشده.
+- **Permission Classes:** `IsCheckHolder`, `IsInvestor`, `IsModerator` و کنترل مالکیت آگهی.
 
 | عملیات | CheckHolder | Investor | Moderator | Admin |
 |---|---|---|---|---|
@@ -308,19 +400,12 @@ class OffPlatformSettlement:
 
 ## ۱۱. نقشه استقرار (MVP)
 
-```
-docker-compose:
-  web        → gunicorn + Django (API/BFF + Core Domain)
-  worker     → celery worker
-  beat       → celery beat (job‌های زمان‌بندی‌شده)
-  redis      → broker + cache
-  postgres   → پایگاه داده اصلی
-  nginx      → reverse proxy + TLS termination
-```
-جزئیات IaC، CI/CD، و مقیاس‌پذیری افقی به سند سطح بسیار پایین (در صورت نیاز) موکول می‌شود.
+**توسعه محلی:** Django `runserver` + UI با Bun روی `127.0.0.1:3000`؛ دمو با `seed_demo` و در صورت نیاز SQLite جدا (`DJANGO_DEMO_DATABASE=1`).
 
----
+**تولید هدف (چابکان):** سرویس جدا برای API (`chequeyar-back`) و SPA روی PaaS **Static** (`chequeyar-front`، دامنه https://royasoft.dev). جزئیات: [`PRODUCTION_CHABOKAN_DEPLOY.md`](development/PRODUCTION_CHABOKAN_DEPLOY.md).
+
+docker-compose کامل با nginx در این مونورپو مسیر اصلی استقرار فعلی نیست.
 
 ## ۱۲. جمع‌بندی
 
-این سند، پنج ماژول و نقطه‌ی توسعه‌ی سند سطح بالا را به ساختار اجرایی Django (apps، models، API، signals) تبدیل کرده، بدون این‌که هیچ مرز یا تصمیم معماری سند سطح بالا را نقض کند. سطح بعدی جزئیات (در صورت نیاز) شامل: schema کامل JSON هر endpoint، فایل‌های migration واقعی، تعریف دقیق سریالایزرها، و سناریوهای تست خواهد بود.
+پنج ماژول سند سطح بالا به appهای `backend/doion/` نگاشت شده‌اند. Settlement در لایه ۱ off-platform است. قرارداد زنده API در MASTER_API_CONTRACT است. UI در مونورپو نیست تا زمان مهاجرت از AI Studio.

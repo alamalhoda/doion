@@ -24,7 +24,7 @@ class ModerationDecision(TimeStampedModel):
         related_name="moderation_decisions",
     )
     decision = models.CharField(max_length=20, choices=Decision.choices)
-    rejection_code = models.CharField(
+    rejection_code = models.CharField(  # noqa: DJ001
         max_length=20,
         choices=RejectionCode.CHOICES,
         null=True,
@@ -36,7 +36,7 @@ class ModerationDecision(TimeStampedModel):
         verbose_name = _("Moderation Decision")
         verbose_name_plural = _("Moderation Decisions")
         indexes = [
-            models.Index(fields=["listing", "-created_at"]),
+            models.Index(fields=["listing", "-created_at"], name="moderation__listing_8f3c0e_idx"),
         ]
 
     def __str__(self):

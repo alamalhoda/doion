@@ -1,8 +1,8 @@
-# ruff: noqa: ERA001, E501
+# ruff: noqa: ERA001
 """Base settings to build other settings files upon."""
 
-from pathlib import Path
 from datetime import timedelta
+from pathlib import Path
 
 import environ
 
@@ -11,10 +11,11 @@ BASE_DIR = Path(__file__).resolve(strict=True).parent.parent.parent
 APPS_DIR = BASE_DIR / "doion"
 env = environ.Env()
 
-READ_DOT_ENV_FILE = env.bool("DJANGO_READ_DOT_ENV_FILE", default=False)
-if READ_DOT_ENV_FILE:
-    # OS environment variables take precedence over variables from .env
-    env.read_env(str(BASE_DIR / ".env"))
+# Load backend/.env when present (local development).
+# Process/OS env always wins (e.g. Chabokan panel) — do not deploy .env to servers.
+_ENV_FILE = BASE_DIR / ".env"
+if _ENV_FILE.is_file():
+    env.read_env(str(_ENV_FILE))
 
 # GENERAL
 # ------------------------------------------------------------------------------
@@ -96,10 +97,14 @@ LOCAL_APPS = [
     "doion.users",
     "doion.identity",
     "doion.documents",
+    "doion.banks",
     "doion.checks",
     "doion.pricing",
     "doion.moderation",
     "doion.marketplace",
+    "doion.notifications",
+    "doion.integrations",
+    "doion.compliance",
     "doion.matching",
 ]
 # https://docs.djangoproject.com/en/dev/ref/settings/#installed-apps
@@ -149,6 +154,7 @@ AUTH_PASSWORD_VALIDATORS = [
 # https://docs.djangoproject.com/en/dev/ref/settings/#middleware
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
+    "config.middleware.CorrelationIDMiddleware",
     "corsheaders.middleware.CorsMiddleware",
     "whitenoise.middleware.WhiteNoiseMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
@@ -266,15 +272,32 @@ LOGGING = {
             "format": "%(levelname)s %(asctime)s %(module)s %(process)d %(thread)d %(message)s",
         },
     },
+    "filters": {
+        "correlation_id": {
+            "()": "config.middleware.CorrelationIdFilter",
+        },
+    },
     "handlers": {
         "console": {
             "level": "DEBUG",
             "class": "logging.StreamHandler",
             "formatter": "verbose",
+            "filters": ["correlation_id"],
         },
     },
     "root": {"level": "INFO", "handlers": ["console"]},
 }
+
+try:
+    import structlog
+
+    LOGGING["formatters"]["structlog_json"] = {
+        "()": "structlog.stdlib.ProcessorFormatter",
+        "processor": structlog.processors.JSONRenderer(),
+    }
+    LOGGING["handlers"]["console"]["formatter"] = "structlog_json"
+except ImportError:
+    pass
 
 REDIS_URL = env("REDIS_URL", default="redis://localhost:6379/0")
 REDIS_SSL = REDIS_URL.startswith("rediss://")
@@ -310,6 +333,16 @@ REST_FRAMEWORK = {
     "EXCEPTION_HANDLER": "config.exception_handler.custom_exception_handler",
     "DEFAULT_PAGINATION_CLASS": "rest_framework.pagination.PageNumberPagination",
     "PAGE_SIZE": 20,
+    "DEFAULT_THROTTLE_CLASSES": [
+        "rest_framework.throttling.AnonRateThrottle",
+        "rest_framework.throttling.UserRateThrottle",
+    ],
+    "DEFAULT_THROTTLE_RATES": {
+        "anon": "100/minute",
+        "user": "1000/minute",
+        "listing_create": "10/day",
+        "register": "10/hour",
+    },
 }
 
 # django-simplejwt - https://django-rest-framework-simplejwt.readthedocs.io/
@@ -331,3 +364,15 @@ SPECTACULAR_SETTINGS = {
 }
 # Your stuff...
 # ------------------------------------------------------------------------------
+
+# Celery
+CELERY_BROKER_URL = env("CELERY_BROKER_URL", default="redis://localhost:6379/0")
+CELERY_RESULT_BACKEND = CELERY_BROKER_URL
+CELERY_TASK_ALWAYS_EAGER = env.bool("CELERY_TASK_ALWAYS_EAGER", default=False)
+
+CELERY_BEAT_SCHEDULE = {
+    "expire-listings-every-hour": {
+        "task": "doion.integrations.tasks.expire_listings",
+        "schedule": 3600.0,
+    },
+}

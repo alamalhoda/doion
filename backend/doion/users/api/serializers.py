@@ -1,6 +1,7 @@
 from rest_framework import serializers
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 
+from doion.identity.services import get_or_create_profile
 from doion.users.models import User
 
 LOGIN_REQUIRED_MESSAGE = "Both identifier and password are required."
@@ -8,13 +9,29 @@ LOGIN_REQUIRED_MESSAGE = "Both identifier and password are required."
 
 class UserSerializer(serializers.ModelSerializer[User]):
     role = serializers.CharField(read_only=True)
+    user_type = serializers.CharField(source="profile.user_type", read_only=True)
+    is_verified = serializers.BooleanField(source="profile.is_verified", read_only=True)
 
     class Meta:
         model = User
-        fields = ["id", "username", "email", "name", "phone", "role", "url"]
+        fields = [
+            "id",
+            "username",
+            "email",
+            "name",
+            "phone",
+            "role",
+            "user_type",
+            "is_verified",
+            "url",
+        ]
         extra_kwargs = {
-            "url": {"view_name": "api:user-detail", "lookup_field": "username"},
+            "url": {"view_name": "api_v1:user-detail", "lookup_field": "username"},
         }
+
+    def to_representation(self, instance: User) -> dict:
+        get_or_create_profile(instance)
+        return super().to_representation(instance)
 
 
 class LoginSerializer(serializers.Serializer[User]):

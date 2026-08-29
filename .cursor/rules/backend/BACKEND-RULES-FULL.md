@@ -296,16 +296,19 @@ alwaysApply: false
 
 ## Branch Strategy (Aligned)
 
-* `main`: production
+* `master`: production (this repo; not GitHub `main`)
 * `develop`: integration
 * `feature/*`: feature جدید
 * `bugfix/*`: رفع باگ محیط توسعه
 * `release/*`: آماده‌سازی release
 * `hotfix/*`: رفع فوری production
 
+شروع کار و همگام‌سازی: سه نقطه در `gitflow-branch-policy.mdc` (شروع با `pull --ff-only` روی `develop`، قبل از PR merge با `origin/develop`، بعد از merge پاک‌سازی + prune).
+
 ```bash
 git checkout develop
-git pull origin develop
+git fetch origin
+git pull --ff-only origin develop
 git checkout -b feature/add-payment develop
 ```
 
@@ -1211,7 +1214,7 @@ class OrderAPITest(APITestCase):
 هدف ≥ ۸۰٪ برای مسیرهای حیاتی:
 
 ```bash
-pytest --cov=khodroban --cov-report=html
+pytest --cov=doion --cov-report=html
 ```
 ````
 

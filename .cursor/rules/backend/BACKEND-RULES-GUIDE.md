@@ -78,7 +78,7 @@
 
 | موضوع | توضیح |
 |-------|-------|
-| Branch | main، develop، feature/*، bugfix/*، release/*، hotfix/* |
+| Branch | master، develop، feature/*، bugfix/*، release/*، hotfix/* |
 | Commit | feat، fix، refactor، test، docs، chore |
 | High-Risk | تغییر DB schema، API contract، auth، refactor >۱۰۰ خط، dependency جدید، حذف field/endpoint |
 

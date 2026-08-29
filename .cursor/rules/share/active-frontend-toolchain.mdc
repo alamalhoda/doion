@@ -1,0 +1,41 @@
+---
+description: Active UI (checkyar-googleai) local toolchain — Bun SSOT, one-way AI Studio sync; do not use npm lockfile
+globs:
+  - "docs/development/FRONTEND_DEVELOPMENT_STATUS.md"
+  - "**/FRONTEND_DEVELOPMENT_STATUS.md"
+alwaysApply: false
+---
+
+# Active Frontend Local Toolchain
+
+## Scope
+
+Applies while the product UI lives in external repo `alamalhoda/checkyar-googleai` (Google AI Studio).
+
+Full policy SSOT: `docs/development/FRONTEND_DEVELOPMENT_STATUS.md`.
+
+## Package manager (mandatory for active UI)
+
+- Use **Bun**, not npm/yarn/pnpm, for install and scripts.
+- Lockfile SSOT: `bun.lock` (committed by AI Studio).
+- `package-lock.json` is gitignored in the UI repo — do not create, commit, or push it.
+- Local commands (prefer loopback host — VPN/TUN often breaks `0.0.0.0`):
+
+```bash
+cd /path/to/checkyar-googleai
+git pull
+bun install
+bun run dev -- --host 127.0.0.1 --port 3000
+```
+
+Open `http://127.0.0.1:3000/`. Full rationale: `docs/development/FRONTEND_DEVELOPMENT_STATUS.md` § Local Vite host.
+
+## One-way sync reminder
+
+- UI source edits: **only** in AI Studio → push to GitHub.
+- Local/Cursor: `git pull` + run/test against `doion` backend; do not push UI source to `checkyar-googleai`.
+- Backend/API/docs in `doion`: normal GitFlow.
+
+## Do not
+
+- Suggest `npm install` as the default for the active UI.

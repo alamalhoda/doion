@@ -1,10 +1,21 @@
-from django.contrib.auth.models import Group
-from django.db import transaction
+from __future__ import annotations
+
+import re
+from typing import Any
+
 from rest_framework import serializers
 
 from doion.documents.models import Document
-from doion.identity.models import Profile, Verification
+from doion.identity.models import Profile
+from doion.identity.models import Verification
+from doion.identity.services import LEGAL_NATIONAL_ID_LENGTH
+from doion.identity.services import NATURAL_NATIONAL_ID_LENGTH
+from doion.identity.services import CreateVerificationService
+from doion.identity.services import RegisterService
+from doion.identity.services import get_or_create_profile
 from doion.users.models import User
+
+DIGITS_ONLY_PATTERN = re.compile(r"^\d+$")
 
 
 class RegisterSerializer(serializers.Serializer):
@@ -15,41 +26,33 @@ class RegisterSerializer(serializers.Serializer):
     name = serializers.CharField(max_length=255, required=False, allow_blank=True, default="")
     phone = serializers.CharField(max_length=20, required=False, allow_blank=True, default="")
     role = serializers.ChoiceField(choices=["check_holder", "investor"])
+    user_type = serializers.ChoiceField(choices=Profile.UserType.choices)
 
-    def validate_username(self, value):
+    def validate_username(self, value: str) -> str:
         if User.objects.filter(username=value).exists():
-            raise serializers.ValidationError("This username is already taken.")
+            msg = "This username is already taken."
+            raise serializers.ValidationError(msg)
         return value
 
-    def validate_phone(self, value):
+    def validate_phone(self, value: str) -> str:
         if value and User.objects.filter(phone=value).exists():
-            raise serializers.ValidationError("This phone number is already registered.")
+            msg = "This phone number is already registered."
+            raise serializers.ValidationError(msg)
         return value
 
-    def validate(self, attrs):
+    def validate(self, attrs: dict[str, Any]) -> dict[str, Any]:
         if attrs["password"] != attrs.pop("password_confirm"):
             raise serializers.ValidationError(
-                {"password_confirm": "Passwords do not match."}
+                {"password_confirm": "Passwords do not match."},
+            )
+        if attrs["user_type"] == Profile.UserType.LEGAL and not (attrs.get("name") or "").strip():
+            raise serializers.ValidationError(
+                {"name": "Company name is required for Legal Entities."},
             )
         return attrs
 
-    def create(self, validated_data):
-        role = validated_data.pop("role")
-        password = validated_data.pop("password")
-        with transaction.atomic():
-            user = User.objects.create_user(
-                username=validated_data["username"],
-                email=validated_data.get("email", ""),
-                password=password,
-                name=validated_data.get("name", ""),
-                phone=validated_data.get("phone", ""),
-                role=role,
-            )
-            profile = Profile.objects.create(user=user, role=role)
-            group_name = "Investor" if role == "investor" else "CheckHolder"
-            group, _ = Group.objects.get_or_create(name=group_name)
-            user.groups.add(group)
-        return user
+    def create(self, validated_data: dict[str, Any]) -> User:
+        return RegisterService().execute(validated_data)
 
 
 class ProfileSerializer(serializers.ModelSerializer):
@@ -67,19 +70,28 @@ class ProfileSerializer(serializers.ModelSerializer):
             "name",
             "phone",
             "role",
+            "user_type",
             "bio",
             "is_verified",
             "created_at",
             "updated_at",
         ]
-        read_only_fields = ["id", "role", "is_verified", "created_at", "updated_at"]
+        read_only_fields = [
+            "id",
+            "role",
+            "user_type",
+            "is_verified",
+            "created_at",
+            "updated_at",
+        ]
 
-    def update(self, instance, validated_data):
+    def update(self, instance: Profile, validated_data: dict[str, Any]) -> Profile:
         user_data = validated_data.pop("user", {})
         user = instance.user
         for attr, value in user_data.items():
             setattr(user, attr, value)
-        user.save()
+        if user_data:
+            user.save()
         for attr, value in validated_data.items():
             setattr(instance, attr, value)
         instance.save()
@@ -88,6 +100,7 @@ class ProfileSerializer(serializers.ModelSerializer):
 
 class UserMeSerializer(serializers.ModelSerializer):
     role = serializers.CharField(source="profile.role", read_only=True)
+    user_type = serializers.CharField(source="profile.user_type", read_only=True)
     is_verified = serializers.BooleanField(source="profile.is_verified", read_only=True)
 
     class Meta:
@@ -99,17 +112,16 @@ class UserMeSerializer(serializers.ModelSerializer):
             "name",
             "phone",
             "role",
+            "user_type",
             "is_verified",
         ]
-        read_only_fields = ["id", "role", "is_verified"]
+        read_only_fields = ["id", "role", "user_type", "is_verified"]
 
-    def update(self, instance, validated_data):
-        profile = instance.profile
-        user = instance
+    def update(self, instance: User, validated_data: dict[str, Any]) -> User:
         for attr, value in validated_data.items():
-            setattr(user, attr, value)
-        user.save()
-        return user
+            setattr(instance, attr, value)
+        instance.save()
+        return instance
 
 
 class DocumentSerializer(serializers.ModelSerializer):
@@ -120,6 +132,7 @@ class DocumentSerializer(serializers.ModelSerializer):
 
 class VerificationSerializer(serializers.ModelSerializer):
     documents = DocumentSerializer(many=True, read_only=True)
+    user_type = serializers.CharField(source="user.profile.user_type", read_only=True)
 
     class Meta:
         model = Verification
@@ -128,6 +141,7 @@ class VerificationSerializer(serializers.ModelSerializer):
             "full_name",
             "national_id",
             "company_name",
+            "user_type",
             "status",
             "rejection_reason",
             "rejection_code",
@@ -135,6 +149,7 @@ class VerificationSerializer(serializers.ModelSerializer):
         ]
         read_only_fields = [
             "id",
+            "user_type",
             "status",
             "rejection_reason",
             "rejection_code",
@@ -146,6 +161,14 @@ class VerificationCreateSerializer(serializers.ModelSerializer):
     national_id_front = serializers.FileField(write_only=True)
     national_id_back = serializers.FileField(write_only=True)
     selfie = serializers.FileField(write_only=True, required=False)
+    national_id = serializers.CharField(required=True, allow_blank=False, max_length=11)
+    full_name = serializers.CharField(required=True, allow_blank=False, max_length=255)
+    company_name = serializers.CharField(
+        required=False,
+        allow_blank=True,
+        default="",
+        max_length=255,
+    )
 
     class Meta:
         model = Verification
@@ -158,40 +181,60 @@ class VerificationCreateSerializer(serializers.ModelSerializer):
             "selfie",
         ]
 
-    def create(self, validated_data):
-        front = validated_data.pop("national_id_front")
-        back = validated_data.pop("national_id_back")
-        selfie = validated_data.pop("selfie", None)
+    def validate_national_id(self, value: str) -> str:
+        if not DIGITS_ONLY_PATTERN.fullmatch(value):
+            msg = "National ID must contain digits only."
+            raise serializers.ValidationError(msg)
+        return value
 
-        verification = Verification.objects.create(**validated_data)
+    def validate(self, attrs: dict[str, Any]) -> dict[str, Any]:
+        request = self.context["request"]
+        profile = get_or_create_profile(request.user)
+        user_type = profile.user_type
+        national_id = attrs["national_id"]
+        company_name = (attrs.get("company_name") or "").strip()
+        attrs["company_name"] = company_name
 
-        Document.objects.create(
-            owner=verification.user,
-            related_object_type="verification",
-            related_object_id=verification.id,
-            document_type=Document.DocumentType.NATIONAL_ID_FRONT,
-            file=front,
-            file_size=front.size,
-        )
-        Document.objects.create(
-            owner=verification.user,
-            related_object_type="verification",
-            related_object_id=verification.id,
-            document_type=Document.DocumentType.NATIONAL_ID_BACK,
-            file=back,
-            file_size=back.size,
-        )
-        if selfie:
-            Document.objects.create(
-                owner=verification.user,
-                related_object_type="verification",
-                related_object_id=verification.id,
-                document_type=Document.DocumentType.SELFIE,
-                file=selfie,
-                file_size=selfie.size,
+        if user_type == Profile.UserType.NATURAL:
+            if len(national_id) != NATURAL_NATIONAL_ID_LENGTH:
+                raise serializers.ValidationError(
+                    {
+                        "national_id": (
+                            "National ID must be exactly 10 digits for Natural Persons."
+                        ),
+                    },
+                )
+            if company_name:
+                raise serializers.ValidationError(
+                    {
+                        "company_name": (
+                            "Company name must be empty for Natural Persons."
+                        ),
+                    },
+                )
+            attrs["company_name"] = ""
+        elif user_type == Profile.UserType.LEGAL:
+            if len(national_id) != LEGAL_NATIONAL_ID_LENGTH:
+                raise serializers.ValidationError(
+                    {
+                        "national_id": (
+                            "National ID must be exactly 11 digits for Legal Entities."
+                        ),
+                    },
+                )
+            if not company_name:
+                raise serializers.ValidationError(
+                    {"company_name": "Company Name is required for Legal Entities."},
+                )
+        else:
+            raise serializers.ValidationError(
+                {"user_type": "Unsupported profile user type."},
             )
 
-        from doion.identity.signals import verification_submitted
-        verification_submitted.send(sender=self.__class__, verification=verification)
+        return attrs
 
-        return verification
+    def create(self, validated_data: dict[str, Any]) -> Verification:
+        return CreateVerificationService().execute(
+            user=self.context["request"].user,
+            validated_data=validated_data,
+        )

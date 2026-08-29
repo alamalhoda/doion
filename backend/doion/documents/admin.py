@@ -1,4 +1,5 @@
 from django.contrib import admin
+
 from doion.documents.models import Document
 
 

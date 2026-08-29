@@ -1,8 +1,9 @@
+from pathlib import Path
+
 from .base import *  # noqa: F403
 from .base import INSTALLED_APPS
 from .base import MIDDLEWARE
 from .base import env
-from pathlib import Path
 
 # GENERAL
 # ------------------------------------------------------------------------------
@@ -16,16 +17,28 @@ SECRET_KEY = env(
 # https://docs.djangoproject.com/en/dev/ref/settings/#allowed-hosts
 ALLOWED_HOSTS = ["localhost", "0.0.0.0", "127.0.0.1"]  # noqa: S104
 
-# DATABASES - SQLite for local development (PostgreSQL not available)
+# DATABASES
 # ------------------------------------------------------------------------------
+# Path A (default): SQLite, no Docker.
+# Path B: DATABASE_URL starting with postgres (optional Compose at repo root).
+# DJANGO_DEMO_DATABASE=1 applies only to Path A (db.demo.sqlite3).
 BASE_DIR = Path(__file__).resolve(strict=True).parent.parent.parent
-DATABASES = {
-    "default": {
-        "ENGINE": "django.db.backends.sqlite3",
-        "NAME": str(BASE_DIR / "db.sqlite3"),
-        "ATOMIC_REQUESTS": True,
+_database_url = env.str("DATABASE_URL", default="")
+if _database_url.startswith("postgres"):
+    DATABASES = {
+        "default": env.db("DATABASE_URL"),
     }
-}
+    DATABASES["default"]["ATOMIC_REQUESTS"] = True
+else:
+    _USE_DEMO_DATABASE = env.bool("DJANGO_DEMO_DATABASE", default=False)
+    _SQLITE_NAME = "db.demo.sqlite3" if _USE_DEMO_DATABASE else "db.sqlite3"
+    DATABASES = {
+        "default": {
+            "ENGINE": "django.db.backends.sqlite3",
+            "NAME": str(BASE_DIR / _SQLITE_NAME),
+            "ATOMIC_REQUESTS": True,
+        },
+    }
 
 # CACHES
 # ------------------------------------------------------------------------------
@@ -54,21 +67,22 @@ INSTALLED_APPS = ["whitenoise.runserver_nostatic", *INSTALLED_APPS]
 # django-debug-toolbar
 # ------------------------------------------------------------------------------
 # https://django-debug-toolbar.readthedocs.io/en/latest/installation.html#prerequisites
-INSTALLED_APPS += ["debug_toolbar"]
-# https://django-debug-toolbar.readthedocs.io/en/latest/installation.html#middleware
-MIDDLEWARE += ["debug_toolbar.middleware.DebugToolbarMiddleware"]
-# https://django-debug-toolbar.readthedocs.io/en/latest/configuration.html#debug-toolbar-config
-DEBUG_TOOLBAR_CONFIG = {
-    "DISABLE_PANELS": [
-        "debug_toolbar.panels.redirects.RedirectsPanel",
-        # Disable profiling panel due to an issue with Python 3.12+:
-        # https://github.com/jazzband/django-debug-toolbar/issues/1875
-        "debug_toolbar.panels.profiling.ProfilingPanel",
-    ],
-    "SHOW_TEMPLATE_CONTEXT": True,
-}
-# https://django-debug-toolbar.readthedocs.io/en/latest/installation.html#internal-ips
-INTERNAL_IPS = ["127.0.0.1", "10.0.2.2"]
+if env.bool("DJANGO_DEBUG_TOOLBAR", default=False):
+    INSTALLED_APPS += ["debug_toolbar"]
+    # https://django-debug-toolbar.readthedocs.io/en/latest/installation.html#middleware
+    MIDDLEWARE += ["debug_toolbar.middleware.DebugToolbarMiddleware"]
+    # https://django-debug-toolbar.readthedocs.io/en/latest/configuration.html#debug-toolbar-config
+    DEBUG_TOOLBAR_CONFIG = {
+        "DISABLE_PANELS": [
+            "debug_toolbar.panels.redirects.RedirectsPanel",
+            # Disable profiling panel due to an issue with Python 3.12+:
+            # https://github.com/jazzband/django-debug-toolbar/issues/1875
+            "debug_toolbar.panels.profiling.ProfilingPanel",
+        ],
+        "SHOW_TEMPLATE_CONTEXT": True,
+    }
+    # https://django-debug-toolbar.readthedocs.io/en/latest/installation.html#internal-ips
+    INTERNAL_IPS = ["127.0.0.1", "10.0.2.2"]
 
 
 # django-extensions
@@ -81,5 +95,7 @@ INSTALLED_APPS += ["django_extensions"]
 CORS_ALLOWED_ORIGINS = [
     "http://localhost:5173",
     "http://127.0.0.1:5173",
+    "http://localhost:3000",
+    "http://127.0.0.1:3000",
 ]
 CORS_ALLOW_ALL_ORIGINS = DEBUG  # Only in development

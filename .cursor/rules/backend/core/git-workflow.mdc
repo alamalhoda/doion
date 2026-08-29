@@ -16,16 +16,19 @@ alwaysApply: false
 
 ## Branch Strategy (Aligned)
 
-* `main`: production
+* `master`: production (this repo; not GitHub `main`)
 * `develop`: integration
 * `feature/*`: feature جدید
 * `bugfix/*`: رفع باگ محیط توسعه
 * `release/*`: آماده‌سازی release
 * `hotfix/*`: رفع فوری production
 
+شروع کار و همگام‌سازی: سه نقطه در `gitflow-branch-policy.mdc` (شروع با `pull --ff-only` روی `develop`، قبل از PR merge با `origin/develop`، بعد از merge پاک‌سازی + prune).
+
 ```bash
 git checkout develop
-git pull origin develop
+git fetch origin
+git pull --ff-only origin develop
 git checkout -b feature/add-payment develop
 ```
 
@@ -59,3 +62,7 @@ AI باید این موارد را **explicitly اعلام خطر** کند:
 * refactoring بیش از ۱۰۰ خط
 * افزودن dependency جدید
 * حذف field یا endpoint
+
+## SemVer tags
+
+Do not create product git tags from backend feature work with `git tag`. Use `.cursor/skills/semver-release/SKILL.md` (workflow `Release`). Remind once when a user-facing feat/fix is on `develop` and they talk about shipping. Human how-to: `docs/development/GIT_TAGS_AND_RELEASES.md`.

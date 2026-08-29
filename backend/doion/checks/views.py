@@ -1,22 +1,22 @@
 from django.db import IntegrityError
 from django.db import transaction
-from django.shortcuts import get_object_or_404
-from rest_framework import status
 from rest_framework import serializers
+from rest_framework import status
 from rest_framework.decorators import action
-from rest_framework.parsers import FormParser, MultiPartParser
+from rest_framework.permissions import SAFE_METHODS
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
-from rest_framework.viewsets import ModelViewSet, GenericViewSet
+from rest_framework.settings import api_settings
+from rest_framework.throttling import ScopedRateThrottle
+from rest_framework.viewsets import ModelViewSet
 
 from doion.checks.models import ChequeListing
 from doion.checks.models import IssuerProfile
-from doion.checks.serializers import (
-    ChequeListingCreateSerializer,
-    ChequeListingSerializer,
-    DocumentUploadSerializer,
-    IssuerProfileSerializer)
-from doion.core.permissions import IsCheckHolder
+from doion.checks.serializers import ChequeListingCreateSerializer
+from doion.checks.serializers import ChequeListingSerializer
+from doion.checks.serializers import DocumentUploadSerializer
+from doion.checks.serializers import IssuerProfileSerializer
+from doion.identity.services import require_approved_kyc
 
 
 class IsListingOwner(IsAuthenticated):
@@ -24,21 +24,57 @@ class IsListingOwner(IsAuthenticated):
         return obj.owner == request.user
 
 
+class IsIssuerCreatorOrStaff(IsAuthenticated):
+    """Allow read for any auth user; mutate only creator, moderator, or admin."""
+
+    def has_object_permission(self, request, view, obj):
+        if request.method in SAFE_METHODS:
+            return True
+        role = getattr(request.user, "role", None)
+        if role in {"moderator", "admin"}:
+            return True
+        return obj.created_by_id == request.user.id
+
+
 class IssuerProfileViewSet(ModelViewSet):
     serializer_class = IssuerProfileSerializer
-    permission_classes = [IsAuthenticated]
+    permission_classes = [IsAuthenticated, IsIssuerCreatorOrStaff]
     queryset = IssuerProfile.objects.all()
+
+    def get_queryset(self):
+        qs = IssuerProfile.objects.all()
+        national_id = self.request.query_params.get("national_or_company_id")
+        if national_id:
+            qs = qs.filter(national_or_company_id=national_id)
+        return qs
+
+    def perform_create(self, serializer):
+        serializer.save(created_by=self.request.user)
 
 
 class ChequeListingViewSet(ModelViewSet):
     serializer_class = ChequeListingSerializer
     permission_classes = [IsAuthenticated]
+    throttle_classes = list(api_settings.DEFAULT_THROTTLE_CLASSES)
+
+    def get_throttles(self):
+        if self.action == "create":
+            return [throttle() for throttle in self.throttle_classes] + [
+                ScopedRateThrottle(),
+            ]
+        return super().get_throttles()
+
+    throttle_scope = "listing_create"
 
     def get_queryset(self):
         user = self.request.user
         if user.profile.role in ["moderator", "admin"]:
-            return ChequeListing.objects.all()
-        return ChequeListing.objects.filter(owner=user)
+            return ChequeListing.objects.select_related("bank", "issuer", "owner").all()
+        return ChequeListing.objects.filter(owner=user).select_related(
+            "bank",
+            "issuer",
+            "owner",
+        )
 
     def get_serializer_class(self):
         if self.action == "create":
@@ -46,17 +82,18 @@ class ChequeListingViewSet(ModelViewSet):
         return ChequeListingSerializer
 
     def perform_create(self, serializer):
+        require_approved_kyc(self.request.user)
         try:
             with transaction.atomic():
                 serializer.save()
-        except IntegrityError:
+        except IntegrityError as err:
             raise serializers.ValidationError(
                 {
                     "cheque_serial_number": [
-                        "A listing with this cheque serial number already exists for this issuer and bank"
-                    ]
-                }
-            )
+                        "A listing with this cheque serial number already exists for this issuer and bank",
+                    ],
+                },
+            ) from err
 
     def update(self, request, *args, **kwargs):
         listing = self.get_object()
@@ -74,7 +111,11 @@ class ChequeListingViewSet(ModelViewSet):
 
     @action(detail=False, methods=["get"], url_path="my")
     def my_listings(self, request):
-        queryset = ChequeListing.objects.filter(owner=request.user)
+        queryset = ChequeListing.objects.filter(owner=request.user).select_related(
+            "bank",
+            "issuer",
+            "owner",
+        )
         serializer = self.get_serializer(queryset, many=True)
         return Response(serializer.data)
 
@@ -86,7 +127,6 @@ class ChequeListingViewSet(ModelViewSet):
                 {"error": {"code": "PERMISSION_ERROR", "message": "Only owner can upload documents"}},
                 status=status.HTTP_403_FORBIDDEN,
             )
-        parser_classes = (MultiPartParser, FormParser)
         serializer = DocumentUploadSerializer(data=request.data, context={"listing": listing})
         serializer.is_valid(raise_exception=True)
         serializer.save()

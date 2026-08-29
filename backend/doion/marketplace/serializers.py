@@ -1,14 +1,47 @@
-from datetime import date
-
+from django.utils import timezone
 from rest_framework import serializers
 
+from doion.banks.serializers import BankSummarySerializer
 from doion.checks.models import ChequeListing
 from doion.checks.serializers import IssuerProfileSerializer
+
+
+class MarketplaceLatestSerializer(serializers.ModelSerializer):
+    issuer_profile = IssuerProfileSerializer(read_only=True)
+    bank = BankSummarySerializer(read_only=True)
+    days_to_due = serializers.SerializerMethodField()
+
+    class Meta:
+        model = ChequeListing
+        fields = [
+            "id",
+            "issuer_profile",
+            "bank",
+            "bank_name",
+            "face_amount",
+            "due_date",
+            "issuer_type",
+            "suggested_discount_rate",
+            "risk_tier",
+            "status",
+            "days_to_due",
+            "created_at",
+        ]
+        read_only_fields = [
+            "id",
+            "status",
+            "created_at",
+            "days_to_due",
+        ]
+
+    def get_days_to_due(self, obj):
+        return (obj.due_date - timezone.localdate()).days
 
 
 class MarketplaceListingSerializer(serializers.ModelSerializer):
     issuer_profile = IssuerProfileSerializer(read_only=True)
     owner_id = serializers.IntegerField(source="owner.id", read_only=True)
+    bank = BankSummarySerializer(read_only=True)
     days_to_due = serializers.SerializerMethodField()
     interest_count = serializers.SerializerMethodField()
     published_at = serializers.SerializerMethodField()
@@ -19,6 +52,7 @@ class MarketplaceListingSerializer(serializers.ModelSerializer):
             "id",
             "owner_id",
             "issuer_profile",
+            "bank",
             "bank_name",
             "cheque_serial_number",
             "face_amount",
@@ -48,7 +82,7 @@ class MarketplaceListingSerializer(serializers.ModelSerializer):
         ]
 
     def get_days_to_due(self, obj):
-        return (obj.due_date - date.today()).days
+        return (obj.due_date - timezone.localdate()).days
 
     def get_interest_count(self, obj):
         return 0

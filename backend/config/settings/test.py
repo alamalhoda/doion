@@ -2,6 +2,7 @@
 With these settings, tests run faster.
 """
 
+import os
 from pathlib import Path
 
 from .base import *  # noqa: F403
@@ -34,13 +35,31 @@ TEMPLATES[0]["OPTIONS"]["debug"] = True  # type: ignore[index]
 
 # DATABASES
 # ------------------------------------------------------------------------------
+# Local pytest: SQLite test_db unless DATABASE_URL is postgres (Compose path B).
+# GitHub Actions: PostgreSQL via DATABASE_URL. No SQLite fallback in CI.
 BASE_DIR = Path(__file__).resolve().parent.parent.parent
-DATABASES = {
-    "default": {
-        "ENGINE": "django.db.backends.sqlite3",
-        "NAME": BASE_DIR / "test_db.sqlite3",
+if os.environ.get("GITHUB_ACTIONS"):
+    DATABASES = {
+        "default": env.db("DATABASE_URL"),
     }
-}
+    engine = DATABASES["default"].get("ENGINE", "")
+    if "postgres" not in engine:
+        msg = "GitHub Actions pytest must use PostgreSQL; SQLite is not allowed."
+        raise RuntimeError(msg)
+else:
+    _database_url = env.str("DATABASE_URL", default="")
+    if _database_url.startswith("postgres"):
+        DATABASES = {
+            "default": env.db("DATABASE_URL"),
+        }
+    else:
+        DATABASES = {
+            "default": {
+                "ENGINE": "django.db.backends.sqlite3",
+                "NAME": BASE_DIR / "test_db.sqlite3",
+            },
+        }
+DATABASES["default"]["ATOMIC_REQUESTS"] = True
 
 # Allow sites app to use its default migrations in test environment
 MIGRATION_MODULES = {}

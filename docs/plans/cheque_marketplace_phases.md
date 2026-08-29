@@ -1,6 +1,6 @@
 ---
 name: Cheque Marketplace Phases
-overview: برنامه فازبندی‌شده برای تبدیل دو پروتوتایپ HTML به محصول واقعی چک‌بازار، با هم‌ترازی کامل با معماری Modular Monolith (LLD) و Vue 3 feature-based frontend موجود. هر فاز یک vertical slice قابل تست end-to-end است.
+overview: "سابقهٔ ساخت v1 لایه ۱ چک‌یار (فازهای ۰–۸ تکمیل). وضعیت محصول: v1 لایه ۱ آماده پایلوت — نه در حال ساخت MVP، نه v1 لانچ‌شده. UI فعال در checkyar-googleai است."
 todos:
   - id: phase-0-platform-setup-refactoring
     content: "فاز ۰: ریفکتورینگ architecture frontend (composables, ui atoms, layout organisms) + API v1 versioning"
@@ -25,24 +25,32 @@ todos:
     status: completed
   - id: phase-7-notifications-center
     content: "فاز ۷: Notification model + Celery SMS stub؛ notification organisms + activity feed"
-    status: pending
+    status: completed
   - id: phase-8-compliance-hardening
-    content: "فاز ۸: AuditEvent/FeatureFlag/Celery beat expiry؛ admin organisms + error handling + E2E smoke"
-    status: pending
+    content: "فاز ۸: Compliance, Jobs & Hardening"
+    status: completed
 isProject: false
 ---
 
-# برنامه اجرایی فازبندی — چک‌بازار MVP
+# برنامه اجرایی فازبندی — ساخت v1 لایه ۱ چک‌یار
+
+**نقش این فایل:** سابقهٔ ساخت فازهای ۰–۸ است، نه برنامهٔ جاری «در حال ساخت MVP» و نه سند لانچ.
+
+**وضعیت محصول (۱۴۰۵/۰۵/۲۳ / 2026-08-14):** **v1 لایه ۱ آماده پایلوت** — نه در حال ساخت MVP، نه v1 لانچ‌شده. فازهای ۰–۸ در بک‌اند `backend/doion/` انجام شده‌اند. مسیرهای `frontend/src/...` در بخش‌های زیر **تاریخی**اند (UI آرشیو). UI فعال: [checkyar-googleai](https://github.com/alamalhoda/checkyar-googleai). SSOT محصول: [`سند پایه پروژه (Core Brief).md`](../سند%20پایه%20پروژه%20(Core%20Brief).md). سیاست UI: [`development/FRONTEND_DEVELOPMENT_STATUS.md`](../development/FRONTEND_DEVELOPMENT_STATUS.md).
+
+**گام بعدی (خارج از این فازبندی):** پایلوت کنترل‌شده، پروندهٔ حقوقی/رگولاتوری، hardening استقرار — نه فاز ۹ ساخت محصول، نه اعلام عرضه عمومی.
 
 ## وضعیت فعلی (Baseline)
 
 | لایه | وضعیت | مرجع |
 |------|--------|------|
-| Backend | `doion.users` + JWT login + `doion.core` + `doion.identity` + role field + register API + `doion.checks` + `doion.pricing` + `doion.moderation` + `doion.marketplace` | [`backend/doion/`](backend/doion/) |
-| Frontend | Vue 3 + design tokens + UI shells + landing + register + role badge | [`frontend/src/features/`](frontend/src/features/) |
-| مستندات | LLD، معماری، state machines، design system، API contract | [`docs/cheque-platform-low-level-design.md`](docs/cheque-platform-low-level-design.md)، [`ai-preview/mvp-spec.md`](ai-preview/mvp-spec.md)، [`docs/development/API_CONTRACT_REGISTRY.md`](docs/development/API_CONTRACT_REGISTRY.md) |
+| Backend | `doion.users` + JWT + identity/KYC + checks + pricing stub + moderation + marketplace + matching + notifications + compliance + integrations | [`backend/doion/`](../../backend/doion/) |
+| Frontend فعال | Vue 3 + Naive UI + Pinia + Bun؛ توسعه در AI Studio | ریپوی خارجی `checkyar-googleai` |
+| قرارداد API | SSOT واحد | [`docs/development/MASTER_API_CONTRACT.md`](../development/MASTER_API_CONTRACT.md) |
+| مستندات معماری | LLD + معماری فنی هم‌تراز با کد ۱۴۰۵/۰۵ | [`cheque-platform-low-level-design.md`](../cheque-platform-low-level-design.md) |
+| وضعیت محصول | v1 لایه ۱ آماده پایلوت | [`سند پایه پروژه (Core Brief).md`](../سند%20پایه%20پروژه%20(Core%20Brief).md) |
 
-**نقشه پروتوتایپ → محصول:**
+**نقشه پروتوتایپ → v1 (آماده پایلوت، نه لانچ‌شده):**
 
 ```mermaid
 flowchart LR
@@ -58,7 +66,7 @@ flowchart LR
     NotifCenter[Notification Center]
     StateViz[State Machines]
   end
-  subgraph product [Production Vue App]
+  subgraph product [v1 Vue App — checkyar-googleai]
     PublicPages[Public + Auth]
     InvestorFlow[Investor Flow]
     HolderFlow[Holder Flow]
@@ -74,7 +82,7 @@ flowchart LR
   StateViz -.->|dev reference only| product
 ```
 
-> **تصمیم ساختاری:** LLD ساختار `backend/apps/` را پیشنهاد می‌دهد؛ کد فعلی Cookiecutter با `backend/doion/` است. در فاز ۱، appهای دامنه را زیر `backend/doion/<app>/` بسازید (هم‌راستا با `users`) و نام‌گذاری bounded context را از LLD حفظ کنید. مهاجرت فیزیکی به `apps/` اختیاری و بعد از MVP است.
+> **تصمیم ساختاری (انجام‌شده):** LLD ساختار `backend/apps/` را پیشنهاد می‌داد؛ appهای دامنه زیر `backend/doion/<app>/` ساخته شدند. مهاجرت فیزیکی به `apps/` در برنامهٔ جاری v1 نیست. بخش‌های فاز ۰–۸ زیر **سابقهٔ ساخت** هستند؛ کار جدید باید روی پایلوت/hardening باشد، نه تکرار این فازها.
 
 ---
 
@@ -86,7 +94,7 @@ flowchart LR
 - JWT login با phone/username/email (موجود)
 - افزودن `POST /api/v1/auth/refresh/` و versioning زیر `/api/v1/`
 - Exception handler یکنواخت خطا (فرمت LLD بخش ۹)
-- ثبت قرارداد API در [`docs/development/API_CONTRACT_REGISTRY.md`](docs/development/API_CONTRACT_REGISTRY.md)
+- ثبت قرارداد API در [`docs/development/MASTER_API_CONTRACT.md`](docs/development/MASTER_API_CONTRACT.md)
 
 ### Frontend (تکمیل)
 - اتصال `authStore` به API واقعی (موجود جدئی)
@@ -98,7 +106,7 @@ flowchart LR
   - ایجاد `frontend/src/components/ui/` برای atoms (Button, Input, Badge, Pill, Icon)
   - ایجاد `frontend/src/components/layout/` برای organisms (Nav, Footer, PageHeader)
   - پایه‌سازی i18n (fa) + RTL در main.ts (همراسی با design system)
-  - sync کامل CSS variables با `cheque-marketplace-design-system.md`
+  - sync کامل CSS variables با [`design-system.md`](../design-system.md)
 
 ### معیار پذیرش فاز ۰
 - Login/logout/refresh پایدار
@@ -191,7 +199,7 @@ flowchart LR
 
 **پروتوتایپ:** فرم ۳ مرحله‌ای create listing — [`cheque-marketplace-prototype.html`](ai-preview/cheque-marketplace-prototype.html) (page-create)
 
-**جریان:** `DRAFT` → submit → `PENDING_MODERATION`
+**جریان:** ایجاد → `pending_moderation` → (moderation) → `published` / `rejected`
 
 ### Backend
 | App | کار |
@@ -233,7 +241,7 @@ flowchart LR
 
 **پروتوتایپ:** صف moderation + modal تأیید/رد — [`extended-prototype.html`](ai-preview/extended-prototype.html) (page-admin)
 
-**جریان:** `PENDING_MODERATION` → approve → `PUBLISHED` / reject → `REJECTED` → resubmit (max 3)
+**جریان:** `pending_moderation` → approve → `published` / reject → `rejected` → resubmit (max 3)
 
 ### Backend
 | App | کار |
@@ -243,7 +251,7 @@ flowchart LR
 
 **APIها:**
 - `GET /api/v1/moderation/queue/` — فیلتر، sort، pagination
-- `POST /api/v1/moderation/listings/{id}/decision/` — `{decision, rejection_reason?}`
+- `POST /api/v1/moderation/{id}/decision/` — `{decision, rejection_code?, rejection_note?}`
 
 **Events:** `ChequeListingPublished`, `ListingRejected` → notification stub
 
@@ -266,23 +274,25 @@ flowchart LR
 
 ![آماده]
 
-## فاز ۵ — Marketplace و مرور سرمایه‌گذار (Backend API ✅)
+## فاز ۵ — Marketplace و مرور سرمایه‌گذار (تکمیل)
 
 **پروتوتایپ:** فیلتر sidebar، grid کارت‌ها، modal جزئیات — [`cheque-marketplace-prototype.html`](ai-preview/cheque-marketplace-prototype.html) (page-marketplace)
 
-**جریان:** Investor (KYC_APPROVED) → browse → filter/sort → detail modal
+**جریان:** Investor (KYC_APPROVED) → browse → filter/sort → detail modal → ابراز تمایل
 
 ### Backend
 | App | کار |
 |-----|-----|
 | `doion.marketplace` | `MarketplaceViewSet` فیلتر فقط `status=published` + `django-filter` |
+| `doion.marketplace` | `latest_listings` action با `AllowAny` برای landing page |
 
 **API:**
 - `GET /api/v1/marketplace/listings/?risk_tier=&min_amount=&max_amount=&max_days_to_due=&issuer_type=&bank_name=&ordering=`
+- `GET /api/v1/marketplace/listings/latest/` — ۴ listing آخر (public، بدون auth)
 
 **فیلترها:** risk tier (`low/medium/high`), issuer type (`legal/natural`), amount range (`min_amount`, `max_amount`), days to due (`max_days_to_due`), bank name (`icontains`), ordering.
 
-**Serializerها:** `MarketplaceSerializer` با `days_to_due`, `interest_count` (=0 placeholder).
+**Serializerها:** `MarketplaceSerializer` با `days_to_due`, `interest_count` (=0 placeholder). `MarketplaceLatestSerializer` برای داده‌های عمومی.
 
 **Pagination:** Emulated via override params (`page`, `page_size`, max=50).
 
@@ -293,24 +303,27 @@ flowchart LR
 ### Frontend
 | Feature | کار |
 |---------|-----|
-| `marketplace` | Wire [`MarketplaceView.vue`](frontend/src/features/marketplace/views/MarketplaceView.vue) + [`MarketplaceListingCard.vue`](frontend/src/features/marketplace/components/MarketplaceListingCard.vue) |
-| | FilterSidebar organism (risk tier, days to due, min amount, issuer type, bank name) |
-| | DetailModal organism (ListingDetail, RiskBar, DiscountRate) |
-| | `useModal.ts` composable برای modal state management |
-| `landing` | بخش «آخرین آگهی‌ها» — fetch ۴ listing منتشرشده (RealTimeCard atoms) |
+| `marketplace` | [`MarketplaceView.vue`](frontend/src/features/marketplace/views/MarketplaceView.vue) — browse + filters + pagination |
+| | [`MarketplaceListingCard.vue`](frontend/src/features/marketplace/components/MarketplaceListingCard.vue) — کارت listing با تاریخ فارسی |
+| | [`FilterSidebar.vue`](frontend/src/features/marketplace/components/FilterSidebar.vue) — فیلترهای risk tier، مبلغ، روز سررسید، نوع صادرکننده، بانک |
+| | [`ListingDetailModal.vue`](frontend/src/features/marketplace/components/ListingDetailModal.vue) — modal جزئیات + دکمه «ابراز تمایل» متصل به API |
+| | KYC gate: investor بدون `is_verified` بنر CTA می‌بیند، چک‌هاورد بنر «فقط برای سرمایه‌گذاران» |
+| `landing` | بخش «آخرین آگهی‌ها» — fetch ۴ listing منتشرشده از endpoint عمومی + CTA برای کاربران غیراحرازشده |
 
 ### تست فاز ۵
 - فقط `published` listings نمایش داده شوند
 - فیلتر risk + sort کار کند
 - Investor بدون KYC → CTA «تکمیل احراز هویت»
+- Landing page عمومی بدون auth ۴ listing آخر را نشان می‌دهد
+- Express interest → match created → navigate to matches
 
 ---
 
-## فاز ۶ — Matching و Settlement (لایه ۱)
+## فاز ۶ — Matching و Settlement (لایه ۱) (تکمیل)
 
 **پروتوتایپ:** دکمه «ابراز تمایل»، تب‌های investor/holder در dashboard، match rows — [`cheque-marketplace-prototype.html`](ai-preview/cheque-marketplace-prototype.html) (dashboard tabs)
 
-**جریان:** Investor express interest → `Match(PENDING)` → Holder accept/decline → `ACCEPTED` → both confirm off-platform → `SETTLED`
+**جریان:** Investor express interest → `Match(pending)` → Holder accept/decline → `accepted` → both confirm off-platform → `settled`
 
 ### Backend
 | App | کار |
@@ -320,7 +333,10 @@ flowchart LR
 
 **APIها:**
 - `POST /api/v1/matches/` — investor creates match
-- `PATCH /api/v1/matches/{id}/status/` — transitions: accept, decline, confirm, cancel
+- `PATCH /api/v1/matches/{id}/accept/` — holder accepts
+- `PATCH /api/v1/matches/{id}/decline/` — holder declines
+- `PATCH /api/v1/matches/{id}/cancel/` — investor cancels
+- `PATCH /api/v1/matches/{id}/confirm-off-platform/` — holder confirms settlement
 - `GET /api/v1/matches/` — filtered by role
 
 **Events:** `MatchCreated`, `MatchAccepted`, `MatchDeclined`, `SettlementConfirmed`
@@ -330,57 +346,65 @@ flowchart LR
 ### Frontend
 | Feature | کار |
 |---------|-----|
-| `marketplace` | دکمه «ابراز تمایل» → API + ConfirmationDialog organism |
-| `matches` | wire [`MatchesListView.vue`](frontend/src/features/matches/views/MatchesListView.vue) + MatchDetail organism |
-| `components/ui/MatchCard.vue` (molecule) برای match rows |
-| `components/ui/ConfirmationDialog.vue` (molecule) برای action confirm |
-| `dashboard` | تب‌های holder/investor با stats واقعی |
-| | Holder: accept/decline incoming matches (MatchAction organism) |
+| `marketplace` | دکمه «ابراز تمایل» در [`ListingDetailModal.vue`](frontend/src/features/marketplace/components/ListingDetailModal.vue) → API + toast + navigate to matches |
+| `matches` | [`MatchesListView.vue`](frontend/src/features/matches/views/MatchesListView.vue) — تب‌های pending/accepted/completed |
+| | [`MatchDetailView.vue`](frontend/src/features/matches/views/MatchDetailView.vue) — جزئیات + action buttons (accept/decline/confirm/cancel) |
+| | [`MatchCard.vue`](frontend/src/features/matches/components/MatchCard.vue) — کارت تطابق با عنوان bank + مبلغ، status badge، تاریخ فارسی |
+| `services` | [`matchService.ts`](frontend/src/features/matches/services/matchService.ts) — متصل به API واقعی با mapping درست serializer fields |
+| `types` | [`match.ts`](frontend/src/features/matches/types/match.ts) — `MatchStatus` هماهنگ با backend constants |
+| `i18n` | کلیدهای `matches.*` در fa.json + en.json اضافه شد |
 
 ### تست فاز ۶
-- Investor express interest → holder notification (in-app)
+- Investor express interest → match created → notification (in-app)
 - Holder accept → listing status `matched`
 - Both confirm off-platform → audit record, disclaimer نمایش داده شود
+- Match detail view: action buttons فقط برای نقش کاربر صحیح نمایش داده می‌شوند
 
 ---
 
-## فاز ۷ — Notifications و Activity Feed
+## فاز ۷ — Notifications و Activity Feed ✅
 
 **پروتوتایپ:** مرکز اعلان‌ها + تنظیمات کانال — [`extended-prototype.html`](ai-preview/extended-prototype.html) (page-notif)
 
 ### Backend
 | App | کار |
 |-----|-----|
-| `doion.matching` | مدل `Notification` |
-| `doion.integrations` | SMS adapter stub (Celery async) |
-| Celery | worker + task `send_notification` |
+| `doion.notifications` | مدل `Notification` + `NotificationPreference`، ViewSet با list/retrieve/mark-all-read/preferences |
+| `doion.integrations` | SMS stub model + سرویس `send_sms` |
+| Celery | task `expire_listings` (هر ۶۰ دقیقه) |
 
 **APIها:**
-- `GET /api/v1/notifications/` — paginated, filter by type
-- `PATCH /api/v1/notifications/{id}/read/`
-- `POST /api/v1/notifications/mark-all-read/`
-- `GET/PATCH /api/v1/notifications/preferences/`
+- `GET /api/v1/notifications/` — paginated, فیلتر بر اساس `type` و `is_read`
+- `PATCH /api/v1/notifications/{id}/` — علامت‌گذاری read
+- `POST /api/v1/notifications/mark-all-read/` — علامت‌گذاری همه به‌عنوان read
+- `GET/PATCH /api/v1/notifications/preferences/` — تنظیمات کاربر
 
-**Event subscribers:** MatchCreated, ChequeListingPublished, VerificationApproved, ListingRejected
+**Event subscribers:** 
+- `ChequeListingPublished` → نوتیفیکیشن برای holder
+- `ListingRejected` → نوتیفیکیشن برای holder
+- توابع کمکی برای Match events (MatchCreated, MatchAccepted, MatchDeclined, MatchCancelled, SettlementConfirmed)
 
 ### Frontend
 | Feature | کار |
 |---------|-----|
-| `notifications` | wire [`NotificationsView.vue`](frontend/src/features/notifications/views/NotificationsView.vue) — tabs: all/match/kyc/listing/settings |
-| | `NotificationItem.vue` (organism) از atoms |
-| | `NotificationSidebar.vue` (organism) برای filter tabs |
-| Layout | bell badge + unread count در nav (useApi polling) |
-| `composables/usePolling.ts` → polling برای unread count |
-| `dashboard` | تب activity — timeline از notifications (Timeline organism) |
+| `notifications` | `NotificationsView.vue` — تب‌بندی: همه/تطابق/آگهی/KYC/تنظیمات |
+| | `NotificationItem.vue` (organism) با آیکون‌های مناسب |
+| | `NotificationSidebar.vue` (organism) با فیلترها و unread badge |
+| Layout | در `Nav.vue` — ستون اعلان + badge شمارش unread |
+| `composables/usePolling.ts` → polling خودکار هر ۳۰ ثانیه |
 
 ### تست فاز ۷
-- MatchCreated → in-app notification برای holder
-- Mark all read → badge صفر
-- Preferences toggle (persist در backend)
+- Model creation و indexes ✅
+- API endpoints (list/filter/mark-read/mark-all-read/preferences) ✅
+- Signal handlers برای listing events ✅
+- SMS stub service ✅
+- Celery task برای expire_listings ✅
+- Frontend view + store + service ✅
+- Empty state و unread styling ✅
 
 ---
 
-## فاز ۸ — Compliance، Jobs و Hardening
+## فاز ۸ — Compliance، Jobs و Hardening (تکمیل)
 
 **پروتوتایپ:** stats admin، state machine viz (فقط dev/internal)
 
@@ -388,17 +412,22 @@ flowchart LR
 | App | کار |
 |-----|-----|
 | `doion.compliance` | `AuditEvent`, `FeatureFlag` |
+| `doion.compliance` | `is_verified` روی `Profile` توسط signal handlers به‌روز می‌شود |
 | Celery Beat | job انقضای listing (`due_date_passed` → `EXPIRED`) |
 | Infrastructure | rate limiting (LLD §10), structlog + correlation_id |
 
 **APIها:**
 - `GET/PATCH /api/v1/feature-flags/{key}/` — Admin
+- `GET /api/v1/compliance/stats/` — aggregate admin stats
+- `GET /api/v1/compliance/audit/` — paginated audit events
 - Audit خودکار روی transitions حساس
+- `UserSerializer` حالا `is_verified` را از `profile` برمی‌گرداند
 
 ### Frontend
 | Feature | کار |
 |---------|-----|
 | `admin` | [`AdminDashboardView.vue`](frontend/src/features/admin/views/AdminDashboardView.vue) — stats واقعی از API (StatCard organisms) |
+| | [`FeatureFlagsView.vue`](frontend/src/features/admin/views/FeatureFlagsView.vue) — UI مدیریت feature flags |
 | Error UX | کاتالوگ خطاهای [`mvp-spec.md`](ai-preview/mvp-spec.md) §2 — AUTH_*, LISTING_*, MATCH_* همراه error boundary components |
 | Polish | responsive (768px breakpoints پروتوتایپ)، loading/empty states (Skeleton organisms) |
 | `components/ui/ErrorBoundary.vue` (organism) برای error states |
@@ -408,6 +437,7 @@ flowchart LR
 - Listing گذشته از due_date → auto EXPIRED
 - Feature flag `matching_enabled=false` → دکمه express interest غیرفعال
 - E2E smoke: register → KYC → create listing → moderate → browse → match → notify
+- Backend tests: 105 tests سبز (identity, compliance, marketplace, matching)
 
 ---
 
@@ -439,21 +469,21 @@ flowchart TD
 
 ---
 
-## قراردادهای توسعه (هر فاز)
+## قراردادهای توسعه (تاریخی — برای فازهای ۰–۸)
 
-### Git Flow — الزام بر Rسوپراپ
-تمام توسعه‌ی این برنامه **الزاماً** باید طبق [`shared-gitflow-branch-policy/WORKFLOW.md`](.kilo/workflows/shared-gitflow-branch-policy/WORKFLOW.md) انجام شود:
-- ✅ **فقط** از `feature/phase-N-*` برای شروع کار جدید استفاده شود
-- ✅ branch جدید از `develop` شا�ف می‌شود: `git checkout -b feature/phase-0-platform-setup develop`
-- ✅ هر ادغام به `develop` فقط از طریق Pull Request
-- ✅ commit format: `feat(scope): description` (conventional commits)
-- ✅ قبل از PR: rebase/merge با `origin/develop` و تست‌های موفق
-- ✅ چک‌لیست قبل از PR رعایت شود (build، تست، conflict رفع شده)
+این قراردادها هنگام **ساخت** v1 اعمال می‌شدند. کار جدید: GitFlow از `develop` با `feature/*` (نه لزوماً `feature/phase-N-*`)، قرارداد API در [`MASTER_API_CONTRACT.md`](../development/MASTER_API_CONTRACT.md)، UI فقط از طریق AI Studio → `checkyar-googleai`.
+
+### Git Flow
+مرجع: [`.cursor/rules/share/gitflow-branch-policy.mdc`](../../.cursor/rules/share/gitflow-branch-policy.mdc)
+- هنگام ساخت فازها از `feature/phase-N-*` از `develop` استفاده می‌شد
+- کار جدید (پایلوت/hardening) با `feature/*` از `develop`؛ ادغام فقط از طریق PR
+- commit format: `feat(scope): description`
+- قبل از PR: همگام‌سازی با `origin/develop` و تست‌های موفق
 
 ### مستندسازی هر PR
-- به‌روز [`docs/development/API_CONTRACT_REGISTRY.md`](docs/development/API_CONTRACT_REGISTRY.md)
+- به‌روز [`docs/development/MASTER_API_CONTRACT.md`](docs/development/MASTER_API_CONTRACT.md)
 - به‌روز [`docs/development/PAGE_REVIEW_LOG.md`](docs/development/PAGE_REVIEW_LOG.md)
-- [`backend/TODO.md`](backend/TODO.md) / [`frontend/TODO.md`](frontend/TODO.md)
+- [`backend/TODO.md`](../../backend/TODO.md)؛ UI فعال TODO جدا در مونورپو ندارد
 
 ### Definition of Done (هر فاز)
 1. Backend: migrations + serializer tests + permission tests
@@ -465,7 +495,7 @@ flowchart TD
 
 ---
 
-## تخمین نسبی (تیم ۲ نفر: ۱ BE + ۱ FE)
+## تخمین نسبی (تاریخی — هنگام ساخت)
 
 | فاز | مدت تقریبی | خروجی قابل دمو |
 |-----|------------|----------------|
@@ -477,14 +507,20 @@ flowchart TD
 | ۵ | ۱ هفته | Marketplace browse |
 | ۶ | ۱.۵ هفته | Matching |
 | ۷ | ۱ هفته | Notifications |
-| ۸ | ۱ هفته | Production-ready MVP |
-| **جمع** | **~۱۰–۱۱ هفته** | |
+| ۸ | ۱ هفته | **v1 لایه ۱ آماده پایلوت** — نه لانچ‌شده |
+| **جمع** | **~۱۰–۱۱ هفته** | ساخت v1 لایه ۱ (تکمیل) |
 
 ---
 
-## موارد خارج از scope MVP (YAGNI)
+## موارد خارج از دامنه v1 لایه ۱ (YAGNI)
 
-- State machine visualization page (فقط مرجع dev در [`WorkflowPrototypeView`](frontend/src/features/workflow/views/WorkflowPrototypeView.vue))
+این موارد عمداً در ساخت v1 نیامده‌اند و پیش‌نیاز پایلوت نیستند:
+
+- State machine visualization page (فقط مرجع dev تاریخی)
 - Escrow / payment / in-platform messaging
-- Real SMS/KYC provider (adapter stub کافی است)
-- Analytics dashboard (از AuditEvent بعداً)
+- ارائه‌دهنده واقعی SMS/KYC (adapter stub کافی است)
+- Analytics dashboard مستقل (از `AuditEvent` بعداً)
+- monetization (کارمزد آگهی/اشتراک/match)
+- عرضه عمومی / لانچ
+
+کار جاری پس از این فایل: پایلوت، انطباق حقوقی، و hardening استقرار — مطابق Core Brief.

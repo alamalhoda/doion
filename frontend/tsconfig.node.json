@@ -1,9 +1,0 @@
-{
-  "extends": "./tsconfig.json",
-  "compilerOptions": {
-    "composite": true,
-    "skipLibCheck": true,
-    "noEmit": false
-  },
-  "include": ["vite.config.ts"]
-}

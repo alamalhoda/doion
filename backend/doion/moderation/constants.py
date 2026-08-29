@@ -1,3 +1,6 @@
+MAX_LISTING_RESUBMITS = 3
+
+
 class RejectionCode:
     INCOMPLETE_INFO = "MOD_101"
     POOR_QUALITY_IMAGE = "MOD_102"
