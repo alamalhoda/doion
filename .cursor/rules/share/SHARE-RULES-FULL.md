@@ -16,19 +16,20 @@ alwaysApply: true
 
 ## هدف
 - این قانون مرجع اصلی Git Flow برای پیشنهادهای AI در این پروژه است.
-- AI باید توسعه را فقط روی branchهای کاری انجام دهد و از commit مستقیم روی `main`/`develop` جلوگیری کند.
+- AI باید توسعه را فقط روی branchهای کاری انجام دهد و از commit مستقیم روی `master`/`develop` جلوگیری کند.
 - سه نقطهٔ همگام‌سازی اجباری است تا conflict و شلوغی ریپو کم شود؛ `develop` محلی فقط آینهٔ `origin/develop` است.
 
 ## مدل شاخه‌ها
-- `main`: فقط نسخه پایدار production-ready
+در این ریپو (`doion`) شاخهٔ پایدار **`master` است، نه `main`**. `main` متعلق به ریپوی UI (`checkyar-googleai`) است و با GitFlow بک‌اند قاطی نشود.
+- `master`: فقط نسخه پایدار production-ready
 - `develop`: شاخه integration (فقط از طریق PR) — محل توسعه نیست
 - `feature/*`: توسعه قابلیت جدید (از `develop`) — یک هدف، عمر کوتاه
 - `bugfix/*`: رفع باگ محیط توسعه (از `develop`)
 - `release/*`: آماده‌سازی نسخه (از `develop`)
-- `hotfix/*`: رفع فوری production (از `main`)
+- `hotfix/*`: رفع فوری production (از `master`)
 
 ## قوانین قطعی
-1. هرگز commit مستقیم روی `main` یا `develop` پیشنهاد نده (نه remote، نه local).
+1. هرگز commit مستقیم روی `master` یا `develop` پیشنهاد نده (نه remote، نه local).
 2. همگام‌سازی در **سه نقطه** اجباری است: شروع Task، قبل از PR، بعد از merge.
 3. branch جدید را صریحاً از `develop` به‌روز بساز (`git checkout -b ... develop`).
 4. قبل از PR، پیش‌فرض همگام‌سازی با `origin/develop` **merge** است؛ rebase فقط اگر کاربر صریح بخواهد.
@@ -134,15 +135,15 @@ PR باید:
 
 ## شلوغی GitHub
 - بعد از merge، head branch نباید بماند. در Settings ریپو گزینهٔ **Automatically delete head branches** توصیه می‌شود.
-- Protection روی `main`/`develop` جلوی push مستقیم را می‌گیرد؛ این جایگزین سه نقطهٔ sync نیست.
+- Protection روی `master`/`develop` جلوی push مستقیم را می‌گیرد؛ این جایگزین سه نقطهٔ sync نیست.
 - Required status checks روی PR به `develop`: jobهای CI بک‌اند (Ruff و pytest). E2E را merge-gate نکن مگر سیاست عوض شود.
 
 ## رفتار اجباری AI در پیشنهاد دستورات
 - قبل از دستورهای حساس، ابتدا `git status` پیشنهاد بده.
-- شروع کار جدید = نقطه ۱ (نه ساخت branch از `main` یا develop کهنه).
+- شروع کار جدید = نقطه ۱ (نه ساخت branch از `master` یا develop کهنه).
 - آماده‌سازی PR = نقطه ۲ با **merge** مگر کاربر rebase بخواهد.
 - بعد از merge = نقطه ۳ (local delete + prune).
-- در صورت مشاهده الگوی خطرناک (کار/commit روی `main`/`develop`)، هشدار صریح بده.
+- در صورت مشاهده الگوی خطرناک (کار/commit روی `master`/`develop`)، هشدار صریح بده.
 - در صورت ابهام در هدف کاربر، اول هدف را شفاف کن و سپس دستور بده.
 - برای ادغام به `develop` ابتدا push branch و سپس PR را راهنمایی/اجرا کن.
 - برای همکار داخلی Fork یا Write روی ریپوی UI پیشنهاد نده مگر کاربر صریح بخواهد.

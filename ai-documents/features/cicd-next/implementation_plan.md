@@ -30,7 +30,7 @@ Scope: FULL-STACK (AUTOMATION)
 - [ ] **Step A2 — cicd-backend: حفاظت شاخهٔ `develop`**  
   - Ruleset یا classic protection: Check **CI Backend** (Ruff + pytest) برای merge به `develop` required شود.  
   - E2E را در این گام required نکن.  
-  - مستقیم روی `develop`/`main` هنوز commit نشود (GitFlow).  
+  - مستقیم روی `develop`/`master` هنوز commit نشود (GitFlow).  
   **Verify:** PR بدون CI سبز merge نمی‌شود (یا مالک صریحاً bypass را مستند کرده).  
   **نکته:** این تنظیم در GitHub است نه لزوماً فایل workflow.
 

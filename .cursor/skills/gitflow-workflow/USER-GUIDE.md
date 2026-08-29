@@ -97,7 +97,7 @@ git fetch --prune
 وقتی درست trigger شود، معمولا این کارها را انجام می‌دهد:
 
 1. وضعیت فعلی git را بررسی می‌کند (`git status`, branch فعلی)
-2. اگر روی `main` یا `develop` باشید هشدار می‌دهد
+2. اگر روی `master` یا `develop` باشید هشدار می‌دهد
 3. مسیر امن GitFlow را مرحله‌به‌مرحله پیشنهاد/اجرا می‌کند
 4. نقطهٔ sync مناسب (۱ / ۲ / ۳) را اعمال می‌کند
 5. قبل از PR، merge با `origin/develop` را پیش‌فرض می‌گذارد
@@ -108,7 +108,7 @@ git fetch --prune
 
 ## خطاهای رایج که این Skill جلوگیری می‌کند
 
-- commit مستقیم روی `main` یا `develop`
+- commit مستقیم روی `master` یا `develop`
 - ساخت branch بدون به‌روز کردن `develop` (نقطه ۱)
 - PR بدون sync دوباره با `develop` (نقطه ۲) → conflict دیرهنگام
 - ماندن شاخه بعد از merge (نقطه ۳) → شلوغی ریپو

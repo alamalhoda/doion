@@ -296,7 +296,7 @@ alwaysApply: false
 
 ## Branch Strategy (Aligned)
 
-* `main`: production
+* `master`: production (this repo; not GitHub `main`)
 * `develop`: integration
 * `feature/*`: feature جدید
 * `bugfix/*`: رفع باگ محیط توسعه
