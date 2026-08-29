@@ -1,0 +1,9 @@
+# Sensitive paths: require owner review when the repo enables
+# "Require review from Code Owners" on branch protection / rulesets.
+# Do not list all of backend/ — that would bottleneck every API PR.
+
+/.github/ @alamalhoda
+/.cursor/ @alamalhoda
+/AGENTS.md @alamalhoda
+/docs/development/MASTER_API_CONTRACT.md @alamalhoda
+/docs/development/ONBOARDING.md @alamalhoda

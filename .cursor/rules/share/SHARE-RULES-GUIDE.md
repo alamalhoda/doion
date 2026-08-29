@@ -24,14 +24,15 @@
 
 ## ۱. GitFlow Branch Policy — `gitflow-branch-policy.mdc`
 
-**محتوا:** سیاست رسمی GitFlow برای branching، commit convention، sync قبل PR، و guardrailهای merge/push. شامل یادآوری کوتاه تگ SemVer وقتی feat/fix به `develop` رسیده و کاربر از انتشار حرف می‌زند (اجرا: Skill `semver-release`). آموزش انسانی: `docs/development/GIT_TAGS_AND_RELEASES.md`.
+**محتوا:** سیاست رسمی GitFlow برای branching، سه نقطهٔ sync (شروع Task / قبل از PR / بعد از merge)، commit convention، و guardrailهای merge/push. شامل یادآوری کوتاه تگ SemVer وقتی feat/fix به `develop` رسیده و کاربر از انتشار حرف می‌زند (اجرا: Skill `semver-release`). آموزش انسانی: `docs/development/GIT_TAGS_AND_RELEASES.md`.
 
 | موضوع | توضیح |
 |-------|-------|
-| Branch Model | `main`, `develop`, `feature/*`, `bugfix/*`, `release/*`, `hotfix/*` |
-| Safety Rules | منع commit مستقیم روی `main/develop`، منع `--force` |
-| PR Flow | sync با `origin/develop`، چک‌لیست قبل از PR |
-| Merge Rule | شاخه فعلی = مقصد merge |
+| Branch Model | `main`, `develop` (فقط آینهٔ remote)، `feature/*` کوتاه‌عمر، `bugfix/*`, `release/*`, `hotfix/*` |
+| Safety Rules | منع commit روی `main/develop`، `pull --ff-only` روی develop، منع `--force` |
+| PR Flow | نقطه ۲: merge با `origin/develop` (rebase اختیاری)، چک‌لیست قبل از PR |
+| Cleanup | نقطه ۳: حذف شاخهٔ محلی/remote، `fetch --prune`؛ توصیهٔ auto-delete در GitHub |
+| Collaboration | clone + Write روی doion؛ نه Fork پیش‌فرض؛ UI بدون پوش Cursor؛ `docs/development/ONBOARDING.md` |
 
 ---
 

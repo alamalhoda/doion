@@ -8,13 +8,15 @@
 
 Skill `gitflow-workflow` کمک می‌کند جریان GitFlow پروژه را درست و امن اجرا کنید:
 
-- شروع branch جدید از `develop`
+- سه نقطهٔ همگام‌سازی: شروع Task، قبل از PR، بعد از merge
+- شروع branch جدید از `develop` به‌روز (`pull --ff-only`)
 - نوشتن commit مطابق convention
-- همگام‌سازی branch قبل از PR
-- push امن بعد از rebase
+- همگام‌سازی branch قبل از PR (پیش‌فرض: merge با `origin/develop`)
+- push امن بعد از rebase (`--force-with-lease`)
 - چک‌لیست آماده‌سازی PR
 - ادغام به `develop` فقط از مسیر PR
-- پاک‌سازی branch بعد از PR merge
+- پاک‌سازی branch بعد از PR merge (`branch -d` محلی + `fetch --prune`)
+- شاخهٔ کوتاه‌عمر با یک هدف (جلوگیری از شلوغی GitHub)
 
 ---
 
@@ -24,9 +26,45 @@ Skill `gitflow-workflow` کمک می‌کند جریان GitFlow پروژه را
 
 - `میخوام یک feature branch جدید شروع کنم`
 - `قبل از PR برنچ من را با develop sync کن`
+- `بعد از merge شاخه را پاک کن`
 - `برای این تغییر commit message استاندارد پیشنهاد بده`
 - `برای این فیچر تگ بزن`
 - `Release روی develop اجرا کن`
+
+---
+
+## سه نقطهٔ Sync (حفظ کنید)
+
+**نقطه ۱ — شروع Task**
+
+```bash
+git switch develop
+git fetch origin
+git pull --ff-only origin develop
+git switch -c feature/<task-name>
+```
+
+روی `develop` محلی commit نکنید؛ فقط آینهٔ `origin/develop` است.
+
+**نقطه ۲ — قبل از PR** (پیش‌فرض merge)
+
+```bash
+git fetch origin
+git merge origin/develop
+```
+
+Rebase فقط اگر با آن راحت هستید؛ بعدش `--force-with-lease`.
+
+**نقطه ۳ — بعد از Merge**
+
+```bash
+git switch develop
+git pull --ff-only origin develop
+git branch -d feature/<task-name>
+git fetch --prune
+```
+
+اگر GitHub گزینهٔ **Automatically delete head branches** را روشن کرده باشد، حذف remote معمولاً لازم نیست.
 
 ---
 
@@ -48,6 +86,10 @@ Skill `gitflow-workflow` کمک می‌کند جریان GitFlow پروژه را
 
 `من rebase کردم، دستور push ایمن را بده`
 
+### 5) پاک‌سازی بعد از merge
+
+`PR مرج شد؛ develop محلی و شاخهٔ feature را طبق نقطه ۳ تمیز کن`
+
 ---
 
 ## رفتار مورد انتظار Skill
@@ -57,18 +99,21 @@ Skill `gitflow-workflow` کمک می‌کند جریان GitFlow پروژه را
 1. وضعیت فعلی git را بررسی می‌کند (`git status`, branch فعلی)
 2. اگر روی `main` یا `develop` باشید هشدار می‌دهد
 3. مسیر امن GitFlow را مرحله‌به‌مرحله پیشنهاد/اجرا می‌کند
-4. قبل از PR، sync با `origin/develop` را یادآوری می‌کند
-5. به جای `--force` از `--force-with-lease` استفاده می‌کند
-6. برای ادغام به `develop` مسیر PR را پیشنهاد می‌دهد (نه merge مستقیم محلی)
+4. نقطهٔ sync مناسب (۱ / ۲ / ۳) را اعمال می‌کند
+5. قبل از PR، merge با `origin/develop` را پیش‌فرض می‌گذارد
+6. به جای `--force` از `--force-with-lease` استفاده می‌کند
+7. برای ادغام به `develop` مسیر PR را پیشنهاد می‌دهد (نه merge مستقیم محلی)
 
 ---
 
 ## خطاهای رایج که این Skill جلوگیری می‌کند
 
 - commit مستقیم روی `main` یا `develop`
-- ساخت branch بدون مشخص‌کردن مبدا (`develop`)
+- ساخت branch بدون به‌روز کردن `develop` (نقطه ۱)
+- PR بدون sync دوباره با `develop` (نقطه ۲) → conflict دیرهنگام
+- ماندن شاخه بعد از merge (نقطه ۳) → شلوغی ریپو
+- شاخهٔ همه‌کاره مثل `feature/ali-work`
 - push اجباری ناامن (`--force`)
-- PR بدون sync شدن با `develop`
 - تگ روی feature به‌جای workflow `Release`
 - فراموش کردن تگ وقتی کاربر صریحاً می‌خواهد نسخهٔ قابل استقرار داشته باشد (یک یادآوری کافی است)
 
@@ -79,6 +124,7 @@ Skill `gitflow-workflow` کمک می‌کند جریان GitFlow پروژه را
 این Skill از Rule اصلی پروژه برای GitFlow استفاده می‌کند:
 
 - `.cursor/rules/share/gitflow-branch-policy.mdc`
+- `docs/development/ONBOARDING.md` برای همکار جدید (clone، دسترسی دو ریپو، UI یک‌طرفه)
 - `.cursor/skills/semver-release/SKILL.md` برای تگ / GitHub Release / GHCR
 - `docs/development/GIT_TAGS_AND_RELEASES.md` آموزش تگ و SemVer (برای انسان، نه فقط Agent)
 

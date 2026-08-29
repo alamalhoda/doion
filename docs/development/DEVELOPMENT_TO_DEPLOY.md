@@ -231,6 +231,7 @@ Env و دامنه و نوع PaaS: [`PRODUCTION_CHABOKAN_DEPLOY.md`](./PRODUCTION
 
 | سند | نقش |
 |-----|-----|
+| [`ONBOARDING.md`](./ONBOARDING.md) | همکار جدید: clone، دسترسی، سه نقطهٔ GitFlow، UI یک‌طرفه |
 | **همین فایل** | نقشهٔ آموزشی سر تا ته |
 | [`LOCAL_DEV_AND_PRODUCT_RUNTIME.md`](./LOCAL_DEV_AND_PRODUCT_RUNTIME.md) | لوکال: میزبان + Postgres Docker در برابر ایمیج محصول |
 | [`FRONTEND_DEVELOPMENT_STATUS.md`](./FRONTEND_DEVELOPMENT_STATUS.md) | Studio یک‌طرفه، Bun، پورت Vite |

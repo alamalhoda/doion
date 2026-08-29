@@ -1779,6 +1779,10 @@ alwaysApply: false
 - ایجاد شاخه برای نسخه جدید: `release/v1.0.0`
 - ایجاد شاخه برای رفع فوری: `hotfix/ui-critical-fix`
 
+تگ SemVer محصول از Cursor با `git tag` روی فیچر ساخته نمی‌شود. از `.cursor/skills/semver-release/SKILL.md` استفاده کن.
+
+شروع کار و PR: سه نقطهٔ همگام‌سازی در `.cursor/rules/share/gitflow-branch-policy.mdc` (شروع با `pull --ff-only` روی `develop`، قبل از PR merge با `origin/develop`، بعد از merge پاک‌سازی).
+
 ## قراردادهای commit message برای تغییرات UI
 
 ### افزودن ویژگی جدید
