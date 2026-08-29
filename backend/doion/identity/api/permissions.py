@@ -1,5 +1,4 @@
 from rest_framework import permissions
-from doion.users.models import User
 
 
 class IsOwnerOrModerator(permissions.BasePermission):

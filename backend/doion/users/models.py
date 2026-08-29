@@ -22,7 +22,7 @@ class User(AbstractUser):
     name = CharField(_("Name of User"), blank=True, max_length=255)
     first_name = None  # type: ignore[assignment]
     last_name = None  # type: ignore[assignment]
-    phone = CharField(_("Phone Number"), blank=True, max_length=20, null=True)
+    phone = CharField(_("Phone Number"), blank=True, max_length=20, null=True)  # noqa: DJ001
     role = CharField(
         _("Role"),
         max_length=20,

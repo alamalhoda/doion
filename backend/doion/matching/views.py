@@ -5,30 +5,43 @@ from rest_framework.response import Response
 from rest_framework.viewsets import GenericViewSet
 
 from doion.checks.models import ChequeListing
-from doion.core.permissions import IsCheckHolder, IsInvestor
-from doion.matching.constants import Status
-from doion.matching.exceptions import InvalidMatchStatus, MatchNotAllowed
+from doion.identity.services import require_approved_kyc
+from doion.matching.exceptions import InvalidMatchStatus
+from doion.matching.exceptions import MatchNotAllowed
 from doion.matching.models import Match
-from doion.matching.serializers import (
-    MatchCreateSerializer,
-    MatchSerializer,
-    MatchStatusUpdateSerializer,
-)
+from doion.matching.serializers import MatchCreateSerializer
+from doion.matching.serializers import MatchSerializer
+from doion.matching.serializers import MatchStatusUpdateSerializer
 from doion.matching.services import MatchingService
 
 
 class MatchViewSet(GenericViewSet):
     permission_classes = [IsAuthenticated]
-    queryset = Match.objects.select_related("listing", "investor", "check_holder").all()
+    queryset = Match.objects.select_related(
+        "listing",
+        "listing__bank",
+        "investor",
+        "check_holder",
+    ).all()
     serializer_class = MatchSerializer
 
     def get_queryset(self):
         user = self.request.user
         role = getattr(user, "role", None)
         if role == "check_holder":
-            return Match.objects.filter(check_holder=user).select_related("listing", "investor", "check_holder")
+            return Match.objects.filter(check_holder=user).select_related(
+                "listing",
+                "listing__bank",
+                "investor",
+                "check_holder",
+            )
         if role == "investor":
-            return Match.objects.filter(investor=user).select_related("listing", "investor", "check_holder")
+            return Match.objects.filter(investor=user).select_related(
+                "listing",
+                "listing__bank",
+                "investor",
+                "check_holder",
+            )
         return Match.objects.none()
 
     def list(self, request):
@@ -40,6 +53,32 @@ class MatchViewSet(GenericViewSet):
         serializer = self.get_serializer(queryset, many=True)
         return Response(serializer.data)
 
+    @action(detail=False, methods=["get"], url_path="my")
+    def my(self, request):
+        queryset = self.get_queryset()
+        page = self.paginate_queryset(queryset)
+        if page is not None:
+            serializer = self.get_serializer(page, many=True)
+            return self.get_paginated_response(serializer.data)
+        serializer = self.get_serializer(queryset, many=True)
+        return Response(serializer.data)
+
+    @action(detail=True, methods=["patch"], url_path="status")
+    def status(self, request, pk=None):
+        match = self.get_object()
+        serializer = MatchStatusUpdateSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+
+        validated = serializer.validated_data
+        match.status = validated["status"]
+        if validated.get("final_discount_rate") is not None:
+            match.final_discount_rate = validated["final_discount_rate"]
+        if validated.get("terms") is not None:
+            match.terms = validated["terms"]
+        match.save(update_fields=["status", "final_discount_rate", "terms", "updated_at"])
+
+        return Response(MatchSerializer(match).data)
+
     def create(self, request):
         serializer = MatchCreateSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
@@ -47,13 +86,17 @@ class MatchViewSet(GenericViewSet):
         listing_id = serializer.validated_data["listing_id"]
         message = serializer.validated_data.get("message", "")
 
+        require_approved_kyc(request.user)
+
         try:
-            listing = ChequeListing.objects.select_for_update().get(id=listing_id)
+            ChequeListing.objects.select_for_update().get(id=listing_id)
         except ChequeListing.DoesNotExist as exc:
-            raise MatchNotAllowed("Listing not found") from exc
+            msg = "Listing not found"
+            raise MatchNotAllowed(msg) from exc
 
         if getattr(request.user, "role", None) != "investor":
-            raise MatchNotAllowed("Only investors can create matches")
+            msg = "Only investors can create matches"
+            raise MatchNotAllowed(msg)
 
         try:
             match = MatchingService.create_match(listing_id, request.user)
@@ -72,7 +115,8 @@ class MatchViewSet(GenericViewSet):
         match = self.get_object()
 
         if getattr(request.user, "role", None) != "check_holder":
-            raise MatchNotAllowed("Only check holders can accept matches")
+            msg = "Only check holders can accept matches"
+            raise MatchNotAllowed(msg)
 
         try:
             updated = MatchingService.accept_match(match.id, request.user)
@@ -86,7 +130,8 @@ class MatchViewSet(GenericViewSet):
         match = self.get_object()
 
         if getattr(request.user, "role", None) != "check_holder":
-            raise MatchNotAllowed("Only check holders can decline matches")
+            msg = "Only check holders can decline matches"
+            raise MatchNotAllowed(msg)
 
         note = request.data.get("note", "")
 
@@ -113,7 +158,8 @@ class MatchViewSet(GenericViewSet):
         match = self.get_object()
 
         if getattr(request.user, "role", None) != "check_holder":
-            raise MatchNotAllowed("Only check holders can confirm settlement")
+            msg = "Only check holders can confirm settlement"
+            raise MatchNotAllowed(msg)
 
         try:
             updated = MatchingService.confirm_off_platform(match.id, request.user)

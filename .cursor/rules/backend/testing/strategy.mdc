@@ -1,8 +1,10 @@
 ---
-description: Testing Rules — Test pyramid، AAA pattern، APITestCase، coverage، naming
+description: Testing Rules — Test pyramid، AAA pattern، factories، APITestCase، coverage، naming
 globs:
   - "backend/**/test*.py"
   - "backend/**/tests/**/*.py"
+  - "backend/**/factories.py"
+  - "backend/**/models.py"
 alwaysApply: false
 ---
 
@@ -13,6 +15,23 @@ alwaysApply: false
 * Unit: ۷۰٪
 * Integration: ۲۰٪
 * E2E: ۱۰٪
+
+## Factory Policy (SSOT برای دادهٔ تست/دمو)
+
+Factoryهای دامنه در `doion/<app>/factories.py` هستند (خارج از `tests/`) تا تست‌ها و دستورات management مثل `seed_demo` از یک منبع استفاده کنند.
+
+فهرست فعلی: بخش Factories در `backend/README.md`.
+
+### قوانین اجباری
+
+1. برای ساخت داده در تست، تا حد امکان از Factory استفاده کن؛ منطق ساخت را در چند فایل تکرار نکن.
+2. اگر مدل **دامنهٔ پرتکرار در تست/دمو** جدید اضافه شد → در همان PR یک Factory در `doion/<app>/factories.py` بساز.
+3. اگر فیلد اجباری، `choices`، default، یا رابطهٔ مدلی که Factory دارد عوض شد → در همان PR همان Factory (و در صورت نیاز traits) را به‌روز کن.
+4. مدل‌های خیلی ساده با ۱–۲ فیلد (مثل `FeatureFlag`) تا وقتی تکرار کم است نیازی به Factory ندارند.
+
+❌ نادرست: تغییر فیلد اجباری مدل بدون به‌روزرسانی Factory مربوطه.
+
+✅ درست: تغییر مدل + به‌روزرسانی Factory + تست‌های متأثر در یک PR.
 
 ## AAA Pattern
 
@@ -62,5 +81,5 @@ class OrderAPITest(APITestCase):
 هدف ≥ ۸۰٪ برای مسیرهای حیاتی:
 
 ```bash
-pytest --cov=khodroban --cov-report=html
+pytest --cov=doion --cov-report=term-missing --cov-report=html
 ```

@@ -1,24 +1,26 @@
 import pytest
+from rest_framework import status
 from rest_framework.test import APIClient
 
+from doion.checks.factories import ChequeListingFactory
+from doion.checks.factories import IssuerProfileFactory
 from doion.checks.models import ChequeListing
-from doion.checks.models import IssuerProfile
-from doion.users.tests.factories import UserFactory
+from doion.users.factories import UserFactory
 
 
 @pytest.fixture
 def moderator(db):
-    return UserFactory.create(role="moderator")
+    return UserFactory.create(as_moderator=True)
 
 
 @pytest.fixture
 def check_holder(db):
-    return UserFactory.create(role="check_holder")
+    return UserFactory.create()
 
 
 @pytest.fixture
 def issuer(db):
-    return IssuerProfile.objects.create(
+    return IssuerProfileFactory.create(
         national_or_company_id="1234567890",
         name="Test Issuer",
     )
@@ -26,7 +28,8 @@ def issuer(db):
 
 @pytest.fixture
 def pending_listing(db, check_holder, issuer):
-    return ChequeListing.objects.create(
+    return ChequeListingFactory.create(
+        pending=True,
         owner=check_holder,
         issuer=issuer,
         bank_name="بانک ملت",
@@ -36,13 +39,13 @@ def pending_listing(db, check_holder, issuer):
         issuer_type="legal",
         issuer_name="شرکت فناوری نوین",
         issuer_national_id="1234567890",
-        status=ChequeListing.Status.PENDING_MODERATION,
     )
 
 
 @pytest.fixture
 def published_listing(db, check_holder, issuer):
-    return ChequeListing.objects.create(
+    return ChequeListingFactory.create(
+        published=True,
         owner=check_holder,
         issuer=issuer,
         bank_name="بانک ملت",
@@ -52,7 +55,6 @@ def published_listing(db, check_holder, issuer):
         issuer_type="natural",
         issuer_name="رضا کریمی",
         issuer_national_id="0012345678",
-        status=ChequeListing.Status.PUBLISHED,
     )
 
 
@@ -64,11 +66,15 @@ class TestModerationQueueEndpoint:
 
         response = client.get("/api/v1/moderation/queue/")
 
-        assert response.status_code == 200
-        results = response.data["results"] if "results" in response.data else response.data
+        assert response.status_code == status.HTTP_200_OK
+        results = response.data.get("results", response.data)
         ids = [item["id"] for item in results]
         assert pending_listing.id in ids
         assert published_listing.id not in ids
+        pending_item = next(item for item in results if item["id"] == pending_listing.id)
+        assert pending_item["bank"]["code"] == "mellat"
+        assert pending_item["bank_name"] == "بانک ملت"
+        assert "aliases" not in pending_item["bank"]
 
     def test_queue_empty_when_no_pending(self, moderator, published_listing):
         client = APIClient()
@@ -76,8 +82,8 @@ class TestModerationQueueEndpoint:
 
         response = client.get("/api/v1/moderation/queue/")
 
-        assert response.status_code == 200
-        results = response.data["results"] if "results" in response.data else response.data
+        assert response.status_code == status.HTTP_200_OK
+        results = response.data.get("results", response.data)
         assert len(results) == 0
 
     def test_queue_requires_moderator_role(self, check_holder, pending_listing):
@@ -86,14 +92,14 @@ class TestModerationQueueEndpoint:
 
         response = client.get("/api/v1/moderation/queue/")
 
-        assert response.status_code == 403
+        assert response.status_code == status.HTTP_403_FORBIDDEN
 
     def test_queue_requires_authentication(self, pending_listing):
         client = APIClient()
 
         response = client.get("/api/v1/moderation/queue/")
 
-        assert response.status_code == 401
+        assert response.status_code == status.HTTP_401_UNAUTHORIZED
 
 
 @pytest.mark.django_db
@@ -107,7 +113,7 @@ class TestModerationDecisionEndpoint:
             {"decision": "approve"},
         )
 
-        assert response.status_code == 201
+        assert response.status_code == status.HTTP_201_CREATED
         assert response.data["decision"] == "approved"
 
         pending_listing.refresh_from_db()
@@ -126,7 +132,7 @@ class TestModerationDecisionEndpoint:
             },
         )
 
-        assert response.status_code == 201
+        assert response.status_code == status.HTTP_201_CREATED
         assert response.data["decision"] == "rejected"
         assert response.data["rejection_code"] == "MOD_101"
 
@@ -144,7 +150,7 @@ class TestModerationDecisionEndpoint:
             {"decision": "reject"},
         )
 
-        assert response.status_code == 400
+        assert response.status_code == status.HTTP_400_BAD_REQUEST
 
     def test_reject_after_three_resubmits_returns_mod_306(self, moderator, pending_listing):
         pending_listing.resubmit_count = 3
@@ -162,7 +168,7 @@ class TestModerationDecisionEndpoint:
             },
         )
 
-        assert response.status_code == 400
+        assert response.status_code == status.HTTP_400_BAD_REQUEST
         assert response.data["error"]["code"] == "MOD_306"
 
     def test_decision_requires_moderator_role(self, check_holder, pending_listing):
@@ -174,7 +180,7 @@ class TestModerationDecisionEndpoint:
             {"decision": "approve"},
         )
 
-        assert response.status_code == 403
+        assert response.status_code == status.HTTP_403_FORBIDDEN
 
     def test_decision_requires_authentication(self, pending_listing):
         client = APIClient()
@@ -184,7 +190,7 @@ class TestModerationDecisionEndpoint:
             {"decision": "approve"},
         )
 
-        assert response.status_code == 401
+        assert response.status_code == status.HTTP_401_UNAUTHORIZED
 
     def test_invalid_decision_value_returns_400(self, moderator, pending_listing):
         client = APIClient()
@@ -195,7 +201,7 @@ class TestModerationDecisionEndpoint:
             {"decision": "invalid"},
         )
 
-        assert response.status_code == 400
+        assert response.status_code == status.HTTP_400_BAD_REQUEST
 
     def test_reject_published_listing_returns_400(self, moderator, published_listing):
         client = APIClient()
@@ -210,4 +216,72 @@ class TestModerationDecisionEndpoint:
             },
         )
 
-        assert response.status_code == 400
+        assert response.status_code == status.HTTP_400_BAD_REQUEST
+
+
+@pytest.fixture
+def rejected_listing(db, check_holder, issuer):
+    return ChequeListingFactory.create(
+        rejected=True,
+        owner=check_holder,
+        issuer=issuer,
+        bank_name="بانک ملت",
+        cheque_serial_number="7777666655554444",
+        face_amount=250000000,
+        due_date="2026-12-31",
+        issuer_type="legal",
+        issuer_name="شرکت نمونه",
+        issuer_national_id="1234567890",
+        resubmit_count=1,
+    )
+
+
+@pytest.mark.django_db
+class TestModerationResubmitEndpoint:
+    def test_resubmit_rejected_listing_moves_to_pending(self, check_holder, rejected_listing):
+        client = APIClient()
+        client.force_authenticate(user=check_holder)
+
+        response = client.post(f"/api/v1/moderation/{rejected_listing.id}/resubmit/")
+
+        assert response.status_code == status.HTTP_200_OK
+        rejected_listing.refresh_from_db()
+        assert rejected_listing.status == ChequeListing.Status.PENDING_MODERATION
+
+    def test_resubmit_non_rejected_listing_returns_400(self, check_holder, pending_listing):
+        client = APIClient()
+        client.force_authenticate(user=check_holder)
+
+        response = client.post(f"/api/v1/moderation/{pending_listing.id}/resubmit/")
+
+        assert response.status_code == status.HTTP_400_BAD_REQUEST
+        assert response.data["error"]["code"] == "VALIDATION_ERROR"
+
+    def test_resubmit_at_limit_returns_mod_306(self, check_holder, rejected_listing):
+        rejected_listing.resubmit_count = 3
+        rejected_listing.save(update_fields=["resubmit_count"])
+
+        client = APIClient()
+        client.force_authenticate(user=check_holder)
+
+        response = client.post(f"/api/v1/moderation/{rejected_listing.id}/resubmit/")
+
+        assert response.status_code == status.HTTP_400_BAD_REQUEST
+        assert response.data["error"]["code"] == "MOD_306"
+
+    def test_resubmit_requires_authentication(self, rejected_listing):
+        client = APIClient()
+
+        response = client.post(f"/api/v1/moderation/{rejected_listing.id}/resubmit/")
+
+        assert response.status_code == status.HTTP_401_UNAUTHORIZED
+
+    def test_resubmit_by_non_owner_returns_403(self, rejected_listing):
+        other_user = UserFactory.create()
+        client = APIClient()
+        client.force_authenticate(user=other_user)
+
+        response = client.post(f"/api/v1/moderation/{rejected_listing.id}/resubmit/")
+
+        assert response.status_code == status.HTTP_403_FORBIDDEN
+        assert response.data["error"]["code"] == "PERMISSION_ERROR"

@@ -1,16 +1,18 @@
 from django.db import transaction
+from django.utils import timezone
 
 from doion.checks.models import ChequeListing
-from doion.matching.constants import Status, SettlementType
-from doion.matching.exceptions import InvalidMatchStatus, MatchNotAllowed
-from doion.matching.models import Match, OffPlatformSettlement
-from doion.matching.signals import (
-    MatchAccepted,
-    MatchCancelled,
-    MatchCreated,
-    MatchDeclined,
-    SettlementConfirmed,
-)
+from doion.matching.constants import SettlementType
+from doion.matching.constants import Status
+from doion.matching.exceptions import InvalidMatchStatus
+from doion.matching.exceptions import MatchNotAllowed
+from doion.matching.models import Match
+from doion.matching.models import OffPlatformSettlement
+from doion.matching.signals import MatchAccepted
+from doion.matching.signals import MatchCancelled
+from doion.matching.signals import MatchCreated
+from doion.matching.signals import MatchDeclined
+from doion.matching.signals import SettlementConfirmed
 
 
 class MatchingService:
@@ -20,13 +22,16 @@ class MatchingService:
             listing = ChequeListing.objects.select_for_update().get(id=listing_id)
 
             if listing.status != ChequeListing.Status.PUBLISHED:
-                raise MatchNotAllowed("Listing is not published")
+                msg = "Listing is not published"
+                raise MatchNotAllowed(msg)
 
             if getattr(investor, "role", None) != "investor":
-                raise MatchNotAllowed("Only investors can create matches")
+                msg = "Only investors can create matches"
+                raise MatchNotAllowed(msg)
 
             if listing.owner_id == investor.id:
-                raise MatchNotAllowed("You cannot match your own listing")
+                msg = "You cannot match your own listing"
+                raise MatchNotAllowed(msg)
 
             match = Match.objects.create(
                 listing=listing,
@@ -46,10 +51,12 @@ class MatchingService:
             match = Match.objects.select_for_update().get(id=match_id)
 
             if match.status != Status.PENDING:
-                raise InvalidMatchStatus("Match is not pending")
+                msg = "Match is not pending"
+                raise InvalidMatchStatus(msg)
 
             if match.check_holder_id != check_holder.id:
-                raise MatchNotAllowed("You are not authorized to accept this match")
+                msg = "You are not authorized to accept this match"
+                raise MatchNotAllowed(msg)
 
             match.status = Status.ACCEPTED
             match.save(update_fields=["status", "updated_at"])
@@ -68,10 +75,12 @@ class MatchingService:
             match = Match.objects.select_for_update().get(id=match_id)
 
             if match.status != Status.PENDING:
-                raise InvalidMatchStatus("Match is not pending")
+                msg = "Match is not pending"
+                raise InvalidMatchStatus(msg)
 
             if match.check_holder_id != check_holder.id:
-                raise MatchNotAllowed("You are not authorized to decline this match")
+                msg = "You are not authorized to decline this match"
+                raise MatchNotAllowed(msg)
 
             match.status = Status.DECLINED
             if note:
@@ -88,10 +97,12 @@ class MatchingService:
             match = Match.objects.select_for_update().get(id=match_id)
 
             if user.id not in (match.investor_id, match.check_holder_id):
-                raise MatchNotAllowed("You are not a party to this match")
+                msg = "You are not a party to this match"
+                raise MatchNotAllowed(msg)
 
             if match.status not in (Status.PENDING, Status.ACCEPTED):
-                raise InvalidMatchStatus("Match cannot be cancelled in its current status")
+                msg = "Match cannot be cancelled in its current status"
+                raise InvalidMatchStatus(msg)
 
             match.status = Status.CANCELLED
             match.save(update_fields=["status", "updated_at"])
@@ -111,10 +122,12 @@ class MatchingService:
             match = Match.objects.select_for_update().get(id=match_id)
 
             if match.check_holder_id != user.id:
-                raise MatchNotAllowed("Only the check holder can confirm settlement")
+                msg = "Only the check holder can confirm settlement"
+                raise MatchNotAllowed(msg)
 
             if match.status != Status.ACCEPTED:
-                raise InvalidMatchStatus("Match must be accepted to confirm settlement")
+                msg = "Match must be accepted to confirm settlement"
+                raise InvalidMatchStatus(msg)
 
             match.status = Status.OFF_PLATFORM_CONFIRMED
             match.save(update_fields=["status", "updated_at"])
@@ -123,6 +136,7 @@ class MatchingService:
                 match=match,
                 confirmation_code="",
                 confirmed_by=user,
+                confirmed_at=timezone.now(),
             )
 
             SettlementConfirmed.send(sender=Match, match=match, user=user)

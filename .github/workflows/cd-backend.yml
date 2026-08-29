@@ -1,0 +1,97 @@
+name: CD Backend
+
+# Owner-only deploy of a tagged commit to chequeyar-back.
+# Does not run on merge to develop. Does not touch chequeyar-front or the mock demo.
+# Chabokan still builds from the Django source of that tag (same path as chabok deploy).
+# GHCR images from workflow Release are the versioned artifacts; this job requires they exist.
+
+on:
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: Existing SemVer git tag (example v0.1.0-test.1)
+        required: true
+        type: string
+
+permissions:
+  contents: read
+  checks: read
+  actions: read
+  packages: read
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    env:
+      GHCR_API: ghcr.io/${{ github.repository_owner }}/doion-api
+      GHCR_SPA: ghcr.io/${{ github.repository_owner }}/chequeyar-front
+    steps:
+      - name: Normalize SemVer tag
+        id: ver
+        env:
+          RAW: ${{ inputs.tag }}
+        run: |
+          set -euo pipefail
+          tag="${RAW#v}"
+          if ! printf '%s' "$tag" | grep -Eq '^[0-9]+\.[0-9]+\.[0-9]+([.-][0-9A-Za-z.-]+)?$'; then
+            echo "tag must be SemVer like 0.1.0 or 0.1.0-test.1"
+            exit 1
+          fi
+          echo "tag=v${tag}" >> "$GITHUB_OUTPUT"
+
+      - name: Checkout tagged commit
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ steps.ver.outputs.tag }}
+
+      - name: Require GitHub Release
+        env:
+          GH_TOKEN: ${{ github.token }}
+          TAG: ${{ steps.ver.outputs.tag }}
+        run: |
+          set -euo pipefail
+          gh release view "$TAG" --repo "${{ github.repository }}"
+
+      - name: Require GHCR images for this tag
+        env:
+          TAG: ${{ steps.ver.outputs.tag }}
+        run: |
+          set -euo pipefail
+          echo "${{ github.token }}" | docker login ghcr.io -u "${{ github.actor }}" --password-stdin
+          docker manifest inspect "${GHCR_API}:${TAG}" >/dev/null
+          docker manifest inspect "${GHCR_SPA}:${TAG}" >/dev/null
+
+      - name: Require green CI Backend on this commit
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          conclusion="$(gh run list \
+            --repo "${{ github.repository }}" \
+            --commit "${{ github.sha }}" \
+            --workflow "CI Backend" \
+            --limit 1 \
+            --json conclusion \
+            --jq '.[0].conclusion // empty')"
+          if [ "$conclusion" != "success" ]; then
+            echo "CI Backend on ${{ github.sha }} is '${conclusion:-missing}', not success"
+            exit 1
+          fi
+
+      - name: Setup Node.js (Chabokan CLI)
+        uses: actions/setup-node@v4
+        with:
+          node-version: "24"
+
+      - name: Deploy to chequeyar-back
+        env:
+          CHABOKAN_TOKEN: ${{ secrets.CHABOKAN_TOKEN }}
+        run: |
+          set -euo pipefail
+          if [ -z "${CHABOKAN_TOKEN:-}" ]; then
+            echo "CHABOKAN_TOKEN secret is not set"
+            exit 1
+          fi
+          npm install -g @chabokan.net/cli
+          chabok login -t "$CHABOKAN_TOKEN"
+          chabok deploy -s chequeyar-back -p backend

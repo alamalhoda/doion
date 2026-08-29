@@ -1,30 +1,34 @@
-from django.db import IntegrityError
 from django.shortcuts import get_object_or_404
 from rest_framework import status
 from rest_framework.decorators import action
-from rest_framework.mixins import RetrieveModelMixin, UpdateModelMixin
-from rest_framework.permissions import AllowAny, IsAuthenticated
+from rest_framework.mixins import RetrieveModelMixin
+from rest_framework.mixins import UpdateModelMixin
+from rest_framework.permissions import AllowAny
+from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
+from rest_framework.throttling import ScopedRateThrottle
 from rest_framework.views import APIView
-from rest_framework.viewsets import GenericViewSet, ModelViewSet, ViewSet
+from rest_framework.viewsets import GenericViewSet
+from rest_framework.viewsets import ModelViewSet
 from rest_framework_simplejwt.tokens import RefreshToken
 
-from doion.identity.api.serializers import (
-    DocumentSerializer,
-    ProfileSerializer,
-    RegisterSerializer,
-    UserMeSerializer,
-    VerificationCreateSerializer,
-    VerificationSerializer,
-)
-from doion.identity.api.permissions import IsModerator, IsOwnerOrModerator
+from doion.identity.api.permissions import IsModerator
+from doion.identity.api.serializers import ProfileSerializer
+from doion.identity.api.serializers import RegisterSerializer
+from doion.identity.api.serializers import UserMeSerializer
+from doion.identity.api.serializers import VerificationCreateSerializer
+from doion.identity.api.serializers import VerificationSerializer
 from doion.identity.models import Verification
-from doion.users.models import User
+from doion.identity.services import get_or_create_profile
+from doion.identity.signals import verification_approved
+from doion.identity.signals import verification_rejected
 
 
 class RegisterViewSet(GenericViewSet):
     serializer_class = RegisterSerializer
     permission_classes = [AllowAny]
+    throttle_classes = [ScopedRateThrottle]
+    throttle_scope = "register"
 
     def create(self, request):
         serializer = self.get_serializer(data=request.data)
@@ -41,6 +45,7 @@ class RegisterViewSet(GenericViewSet):
                     "email": user.email,
                     "name": user.name,
                     "role": user.role,
+                    "user_type": user.profile.user_type,
                 },
             },
             status=status.HTTP_201_CREATED,
@@ -52,11 +57,7 @@ class ProfileViewSet(RetrieveModelMixin, UpdateModelMixin, GenericViewSet):
     permission_classes = [IsAuthenticated]
 
     def get_object(self):
-        profile, created = Profile.objects.get_or_create(
-            user=self.request.user,
-            defaults={"role": self.request.user.role},
-        )
-        return profile
+        return get_or_create_profile(self.request.user)
 
 
 class UserMeViewSet(RetrieveModelMixin, UpdateModelMixin, GenericViewSet):
@@ -64,6 +65,7 @@ class UserMeViewSet(RetrieveModelMixin, UpdateModelMixin, GenericViewSet):
     permission_classes = [IsAuthenticated]
 
     def get_object(self):
+        get_or_create_profile(self.request.user)
         return self.request.user
 
 
@@ -72,22 +74,30 @@ class VerificationViewSet(ModelViewSet):
     permission_classes = [IsAuthenticated]
 
     def get_queryset(self):
+        qs = Verification.objects.select_related("user", "user__profile")
         if self.request.user.profile.role in ["moderator", "admin"]:
-            return Verification.objects.all()
-        return Verification.objects.filter(user=self.request.user)
+            return qs.all()
+        return qs.filter(user=self.request.user)
 
     def get_serializer_class(self):
         if self.action == "create":
             return VerificationCreateSerializer
         return VerificationSerializer
 
-    def perform_create(self, serializer):
-        serializer.save(user=self.request.user)
+    def create(self, request, *args, **kwargs):
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        verification = serializer.save()
+        output = VerificationSerializer(
+            verification,
+            context=self.get_serializer_context(),
+        )
+        return Response(output.data, status=status.HTTP_201_CREATED)
 
     @action(detail=False, methods=["get"], url_path="me")
     def my_verification(self, request):
         verification = Verification.objects.filter(user=request.user).order_by(
-            "-created_at"
+            "-created_at",
         ).first()
         if not verification:
             return Response(
@@ -102,9 +112,11 @@ class ModerationVerificationListView(APIView):
     permission_classes = [IsModerator]
 
     def get(self, request):
-        verifications = Verification.objects.filter(
-            status=Verification.Status.PENDING
-        ).order_by("created_at")
+        verifications = (
+            Verification.objects.filter(status=Verification.Status.PENDING)
+            .select_related("user", "user__profile")
+            .order_by("created_at")
+        )
         serializer = VerificationSerializer(verifications, many=True)
         return Response(serializer.data)
 
@@ -124,9 +136,8 @@ class ModerationVerificationDecisionView(APIView):
             verification.rejection_code = ""
             verification.save()
 
-            from doion.identity.signals import verification_approved
             verification_approved.send(
-                sender=self.__class__, verification=verification
+                sender=self.__class__, verification=verification,
             )
             return Response({"status": "approved"})
 
@@ -141,7 +152,6 @@ class ModerationVerificationDecisionView(APIView):
             verification.rejection_code = rejection_code
             verification.save()
 
-            from doion.identity.signals import verification_rejected
             verification_rejected.send(
                 sender=self.__class__,
                 verification=verification,

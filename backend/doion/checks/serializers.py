@@ -1,26 +1,69 @@
-from decimal import Decimal
+from datetime import timedelta
 
-from django.contrib.auth.models import Group
-from django.db import transaction
 from django.utils import timezone
 from rest_framework import serializers
 
+from doion.banks.models import Bank
+from doion.banks.serializers import BankSummarySerializer
+from doion.banks.services import BANK_NAME_NOT_ACCEPTED
+from doion.banks.services import UNKNOWN_OR_INACTIVE_BANK_CODE
+from doion.banks.services import UnknownOrInactiveBankError
+from doion.banks.services import apply_bank_to_listing
+from doion.banks.services import get_active_by_code
 from doion.checks.models import ChequeListing
 from doion.checks.models import IssuerProfile
-from doion.pricing.engine import calculate_suggested_rate
 from doion.documents.models import Document
+from doion.pricing.engine import calculate_suggested_rate
+
+SAYAD_NUMBER_LENGTH = 16
+DAILY_LISTING_CREATE_LIMIT = 10
+
+
+class CatalogBankInputMixin:
+    def validate_bank(self, value: str) -> Bank:
+        try:
+            return get_active_by_code(value)
+        except UnknownOrInactiveBankError as exc:
+            raise serializers.ValidationError(UNKNOWN_OR_INACTIVE_BANK_CODE) from exc
+
+    def validate(self, attrs: dict) -> dict:
+        attrs = super().validate(attrs)
+        if "bank_name" in self.initial_data:
+            raise serializers.ValidationError({"bank": [BANK_NAME_NOT_ACCEPTED]})
+        if isinstance(attrs.get("bank"), Bank):
+            return attrs
+        raw_bank = self.initial_data.get("bank", serializers.empty)
+        if raw_bank is not serializers.empty:
+            if not isinstance(raw_bank, str):
+                raise serializers.ValidationError({"bank": [UNKNOWN_OR_INACTIVE_BANK_CODE]})
+            try:
+                attrs["bank"] = get_active_by_code(raw_bank)
+            except UnknownOrInactiveBankError as exc:
+                raise serializers.ValidationError(
+                    {"bank": [UNKNOWN_OR_INACTIVE_BANK_CODE]},
+                ) from exc
+        return attrs
 
 
 class IssuerProfileSerializer(serializers.ModelSerializer):
     class Meta:
         model = IssuerProfile
-        fields = ["id", "national_or_company_id", "name", "credit_score", "created_at", "updated_at"]
-        read_only_fields = ["id", "credit_score", "created_at", "updated_at"]
+        fields = [
+            "id",
+            "national_or_company_id",
+            "name",
+            "credit_score",
+            "created_by",
+            "created_at",
+            "updated_at",
+        ]
+        read_only_fields = ["id", "credit_score", "created_by", "created_at", "updated_at"]
 
 
-class ChequeListingSerializer(serializers.ModelSerializer):
+class ChequeListingSerializer(CatalogBankInputMixin, serializers.ModelSerializer):
     issuer_profile = IssuerProfileSerializer(read_only=True)
     owner_id = serializers.IntegerField(source="owner.id", read_only=True)
+    bank = BankSummarySerializer(read_only=True)
 
     class Meta:
         model = ChequeListing
@@ -28,6 +71,7 @@ class ChequeListingSerializer(serializers.ModelSerializer):
             "id",
             "owner_id",
             "issuer_profile",
+            "bank",
             "bank_name",
             "cheque_serial_number",
             "face_amount",
@@ -42,14 +86,33 @@ class ChequeListingSerializer(serializers.ModelSerializer):
             "created_at",
             "updated_at",
         ]
-        read_only_fields = ["id", "owner_id", "status", "created_at", "updated_at"]
+        read_only_fields = [
+            "id",
+            "owner_id",
+            "bank_name",
+            "status",
+            "created_at",
+            "updated_at",
+        ]
+
+    def update(self, instance, validated_data):
+        bank = validated_data.pop("bank", None)
+        instance = super().update(instance, validated_data)
+        if bank is not None:
+            apply_bank_to_listing(instance, bank)
+            instance.save(update_fields=["bank", "bank_name", "updated_at"])
+        return instance
 
 
-class ChequeListingCreateSerializer(serializers.ModelSerializer):
+class ChequeListingCreateSerializer(CatalogBankInputMixin, serializers.ModelSerializer):
+    bank = serializers.SlugField(write_only=True)
+    bank_name = serializers.CharField(read_only=True)
+
     class Meta:
         model = ChequeListing
         fields = [
             "issuer",
+            "bank",
             "bank_name",
             "cheque_serial_number",
             "face_amount",
@@ -62,25 +125,34 @@ class ChequeListingCreateSerializer(serializers.ModelSerializer):
 
     def validate_face_amount(self, value):
         if value <= 0:
-            raise serializers.ValidationError("face_amount must be greater than 0")
+            msg = "face_amount must be greater than 0"
+            raise serializers.ValidationError(msg)
         return value
 
     def validate_due_date(self, value):
         if value <= timezone.now().date():
-            raise serializers.ValidationError("due_date must be in the future")
+            msg = "due_date must be in the future"
+            raise serializers.ValidationError(msg)
         return value
 
     def validate_cheque_serial_number(self, value):
-        if len(value) != 16 or not value.isdigit():
-            raise serializers.ValidationError("sayad_number must be 16 digits")
+        if len(value) != SAYAD_NUMBER_LENGTH or not value.isdigit():
+            msg = "sayad_number must be 16 digits"
+            raise serializers.ValidationError(msg)
         return value
 
     def validate(self, attrs):
-        today = timezone.now().date()
-        count = ChequeListing.objects.filter(owner=self.context["request"].user, created_at__date=today).count()
-        if count >= 10:
+        attrs = super().validate(attrs)
+        # Postgres `__date` uses UTC; TIME_ZONE is Asia/Tehran. Count the local calendar day.
+        day_start = timezone.localtime().replace(hour=0, minute=0, second=0, microsecond=0)
+        count = ChequeListing.objects.filter(
+            owner=self.context["request"].user,
+            created_at__gte=day_start,
+            created_at__lt=day_start + timedelta(days=1),
+        ).count()
+        if count >= DAILY_LISTING_CREATE_LIMIT:
             raise serializers.ValidationError(
-                {"non_field_errors": ["Daily limit of 10 listings reached"]}
+                {"non_field_errors": ["Daily limit of 10 listings reached"]},
             )
         return attrs
 
@@ -95,13 +167,25 @@ class ChequeListingCreateSerializer(serializers.ModelSerializer):
             issuer_credit_score=issuer.credit_score,
         )
 
-        listing = ChequeListing.objects.create(
+        bank = validated_data.pop("bank")
+        listing = ChequeListing(
             owner=request.user,
             suggested_discount_rate=rate,
             risk_tier=risk_tier,
             **validated_data,
         )
+        apply_bank_to_listing(listing, bank)
+        listing.save()
         return listing
+
+    def to_representation(self, instance):
+        data = super().to_representation(instance)
+        data["bank"] = (
+            BankSummarySerializer(instance.bank, context=self.context).data
+            if instance.bank_id
+            else None
+        )
+        return data
 
 
 class DocumentUploadSerializer(serializers.ModelSerializer):
@@ -114,7 +198,7 @@ class DocumentUploadSerializer(serializers.ModelSerializer):
         listing = self.context["listing"]
         document_type = validated_data["document_type"]
         uploaded_file = validated_data["file"]
-        document = Document.objects.create(
+        return Document.objects.create(
             owner=listing.owner,
             related_object_type="cheque_listing",
             related_object_id=listing.id,
@@ -122,4 +206,3 @@ class DocumentUploadSerializer(serializers.ModelSerializer):
             file=uploaded_file,
             file_size=uploaded_file.size,
         )
-        return document

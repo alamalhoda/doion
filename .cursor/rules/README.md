@@ -2,6 +2,8 @@
 
 قوانین توسعه در ریشه مونورپو اعمال می‌شوند. هر قانون با **globs** به مسیر مشخص (مثلاً `frontend/**` یا `backend/**`) محدود می‌شود.
 
+> **UI فعال:** فعلاً خارج از این مونورپو است ([checkyar-googleai](https://github.com/alamalhoda/checkyar-googleai)). جزئیات: `docs/development/FRONTEND_DEVELOPMENT_STATUS.md`. نصب/اجرای لوکال UI فعال با **Bun** (`bun install` / `bun run dev`) — rule: `share/active-frontend-toolchain.mdc`. پوشه `.cursor/rules/frontend/` همچنان قوانین *مهندسی* UI است (نه مسیر اپ فعال)؛ پس از خروج از AI Studio روی `frontend/` اعمال می‌شوند.
+
 ## تفکیک فیزیکی
 
 - **share/** — قوانین مشترک و جهان‌شمول (global baseline). راهنما: `share/README.md`.

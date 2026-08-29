@@ -1,14 +1,17 @@
 
 from django.core.cache import cache
 from django_filters.rest_framework import DjangoFilterBackend
+from rest_framework.decorators import action
 from rest_framework.filters import OrderingFilter
 from rest_framework.filters import SearchFilter
+from rest_framework.permissions import AllowAny
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.viewsets import ReadOnlyModelViewSet
 
 from doion.checks.models import ChequeListing
 from doion.marketplace.filters import MarketplaceFilter
+from doion.marketplace.serializers import MarketplaceLatestSerializer
 from doion.marketplace.serializers import MarketplaceListingSerializer
 
 
@@ -23,15 +26,26 @@ class MarketplaceViewSet(ReadOnlyModelViewSet):
 
     CACHE_KEY_PREFIX = "marketplace:listings"
     CACHE_TTL = 60
+    LATEST_LISTINGS_LIMIT = 4
+
+    def get_permissions(self):
+        if self.action == "latest_listings":
+            return [AllowAny()]
+        return super().get_permissions()
 
     def get_queryset(self):
         return (
             ChequeListing.objects.filter(status=ChequeListing.Status.PUBLISHED)
-            .select_related("issuer", "owner")
+            .select_related("issuer", "owner", "bank")
             .order_by("-created_at")
         )
 
     def list(self, request, *args, **kwargs):
+        extra_params = request.query_params.copy()
+        extra_params.pop("page", None)
+        if extra_params:
+            return super().list(request, *args, **kwargs)
+
         page = request.query_params.get("page", "1")
         cache_key = f"{self.CACHE_KEY_PREFIX}:{page}"
         cached = cache.get(cache_key)
@@ -41,3 +55,17 @@ class MarketplaceViewSet(ReadOnlyModelViewSet):
         response = super().list(request, *args, **kwargs)
         cache.set(cache_key, response.data, timeout=self.CACHE_TTL)
         return response
+
+    @action(detail=False, methods=["get"], url_path="latest")
+    def latest_listings(self, request):
+        queryset = (
+            ChequeListing.objects.filter(status=ChequeListing.Status.PUBLISHED)
+            .select_related("issuer", "owner", "bank")
+            .order_by("-created_at")[: self.LATEST_LISTINGS_LIMIT]
+        )
+        serializer = MarketplaceLatestSerializer(
+            queryset,
+            many=True,
+            context={"request": request},
+        )
+        return Response(serializer.data)

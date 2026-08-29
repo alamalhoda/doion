@@ -27,10 +27,20 @@ alwaysApply: false
 
 - تغییرات cross-domain یا اولویت‌ها -> `TODO.md`
 - تغییرات backend -> `backend/TODO.md`, `backend/README.md`
-- تغییرات frontend -> `frontend/TODO.md`, `frontend/README.md`
-- تغییرات roadmap/phase -> `frontend/IMPLEMENTATION_PLAN.md`
-- تغییرات قرارداد API -> `docs/development/API_CONTRACT_REGISTRY.md`
+- تغییرات UI فعال (فعلاً repo خارجی) -> سیاست در `docs/development/FRONTEND_DEVELOPMENT_STATUS.md`؛ قرارداد API همچنان فقط در این مونورپو
+- تغییرات UI داخل مونورپو (پس از مهاجرت به `frontend/`) -> `frontend/README.md` در صورت وجود
+- تغییرات قرارداد API -> **`docs/development/MASTER_API_CONTRACT.md` فقط** (SSOT واحد؛ `API_CONTRACT_REGISTRY.md` deprecated stub است)
 - تغییرات وضعیت flow صفحات -> `docs/development/PAGE_REVIEW_LOG.md`
+
+## API Contract Rule (Mandatory)
+
+هر تغییر در `serializers` / `views` / `urls` / `api_router` / `exception_handler` / model choices مرتبط با API باید **همان PR** را با به‌روزرسانی `docs/development/MASTER_API_CONTRACT.md` همراه کند.
+
+**بدون sync مستند، تغییر API کامل نیست.**
+
+- رفتار را از کد استخراج کن؛ حدس نزن.
+- اگر چیزی فقط در spec است و در کد نیست، با برچسب `spec-only / not implemented` علامت بزن یا حذف کن.
+- سند موازی جدید برای قرارداد API نساز.
 
 ## PR Rule
 
@@ -43,4 +53,3 @@ alwaysApply: false
 - وضعیت انجام کار را حدسی یا optimistic ثبت نکن؛ فقط بر اساس شواهد کد/تست.
 - اگر تغییر behavior یا contract رخ داده، به‌روزرسانی doc را به PR بعدی موکول نکن.
 - از ایجاد TODO تکراری در چند فایل پرهیز کن؛ برای هر موضوع، مرجع اصلی مشخص باشد.
-

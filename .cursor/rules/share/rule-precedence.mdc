@@ -35,3 +35,5 @@ alwaysApply: true
 - فایل‌های `backend/**` → rules در `backend/` + `share/`
 - فایل‌های `frontend/**` → rules در `frontend/` + `share/`
 - سایر فایل‌ها → فقط `share/` و ruleهای مرتبط با همان مسیر
+
+> UI فعال فعلاً در repo خارجی `checkyar-googleai` است؛ مسیر `frontend/` در این مونورپو پس از خروج از AI Studio پر می‌شود. جزئیات: `docs/development/FRONTEND_DEVELOPMENT_STATUS.md`.

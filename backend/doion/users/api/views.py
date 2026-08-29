@@ -12,6 +12,7 @@ from rest_framework_simplejwt.exceptions import ExpiredTokenError
 from rest_framework_simplejwt.exceptions import TokenError
 from rest_framework_simplejwt.tokens import RefreshToken
 
+from doion.identity.services import get_or_create_profile
 from doion.users.models import User
 from doion.users.services import LoginService
 
@@ -36,6 +37,7 @@ class UserViewSet(RetrieveModelMixin, ListModelMixin, UpdateModelMixin, GenericV
 
     @action(detail=False)
     def me(self, request):
+        get_or_create_profile(request.user)
         serializer = UserSerializer(request.user, context={"request": request})
         return Response(status=status.HTTP_200_OK, data=serializer.data)
 
@@ -66,6 +68,7 @@ class LoginViewSet(GenericViewSet):
         if user is None:
             raise AuthenticationFailed(INVALID_CREDENTIALS_MESSAGE)
 
+        profile = get_or_create_profile(user)
         refresh = RefreshToken.for_user(user)
         response_data = {
             "access": str(refresh.access_token),
@@ -75,6 +78,9 @@ class LoginViewSet(GenericViewSet):
                 "username": user.username,
                 "email": user.email,
                 "name": user.name,
+                "role": user.role,
+                "user_type": profile.user_type,
+                "phone": user.phone or "",
             },
         }
 
@@ -115,6 +121,7 @@ class RefreshViewSet(GenericViewSet):
             raise AuthenticationFailed(REFRESH_AUTH_ERROR) from exc
 
         new_refresh = RefreshToken.for_user(user)
+        profile = get_or_create_profile(user)
         response_data = {
             "access": str(new_refresh.access_token),
             "refresh": str(new_refresh),
@@ -123,6 +130,9 @@ class RefreshViewSet(GenericViewSet):
                 "username": user.username,
                 "email": user.email,
                 "name": user.name,
+                "role": user.role,
+                "user_type": profile.user_type,
+                "phone": user.phone or "",
             },
         }
 

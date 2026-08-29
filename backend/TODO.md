@@ -1,5 +1,12 @@
 # Backend TODO
 
+**وضعیت محصول:** v1 لایه ۱ آماده پایلوت — نه در حال ساخت MVP، نه v1 لانچ‌شده.  
+مرجع: [`docs/سند پایه پروژه (Core Brief).md`](../docs/سند%20پایه%20پروژه%20(Core%20Brief).md)
+
+موارد `[x]` سابقهٔ ساخت‌اند و حذف نمی‌شوند. بخش Follow-ups کار باز برای پایلوت/hardening است.
+
+---
+
 ## Phase 1 — Completed
 
 - [x] Create `doion.core` app with `TimeStampedModel`, `UUIDModel`, permission classes
@@ -14,8 +21,12 @@
 
 ## Phase 1 — Remaining
 
-- [ ] Add tests for identity endpoints (serializer + permission)
-- [ ] Add rate limiting to register endpoint
+- [x] Add tests for identity endpoints (serializer + permission)
+- [x] Add rate limiting to register endpoint
+- [x] Enforce KYC_APPROVED before listing create / express interest
+- [x] Scope IssuerProfile update/delete to creator or staff (`created_by`)
+- [x] Default `ordering` on FeatureFlag / Verification / Match / ChequeListing / IssuerProfile
+- [x] Separate `user_type` (`natural` / `legal`) on Profile: register + KYC validation (10 vs 11 digit IDs) — PR #25
 - [ ] Add OpenAPI schema annotations (drf-spectacular)
 
 ## Phase 2 — KYC — Completed
@@ -40,24 +51,90 @@
 ## Phase 4 — Moderation — Completed
 
 - [x] Create `doion.moderation` app with `ModerationDecision` model
-- [x] Moderation queue API with filtering, pagination
-- [x] Decision endpoint (approve/reject) with rejection_code enum
-- [x] Migrations created and applied
+- [x] `ModerationViewSet.queue` endpoint for Moderator/Admin only
+- [x] `ModerationViewSet.decision` endpoint for approve/reject
+- [x] `ModerationResubmitLimitExceeded` exception for MOD_306
+- [x] Signal handlers for `ChequeListingPublished` and `ListingRejected`
+- [x] Integration with Notification model (Phase 7)
 
 ## Phase 5 — Marketplace — Completed
 
 - [x] Create `doion.marketplace` app
-- [x] `MarketplaceViewSet` listing only `published` listings
-- [x] Filtering by risk_tier, amount range, days_to_due, issuer_type, bank_name
-- [x] Ordering support
-- [x] Migrations created and applied
+- [x] `MarketplaceViewSet` with caching (TTL 60s) and pagination (max 50/page)
+- [x] `MarketplaceFilter` with risk_tier, amount range, days to due, issuer type, bank name filters
 
-## Phase 6 — Matching & Settlement — Completed
+## Phase 6 — Matching — Completed
 
-- [x] Create `doion.matching` app with `Match`, `SettlementPort`, `OffPlatformSettlement` models
-- [x] `Status` and `SettlementType` enums in `constants.py`
-- [x] `MatchingService` with `create_match`, `accept_match`, `decline_match`, `cancel_match`, `confirm_off_platform`
-- [x] Signals: `MatchCreated`, `MatchAccepted`, `MatchDeclined`, `MatchCancelled`, `SettlementConfirmed`
-- [x] `MatchViewSet` with role-based filtering
-- [x] Migrations created and applied
-- [x] Fixed signals.py to import Status from constants (was causing 21 test failures)
+- [x] Match model created
+- [x] Settlement Port stub implemented
+- [x] Express interest endpoint
+
+> Backend was implemented and merged via PR #6. The matching app exists, is in
+> `INSTALLED_APPS`, and has models/views/serializers/services/urls/tests.
+
+- [x] Match model + state machine
+- [x] Settlement Port implementation
+- [x] Express interest endpoint (`POST /api/v1/matches/`)
+- [x] Match status transitions + listing `MATCHED` side-effect
+- [x] Notification match-event handlers wired
+- [x] Frontend Match flow in active UI (`checkyar-googleai`: express-interest, my-matches, store) + E2E critical-path in `doion/e2e/`
+
+## Phase 7 — Notifications — Completed
+
+- [x] Create `doion.notifications` app with `Notification` and `NotificationPreference` models
+- [x] `NotificationViewSet` with list, retrieve, mark-read, mark-all-read, preferences actions
+- [x] Index optimization on `(user, -created_at)` and `(user, status, -created_at)`
+- [x] TextChoices for `NotificationType`, `NotificationChannel`, `NotificationStatus`
+- [x] Create `doion.integrations` app with `SMSLog` model and `send_sms` stub service
+- [x] Signal handlers for `ChequeListingPublished` and `ListingRejected`
+- [x] Helper functions for Match events (created, accepted, declined, cancelled, settled)
+- [x] Celery task `expire_listings` for expired listings (every 60 minutes)
+- [x] Notification URLs registered in api_router
+- [x] Tests: test_models.py, test_views.py, test_signals.py, test_services.py, test_celery_task.py
+
+## Phase 8 — Compliance, Jobs & Hardening — Completed
+
+- [x] Create `doion.compliance` app with `AuditEvent` and `FeatureFlag` models
+- [x] `AuditEvent` indexes on `(event_type, -created_at)` and `actor`
+- [x] `FeatureFlag.is_enabled(key, default)` classmethod
+- [x] Seed `matching_enabled`, `notifications_sms_enabled`, and `show_risk_tier` flags on `post_migrate`
+- [x] `FeatureFlagViewSet`: `GET` public; `PATCH`/`toggle` Moderator/Admin; system flags protected
+- [x] `ComplianceStatsView`: `GET /api/v1/compliance/stats/` aggregate admin stats
+- [x] `AuditEventViewSet`: `GET /api/v1/compliance/audit/` (paginated)
+- [x] Compliance URLs wired into `config/api_router.py`; app added to `LOCAL_APPS`
+- [x] Audit hooks on `ChequeListingPublished`, `ListingRejected`, KYC approved/rejected, and `FeatureFlag` changes
+- [x] Celery app instance (`config/celery.py`) + guarded `shared_task` `expire_listings`; Beat schedule already in settings
+- [x] DRF throttling: anon 100/min, user 1000/min, `listing_create` scope 10/day (ChequeListing create)
+- [x] `CorrelationIDMiddleware` (`X-Correlation-ID`) + structlog JSON logging config (guarded imports so app boots without the packages)
+- [x] Resolved `urls.W005` namespace warning in `config/urls.py`
+- [x] Tests: `test_models.py`, `test_views.py`, `test_celery.py` (expire_listings → EXPIRED), `test_audit.py`
+- [x] API contract consolidated into `docs/development/MASTER_API_CONTRACT.md` (SSOT); `API_CONTRACT_REGISTRY.md` deprecated stub
+- [x] `python manage.py makemigrations` + `migrate` (compliance / integrations / moderation / notifications `0001` in repo)
+- [x] `celery` and `structlog` declared in `pyproject.toml`
+- [x] Tests under `doion.compliance` present in repo
+
+## Domain factories (prep for demo seed + broader tests)
+
+- [x] App-level factories (outside `tests/`) for User, IssuerProfile, ChequeListing, Profile, Verification, Notification, Match, ModerationDecision
+- [x] Refactor existing tests to use shared factories (DRY/SSOT)
+- [x] `seed_demo` management command using the same factories
+- [x] Local demo SQLite switch: `DJANGO_DEMO_DATABASE=1` → `db.demo.sqlite3` (see `docs/development/BACKEND_DEMO_SEED_AND_DATA.md`)
+
+## Follow-ups — پایلوت و hardening (باز)
+
+کارهای بعد از ساخت v1. جزئیات دمو/چابکان: [`docs/development/BACKEND_DEMO_SEED_AND_DATA.md`](../docs/development/BACKEND_DEMO_SEED_AND_DATA.md).
+
+### Wave 2 — Automation & quality
+- [x] GitHub Actions: `pytest` روی PostgreSQL و `ruff check` اجباری روی PR/push به `develop` (`.github/workflows/ci-backend.yml`)
+- [ ] رفع `UnorderedObjectListWarning` اگر هنوز روی querysetهایی بدون `order_by` دیده شود (مدل‌های FeatureFlag / Verification / Match / ChequeListing / IssuerProfile خود `Meta.ordering` دارند)
+- [ ] پوشش بیشتر matching API (شاخه‌های باقی‌مانده در `matching/views.py`) و edgeهای upload سند
+
+### Demo / staging (ops) — پیش‌نیاز پایلوت، نه لانچ عمومی
+- [ ] محیط staging یا demo جدا روی چابکان با **Postgres** + `migrate` + `seed_demo` (نه SQLite روی production)
+- [ ] راهنمای کوتاه در پنل/runbook: رمز دمو فقط از `DEMO_SEED_PASSWORD` / خروجی seed؛ هرگز در production واقعی seed با `--reset` بدون آگاهی
+
+### Cross-cutting (UI فعال در `checkyar-googleai`)
+- [x] E2E smoke harness در `e2e/` (Playwright) با `VITE_USE_MOCK=false` + `seed_demo` / demo DB — see [`docs/development/E2E_LOCAL_RUNBOOK.md`](../docs/development/E2E_LOCAL_RUNBOOK.md)
+- [x] E2E critical-path specs + rich `seed_demo` (express interest / accept / moderation approve / create listing / notifications mark-read) — [`AI_STUDIO_E2E_CRITICAL_PATH_PROMPT.md`](../docs/development/AI_STUDIO_E2E_CRITICAL_PATH_PROMPT.md)
+- [x] CI Playwright (smoke + critical) — `.github/workflows/ci-e2e.yml`
+- [ ] ادامه تست‌های UI در `checkyar-googleai` (store/API-client با mock کنترل‌شده) فقط از طریق AI Studio — [`docs/development/AI_STUDIO_E2E_PREP_PROMPT.md`](../docs/development/AI_STUDIO_E2E_PREP_PROMPT.md)

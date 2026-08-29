@@ -3,6 +3,8 @@ import logging
 from django.contrib.auth import authenticate
 from django.contrib.auth.models import AbstractBaseUser
 
+from doion.users.models import User
+
 logger = logging.getLogger(__name__)
 
 
@@ -46,8 +48,6 @@ class LoginService:
         Returns:
             User instance or None.
         """
-        from doion.users.models import User
-
         try:
             return User.objects.get(username=identifier)
         except User.DoesNotExist:
