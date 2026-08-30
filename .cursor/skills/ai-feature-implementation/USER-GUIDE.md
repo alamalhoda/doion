@@ -38,6 +38,10 @@
 2. چت تازه باز کنید و spec + plan را بدهید.
 3. **Chat 2 — BUILD:** پیاده‌سازی قدم‌به‌قدم → self-review → تست از روی spec → `integration_check.md`
 
+اگر ویژگی به KYC، SMS، صیاد، اعتبار صادرکننده، امضا، یا OCR چک وصل است، در Chat 1 فایل [`docs/capability-roadmap/vendor-landscape.md`](../../../docs/capability-roadmap/vendor-landscape.md) را هم بدهید تا Agent قبل از قفل آداپتر تحقیق و امتیازدهی را انجام دهد.
+
+برش‌های کاتالوگ قابلیت (`CY-NNN`): قبل از Think راهنمای [`usage-guide.md`](../../../docs/capability-roadmap/usage-guide.md) را هم بدهید — یک برش، دروازهٔ وضعیت، بدون شروع روی `blocked`.
+
 ---
 
 ## مثال پرامپت
