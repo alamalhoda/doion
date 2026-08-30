@@ -78,6 +78,7 @@ Write under `ai-documents/features/<feature-name>/` when that tree exists or is 
 feature_spec.md
 implementation_plan.md
 integration_check.md
+vendor-score.md   # only when the slice is KYC, SMS, SAYAD, issuer credit, e-signature, or cheque OCR
 ```
 
 ### Chat 1 gates
@@ -86,6 +87,8 @@ integration_check.md
 - **Step 2:** `feature_spec.md` = WHAT, not HOW. Every statement testable.
 - **Step 3:** Design brief first; wait for approval; then write `implementation_plan.md` with checkboxes. Full-stack: do not cram UI and backend into one step.
 - Tell the user to commit spec + plan before Chat 2.
+- If the slice is KYC, SMS, SAYAD inquiry, issuer credit, e-signature, or cheque OCR: Read `docs/capability-roadmap/vendor-landscape.md` before Step 2, run its research prompt, keep the domain vendor-agnostic, and write `vendor-score.md` next to the spec.
+- If the work comes from `docs/capability-roadmap/`: Read `docs/capability-roadmap/usage-guide.md` before Step 1. Do not start Build on `blocked`/`draft` slices or skip `blocked_by`. One slice per feature branch.
 
 Use the prompt blocks from the SSOT guide for each step. Do not shorten the spec/plan templates.
 

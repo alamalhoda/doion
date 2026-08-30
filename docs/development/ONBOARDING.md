@@ -5,6 +5,9 @@
 
 سیاست Git: [`.cursor/rules/share/gitflow-branch-policy.mdc`](../../.cursor/rules/share/gitflow-branch-policy.mdc) و Skill [`gitflow-workflow`](../../.cursor/skills/gitflow-workflow/USER-GUIDE.md).  
 نقشهٔ محصول: [`DEVELOPMENT_TO_DEPLOY.md`](./DEVELOPMENT_TO_DEPLOY.md).  
+کاتالوگ قابلیت‌های آینده (شریک هم‌برند): [`capability-roadmap/README.md`](../capability-roadmap/README.md).  
+اجرای اصولی برش‌های کاتالوگ: [`capability-roadmap/usage-guide.md`](../capability-roadmap/usage-guide.md).  
+انتخاب ارائه‌دهنده برای KYC / SMS / صیاد / اعتبار / امضا / OCR چک: [`capability-roadmap/vendor-landscape.md`](../capability-roadmap/vendor-landscape.md).  
 UI یک‌طرفه: [`FRONTEND_DEVELOPMENT_STATUS.md`](./FRONTEND_DEVELOPMENT_STATUS.md).
 
 ---

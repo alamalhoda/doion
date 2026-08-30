@@ -15,6 +15,8 @@ Invoke with skill `ai-feature-implementation` (explicit only; does not auto-run)
 - GitFlow: work on `feature/*` from `develop`; never commit directly to `develop`/`main`.
 - Store feature specs under `docs/` or `ai-documents/features/<feature-name>/` as agreed; do not invent a parallel API spec.
 - Layer 1 Marketplace MVP is implemented. New work should extend it (or explicitly mark Layer 2/3) — see `docs/سند پایه پروژه (Core Brief).md`.
+- Multi-year partner-backed capabilities (catalog + slices for `@ai-feature-implementation`) live in `docs/capability-roadmap/`; do not treat that tree as current product scope until a capability is `shipped`. Process SSOT: `docs/capability-roadmap/usage-guide.md`.
+- Live KYC, SMS, SAYAD inquiry, issuer credit, e-signature, or cheque OCR assist: in Chat 1 read `docs/capability-roadmap/vendor-landscape.md` and run its implementation research prompt before locking an adapter. Domain stays vendor-agnostic (Port). Re-fetch vendor docs; the landscape snapshot can be stale.
 
 Start a new feature with the prompt in `docs/ai_feature_implementaation_start.md`.
 
